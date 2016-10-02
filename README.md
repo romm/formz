@@ -12,21 +12,21 @@
 
 ## Introduction
 
-Forms are **common elements in the conception of an internet website**, as they allow a **direct interaction** between the user and the application. Technically, setting up a form can quickly become **complex** and require a **lot of time**: many aspects must be considered: **style, displaying, validation, security**…
+Forms are **common elements in the conception of a website**, as they allow a **direct interaction** between the user and the application. Technically, setting up a form can quickly become **complex** and require a **lot of time**: many aspects must be considered: **style, displaying, validation, security**…
 
 This is why Formz was born: facilitate the **set up** and the **maintenance** of a form, by providing tools which are **simple and fast to use**, but also **powerful and flexible** to fulfill every need.
 
-Formz facilitates the following topics:
+Formz helps with the following topics:
 
-- **HTML** – tools are provided for Fluid template integration.
+- **HTML** – tools are provided for Fluid, to facilitate integration.
 
-- **Validation** – with a TypoScript based configuration, every fields validation rule is easy to set up and maintain.
+- **Validation** – with a TypoScript based configuration, every field's validation rule is easy to set up and maintain.
 
 - **Style** – with its advanced “data attributes” system, Formz can fulfill almost all possible display needs.
 
-- **UX** – a whole JavaScript API is provided to make the user experience as fast and pleasant as possible.
+- **UX** – a whole JavaScript API is provided to make a user experience as fast and as pleasant as possible.
 
-- **Automation** – Formz can generate JavaScript and CSS code, which are then injected in the page and automatize a big part of the form behaviours.
+- **Code generation** – Formz can generate JavaScript and CSS, which are then injected in the page and will automatize a part of the client-sided behaviours.
 
 ## Example
 
