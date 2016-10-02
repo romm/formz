@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<svg width="1000" height="650" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+ <g>
+  <title>Layer 1</title>
+  <path fill="black" id="svg_2" d="m528.419189,52.978268q0,4.062263 -2.471191,6.415009t-6.567383,2.352726l-29.586823,0q-4.09613,0 -6.567383,-2.352726t-2.471191,-6.415009q0,-1.794174 0.118469,-3.503716t0.473938,-3.689892t0.897095,-3.672974t1.455627,-3.300591t2.098877,-2.74205t2.894348,-1.811081t3.774536,-0.677048q0.304688,0 1.421814,0.727821t2.521973,1.624908t3.656067,1.624908t4.519287,0.727829t4.519226,-0.727829t3.656036,-1.624908t2.521973,-1.624908t1.421814,-0.727821q2.065002,0 3.774536,0.677048t2.894348,1.811081t2.098877,2.74205t1.455627,3.300591t0.897095,3.672974t0.473938,3.689892t0.118469,3.503716zm-10.832703,-30.230072q0,5.3825 -3.808411,9.190884t-9.190826,3.808388t-9.190918,-3.808388t-3.808411,-9.190884t3.808411,-9.190903t9.190918,-3.80837t9.190826,3.80837t3.808411,9.190903z" xmlns="http://www.w3.org/2000/svg"/>
+  <g id="svg_36">
+   <rect fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="727.654511" y="193.361109" width="150.999997" height="46.000001" fill-opacity="0" stroke="#000000" id="svg_14"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="803.162324" y="222.861109" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_15">CSS PERSO</text>
+  </g>
+  <g id="svg_37">
+   <rect fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="727.654511" y="285.861109" width="195.000003" height="46.000001" fill-opacity="0" id="svg_18" stroke="#000000"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="825.162324" y="315.361109" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_19">JAVASCRIPT PERSO</text>
+  </g>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="727.477847" y1="214.677488" x2="579.138978" y2="250.818122" id="svg_38" stroke="#000000"/>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="726.818616" y1="310.197076" x2="579.373301" y2="274.759575" id="svg_40" stroke="#000000"/>
+  <line fill="none" stroke="#00ff00" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="560.951474" y1="144.611165" x2="560.951474" y2="239.111169" id="svg_41"/>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="560.951474" y1="286.150164" x2="560.951474" y2="428.365985" id="svg_43" stroke="#00ff00"/>
+  <line stroke="#000000" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="145.740517" y1="261.091593" x2="177.826443" y2="261.091593" id="svg_84"/>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="334.391815" y1="203.156385" x2="334.391815" y2="15.354307" id="svg_86" transform="rotate(90 334.3918762207032,109.2553405761719) " stroke="#00ff00"/>
+  <line stroke="#00ff00" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="240.611413" y1="238.654173" x2="240.611413" y2="108.257097" id="svg_87"/>
+  <line stroke="#000000" transform="rotate(90 254.05554199218747,357.5733947753907) " fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="182.864129" y1="357.573404" x2="325.246944" y2="357.573404" id="svg_88"/>
+  <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="304.421851" y="377.893746" id="svg_111" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve">SOUMISSION</text>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="449.625024" y1="238.772911" x2="449.625024" y2="144.888544" id="svg_112" stroke="#ff0000"/>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="449.634549" y1="428.21895" x2="449.634549" y2="285.291611" id="svg_113" stroke="#ff0000"/>
+  <g id="svg_35">
+   <rect fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="428.888886" y="239.111109" width="150.999997" height="46.000001" fill-opacity="0" stroke="#000000" id="svg_7"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="504.388886" y="268.611109" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_8">TEMPLATE</text>
+  </g>
+  <g id="svg_110">
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="756.490524" y="462.173617" id="svg_103" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve">PAGE DE RESULTAT</text>
+   <rect fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="540.482641" y="428.486109" width="431.999973" height="196" fill-opacity="0" stroke="#000000" id="svg_90"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="746.042488" y="563.75434" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_107">Vous allez revevoir un email de confirmation.</text>
+   <text fill="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="615.193558" y="517.090284" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_109" stroke="#000000">Bienvenue !</text>
+  </g>
+  <g id="svg_108">
+   <rect fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="90.149298" y="428.486109" width="431.999973" height="196" fill-opacity="0" id="svg_23" stroke="#000000"/>
+   <rect fill="#ffffff" stroke="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="201.82897" y="499.986109" width="152" height="23" id="svg_25"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="260.875845" y="515.986109" id="svg_27" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve">email de test</text>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="150.82897" y="515.986109" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_3">email :</text>
+   <text fill="#ff0000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="426.844595" y="515.986109" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_5">email non valide</text>
+   <rect fill="#ffffff" stroke="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="201.82897" y="569.986109" width="152" height="23" id="svg_24"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="146.969595" y="585.986109" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_26">tel. :</text>
+   <rect fill="#ffffff" stroke="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="201.82897" y="533.986109" width="152" height="23" id="svg_10"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="143.125845" y="549.986109" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_17">nom :</text>
+   <text fill="#ff0000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="411.45397" y="549.986109" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_21">champ requis</text>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="248.875845" y="586.986109" font-size="14" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_31">0123456789</text>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="306.15708" y="463.986109" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_33">MON FORMULAIRE</text>
+  </g>
+  <line stroke="#ff0000" fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="264.793943" y1="129.419575" x2="264.793943" y2="238.810452" id="svg_114"/>
+  <g id="svg_50">
+   <rect fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="178.555549" y="239.590272" width="150.999997" height="46.000001" fill-opacity="0" stroke="#000000" id="svg_46"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="254.063362" y="269.246522" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_47">VALIDATION</text>
+  </g>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="346.328977" y1="47.551678" x2="346.328977" y2="212.353184" id="svg_115" transform="rotate(90 346.3290100097657,129.95245361328128) " stroke="#ff0000"/>
+  <g id="svg_48">
+   <rect fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="428.888886" y="99.111109" width="150.999997" height="46.000001" id="svg_1" fill-opacity="0" stroke="#000000"/>
+   <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="504.396699" y="128.611109" id="svg_4" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve">CONTROLEUR</text>
+  </g>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="504.388857" y1="285.833376" x2="504.388857" y2="427.583379" id="svg_120" stroke="#000000"/>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="504.388857" y1="145.537923" x2="504.388857" y2="239.115072" id="svg_121" stroke="#000000"/>
+  <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="504.388857" y1="65.210289" x2="504.388857" y2="99.698568" id="svg_122" stroke="#000000"/>
+  <g id="svg_9">
+   <rect stroke="#000000" fill="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="19.694459" y="239.277767" width="126.249997" height="46.000001" fill-opacity="0" id="svg_52"/>
+   <text stroke="#000000" fill="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="82.829927" y="269.031246" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve" id="svg_53">TYPOSCRIPT</text>
+  </g>
+ </g>
+</svg>

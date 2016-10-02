@@ -1,0 +1,25 @@
+.formz-error-block {
+    padding: 15px;
+    border: 1px dashed black;
+    font-family: Arial;
+    font-size: 14px;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.formz-error-block ul {
+    font-weight: bold;
+}
+
+.formz-error-block ul {
+    text-align: left;
+    list-style-image: none;
+    padding-left: 10px;
+}
+
+.formz-error-block ul li {
+    margin: 5px 0 10px 0;
+}
+.formz-error-block ul li ul {
+    font-weight: normal;
+}

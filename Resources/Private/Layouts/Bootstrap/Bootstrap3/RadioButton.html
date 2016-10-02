@@ -1,0 +1,30 @@
+{namespace formz=Romm\Formz\ViewHelpers}
+
+<div formz-field-container="{fieldName}" class="form-group
+	{formz:class(name: 'errors.has-error')}
+	{f:if(condition: '{showSuccess}', then: '{formz:class(name: \'valid.has-success\')}')}
+">
+	<f:render section="Label" arguments="{_all}" />
+
+	<div class="row">
+		<f:for each="{items}" key="key" as="item">
+			<div class="col-lg-{columns}">
+				<div class="input-group">
+					<f:if condition="{item.reverse}">
+						<f:else>
+							<label class="btn btn-default form-control" for="{fieldId}-{key}">{item.label}</label>
+						</f:else>
+					</f:if>
+					<span class="input-group-addon">
+						<formz:renderSection section="Field-{key}" />
+		            </span>
+					<f:if condition="{item.reverse}">
+						<label class="btn btn-default form-control" for="{fieldId}-{key}">{item.label}</label>
+					</f:if>
+				</div>
+			</div>
+		</f:for>
+	</div>
+
+	<f:render section="Feedback" arguments="{_all}" />
+</div>

@@ -1,0 +1,9 @@
+.formz [formz-field-container][formz-loading="1"] input[type="text"],
+.formz [formz-field-container][formz-loading="1"] select {
+	background: url('/typo3conf/ext/formz/Resources/Public/Images/ajax-loader.gif') no-repeat right 5px top 2px;
+	background-size: 15px 15px;
+}
+
+.formz [formz-field-container][formz-loading="1"] select {
+	background-position: right 17px center;
+}

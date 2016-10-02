@@ -1,0 +1,30 @@
+config.tx_formz {
+    view {
+        classes {
+            valid {
+                has-success = has-success
+            }
+            errors {
+                has-error = has-error
+            }
+        }
+
+        layouts {
+            bootstrap3 {
+                templateFile = EXT:formz/Resources/Private/Templates/Bootstrap/Default.html
+
+                items {
+                    default {
+                        layout = Bootstrap/Bootstrap3/Default
+                    }
+                    3-cols {
+                        layout = Bootstrap/Bootstrap3/3Cols-4-4-4
+                    }
+                    radio-button {
+                        layout = Bootstrap/Bootstrap3/RadioButton
+                    }
+                }
+            }
+        }
+    }
+}

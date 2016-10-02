@@ -1,0 +1,26 @@
+config.tx_formz {
+    settings.defaultFieldSettings.messageTemplate = <small class="#TYPE#">#MESSAGE#</small>
+
+    view {
+        classes {
+            errors {
+                error = error
+            }
+        }
+
+        layouts {
+            foundation5 {
+                templateFile = EXT:formz/Resources/Private/Templates/Foundation/Foundation5/Default.html
+
+                items {
+                    default {
+                        layout = Foundation/Foundation5/Default
+                    }
+                    radio-button {
+                        layout = Foundation/Foundation5/RadioButton
+                    }
+                }
+            }
+        }
+    }
+}

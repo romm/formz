@@ -1,0 +1,2 @@
+# cat=debug/enable/100; type=boolean; label=LLL:EXT:formz/Resources/Private/Language/locallang.xlf:formz.debug.enable
+debugMode = 0

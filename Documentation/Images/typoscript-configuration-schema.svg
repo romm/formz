@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<svg width="1599.9999999999998" height="1200" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+ <g>
+  <title>Layer 1</title>
+  <text fill="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="418.0001" y="45.49998" id="svg_4" font-size="24" font-family="Monospace" text-anchor="middle" xml:space="preserve" stroke="#000000">config.tx_formz.forms.\MyVendor\MyExtension\Form\MyForm</text>
+  <g id="svg_6">
+   <rect fill="#000000" stroke-width="2" x="169.62761" y="118.83507" width="376.6389" height="196.91668" id="svg_1" fill-opacity="0" stroke="#000000"/>
+   <line fill="none" stroke="#000000" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" fill-opacity="0" x1="170.79433" y1="159.14061" x2="546.54434" y2="159.14061" id="svg_5"/>
+  </g>
+  <text fill="#000000" stroke="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="385.24486" y="146.81255" id="svg_10" font-size="24" font-family="Monospace" text-anchor="middle" xml:space="preserve" font-weight="bold">FORM CONFIGURATION</text>
+  <g id="svg_22" stroke="null">
+   <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="367.27571" y1="69.74119" x2="367.27571" y2="107.99119" id="svg_15" stroke="#000000"/>
+   <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="367.47592" y1="107.39052" x2="373.80404" y2="100.21864" id="svg_17" stroke="#000000"/>
+   <line fill="none" stroke-width="2" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="366.94178" y1="107.34002" x2="360.61366" y2="100.16814" id="svg_21" stroke="#000000"/>
+  </g>
+  <text stroke="#000000" fill="#000000" stroke-width="0" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x="324.575639" y="190.49998" id="svg_23" font-size="20" font-family="Monospace" text-anchor="middle" xml:space="preserve">- fields : liste des champs</text>
+ </g>
+</svg>

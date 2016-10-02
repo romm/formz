@@ -1,0 +1,39 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xsd.helmut-hummel.de/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:formz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
+
+<f:layout name="{layout}" />
+
+<f:section name="Label">
+	<formz:renderSection section="Label.Before" />
+
+	<label class="control-label" for="{fieldId}">{label}</label>
+
+	<formz:renderSection section="Label.After" />
+</f:section>
+
+<f:section name="Field">
+	<formz:renderSection section="Field" />
+</f:section>
+
+<f:section name="Feedback">
+	<formz:renderSection section="Feedback.Out.Before" />
+
+	<span class="help-block" formz-field-feedback-container="{fieldName}">
+		<formz:renderSection section="Feedback.In.Before" />
+
+		<span formz-field-feedback-list="{fieldName}">
+			<f:form.validationResults for="{formName}.{fieldName}">
+				<f:for each="{validationResults.errors}" as="error">
+					<formz:formatMessage message="{error}" />
+				</f:for>
+			</f:form.validationResults>
+		</span>
+
+		<formz:renderSection section="Feedback.In.After" />
+	</span>
+
+	<formz:renderSection section="Feedback.Out.After" />
+</f:section>
+
+</html>

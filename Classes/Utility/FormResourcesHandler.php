@@ -1,0 +1,371 @@
+<?php
+/*
+ * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ *
+ * This file is part of the TYPO3 Formz project.
+ * It is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License, either
+ * version 3 of the License, or any later version.
+ *
+ * For the full copyright and license information, see:
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Romm\Formz\Utility;
+
+use Romm\Formz\AssetHandler\AssetHandlerFactory;
+use Romm\Formz\AssetHandler\Css\ErrorContainerDisplayCssAssetHandler;
+use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
+use Romm\Formz\Condition\Items\AbstractConditionItem;
+use Romm\Formz\Condition\Node\ConditionNode;
+use Romm\Formz\Core\Core;
+use Romm\Formz\ViewHelpers\FormViewHelper;
+use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+
+class FormResourcesHandler implements SingletonInterface
+{
+
+    /**
+     * List of JavaScript files which will be included whenever this view helper
+     * is used.
+     *
+     * @var array
+     */
+    protected static $javaScriptFiles = [
+        'Formz.Main.js',
+        'Formz.Misc.js',
+        'Formz.EventsManager.js',
+        'Formz.Result.js',
+        'Formz.Localization.js',
+        'Form/Formz.Form.js',
+        'Form/Formz.Form.SubmissionService.js',
+        'Field/Formz.Field.js',
+        'Field/Formz.Field.DataAttributesService.js',
+        'Field/Formz.Field.ValidationService.js',
+        'Conditions/Formz.Condition.js',
+        'Validators/Formz.Validation.js',
+        'Validators/Formz.Validator.Ajax.js'
+    ];
+
+    /**
+     * List of CSS files which will be included whenever this view helper is
+     * used.
+     *
+     * @var array
+     */
+    protected static $cssFiles = [
+        'Form.Main.css'
+    ];
+
+    /**
+     * @var bool
+     */
+    protected static $assetsIncluded = false;
+
+    /**
+     * Storage for JavaScript files which were already included. It will handle
+     * multiple instance of forms in the same page, by avoiding multiple
+     * inclusions of the same JavaScript files.
+     *
+     * @var array
+     */
+    protected static $alreadyIncludedValidationJavaScriptFiles = [];
+
+    /**
+     * @var PageRenderer
+     */
+    protected $pageRenderer;
+
+    /**
+     * @var AssetHandlerFactory
+     */
+    protected $assetHandlerFactory;
+
+    /**
+     * @var string
+     */
+    protected $formObjectClassName;
+
+    /**
+     * @var string
+     */
+    protected $formObjectName;
+
+    /**
+     * @param PageRenderer        $pageRenderer
+     * @param AssetHandlerFactory $assetHandlerFactory
+     * @param string              $formObjectClassName
+     * @param string              $formObjectName
+     * @return FormResourcesHandler
+     */
+    public static function get(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory, $formObjectClassName, $formObjectName)
+    {
+        /** @var FormResourcesHandler $instance */
+        $instance = GeneralUtility::makeInstance(self::class);
+        $instance->insertData($pageRenderer, $assetHandlerFactory, $formObjectClassName, $formObjectName);
+
+        return $instance;
+    }
+
+    /**
+     * @param PageRenderer        $pageRenderer
+     * @param AssetHandlerFactory $assetHandlerFactory
+     * @param string              $formObjectClassName
+     * @param string              $formObjectName
+     */
+    public function insertData(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory, $formObjectClassName, $formObjectName)
+    {
+        $this->pageRenderer = $pageRenderer;
+        $this->assetHandlerFactory = $assetHandlerFactory;
+        $this->formObjectClassName = $formObjectClassName;
+        $this->formObjectName = $formObjectName;
+    }
+
+    /**
+     * Will take care of including internal Formz JavaScript and CSS files. They
+     * will be included only once, even if the view helper is used several times
+     * in the same page.
+     *
+     * @return $this
+     */
+    public function includeAssets()
+    {
+        if (false === self::$assetsIncluded) {
+            self::$assetsIncluded = true;
+
+            if (Core::isInDebugMode()) {
+                self::$javaScriptFiles[] = 'Formz.Debug.js';
+            }
+
+            foreach (self::$javaScriptFiles as $file) {
+                $filePath = ExtensionManagementUtility::siteRelPath('formz') . 'Resources/Public/JavaScript/' . $file;
+                $this->pageRenderer->addJsFile($filePath);
+            }
+
+            foreach (self::$cssFiles as $file) {
+                $filePath = ExtensionManagementUtility::siteRelPath('formz') . 'Resources/Public/StyleSheets/' . $file;
+                $this->pageRenderer->addCssFile($filePath);
+            }
+
+            $formzConfigurationJavaScriptAssetHandler = FormzConfigurationJavaScriptAssetHandler::with($this->assetHandlerFactory);
+            $formzConfigurationJavaScriptFileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
+            if (false === file_exists(GeneralUtility::getFileAbsFileName($formzConfigurationJavaScriptFileName))) {
+                GeneralUtility::writeFileToTypo3tempDir(
+                    GeneralUtility::getFileAbsFileName($formzConfigurationJavaScriptFileName),
+                    $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode()
+                );
+            }
+
+            $this->pageRenderer->addJsFooterFile($formzConfigurationJavaScriptFileName);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Will take care of generating the CSS with the AssetHandlerFactory. The
+     * code will be put in a `.css` file in the `typo3temp` directory.
+     *
+     * If the file already exists, it is included directly before the code
+     * generation.
+     *
+     * @return $this
+     */
+    public function includeGeneratedCss()
+    {
+        $filePath = $this->getFormzGeneratedFilePath() . '.css';
+        if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
+            $css = ErrorContainerDisplayCssAssetHandler::with($this->assetHandlerFactory)->getErrorContainerDisplayCss() . LF;
+            $css .= FieldsActivationCssAssetHandler::with($this->assetHandlerFactory)->getFieldsActivationCss();
+            GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $css);
+        }
+        $this->pageRenderer->addCssFile($filePath);
+
+        return $this;
+    }
+
+    /**
+     * Will take care of generating the JavaScript with the AssetHandlerFactory.
+     * The code will be put in a `.js` file in the `typo3temp` directory.
+     *
+     * If the file already exists, it is included directly before the code
+     * generation.
+     *
+     * @return $this
+     */
+    public function includeGeneratedJavaScript()
+    {
+        $filePath = $this->getFormzGeneratedFilePath() . '.js';
+        $cacheInstance = Core::getCacheInstance();
+        $javaScriptValidationFilesCacheIdentifier = Core::getCacheIdentifier('js-files-', $this->formObjectClassName);
+
+        if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
+            ConditionNode::distinctUsedConditions();
+            $fieldValidationConfigurationAssetHandler = FieldsValidationJavaScriptAssetHandler::with($this->assetHandlerFactory)->process();
+
+            $javaScriptCode = FormInitializationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFormInitializationJavaScriptCode() . LF;
+            $javaScriptCode .= $fieldValidationConfigurationAssetHandler->getJavaScriptCode() . LF;
+            $javaScriptCode .= FieldsActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsActivationJavaScriptCode() . LF;
+            $javaScriptCode .= FieldsValidationActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsValidationActivationJavaScriptCode();
+
+            GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $javaScriptCode);
+
+            $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
+                $javaScriptValidationFilesCacheIdentifier,
+                $fieldValidationConfigurationAssetHandler->getJavaScriptValidationFiles()
+            );
+        } else {
+            // Including all JavaScript files required by used validation rules and conditions.
+            if ($cacheInstance->has($javaScriptValidationFilesCacheIdentifier)) {
+                $javaScriptFiles = $cacheInstance->get($javaScriptValidationFilesCacheIdentifier);
+            } else {
+                $fieldValidationConfigurationAssetHandler = FieldsValidationJavaScriptAssetHandler::with($this->assetHandlerFactory)->process();
+                ConditionNode::distinctUsedConditions();
+                FieldsActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsActivationJavaScriptCode();
+                FieldsValidationActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsValidationActivationJavaScriptCode();
+
+                $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
+                    $javaScriptValidationFilesCacheIdentifier,
+                    $fieldValidationConfigurationAssetHandler->getJavaScriptValidationFiles()
+                );
+            }
+        }
+
+        $this->pageRenderer->addJsFooterFile($filePath);
+
+        $this->includeJavaScriptValidationFiles($javaScriptFiles);
+
+        // Here we generate the JavaScript code containing the submitted values, and the existing errors.
+        $javaScriptCode = FormRequestDataJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFormRequestDataJavaScriptCode(FormViewHelper::getVariable(FormViewHelper::FORM_INSTANCE));
+
+        if (Core::isInDebugMode()) {
+            $javaScriptCode .= LF;
+            $javaScriptCode .= 'Formz.Debug.activate();';
+        }
+
+        /** @var UriBuilder $uriBuilder */
+        $uriBuilder = Core::getObjectManager()->get(UriBuilder::class);
+        $uri = $uriBuilder->reset()
+            ->setTargetPageType(1473682545)
+            ->setNoCache(true)
+            ->setUseCacheHash(false)
+            ->setCreateAbsoluteUri(true)
+            ->build();
+
+        $javaScriptCode .= LF;
+        $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
+
+        $this->pageRenderer->addJsFooterInlineCode('Formz - Initialization ' . $this->formObjectClassName, $javaScriptCode);
+
+        return $this;
+    }
+
+    /**
+     * Will save in cache and return the list of files which must be included in
+     * order to make validation rules and conditions work properly.
+     *
+     * @param string $cacheIdentifier
+     * @param array  $javaScriptFiles
+     * @return array
+     */
+    protected function saveAndGetJavaScriptFiles($cacheIdentifier, array $javaScriptFiles)
+    {
+        /** @var AbstractConditionItem[] $conditions */
+        $conditions = ConditionNode::getDistinctUsedConditions();
+
+        foreach ($conditions as $condition) {
+            $javaScriptFiles = array_merge($javaScriptFiles, $condition::getJavaScriptFiles());
+        }
+
+        Core::getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
+
+        return $javaScriptFiles;
+    }
+
+    /**
+     * This function will handle the JavaScript localization files.
+     *
+     * A file will be created for the current language (there can be as many
+     * files as languages), containing the translations handling for JavaScript.
+     * If the file already exists, it is directly included.
+     *
+     * @return $this
+     */
+    public function handleJavaScriptLocalization()
+    {
+        $filePath = $this->getFormzGeneratedFilePath('local-' . Core::getLanguageKey()) . '.js';
+
+        if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
+            $javaScriptCode = FormzLocalizationJavaScriptAssetHandler::with($this->assetHandlerFactory)
+                ->injectTranslationsForFormFieldsValidation()
+                ->getJavaScriptCode();
+
+            GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $javaScriptCode);
+        }
+
+        $this->pageRenderer->addJsFooterFile($filePath);
+
+        return $this;
+    }
+
+    /**
+     * Returns a file name based on the form object class name.
+     *
+     * @param string $prefix
+     * @return string
+     */
+    protected function getFormzGeneratedFilePath($prefix = '')
+    {
+        $prefix = (false === empty($prefix))
+            ? $prefix . '-'
+            : '';
+
+        return Core::GENERATED_FILES_PATH . Core::getCacheIdentifier('formz-' . $prefix, $this->formObjectClassName . '-' . $this->formObjectName);
+    }
+
+    /**
+     * Will include all new JavaScript files given, by checking that every given
+     * file was not already included.
+     *
+     * @param array $javaScriptValidationFiles List of JavaScript validation files.
+     */
+    protected function includeJavaScriptValidationFiles(array $javaScriptValidationFiles)
+    {
+        $javaScriptValidationFiles = array_unique($javaScriptValidationFiles);
+
+        foreach ($javaScriptValidationFiles as $file) {
+            if (false === in_array($file, self::$alreadyIncludedValidationJavaScriptFiles)) {
+                $path = self::getResourceRelativePath($file);
+                $this->pageRenderer->addJsFooterFile($path);
+                self::$alreadyIncludedValidationJavaScriptFiles[] = $file;
+            }
+        }
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public static function getResourceRelativePath($path)
+    {
+        return rtrim(
+            PathUtility::getRelativePath(
+                GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT'),
+                GeneralUtility::getFileAbsFileName($path)
+            ),
+            '/'
+        );
+    }
+}

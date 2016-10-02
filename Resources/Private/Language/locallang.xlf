@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" product-name="formz">
+		<header />
+		<body>
+
+            <trans-unit id="formz.debug.enable">
+				<source>Enable Debug mode: Be careful, this is not advised to enable this mode in production environment!</source>
+			</trans-unit>
+
+			<trans-unit id="form.typoscript_not_included.error_message">
+				<source>Formz TypoScript configuration seems not to be included. Please include the "formz" static TypoScript on this page.</source>
+			</trans-unit>
+			<trans-unit id="form.wrong_configuration.error_message">
+				<source>The configuration for this form contains at least one error:</source>
+			</trans-unit>
+
+			<trans-unit id="default_error_message">
+				<source>Processing error.</source>
+			</trans-unit>
+
+			<trans-unit id="validator.form.default_error">
+				<source>This field is not valid.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.number.error">
+				<source>This field must contain a valid number.</source>
+			</trans-unit>
+
+			<trans-unit id="validator.form.required.error">
+				<source>This field is required.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.is_integer.error">
+				<source>This field must contain a valid integer.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.contains_values.error">
+				<source>This field must contain at least one of the following values: %s.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.email.error">
+				<source>This field must contain a valid email address.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.phone_number.error">
+				<source>This field must contain a valid phone number.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.number_length.error">
+				<source>This field must contain a number with a length between %1$s and %2$s.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.between_numbers.error">
+				<source>This field must have a value between %1$s and %2$s.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.between_numbers.not_number.error">
+				<source>This field must contain a valid number.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.string_length.error">
+				<source>This field must contain a string with a length between %1$s and %2$s characters.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.equals_to_field.error">
+				<source>This field must have the same value as %s.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.class_exists.error">
+				<source>The value « %s » is not referring to an existing class.</source>
+			</trans-unit>
+			<trans-unit id="validator.form.condition_is_valid.error">
+				<source>The condition « %s » has at least one error: « %s ».</source>
+			</trans-unit>
+
+		</body>
+	</file>
+</xliff>
