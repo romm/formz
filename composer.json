@@ -16,7 +16,7 @@
   ],
   "require": {
     "php": ">=5.5",
-    "romm/configuration-object": "^1.*"
+    "romm/configuration-object": "^1.0"
   },
   "replace": {
     "formz": "self.version",
