@@ -1,0 +1,40 @@
+language: php
+
+php:
+  - 5.5
+  - 5.6
+  - 7.0
+
+env:
+  matrix:
+    - TYPO3_VERSION=7.6.9
+
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - parallel
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_install:
+  - composer self-update
+  - composer --version
+
+before_script:
+  - composer require typo3/cms=$TYPO3_VERSION
+  - git checkout composer.json
+  - export TYPO3_PATH_WEB=$PWD/.Build/Web
+  - mkdir -p build/logs
+
+script:
+  - >
+    echo;
+    echo "Running unit tests";
+    .Build/bin/phpunit --colors --coverage-text --coverage-clover build/logs/clover.xml Tests/Unit/
+
+after_script:
+  - travis_retry php .Build/bin/coveralls -v
