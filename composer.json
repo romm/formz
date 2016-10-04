@@ -31,7 +31,7 @@
   "autoload-dev": {
     "psr-4": {
       "Romm\\Formz\\Tests\\": "Tests",
-      "Romm\\ConfigurationObject\\Tests\\": "Tests",
+      "Romm\\ConfigurationObject\\Tests\\": "../configuration_object/Tests",
       "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/",
       "TYPO3\\CMS\\Fluid\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/fluid/Tests/"
     }
