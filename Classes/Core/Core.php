@@ -236,7 +236,7 @@ class Core implements SingletonInterface
     }
 
     /**
-     * Returns the actual language key.
+     * Returns the current language key.
      *
      * @return string
      */
