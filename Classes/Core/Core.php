@@ -148,20 +148,27 @@ class Core implements SingletonInterface
     }
 
     /**
+     * @var FrontendInterface
+     */
+    protected static $cacheInstance;
+
+    /**
      * Returns the cache instance for this extension.
      *
-     * @return FrontendInterface|null
+     * @return FrontendInterface
      */
     public static function getCacheInstance()
     {
-        /** @var $cacheManager CacheManager */
-        $cacheManager = self::getObjectManager()->get(CacheManager::class);
-        $result = null;
-        if ($cacheManager->hasCache(self::CACHE_IDENTIFIER)) {
-            $result = $cacheManager->getCache(self::CACHE_IDENTIFIER);
+        if (null === self::$cacheInstance) {
+            /** @var $cacheManager CacheManager */
+            $cacheManager = self::getObjectManager()->get(CacheManager::class);
+
+            if ($cacheManager->hasCache(self::CACHE_IDENTIFIER)) {
+                self::$cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
+            }
         }
 
-        return $result;
+        return self::$cacheInstance;
     }
 
     /**

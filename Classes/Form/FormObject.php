@@ -152,21 +152,26 @@ class FormObject
     }
 
     /**
+     * Returns an instance of configuration object. Checks if it was previously
+     * stored in cache, otherwise it is created from scratch.
+     *
      * @return ConfigurationObjectInstance
      * @internal
      */
     public function getConfigurationObject()
     {
         if (null === $this->configurationObject) {
+            $cacheInstance = Core::getCacheInstance();
             $cacheIdentifier = 'configuration-' . $this->getHash();
-            $configurationObject = $this->getConfigurationObjectFromCache($cacheIdentifier);
 
-            if (null === $configurationObject) {
-                $configurationObject = ConfigurationObjectFactory::getInstance()
+            if ($cacheInstance->has($cacheIdentifier)) {
+                $configurationObject = $cacheInstance->get($cacheIdentifier);
+            } else {
+                $configurationObject =  ConfigurationObjectFactory::getInstance()
                     ->get(Form::class, $this->configurationArray);
 
                 if (false === $configurationObject->getValidationResult()->hasErrors()) {
-                    $this->insertConfigurationObjectInCache($cacheIdentifier, $configurationObject);
+                    $cacheInstance->set($cacheIdentifier, $configurationObject);
                 }
             }
 
@@ -174,36 +179,6 @@ class FormObject
         }
 
         return $this->configurationObject;
-    }
-
-    /**
-     * Returns an instance of configuration object if it was previously stored
-     * in cache, otherwise null is returned.
-     *
-     * @param string $cacheIdentifier
-     * @return ConfigurationObjectInstance|null
-     */
-    protected function getConfigurationObjectFromCache($cacheIdentifier)
-    {
-        $cacheInstance = Core::getCacheInstance();
-
-        return ($cacheInstance->has($cacheIdentifier))
-            ? $cacheInstance->get($cacheIdentifier)
-            : null;
-    }
-
-    /**
-     * Stores a configuration object instance in cache, which can be fetched
-     * later.
-     *
-     * @param string                      $cacheIdentifier
-     * @param ConfigurationObjectInstance $configurationObject
-     */
-    protected function insertConfigurationObjectInCache($cacheIdentifier, ConfigurationObjectInstance $configurationObject)
-    {
-        $cacheInstance = Core::getCacheInstance();
-
-        $cacheInstance->set($cacheIdentifier, $configurationObject);
     }
 
     /**

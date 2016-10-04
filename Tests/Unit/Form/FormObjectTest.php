@@ -21,6 +21,7 @@ class FormObjectTest extends UnitTestCase
     {
         $this->initializeConfigurationObjectTestServices();
         $this->injectMockedConfigurationServicesUtility();
+        $this->injectTransientMemoryCacheInCore();
     }
 
     /**
@@ -163,13 +164,7 @@ class FormObjectTest extends UnitTestCase
      */
     public function configurationObjectIsCorrectlyBuilt()
     {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMock(
-            FormObject::class,
-            ['getConfigurationObjectFromCache', 'insertConfigurationObjectInCache'],
-            [self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME]
-        );
-
+        $formObject = $this->getFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => []
