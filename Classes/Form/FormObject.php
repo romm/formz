@@ -49,7 +49,7 @@ class FormObject
      *
      * @var array
      */
-    protected $arrayConfiguration = [];
+    protected $configurationArray = [];
 
     /**
      * Contains the form configuration object, which was created from the
@@ -70,7 +70,8 @@ class FormObject
     protected $hashShouldBeCalculated = true;
 
     /**
-     * Constructor.
+     * You should never create a new instance of this class directly, use the
+     * `FormObjectFactory->getInstanceFromClassName()` function instead.
      *
      * @param string $className
      * @param string $name
@@ -85,37 +86,16 @@ class FormObject
      * Registers a new property for this form.
      *
      * @param string $name
+     * @return $this
      */
     public function addProperty($name)
     {
-        $this->properties[] = $name;
-        $this->hashShouldBeCalculated = true;
-    }
-
-    /**
-     * @return ConfigurationObjectInstance
-     * @internal
-     */
-    public function getConfigurationObject()
-    {
-        if (null === $this->configurationObject) {
-            $cacheInstance = Core::getCacheInstance();
-            $cacheIdentifier = 'configuration-' . $this->getHash();
-
-            if ($cacheInstance->has($cacheIdentifier)) {
-                $this->configurationObject = $cacheInstance->get($cacheIdentifier);
-            } else {
-                $instance = ConfigurationObjectFactory::getInstance()
-                    ->get(Form::class, $this->arrayConfiguration);
-                $this->configurationObject = $instance;
-
-                if (false === $instance->getValidationResult()->hasErrors()) {
-                    $cacheInstance->set($cacheIdentifier, $this->configurationObject);
-                }
-            }
+        if (false === in_array($name, $this->properties)) {
+            $this->properties[] = $name;
+            $this->hashShouldBeCalculated = true;
         }
 
-        return $this->configurationObject;
+        return $this;
     }
 
     /**
@@ -146,15 +126,84 @@ class FormObject
     }
 
     /**
-     * @param array $configuration
-     * @return $this
+     * @return array
      */
-    public function setArrayConfiguration($configuration)
+    public function getProperties()
     {
-        $this->arrayConfiguration = $this->sanitizeConfiguration($configuration);
-        $this->hashShouldBeCalculated = true;
+        return $this->properties;
+    }
 
-        return $this;
+    /**
+     * Returns the hash, which should be calculated only once for performance
+     * concerns.
+     *
+     * @return string
+     */
+    public function getHash()
+    {
+        if (true === $this->hashShouldBeCalculated
+            || null === $this->hash
+        ) {
+            $this->hashShouldBeCalculated = false;
+            $this->hash = $this->calculateHash();
+        }
+
+        return $this->hash;
+    }
+
+    /**
+     * @return ConfigurationObjectInstance
+     * @internal
+     */
+    public function getConfigurationObject()
+    {
+        if (null === $this->configurationObject) {
+            $cacheIdentifier = 'configuration-' . $this->getHash();
+            $configurationObject = $this->getConfigurationObjectFromCache($cacheIdentifier);
+
+            if (null === $configurationObject) {
+                $configurationObject = ConfigurationObjectFactory::getInstance()
+                    ->get(Form::class, $this->configurationArray);
+
+                if (false === $configurationObject->getValidationResult()->hasErrors()) {
+                    $this->insertConfigurationObjectInCache($cacheIdentifier, $configurationObject);
+                }
+            }
+
+            $this->configurationObject = $configurationObject;
+        }
+
+        return $this->configurationObject;
+    }
+
+    /**
+     * Returns an instance of configuration object if it was previously stored
+     * in cache, otherwise null is returned.
+     *
+     * @param string $cacheIdentifier
+     * @return ConfigurationObjectInstance|null
+     */
+    protected function getConfigurationObjectFromCache($cacheIdentifier)
+    {
+        $cacheInstance = Core::getCacheInstance();
+
+        return ($cacheInstance->has($cacheIdentifier))
+            ? $cacheInstance->get($cacheIdentifier)
+            : null;
+    }
+
+    /**
+     * Stores a configuration object instance in cache, which can be fetched
+     * later.
+     *
+     * @param string                      $cacheIdentifier
+     * @param ConfigurationObjectInstance $configurationObject
+     */
+    protected function insertConfigurationObjectInCache($cacheIdentifier, ConfigurationObjectInstance $configurationObject)
+    {
+        $cacheInstance = Core::getCacheInstance();
+
+        $cacheInstance->set($cacheIdentifier, $configurationObject);
     }
 
     /**
@@ -184,24 +233,13 @@ class FormObject
     }
 
     /**
-     * Refreshes the hash of the class.
-     */
-    public function calculateHash()
-    {
-        $this->hash = sha1(serialize($this));
-        $this->hashShouldBeCalculated = false;
-    }
-
-    /**
+     * Returns the calculated hash of this class.
+     *
      * @return string
      */
-    public function getHash()
+    protected function calculateHash()
     {
-        if (true === $this->hashShouldBeCalculated) {
-            $this->calculateHash();
-        }
-
-        return $this->hash;
+        return sha1(serialize($this));
     }
 
     /**
@@ -212,7 +250,7 @@ class FormObject
      */
     public function __sleep()
     {
-        return ['name', 'className', 'properties', 'arrayConfiguration', 'hash'];
+        return ['name', 'className', 'properties', 'configurationArray', 'hash'];
     }
 
     /**
@@ -223,5 +261,26 @@ class FormObject
     public function __wakeup()
     {
         $this->hashShouldBeCalculated = (null === $this->hash);
+    }
+
+    /**
+     * @return array
+     * @internal Should not be used, it is here only for unit tests.
+     */
+    public function getConfigurationArray()
+    {
+        return $this->configurationArray;
+    }
+
+    /**
+     * @param array $configuration
+     * @return $this
+     */
+    public function setConfigurationArray($configuration)
+    {
+        $this->configurationArray = $this->sanitizeConfiguration($configuration);
+        $this->hashShouldBeCalculated = true;
+
+        return $this;
     }
 }
