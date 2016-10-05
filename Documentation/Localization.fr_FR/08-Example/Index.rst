@@ -16,7 +16,7 @@ Vous trouverez à cette adresse une extension d'exemple complète, utilisant la 
 
 Pour l'installer :
 
-* Clonez le repository avec Git (``git clone https://github.com/romm/formz.git``) ;
+* Clonez le repository avec Git (``git clone https://github.com/romm/formz_example.git``) ;
 * Ou téléchargez l'archive et ajoutez-la dans le dossier ``typo3conf/ext/`` de votre instance TYPO3.
 
 Cette extension propose un plug-in à poser sur une page, qui affichera — sans configuration complémentaire — un formulaire utilisable. Ce formulaire peut-être rendu avec les deux layouts fournis par Formz : **Twitter Bootstrap** et **Foundation**, voyez plutôt :
