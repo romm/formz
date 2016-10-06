@@ -1,6 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Form;
 
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -17,14 +18,6 @@ class FormObjectFactoryTest extends AbstractUnitTest
     public function formObjectFromClassNameIsCreated()
     {
         $formObjectFactory = new FormObjectFactory;
-        $formConfiguration = [
-            'fields' => [
-                'foo' => [
-                ]
-            ]
-        ];
-
-        $this->setFormConfigurationFromClassName(DefaultForm::class, $formConfiguration);
 
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
@@ -34,6 +27,33 @@ class FormObjectFactoryTest extends AbstractUnitTest
 
         unset($formObject);
         unset($formObjectFactory);
+    }
+
+    /**
+     * Check that an exception is thrown when sending a class name that does not
+     * exist.
+     *
+     * @test
+     */
+    public function wrongClassNameGivenThrowsException()
+    {
+        $this->setExpectedException(ClassNotFoundException::class);
+        $formObjectFactory = new FormObjectFactory;
+
+        $formObjectFactory->getInstanceFromClassName('foo', 'foo');
+    }
+
+    /**
+     * Checks that there is a check on the inheritance of the given class name.
+     *
+     * @test
+     */
+    public function wrongClassTypeGivenThrowsException()
+    {
+        $this->setExpectedException(ClassNotFoundException::class);
+        $formObjectFactory = new FormObjectFactory;
+
+        $formObjectFactory->getInstanceFromClassName(\stdClass::class, 'foo');
     }
 
     /**

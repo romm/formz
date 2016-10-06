@@ -14,6 +14,7 @@
 namespace Romm\Formz\Form;
 
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -47,8 +48,10 @@ class FormObjectFactory implements SingletonInterface
      */
     public function getInstanceFromClassName($className, $name)
     {
-        if (false === in_array(FormInterface::class, class_implements($className))) {
-            throw new \Exception(
+        if (false === class_exists($className)
+            || false === in_array(FormInterface::class, class_implements($className))
+        ) {
+            throw new ClassNotFoundException(
                 'Invalid class name given: "' . $className . '"; the class must be an instance of "' . FormInterface::class . '".',
                 1467191011
             );
