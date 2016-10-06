@@ -2,15 +2,18 @@
 namespace Romm\Formz\Tests\Unit;
 
 use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Configuration\ConfigurationServicesUtility;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Utility\TypoScriptUtility;
+use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\CacheFactory;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
+use TYPO3\CMS\Extbase\Service\TypoScriptService;
+use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 trait FormzUnitTestUtility
 {
@@ -21,17 +24,46 @@ trait FormzUnitTestUtility
     protected $formzCoreMock;
 
     /**
+     * @var array
+     */
+    protected $formzConfiguration = [];
+
+    /**
+     * @var array
+     */
+    protected $formConfiguration = [];
+
+    /**
      * Initializes correctly this extension `Core` class to be able to work
      * correctly in unit tests.
      */
     private function setUpFormzCore()
     {
-        $this->formzCoreMock = $this->getMock(Core::class, ['dummy']);
+        $this->formzCoreMock = $this->getMock(Core::class, ['translate']);
         $this->formzCoreMock->injectObjectManager($this->getFormzObjectManagerMock());
         $this->formzCoreMock->injectTypoScriptUtility(new TypoScriptUtility);
         $this->formzCoreMock->injectConfigurationFactory(new ConfigurationFactory);
         $this->formzCoreMock->injectFormObjectFactory(new FormObjectFactory());
 
+        $this->injectTransientMemoryCacheInFormzCore();
+
+        $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
+        $this->injectMockedTypoScriptUtilityInFormzCore();
+
+        /*
+         * Mocking the translate function, to avoid the fatal error due to TYPO3
+         * core trying to get the localization data in database cache.
+         */
+        $this->formzCoreMock->method('translate')
+            ->will(
+                $this->returnCallback(
+                    function ($key, $extension) {
+                        return 'LLL:' . $extension . ':' . $key;
+                    }
+                )
+            );
+
+        // Injecting the mocked instance in the core.
         $reflectedCore = new \ReflectionClass(Core::class);
         $objectManagerProperty = $reflectedCore->getProperty('instance');
         $objectManagerProperty->setAccessible(true);
@@ -39,29 +71,64 @@ trait FormzUnitTestUtility
     }
 
     /**
-     * Will force the instance of `ConfigurationServicesUtility` to be mocked
-     * and not inject the cache service.
-     */
-    public function injectMockedConfigurationServicesUtility()
-    {
-        $mock = $this->getMock(ConfigurationServicesUtility::class, ['addCacheServiceToServiceFactory']);
-
-        $reflectedCore = new \ReflectionClass(ConfigurationServicesUtility::class);
-        $property = $reflectedCore->getProperty('instance');
-        $property->setAccessible(true);
-        $property->setValue($mock);
-    }
-
-    /**
      * Inject a special type of cache that will work with the unit tests suit.
      */
-    public function injectTransientMemoryCacheInCore()
+    private function injectTransientMemoryCacheInFormzCore()
     {
-        $cacheManager = new CacheManager();
+        $cacheManager = new CacheManager;
         $cacheFactory = new CacheFactory('foo', $cacheManager);
         $cacheInstance = $cacheFactory->create('foo', VariableFrontend::class, TransientMemoryBackend::class);
 
         $this->formzCoreMock->setCacheInstance($cacheInstance);
+    }
+
+    /**
+     * @param array $formzConfiguration
+     */
+    protected function setFormzConfiguration(array $formzConfiguration)
+    {
+        $this->formzConfiguration = $formzConfiguration;
+    }
+
+    /**
+     * Sets the array configuration for a given form class name.
+     *
+     * @param string $className
+     * @param array  $configuration
+     */
+    protected function setFormConfigurationFromClassName($className, array $configuration)
+    {
+        $this->formConfiguration[$className] = $configuration;
+    }
+
+    /**
+     * This function will mock the `TypoScriptUtility` class to return a
+     * custom configuration array.
+     */
+    private function injectMockedTypoScriptUtilityInFormzCore()
+    {
+        /** @var TypoScriptUtility|\PHPUnit_Framework_MockObject_MockObject $typoScriptUtilityMock */
+        $typoScriptUtilityMock = $this->getMock(TypoScriptUtility::class, ['getConfiguration']);
+        $typoScriptUtilityMock->expects($this->any())
+            ->method('getConfiguration')
+            ->will(
+                $this->returnCallback(
+                    function () {
+                        $configuration = ArrayUtility::setValueByPath(
+                            $this->formzConfiguration,
+                            'config.tx_formz.forms',
+                            $this->formConfiguration
+                        );
+
+                        return $configuration;
+                    }
+                )
+            );
+
+        $typoScriptUtilityMock->injectEnvironmentService(new EnvironmentService);
+        $typoScriptUtilityMock->injectTypoScriptService(new TypoScriptService);
+
+        $this->formzCoreMock->injectTypoScriptUtility($typoScriptUtilityMock);
     }
 
     /**
@@ -70,7 +137,7 @@ trait FormzUnitTestUtility
      *
      * @return ObjectManagerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    public function getFormzObjectManagerMock()
+    private function getFormzObjectManagerMock()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject $objectManagerMock */
         $objectManagerMock = $this->getMock(ObjectManagerInterface::class);

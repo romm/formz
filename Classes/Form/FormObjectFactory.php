@@ -62,19 +62,9 @@ class FormObjectFactory implements SingletonInterface
             if ($cacheInstance->has($cacheIdentifier)) {
                 $this->instances[$cacheIdentifier] = $cacheInstance->get($cacheIdentifier);
             } else {
-                /** @var FormObject $instance */
-                $instance = GeneralUtility::makeInstance(FormObject::class, $className, $name);
-
-                $formConfiguration = Core::get()->getTypoScriptUtility()->getFormConfiguration($className);
-                $instance->setConfigurationArray($formConfiguration);
-
-                $this->insertObjectProperties($instance);
-                $instance->getHash();
-
-                $cacheInstance->set($cacheIdentifier, $instance);
-
+                $instance = $this->createInstance($className, $name);
                 $this->instances[$cacheIdentifier] = $instance;
-                unset($publicProperties);
+                $cacheInstance->set($cacheIdentifier, $instance);
             }
 
             Core::get()->getConfigurationFactory()
@@ -85,13 +75,35 @@ class FormObjectFactory implements SingletonInterface
     }
 
     /**
+     * Creates and initializes a new `FormObject` instance.
+     *
+     * @param string $className
+     * @param string $name
+     * @return FormObject
+     */
+    protected function createInstance($className, $name)
+    {
+        /** @var FormObject $instance */
+        $instance = GeneralUtility::makeInstance(FormObject::class, $className, $name);
+
+        $this->insertObjectProperties($instance);
+
+        $formConfiguration = Core::get()->getTypoScriptUtility()->getFormConfiguration($className);
+        $instance->setConfigurationArray($formConfiguration);
+
+        $instance->getHash();
+
+        return $instance;
+    }
+
+    /**
      * Will insert all the accessible properties of the given instance.
      *
      * @param FormObject $instance
      */
     protected function insertObjectProperties(FormObject $instance)
     {
-        $className = get_class($instance);
+        $className = $instance->getClassName();
 
         /** @var ReflectionService $reflectionService */
         $reflectionService = GeneralUtility::makeInstance(ReflectionService::class);
@@ -110,5 +122,7 @@ class FormObjectFactory implements SingletonInterface
                 $instance->addProperty($property);
             }
         }
+
+        unset($publicProperties);
     }
 }

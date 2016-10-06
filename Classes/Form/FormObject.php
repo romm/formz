@@ -152,6 +152,27 @@ class FormObject
     }
 
     /**
+     * @return array
+     * @internal Should not be used, it is here only for unit tests.
+     */
+    public function getConfigurationArray()
+    {
+        return $this->configurationArray;
+    }
+
+    /**
+     * @param array $configuration
+     * @return $this
+     */
+    public function setConfigurationArray($configuration)
+    {
+        $this->configurationArray = $this->sanitizeConfiguration($configuration);
+        $this->hashShouldBeCalculated = true;
+
+        return $this;
+    }
+
+    /**
      * Returns an instance of configuration object. Checks if it was previously
      * stored in cache, otherwise it is created from scratch.
      *
@@ -167,7 +188,7 @@ class FormObject
             if ($cacheInstance->has($cacheIdentifier)) {
                 $configurationObject = $cacheInstance->get($cacheIdentifier);
             } else {
-                $configurationObject =  ConfigurationObjectFactory::getInstance()
+                $configurationObject = ConfigurationObjectFactory::getInstance()
                     ->get(Form::class, $this->configurationArray);
 
                 if (false === $configurationObject->getValidationResult()->hasErrors()) {
@@ -236,26 +257,5 @@ class FormObject
     public function __wakeup()
     {
         $this->hashShouldBeCalculated = (null === $this->hash);
-    }
-
-    /**
-     * @return array
-     * @internal Should not be used, it is here only for unit tests.
-     */
-    public function getConfigurationArray()
-    {
-        return $this->configurationArray;
-    }
-
-    /**
-     * @param array $configuration
-     * @return $this
-     */
-    public function setConfigurationArray($configuration)
-    {
-        $this->configurationArray = $this->sanitizeConfiguration($configuration);
-        $this->hashShouldBeCalculated = true;
-
-        return $this;
     }
 }
