@@ -10,7 +10,7 @@
 Forms
 =====
 
-The configuration for forms is settable at the path ``config.tx_formz.forms``. We can find the list of all forms. Each configuration mist use as a key the class name of the form.
+The configuration for forms is settable at the path ``config.tx_formz.forms``. We can find the list of all forms. Each configuration must use as a key the class name of the form.
 
 Example: ``config.tx_formz.forms.MyVendor\MyExtension\Form\ExampleForm { ... }``
 
@@ -47,7 +47,7 @@ Form fields
     Description
         Contains the list of fields for the form.
 
-        Note that each field must bind a property of the form PHP model, in order to be processed.
+        Note that each field must bind a property of the form's PHP model, in order to be processed.
 
 .. _formActivationCondition:
 
