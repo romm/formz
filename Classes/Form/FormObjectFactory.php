@@ -65,26 +65,10 @@ class FormObjectFactory implements SingletonInterface
                 /** @var FormObject $instance */
                 $instance = GeneralUtility::makeInstance(FormObject::class, $className, $name);
 
-                /** @var ReflectionService $reflectionService */
-                $reflectionService = GeneralUtility::makeInstance(ReflectionService::class);
-                $reflectionProperties = $reflectionService->getClassPropertyNames($className);
-
-                $classReflection = new \ReflectionClass($className);
-                $publicProperties = $classReflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-                foreach ($reflectionProperties as $property) {
-                    if (false === in_array($property, self::$ignoredProperties)
-                        && false === $reflectionService->isPropertyTaggedWith($className, $property, self::IGNORE_PROPERTY)
-                        && ((true === in_array($property, $publicProperties))
-                            || $reflectionService->hasMethod($className, 'get' . ucfirst($property))
-                        )
-                    ) {
-                        $instance->addProperty($property);
-                    }
-                }
-
                 $formConfiguration = Core::get()->getTypoScriptUtility()->getFormConfiguration($className);
                 $instance->setConfigurationArray($formConfiguration);
+
+                $this->insertObjectProperties($instance);
                 $instance->getHash();
 
                 $cacheInstance->set($cacheIdentifier, $instance);
@@ -98,5 +82,33 @@ class FormObjectFactory implements SingletonInterface
         }
 
         return $this->instances[$cacheIdentifier];
+    }
+
+    /**
+     * Will insert all the accessible properties of the given instance.
+     *
+     * @param FormObject $instance
+     */
+    protected function insertObjectProperties(FormObject $instance)
+    {
+        $className = get_class($instance);
+
+        /** @var ReflectionService $reflectionService */
+        $reflectionService = GeneralUtility::makeInstance(ReflectionService::class);
+        $reflectionProperties = $reflectionService->getClassPropertyNames($className);
+
+        $classReflection = new \ReflectionClass($className);
+        $publicProperties = $classReflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($reflectionProperties as $property) {
+            if (false === in_array($property, self::$ignoredProperties)
+                && false === $reflectionService->isPropertyTaggedWith($className, $property, self::IGNORE_PROPERTY)
+                && ((true === in_array($property, $publicProperties))
+                    || $reflectionService->hasMethod($className, 'get' . ucfirst($property))
+                )
+            ) {
+                $instance->addProperty($property);
+            }
+        }
     }
 }
