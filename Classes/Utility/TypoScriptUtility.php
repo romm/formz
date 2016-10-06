@@ -62,7 +62,7 @@ class TypoScriptUtility implements SingletonInterface
      */
     public function getExtensionConfigurationFromPath($path = null, $pageUid = null, $delimiter = '.')
     {
-        $extensionConfiguration = self::getFullExtensionConfiguration($pageUid);
+        $extensionConfiguration = $this->getFullExtensionConfiguration($pageUid);
 
         if (null === $path) {
             $result = $extensionConfiguration;
@@ -134,7 +134,7 @@ class TypoScriptUtility implements SingletonInterface
         }
 
         if (null === $result) {
-            $result = self::getConfiguration($pageUid);
+            $result = $this->getConfiguration($pageUid);
 
             $result = (ArrayUtility::isValidPath($result, self::EXTENSION_CONFIGURATION_PATH, '.'))
                 ? ArrayUtility::getValueByPath($result, self::EXTENSION_CONFIGURATION_PATH, '.')
@@ -162,7 +162,7 @@ class TypoScriptUtility implements SingletonInterface
      * It can still be useful to get the whole TypoScript configuration, so the
      * function remains public, but use with caution!
      *
-     * @param int|null $pageUid The uid of the page you want the TypoScript configuration from. If `null` is given, the current page uid is used
+     * @param int|null $pageUid The uid of the page you want the TypoScript configuration from. If `null` is given, the current page uid is used.
      * @return array The configuration.
      */
     public function getConfiguration($pageUid = null)
