@@ -78,8 +78,8 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHan
             $translationsBinding[$key] = $hash;
         }
 
-        $jsonRealTranslations = Core::arrayToJavaScriptJson($realTranslations);
-        $jsonTranslationsBinding = Core::arrayToJavaScriptJson($translationsBinding);
+        $jsonRealTranslations = Core::get()->arrayToJavaScriptJson($realTranslations);
+        $jsonTranslationsBinding = Core::get()->arrayToJavaScriptJson($translationsBinding);
 
         return <<<JS
 Formz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);

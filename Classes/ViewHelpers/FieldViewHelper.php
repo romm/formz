@@ -93,7 +93,7 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
 
         /** @var StandaloneView $view */
         $view = self::$view = (null === self::$view)
-            ? Core::getObjectManager()->get(StandaloneView::class)
+            ? Core::get()->getObjectManager()->get(StandaloneView::class)
             : self::$view;
 
         $templateArguments = is_array($arguments['arguments'])

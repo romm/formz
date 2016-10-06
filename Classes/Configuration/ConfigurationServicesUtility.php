@@ -71,7 +71,7 @@ class ConfigurationServicesUtility implements SingletonInterface
     protected function getBackendCache()
     {
         if (null === $this->backendCache) {
-            $backendCache = Core::getTypoScriptUtility()
+            $backendCache = Core::get()->getTypoScriptUtility()
                 ->getExtensionConfigurationFromPath('settings.defaultBackendCache');
 
             if (false === class_exists($backendCache)

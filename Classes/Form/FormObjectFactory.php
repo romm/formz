@@ -54,10 +54,10 @@ class FormObjectFactory implements SingletonInterface
             );
         }
 
-        $cacheIdentifier = Core::getCacheIdentifier('form-object-', $className . '-' . $name);
+        $cacheIdentifier = Core::get()->getCacheIdentifier('form-object-', $className . '-' . $name);
 
         if (false === isset($this->instances[$cacheIdentifier])) {
-            $cacheInstance = Core::getCacheInstance();
+            $cacheInstance = Core::get()->getCacheInstance();
 
             if ($cacheInstance->has($cacheIdentifier)) {
                 $this->instances[$cacheIdentifier] = $cacheInstance->get($cacheIdentifier);
@@ -83,7 +83,7 @@ class FormObjectFactory implements SingletonInterface
                     }
                 }
 
-                $formConfiguration = Core::getTypoScriptUtility()->getFormConfiguration($className);
+                $formConfiguration = Core::get()->getTypoScriptUtility()->getFormConfiguration($className);
                 $instance->setConfigurationArray($formConfiguration);
                 $instance->getHash();
 
@@ -93,7 +93,7 @@ class FormObjectFactory implements SingletonInterface
                 unset($publicProperties);
             }
 
-            Core::getConfigurationFactory()
+            Core::get()->getConfigurationFactory()
                 ->addFormFromClassName($className, $name);
         }
 

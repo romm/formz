@@ -38,7 +38,7 @@ class AjaxFieldValidation implements SingletonInterface
         // Default technical error result if the function can not be reached.
         $result = [
             'success' => false,
-            'message' => [Core::translate('default_error_message')]
+            'message' => [Core::get()->translate('default_error_message')]
         ];
 
         // We prevent any external message to be displayed here.
@@ -54,8 +54,8 @@ class AjaxFieldValidation implements SingletonInterface
 
         if ($formClassName && $formName && $passObjectInstance && $fieldValue && $fieldName && $validatorName) {
             try {
-                $formObject = Core::getFormObjectFactory()->getInstanceFromClassName($formClassName, $formName);
-                $validationResult = Core::getConfigurationFactory()->mergeValidationResultWithFormObject($formObject);
+                $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName($formClassName, $formName);
+                $validationResult = Core::get()->getConfigurationFactory()->mergeValidationResultWithFormObject($formObject);
 
                 if (false === $validationResult->hasErrors()) {
                     $formConfiguration = $formObject->getConfiguration();
@@ -76,7 +76,7 @@ class AjaxFieldValidation implements SingletonInterface
                             }
 
                             /** @var AbstractValidator $validatorInstance */
-                            $validatorInstance = Core::getObjectManager()->get(
+                            $validatorInstance = Core::get()->getObjectManager()->get(
                                 $validatorClassName,
                                 $fieldValidationConfiguration->getOptions(),
                                 $form,
@@ -89,7 +89,7 @@ class AjaxFieldValidation implements SingletonInterface
                 }
             } catch (\Exception $e) {
                 $result['data'] = ['errorCode' => $e->getCode()];
-                if (Core::isInDebugMode()) {
+                if (Core::get()->isInDebugMode()) {
                     $result['message'] = $e->getMessage();
                 }
             }

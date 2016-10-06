@@ -5,10 +5,10 @@ use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\ConfigurationObject\Tests\Unit\ConfigurationObjectUnitTestUtility;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\FormzUnitTestUtility;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 
-class FormObjectTest extends UnitTestCase
+class FormObjectTest extends AbstractUnitTest
 {
 
     use ConfigurationObjectUnitTestUtility;
@@ -19,6 +19,8 @@ class FormObjectTest extends UnitTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->initializeConfigurationObjectTestServices();
         $this->injectMockedConfigurationServicesUtility();
         $this->injectTransientMemoryCacheInCore();

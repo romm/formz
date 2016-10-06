@@ -209,7 +209,7 @@ abstract class AbstractFormValidator extends GenericObjectValidator
         $this->result = new FormResult();
         $this->result->setData(self::RESULT_KEY_ACTIVATION_PROPERTY, []);
 
-        $this->formObject = Core::getFormObjectFactory()
+        $this->formObject = Core::get()->getFormObjectFactory()
             ->getInstanceFromClassName($formClassName, $formName);
 
         /** @var BehavioursManager $behavioursManager */

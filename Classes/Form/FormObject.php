@@ -161,7 +161,7 @@ class FormObject
     public function getConfigurationObject()
     {
         if (null === $this->configurationObject) {
-            $cacheInstance = Core::getCacheInstance();
+            $cacheInstance = Core::get()->getCacheInstance();
             $cacheIdentifier = 'configuration-' . $this->getHash();
 
             if ($cacheInstance->has($cacheIdentifier)) {

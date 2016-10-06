@@ -145,7 +145,7 @@ class FormResourcesHandler implements SingletonInterface
         if (false === self::$assetsIncluded) {
             self::$assetsIncluded = true;
 
-            if (Core::isInDebugMode()) {
+            if (Core::get()->isInDebugMode()) {
                 self::$javaScriptFiles[] = 'Formz.Debug.js';
             }
 
@@ -208,8 +208,8 @@ class FormResourcesHandler implements SingletonInterface
     public function includeGeneratedJavaScript()
     {
         $filePath = $this->getFormzGeneratedFilePath() . '.js';
-        $cacheInstance = Core::getCacheInstance();
-        $javaScriptValidationFilesCacheIdentifier = Core::getCacheIdentifier('js-files-', $this->formObjectClassName);
+        $cacheInstance = Core::get()->getCacheInstance();
+        $javaScriptValidationFilesCacheIdentifier = Core::get()->getCacheIdentifier('js-files-', $this->formObjectClassName);
 
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
             ConditionNode::distinctUsedConditions();
@@ -250,13 +250,13 @@ class FormResourcesHandler implements SingletonInterface
         // Here we generate the JavaScript code containing the submitted values, and the existing errors.
         $javaScriptCode = FormRequestDataJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFormRequestDataJavaScriptCode(FormViewHelper::getVariable(FormViewHelper::FORM_INSTANCE));
 
-        if (Core::isInDebugMode()) {
+        if (Core::get()->isInDebugMode()) {
             $javaScriptCode .= LF;
             $javaScriptCode .= 'Formz.Debug.activate();';
         }
 
         /** @var UriBuilder $uriBuilder */
-        $uriBuilder = Core::getObjectManager()->get(UriBuilder::class);
+        $uriBuilder = Core::get()->getObjectManager()->get(UriBuilder::class);
         $uri = $uriBuilder->reset()
             ->setTargetPageType(1473682545)
             ->setNoCache(true)
@@ -289,7 +289,7 @@ class FormResourcesHandler implements SingletonInterface
             $javaScriptFiles = array_merge($javaScriptFiles, $condition::getJavaScriptFiles());
         }
 
-        Core::getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
+        Core::get()->getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
 
         return $javaScriptFiles;
     }
@@ -305,7 +305,7 @@ class FormResourcesHandler implements SingletonInterface
      */
     public function handleJavaScriptLocalization()
     {
-        $filePath = $this->getFormzGeneratedFilePath('local-' . Core::getLanguageKey()) . '.js';
+        $filePath = $this->getFormzGeneratedFilePath('local-' . Core::get()->getLanguageKey()) . '.js';
 
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
             $javaScriptCode = FormzLocalizationJavaScriptAssetHandler::with($this->assetHandlerFactory)
@@ -332,7 +332,7 @@ class FormResourcesHandler implements SingletonInterface
             ? $prefix . '-'
             : '';
 
-        return Core::GENERATED_FILES_PATH . Core::getCacheIdentifier('formz-' . $prefix, $this->formObjectClassName . '-' . $this->formObjectName);
+        return Core::GENERATED_FILES_PATH . Core::get()->getCacheIdentifier('formz-' . $prefix, $this->formObjectClassName . '-' . $this->formObjectName);
     }
 
     /**

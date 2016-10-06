@@ -55,7 +55,7 @@ class FormSettings extends AbstractFormzConfiguration
      */
     public function getDefaultErrorMessage()
     {
-        return Core::translate($this->getSettingsProperty('defaultErrorMessage'));
+        return Core::get()->translate($this->getSettingsProperty('defaultErrorMessage'));
     }
 
     /**

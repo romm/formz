@@ -139,7 +139,7 @@ JS;
             'acceptsEmptyValues' => $acceptsEmptyValues
         ];
 
-        $validatorConfigurationFinal = Core::arrayToJavaScriptJson($validatorConfigurationFinal);
+        $validatorConfigurationFinal = Core::get()->arrayToJavaScriptJson($validatorConfigurationFinal);
 
         return <<<JS
                 /*

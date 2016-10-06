@@ -47,19 +47,19 @@ class ConfigurationFactory implements SingletonInterface
      */
     public function getFormzConfiguration()
     {
-        if (false === isset($this->cacheIdentifiers[Core::getCurrentPageUid()])) {
-            $configuration = Core::getTypoScriptUtility()->getFormzConfiguration();
-            $this->cacheIdentifiers[Core::getCurrentPageUid()] = 'formz-configuration-' . sha1(serialize($configuration));
+        if (false === isset($this->cacheIdentifiers[Core::get()->getCurrentPageUid()])) {
+            $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
+            $this->cacheIdentifiers[Core::get()->getCurrentPageUid()] = 'formz-configuration-' . sha1(serialize($configuration));
         }
-        $cacheIdentifier = $this->cacheIdentifiers[Core::getCurrentPageUid()];
+        $cacheIdentifier = $this->cacheIdentifiers[Core::get()->getCurrentPageUid()];
 
         if (null === $this->instances[$cacheIdentifier]) {
-            $cacheInstance = Core::getCacheInstance();
+            $cacheInstance = Core::get()->getCacheInstance();
 
             if ($cacheInstance->has($cacheIdentifier)) {
                 $this->instances[$cacheIdentifier] = $cacheInstance->get($cacheIdentifier);
             } else {
-                $configuration = Core::getTypoScriptUtility()->getFormzConfiguration();
+                $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
                 $instance = ConfigurationObjectFactory::getInstance()
                     ->get(Configuration::class, $configuration);
                 /** @var Configuration $instanceObject */
@@ -94,7 +94,7 @@ class ConfigurationFactory implements SingletonInterface
         $formzConfigurationObject = $this->getFormzConfiguration()->getObject(true);
 
         if (false === $formzConfigurationObject->hasForm($className, $name)) {
-            $formObject = Core::getFormObjectFactory()->getInstanceFromClassName($className, $name);
+            $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName($className, $name);
             $formObjectConfiguration = $formObject->getConfigurationObject();
             /** @var Form $formConfiguration */
             $formConfiguration = $formObjectConfiguration->getObject(true);

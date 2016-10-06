@@ -117,7 +117,7 @@ class TypoScriptUtility implements SingletonInterface
     {
         $result = null;
         $pageUid = $this->getRealPageUid($pageUid);
-        $cacheInstance = Core::getCacheInstance();
+        $cacheInstance = Core::get()->getCacheInstance();
 
         if (null === $this->pagesConfigurationHashes) {
             $this->pagesConfigurationHashes = ($cacheInstance->has(self::PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER))
@@ -171,7 +171,7 @@ class TypoScriptUtility implements SingletonInterface
 
         if (!array_key_exists($pageUid, $this->pageConfiguration)) {
             if ($this->environmentService->isEnvironmentInFrontendMode()) {
-                $typoScriptArray = Core::getPageController()->tmpl->setup;
+                $typoScriptArray = Core::get()->getPageController()->tmpl->setup;
             } else {
                 // @todo: backend context
                 $typoScriptArray = [];
@@ -192,7 +192,7 @@ class TypoScriptUtility implements SingletonInterface
     private function getRealPageUid($pageUid)
     {
         return ($pageUid === null)
-            ? Core::getCurrentPageUid()
+            ? Core::get()->getCurrentPageUid()
             : $pageUid;
     }
 

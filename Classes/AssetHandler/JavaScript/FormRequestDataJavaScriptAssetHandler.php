@@ -35,8 +35,8 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractJavaScriptAssetHandl
      */
     public function getFormRequestDataJavaScriptCode($formInstance)
     {
-        $submittedFormValues = Core::arrayToJavaScriptJson($this->getSubmittedFormValues($formInstance));
-        $fieldsExistingErrors = Core::arrayToJavaScriptJson($this->getFieldsExistingErrors());
+        $submittedFormValues = Core::get()->arrayToJavaScriptJson($this->getSubmittedFormValues($formInstance));
+        $fieldsExistingErrors = Core::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
 
         $originalRequest = $this->assetHandlerFactory
             ->getControllerContext()
