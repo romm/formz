@@ -13,8 +13,6 @@
 
 namespace Romm\Formz\Form;
 
-use Romm\Formz\Configuration\Form\Form;
-
 /**
  * This trait should be used by default to implement all the functions required
  * by the interface `FormInterface`.
@@ -24,13 +22,6 @@ use Romm\Formz\Configuration\Form\Form;
  */
 trait FormTrait
 {
-
-    /**
-     * Contains the configuration of the form.
-     *
-     * @var Form
-     */
-    protected $formConfiguration;
 
     /**
      * Contains the optional data returned from the validators of each field.
