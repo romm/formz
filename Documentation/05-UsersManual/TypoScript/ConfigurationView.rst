@@ -10,7 +10,7 @@
 View
 ====
 
-To be able to correctly use all features during forms HTML integration, you will have to use some TypoScript parameters.
+To be able to correctly use all features during a form's HTML integration, you will have to use some TypoScript parameters.
 
 Properties
 ----------

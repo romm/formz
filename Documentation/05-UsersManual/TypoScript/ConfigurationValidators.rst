@@ -15,7 +15,7 @@ A validator is a rule which will be applied on a field after the form submission
 
 .. hint::
 
-    By convention, everytime a new common validator is configured, its configuration should be set at the path ``config.tx_formz.validators``; this way, it may be used again by several fields.
+    By convention, every time a new common validator is configured, its configuration should be set at the path ``config.tx_formz.validators``; this way, it may be used again by different fields.
 
 Properties
 ----------
@@ -102,7 +102,7 @@ Validator messages
     Required?
         No
     Description
-        Allows to override the messages of the validator. A validator may have one or several messages, and each one is identified by a key, ``default`` being by convention the default key.
+        Allows to override the messages of the validator. A validator may have one or more messages, and each one is identified by a key, ``default`` being by convention the default key.
 
         **Example:**
 

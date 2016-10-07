@@ -10,11 +10,11 @@
 Fields
 ======
 
-The fields are the properties of a form PHP model. For each field having a custom behaviour (for instance a validation rule), you must fill its TypoScript configuration.
+The fields are the properties of a form's PHP model. For each field having a custom behaviour (for instance a validation rule), you must fill its TypoScript configuration.
 
 .. hint::
 
-    By convention, everytime a new common field is configured, its configuration should be set at the path ``config.tx_formz.fields``; this way, it may be used again by another form. A good example of a common field is “email”: several forms may use this field with the exact same configuration.
+    By convention, every time a new common field is configured, its configuration should be set at the path ``config.tx_formz.fields``; this way, it may be used again by another form. A good example of a common field is “email”: several forms may use this field with the exact same configuration.
 
 Properties
 ----------
@@ -55,9 +55,9 @@ Field validation
     Required?
         No
     Description
-        Contains the list of validators and theirs rules used for the field validation.
+        Contains the list of validators and their rules used for the field's validation.
 
-        The validators will be evaluated following the order of their declaration.
+        Validators will be evaluated following the order of their declaration.
 
         **Example:**
 
@@ -150,7 +150,7 @@ Field activation
     Required?
         No
     Description
-        Contains the field activation condition: a logical expression the case(s) where the field is activated.
+        Contains the field activation condition: a logical expression to describe how the field is activated.
 
         For more information on this, read the chapter “:ref:`usersManual-typoScript-configurationActivation`”.
 
@@ -208,7 +208,7 @@ Field container selector
 
         .. note::
 
-            You can regroup several fields by assigning them the same container selector, this is what you can find in the example above.
+            You can regroup several fields by assigning them the same container selector, as in the example above.
 
 .. _fieldsSettings-feedbackContainerSelector:
 
@@ -254,7 +254,7 @@ Feedback list selector
     Required?
         No
     Description
-        Contains the CSS selector which will be used to fetch the block containing the field messages. It is a second selection layout for the feedback container (``settings.feedbackContainerSelector``): it allows adding static HTML contents which wont be cleaned by JavaScript during the feedback refreshing.
+        Contains the CSS selector which will be used to fetch the block containing the field messages. It's a second selection layout for the feedback container (``settings.feedbackContainerSelector``): it allows adding static HTML contents which wont be cleaned up by JavaScript during the feedback refreshing.
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
@@ -303,7 +303,7 @@ Message template
 
         * **#FIELD_ID#**: “id” attribute of the field. Note that for fields of type “radio” or “checkbox” using this marker is useless.
 
-        * **#VALIDATOR#**: name if the validation rule which sent this message. For instance, it can be ``required``;
+        * **#VALIDATOR#**: name of the validation rule which sent this message. For instance, it can be ``required``;
 
         * **#TYPE#**: message type, often an error (in which case the value is ``error``);
 

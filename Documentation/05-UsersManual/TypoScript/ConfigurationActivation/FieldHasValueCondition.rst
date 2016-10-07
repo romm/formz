@@ -53,7 +53,7 @@ Value of the field
     Required?
         Yes
     Description
-        The value which the field must have in order for the condition to be verified.
+        The value the field must have in order for the condition to be verified.
 
 Example
 -------

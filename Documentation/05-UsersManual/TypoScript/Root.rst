@@ -19,7 +19,7 @@ Property                                                                        
 
 :ref:`settings.defaultFormSettings <settingsDefaultFormSettings>`                Default forms configuration
 
-:ref:`settings.defaultFieldSettings <settingsDefaultFieldSettings>`              Default fields configur         Yes
+:ref:`settings.defaultFieldSettings <settingsDefaultFieldSettings>`              Default fields configuration
 ================================================================================ ===========================================
 
 .. _formzForms:
@@ -56,7 +56,7 @@ Type of cache
 
         The default value is :php:`TYPO3\CMS\Core\Cache\Backend\FileBackend`.
 
-        You may change this value to follow your needs: it must be a valid backend cache type (see https://docs.typo3.org/typo3cms/CoreApiReference/CachingFramework/FrontendsBackends/Index.html#cache-backends).
+        You may change this value to suit your needs: it must be a valid backend cache type (see https://docs.typo3.org/typo3cms/CoreApiReference/CachingFramework/FrontendsBackends/Index.html#cache-backends).
 
 .. _settingsDefaultFormSettings:
 
@@ -90,6 +90,6 @@ Fields default configuration
     Description
         Contains the default configuration used by forms fields.
 
-        The properties which you can set here are strictly the same than the properties ``settings.*`` in the chapter “:ref:`usersManual-typoScript-configurationFields`”.
+        The properties which you can set here are strictly the same as the properties ``settings.*`` in the chapter “:ref:`usersManual-typoScript-configurationFields`”.
 
-        Notehat a field configuration set in the ``settings`` property of this field will override the default one.
+        Note that a field configuration set in the ``settings`` property of this field will override the default one.
