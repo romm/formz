@@ -12,7 +12,7 @@
 
 One of the main features of Formz is the handling of attributes, automatically updated in the HTML tag ``<form>``.
 
-These attributes allow to know exactly what is the state of every field in the form: is this field valid? What is the value of this field? Does this field contain an error?
+These attributes allow to know exactly what is the state of every field in the form: is this field valid? What's the value of this field? Does this field contain an error?
 
 This way, you can set up CSS selectors that follow your needs.
 

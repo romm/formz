@@ -12,7 +12,7 @@ Configuration
 
 In order for CSS and JavaScript to be able to find elements in the HTML DOM, it's necessary to respect some integration rules.
 
-Take care of respecting them when :ref:`you create new layouts <integratorManual-layouts>`, or Formz may suffer of dysfunction.
+Take care of respecting them when :ref:`you create new layouts <integratorManual-layouts>`, or Formz may not work properly.
 
 Field container
 ---------------
@@ -60,7 +60,7 @@ This container is divided into two parts: a global container, and a container fo
 
 In this example, the messages container is identified with ``formz-field-feedback-container="email"``, and the container of the messages list with ``formz-field-feedback-list="email"``. If the field ``email`` does not contain any message, the first container will be hidden.
 
-The attributes used in this example are the default ones. It is possible to customize them, see “:ref:`Messages container selector <fieldsSettings-feedbackContainerSelector>`” and “:ref:`Messages list container selector <fieldsSettings-feedbackListSelector>`”.
+The attributes used in this example are the default ones. It's possible to customize them, see “:ref:`Messages container selector <fieldsSettings-feedbackContainerSelector>`” and “:ref:`Messages list container selector <fieldsSettings-feedbackListSelector>`”.
 
 -----
 
@@ -69,7 +69,7 @@ The attributes used in this example are the default ones. It is possible to cust
 Message template
 ----------------
 
-Messages are automatically handled by JavaScript and Fluid. It works this way: when a field returns a message, it is wrapped in a HTML template, then put in the messages container (see above).
+Messages are automatically handled by JavaScript and Fluid. It works this way: when a field returns a message, it's wrapped inside a HTML template, then put into the messages container (see above).
 
 Of course, it can be necessary that the message template changes according to the platforms, style guides, and other things. You can customize the template of messages for every field. The default value of this template is:
 
@@ -81,13 +81,13 @@ In the template, the following values are dynamically replaced:
 
 * **#FIELD#**: name of the field;
 
-* **#FIELD_ID#**: “id” attribute of the field. Note that in the case of “radio” or “checkbox” fields using this marker is out of use;
+* **#FIELD_ID#**: “id” attribute of the field. Note that for fields of type “radio” or “checkbox” using this marker is useless.
 
 * **#VALIDATOR#**: name of the validation rule which returned this message. For instance, it can be ``required``;
 
 * **#TYPE#**: type of the message, usually an error (in which case the value is ``error``);
 
-* **#KEY#**: key of the message. In most cases, it is set to ``default``;
+* **#KEY#**: key of the message. In most cases, it's set to ``default``;
 
 * **#MESSAGE#**: body of the message.
 
@@ -103,7 +103,7 @@ Note that you can also modify the default value for all fields: “:ref:`Default
 HTML block
 ^^^^^^^^^^
 
-You can insert, directly in your template, a HTML block which contains the template. The block container must have the attribute ``formz-message-template="1"``.
+You can insert, directly in your template, a HTML block that contains the template. The block container must have the attribute ``formz-message-template="1"``.
 
 By convention, this container should be a tag ``<script>`` of type ``text/template``.
 

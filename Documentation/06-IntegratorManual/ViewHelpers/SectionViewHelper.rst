@@ -12,7 +12,7 @@ Section
 
 Defines a section which can be rendered in the field layout with the ViewHelper “:ref:`integratorManual-viewHelpers-renderSection`”.
 
-The goal of this ViewHelper is to dynamise some parts of the layout, for instance to be able to display informative messages for some fields.
+The goal of this ViewHelper is to dynamize some parts of the layout, for instance to be able to display informative messages for some fields.
 
 .. important::
 
@@ -26,7 +26,7 @@ Argument                Description
 ======================= ================================================================================================================
 \* ``name``             Name of the section.
 
-                        Note that if you use the name of a section which is not used in the field layout, this section wont be rendred.
+                        Note that if you use the name of a section which is not used in the field layout, this section wont be rendered.
 ======================= ================================================================================================================
 
 Example
