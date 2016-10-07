@@ -299,16 +299,6 @@ abstract class AbstractFormValidator extends GenericObjectValidator
     }
 
     /**
-     * @param string $fieldName
-     * @deprecated use `activateField()` instead
-     */
-    protected function activateFieldValidation($fieldName)
-    {
-        GeneralUtility::logDeprecatedFunction();
-        $this->activateField($fieldName);
-    }
-
-    /**
      * Deactivates the full validation for the given field.
      *
      * @param string $fieldName Name of the field.
@@ -318,16 +308,6 @@ abstract class AbstractFormValidator extends GenericObjectValidator
         if (false === in_array($fieldName, $this->deactivatedFields)) {
             $this->deactivatedFields[] = $fieldName;
         }
-    }
-
-    /**
-     * @param string $fieldName
-     * @deprecated use `deactivateField()` instead
-     */
-    protected function deactivateFieldValidation($fieldName)
-    {
-        GeneralUtility::logDeprecatedFunction();
-        $this->deactivateField($fieldName);
     }
 
     /**
@@ -407,7 +387,7 @@ abstract class AbstractFormValidator extends GenericObjectValidator
 
     /**
      * Will loop on each validation rule and apply it of the field.
-     * Errors are stored in $this->result
+     * Errors are stored in `$this->result`.
      *
      * @param string $fieldName The name of the field.
      * @return FormResult
