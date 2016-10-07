@@ -11,9 +11,8 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Utility;
+namespace Romm\Formz\AssetHandler;
 
-use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Css\ErrorContainerDisplayCssAssetHandler;
 use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
@@ -34,7 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
-class FormResourcesHandler implements SingletonInterface
+class FormAssetHandler implements SingletonInterface
 {
 
     /**
@@ -94,27 +93,15 @@ class FormResourcesHandler implements SingletonInterface
     protected $assetHandlerFactory;
 
     /**
-     * @var string
-     */
-    protected $formObjectClassName;
-
-    /**
-     * @var string
-     */
-    protected $formObjectName;
-
-    /**
      * @param PageRenderer        $pageRenderer
      * @param AssetHandlerFactory $assetHandlerFactory
-     * @param string              $formObjectClassName
-     * @param string              $formObjectName
-     * @return FormResourcesHandler
+     * @return FormAssetHandler
      */
-    public static function get(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory, $formObjectClassName, $formObjectName)
+    public static function get(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory)
     {
-        /** @var FormResourcesHandler $instance */
+        /** @var FormAssetHandler $instance */
         $instance = GeneralUtility::makeInstance(self::class);
-        $instance->insertData($pageRenderer, $assetHandlerFactory, $formObjectClassName, $formObjectName);
+        $instance->insertData($pageRenderer, $assetHandlerFactory);
 
         return $instance;
     }
@@ -122,15 +109,11 @@ class FormResourcesHandler implements SingletonInterface
     /**
      * @param PageRenderer        $pageRenderer
      * @param AssetHandlerFactory $assetHandlerFactory
-     * @param string              $formObjectClassName
-     * @param string              $formObjectName
      */
-    public function insertData(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory, $formObjectClassName, $formObjectName)
+    public function insertData(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory)
     {
         $this->pageRenderer = $pageRenderer;
         $this->assetHandlerFactory = $assetHandlerFactory;
-        $this->formObjectClassName = $formObjectClassName;
-        $this->formObjectName = $formObjectName;
     }
 
     /**
@@ -209,7 +192,7 @@ class FormResourcesHandler implements SingletonInterface
     {
         $filePath = $this->getFormzGeneratedFilePath() . '.js';
         $cacheInstance = Core::get()->getCacheInstance();
-        $javaScriptValidationFilesCacheIdentifier = Core::get()->getCacheIdentifier('js-files-', $this->formObjectClassName);
+        $javaScriptValidationFilesCacheIdentifier = Core::get()->getCacheIdentifier('js-files-', $this->assetHandlerFactory->getFormObject()->getClassName());
 
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
             ConditionNode::distinctUsedConditions();
@@ -267,7 +250,7 @@ class FormResourcesHandler implements SingletonInterface
         $javaScriptCode .= LF;
         $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
 
-        $this->pageRenderer->addJsFooterInlineCode('Formz - Initialization ' . $this->formObjectClassName, $javaScriptCode);
+        $this->pageRenderer->addJsFooterInlineCode('Formz - Initialization ' . $this->assetHandlerFactory->getFormObject()->getClassName(), $javaScriptCode);
 
         return $this;
     }
@@ -328,11 +311,12 @@ class FormResourcesHandler implements SingletonInterface
      */
     protected function getFormzGeneratedFilePath($prefix = '')
     {
+        $formObject = $this->assetHandlerFactory->getFormObject();
         $prefix = (false === empty($prefix))
             ? $prefix . '-'
             : '';
 
-        return Core::GENERATED_FILES_PATH . Core::get()->getCacheIdentifier('formz-' . $prefix, $this->formObjectClassName . '-' . $this->formObjectName);
+        return Core::GENERATED_FILES_PATH . Core::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
     }
 
     /**

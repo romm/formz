@@ -14,6 +14,7 @@
 namespace Romm\Formz\Utility;
 
 use \TYPO3\CMS\Core\TimeTracker\TimeTracker as TYPO3TimeTracker;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Little utility to track the time used by certain functionality.
@@ -25,6 +26,18 @@ class TimeTracker extends TYPO3TimeTracker
      * @var array
      */
     protected $logs = [];
+
+    /**
+     * @return TimeTracker
+     */
+    public static function getAndStart()
+    {
+        /** @var TimeTracker $timeTracker */
+        $timeTracker = GeneralUtility::makeInstance(TimeTracker::class);
+        $timeTracker->start();
+
+        return $timeTracker;
+    }
 
     /**
      * @param string $label

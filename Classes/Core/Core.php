@@ -252,7 +252,6 @@ class Core implements SingletonInterface
      * asset files created by Formz.
      *
      * @param array $parameters
-     * @return void
      */
     public function clearCacheCommand($parameters)
     {
@@ -300,6 +299,17 @@ class Core implements SingletonInterface
         }
 
         return $this->languageKey;
+    }
+
+    /**
+     * Will check if the TypoScript was indeed included, as it contains required
+     * configuration to make the forms work properly.
+     *
+     * @return bool
+     */
+    public function isTypoScriptIncluded()
+    {
+        return (null !== $this->getTypoScriptUtility()->getExtensionConfigurationFromPath('settings.typoScriptIncluded'));
     }
 
     /**

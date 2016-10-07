@@ -20,7 +20,7 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\Utility\FormResourcesHandler;
+use Romm\Formz\AssetHandler\FormAssetHandler;
 use Romm\Formz\Utility\TimeTracker;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
@@ -98,6 +98,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $assetHandlerFactory;
 
     /**
+     * @var TimeTracker
+     */
+    protected $timeTracker;
+
+    /**
      * @var array
      */
     protected static $staticVariables = [];
@@ -142,13 +147,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     public function render($action = null, array $arguments = [], $controller = null, $extensionName = null, $pluginName = null, $pageUid = null, $object = null, $pageType = 0, $noCache = false, $noCacheHash = false, $section = '', $format = '', array $additionalParams = [], $absolute = false, $addQueryString = false, array $argumentsToBeExcludedFromQueryString = [], $fieldNamePrefix = null, $actionUri = null, $objectName = null, $hiddenFieldClassName = null)
     {
+        $this->timeTracker = TimeTracker::getAndStart();
         $result = '';
 
-        /** @var TimeTracker $timeTracker */
-        $timeTracker = GeneralUtility::makeInstance(TimeTracker::class);
-        $timeTracker->start();
-
-        if (false === $this->isTypoScriptIncluded()) {
+        if (false === Core::get()->isTypoScriptIncluded()) {
             if (Core::get()->isInDebugMode()) {
                 $result = Core::get()->translate('form.typoscript_not_included.error_message');
             }
@@ -160,58 +162,59 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 ->mergeValidationResultWithFormObject($this->formObject);
 
             if ($formzValidationResult->hasErrors()) {
+                // If the form configuration is not valid, we display the errors list.
                 $result = $this->getErrorText($formzValidationResult);
             } else {
-                $this->formzConfiguration = Core::get()->getConfigurationFactory()
-                    ->getFormzConfiguration()
-                    ->getObject();
-                $timeTracker->logTime('post-config');
-
-                $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
-
-                $formResourcesHandler = FormResourcesHandler::get(
-                    $this->pageRenderer,
-                    $this->assetHandlerFactory,
-                    $this->getFormObjectClassName(),
-                    $this->getFormObjectName()
-                );
-
-                $this->injectFormInstance()
-                    ->injectObjectAndRequestResult()
-                    ->applyBehavioursOnSubmittedForm()
-                    ->addDefaultClass()
-                    ->handleDataAttributes();
-
-                $formResourcesHandler->includeAssets()
-                    ->includeGeneratedCss()
-                    ->includeGeneratedJavaScript();
-
-                $timeTracker->logTime('pre-render');
-                $result = call_user_func_array([$this, 'parent::render'], func_get_args());
-
-                $formResourcesHandler->handleJavaScriptLocalization();
-                $this->resetVariables();
+                // Everything is ok, we render the form.
+                $result = $this->renderForm();
             }
 
             unset($formzValidationResult);
         }
 
-        $timeTracker->logTime('final');
-        $result = $timeTracker->getHTMLCommentLogs() . LF . $result;
-        unset($timeTracker);
+        $this->timeTracker->logTime('final');
+        $result = $this->timeTracker->getHTMLCommentLogs() . LF . $result;
+        unset($this->timeTracker);
 
         return $result;
     }
 
     /**
-     * Will check if the TypoScript was indeed included, as it contains required
-     * configuration to make the forms work properly.
+     * Will render the whole form and return the HTML result.
      *
-     * @return bool
+     * @return string
      */
-    private function isTypoScriptIncluded()
+    protected function renderForm()
     {
-        return (null !== Core::get()->getTypoScriptUtility()->getExtensionConfigurationFromPath('settings.typoScriptIncluded'));
+        $this->formzConfiguration = Core::get()->getConfigurationFactory()
+            ->getFormzConfiguration()
+            ->getObject();
+
+        $this->timeTracker->logTime('post-config');
+
+        $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
+
+        $this->injectFormInstance()
+            ->injectObjectAndRequestResult()
+            ->applyBehavioursOnSubmittedForm()
+            ->addDefaultClass()
+            ->handleDataAttributes();
+
+        $formResourcesHandler = FormAssetHandler::get($this->pageRenderer, $this->assetHandlerFactory);
+        $formResourcesHandler->includeAssets()
+            ->includeGeneratedCss()
+            ->includeGeneratedJavaScript();
+
+        $this->timeTracker->logTime('pre-render');
+
+        // Renders the whole Fluid template.
+        $result = call_user_func_array([$this, 'parent::render'], func_get_args());
+
+        $formResourcesHandler->handleJavaScriptLocalization();
+
+        $this->resetVariables();
+
+        return $result;
     }
 
     /**
@@ -335,8 +338,8 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     /**
      * Will add a default class to the form element.
      *
-     * To customize the class, take a look at "settings.defaultClass" in the form
-     * TypoScript configuration.
+     * To customize the class, take a look at `settings.defaultClass` in the
+     * form TypoScript configuration.
      *
      * @return $this
      */
@@ -398,7 +401,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $view->assign('result', $result);
 
         $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
-        $this->pageRenderer->addCssFile(FormResourcesHandler::getResourceRelativePath($templatePath));
+        $this->pageRenderer->addCssFile(FormAssetHandler::getResourceRelativePath($templatePath));
 
         return $view->render();
     }
