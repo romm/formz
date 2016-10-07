@@ -10,7 +10,7 @@
 Option
 ======
 
-Defines the value of an argument which is sent during the rendering of a field.
+Defines the value of an argument that is sent during the rendering of a field.
 
 It's another way of using ``arguments`` of the ViewHelper “:ref:`integratorManual-viewHelpers-field`”. You can use both features, but the ViewHelper ``option`` will override an argument previously defined.
 

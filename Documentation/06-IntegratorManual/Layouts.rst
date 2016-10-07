@@ -10,7 +10,7 @@
 Layouts
 =======
 
-During a form integration, one problem always come back: setting up fields which have **exactly the same template**, meaning the container of a field will be **almost identical from one field to another**. In most cases, two fields answer the exact same HTML/CSS integration rules, which leads to huge code repetition, and breaks the “*Don't Repeat Yourself*” rule.
+During a form integration, one problem always comes back: setting up fields which have **exactly the same template**, meaning the container of a field will be **almost identical from one field to another**. In most cases, two fields answer the exact same HTML/CSS integration rules, which leads to huge code repetition, and breaks the “*Don't Repeat Yourself*” rule.
 
 Problem
 -------
@@ -18,16 +18,16 @@ Problem
 Why is block repetition annoying?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-One of the first reason is obvious: it make **code reading more complicated**. It is possible that a field is made of several HTML tags levels: if we multiply it by the number of fields in a form, we can come to hundreds of code lines.
+One of the first reasons is obvious: it makes **code reading harder**. It's possible that a field is made out of several HTML tags levels: if we multiply it by the number of fields in a form, we can quickly get to hundreds of lines of code.
 
 Setting up a new field is also slow: adjust the container to the field, and modify all variables bound to the field: label, attributes (``class``, ``id``), etc.
 
-Finally, the **maintainability becomes more complicated**. Indeed, if a modification must be done in the HTML structure for every field of a form, the correction must be applied on each one of the fields. Worse case: if a site contains dozens of forms based on the same template, every form must be modified.
+Finally, the **maintainability becomes harder**. Indeed, if a modification must be done in the HTML structure for every field of a form, the correction must be applied on each one of the fields. Worse case: if a site contains dozens of forms based on the same template, every form must be modified.
 
 Solution
 ^^^^^^^^
 
-To solve this problem, Formz allows to **regroup templates for fields in standalone view**. The code required to integrate a field is then **much shorter and more understandable, but also more maintainable**: when a modification is done in a field layout, it is done for every real field which actually uses this layout.
+To solve this problem, Formz allows to **regroup templates for fields in standalone views**. The code required to integrate a field is then **much shorter and more understandable, but also more maintainable**: when a modification is done in a field layout, it is done for every real field which actually uses this layout.
 
 -----
 
@@ -71,7 +71,7 @@ Template file creation
 
 The template file declared in the property ``templateFile`` of the TypoScript configuration must be created, if it doesn't exist yet. You should try to use this template with as much layouts as you can.
 
-It's advised to divide your template in several sections, which contain the important blocks which are used by your layout. By default, three sections are used: ``Label``, ``Field`` and ``Feedback``.
+It's advised to divide your template in several sections, which contain the important blocks that are used by your layout. By default, three sections are used: ``Label``, ``Field`` and ``Feedback``.
 
 The following variables can be used in your template:
 
@@ -121,7 +121,7 @@ The following variables can be used in your template:
 Layout file creation
 """"""""""""""""""""
 
-The layout usage with the template is exactly the **same as in a classic Fluid integration**: you can render section defined in the template.
+The layout usage with the template is exactly the **same as in a classic Fluid integration**: you can render sections defined in the template.
 
 Use the layout to get the wanted dividing, which may then be used by the form fields (see below).
 
@@ -146,7 +146,7 @@ Use the layout to get the wanted dividing, which may then be used by the form fi
 Using a layout
 ^^^^^^^^^^^^^^
 
-Once you registered your layouts, you can used them with the ViewHelper :ref:`integratorManual-viewHelpers-field` by filling the attribute ``layout``. The field will then use the wanted layout for its rendering, with chosen options.
+Once you registered your layouts, you can use them with the ViewHelper :ref:`integratorManual-viewHelpers-field` by filling the attribute ``layout``. The field will then use the wanted layout for its rendering, with chosen options.
 
 This way, the field rendering stays completely outside your form integration.
 
