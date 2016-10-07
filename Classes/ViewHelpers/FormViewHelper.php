@@ -167,7 +167,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                     ->getObject();
                 $timeTracker->logTime('post-config');
 
-                $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->arguments, $this->controllerContext);
+                $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
 
                 $formResourcesHandler = FormResourcesHandler::get(
                     $this->pageRenderer,

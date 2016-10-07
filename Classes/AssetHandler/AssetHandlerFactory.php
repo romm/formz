@@ -35,11 +35,6 @@ class AssetHandlerFactory
     protected static $instances = [];
 
     /**
-     * @var array
-     */
-    protected $formData = [];
-
-    /**
      * @var FormObject
      */
     protected $formObject = [];
@@ -51,48 +46,27 @@ class AssetHandlerFactory
 
     /**
      * @param FormObject        $formObject Name of the form class.
-     * @param array             $formData   Data of the form from the view helper.
      * @param ControllerContext $controllerContext
      * @throws \Exception
      */
-    protected function __construct(FormObject $formObject, array $formData, ControllerContext $controllerContext)
+    protected function __construct(FormObject $formObject, ControllerContext $controllerContext)
     {
-        $this->formData = $formData;
         $this->formObject = $formObject;
         $this->controllerContext = $controllerContext;
     }
 
     /**
      * @param FormObject        $formObject Configuration of the form.
-     * @param array             $formData   Data of the form from the view helper.
      * @param ControllerContext $controllerContext
      * @return AssetHandlerFactory
      */
-    public static function get(FormObject $formObject, array $formData, ControllerContext $controllerContext)
+    public static function get(FormObject $formObject, ControllerContext $controllerContext)
     {
         if (false === isset(self::$instances[$formObject->getClassName()])) {
-            self::$instances[$formObject->getClassName()] = new AssetHandlerFactory($formObject, $formData, $controllerContext);
+            self::$instances[$formObject->getClassName()] = new AssetHandlerFactory($formObject, $controllerContext);
         }
 
         return self::$instances[$formObject->getClassName()];
-    }
-
-    /**
-     * @param string|null $dataKey If set, the function will check if the given key exists in the data array.
-     * @return array
-     */
-    public function getFormData($dataKey = null)
-    {
-        $result = $dataKey;
-
-        if (null !== $dataKey) {
-            $result = null;
-            if (true === isset($this->formData[$dataKey])) {
-                $result = $this->formData[$dataKey];
-            }
-        }
-
-        return $result;
     }
 
     /**

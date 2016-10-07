@@ -34,7 +34,7 @@ class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
         $this->removeFieldsValidationConfiguration($formConfigurationArray)
             ->addClassNameProperty($formConfigurationArray);
 
-        $formName = GeneralUtility::quoteJSvalue($this->assetHandlerFactory->getFormData('name'));
+        $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
         $formConfigurationJson = Core::get()->arrayToJavaScriptJson($formConfigurationArray);
 
         $javaScriptCode = <<<JS

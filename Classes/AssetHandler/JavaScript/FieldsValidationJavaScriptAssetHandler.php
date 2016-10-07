@@ -55,7 +55,7 @@ class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHand
             $fieldsJavaScriptCode[] = $this->processField($field);
         }
 
-        $formName = GeneralUtility::quoteJSvalue($this->assetHandlerFactory->getFormData('name'));
+        $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
         $fieldsJavaScriptCode = implode(CRLF, $fieldsJavaScriptCode);
 
         $this->javaScriptCode = <<<JS

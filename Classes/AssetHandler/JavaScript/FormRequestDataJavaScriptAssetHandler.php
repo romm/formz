@@ -46,7 +46,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractJavaScriptAssetHandl
             ? 'true'
             : 'false';
 
-        $formName = GeneralUtility::quoteJSvalue($this->assetHandlerFactory->getFormData('name'));
+        $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
 
         $javaScriptCode = <<<JS
 (function() {
@@ -104,7 +104,7 @@ JS;
         if (null !== $controllerContext->getRequest()->getOriginalRequest()) {
             $requestResult = $controllerContext->getRequest()->getOriginalRequestMappingResults();
             /** @var Result[] $formFieldsResult */
-            $formFieldsResult = $requestResult->forProperty($this->assetHandlerFactory->getFormData('name'))->getSubResults();
+            $formFieldsResult = $requestResult->forProperty($this->getFormObject()->getName())->getSubResults();
 
             foreach ($formConfiguration->getFields() as $field) {
                 $fieldName = $field->getFieldName();
