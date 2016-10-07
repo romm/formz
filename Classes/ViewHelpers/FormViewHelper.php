@@ -149,20 +149,20 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $timeTracker->start();
 
         if (false === $this->isTypoScriptIncluded()) {
-            if (Core::isInDebugMode()) {
-                $result = Core::translate('form.typoscript_not_included.error_message');
+            if (Core::get()->isInDebugMode()) {
+                $result = Core::get()->translate('form.typoscript_not_included.error_message');
             }
         } else {
-            $this->formObject = Core::getFormObjectFactory()
+            $this->formObject = Core::get()->getFormObjectFactory()
                 ->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
 
-            $formzValidationResult = Core::getConfigurationFactory()
+            $formzValidationResult = Core::get()->getConfigurationFactory()
                 ->mergeValidationResultWithFormObject($this->formObject);
 
             if ($formzValidationResult->hasErrors()) {
                 $result = $this->getErrorText($formzValidationResult);
             } else {
-                $this->formzConfiguration = Core::getConfigurationFactory()
+                $this->formzConfiguration = Core::get()->getConfigurationFactory()
                     ->getFormzConfiguration()
                     ->getObject();
                 $timeTracker->logTime('post-config');
@@ -211,7 +211,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     private function isTypoScriptIncluded()
     {
-        return (null !== Core::getTypoScriptUtility()->getExtensionConfigurationFromPath('settings.typoScriptIncluded'));
+        return (null !== Core::get()->getTypoScriptUtility()->getExtensionConfigurationFromPath('settings.typoScriptIncluded'));
     }
 
     /**
@@ -392,12 +392,12 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     {
         /** @var $view \TYPO3\CMS\Fluid\View\StandaloneView */
         $view = $this->objectManager->get(StandaloneView::class);
-        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . Core::getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
-        $layoutRootPath = ExtensionManagementUtility::siteRelPath(Core::getExtensionKey()) . '/Resources/Private/Layouts';
+        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
+        $layoutRootPath = ExtensionManagementUtility::siteRelPath(Core::get()->getExtensionKey()) . '/Resources/Private/Layouts';
         $view->setLayoutRootPaths([$layoutRootPath]);
         $view->assign('result', $result);
 
-        $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . Core::getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
+        $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
         $this->pageRenderer->addCssFile(FormResourcesHandler::getResourceRelativePath($templatePath));
 
         return $view->render();

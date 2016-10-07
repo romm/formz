@@ -16,7 +16,7 @@
   ],
   "require": {
     "php": ">=5.5",
-    "romm/configuration-object": "^1.2"
+    "romm/configuration-object": "^1.2.1"
   },
   "require-dev": {
     "mikey179/vfsStream": "1.4.*@dev",

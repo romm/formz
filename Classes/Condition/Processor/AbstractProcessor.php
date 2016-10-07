@@ -60,7 +60,7 @@ abstract class AbstractProcessor implements ProcessorInterface
         $formConfiguration = $this->formObject->getConfiguration();
 
         if (true === static::$storeInCache) {
-            $cacheInstance = Core::getCacheInstance();
+            $cacheInstance = Core::get()->getCacheInstance();
             if ($cacheInstance) {
                 $cacheIdentifier = 'processor-' . sha1(get_class($this) . $this->formObject->getClassName());
 
@@ -201,7 +201,7 @@ abstract class AbstractProcessor implements ProcessorInterface
                 throw new \Exception('You need to give a form object to the processor first.', 1457623098);
             }
 
-            $cacheInstance = Core::getCacheInstance();
+            $cacheInstance = Core::get()->getCacheInstance();
 
             if ($cacheInstance) {
                 if ($cacheInstance->has($cacheIdentifier)) {

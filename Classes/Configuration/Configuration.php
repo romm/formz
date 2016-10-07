@@ -14,6 +14,7 @@
 namespace Romm\Formz\Configuration;
 
 use Romm\ConfigurationObject\ConfigurationObjectInterface;
+use Romm\ConfigurationObject\Service\Items\Cache\CacheService;
 use Romm\ConfigurationObject\Service\ServiceFactory;
 use Romm\ConfigurationObject\Service\ServiceInterface;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
@@ -21,6 +22,8 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\DefaultConfigurationObje
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
+use Romm\Formz\Core\Core;
+use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
@@ -69,13 +72,25 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public static function getConfigurationObjectServices()
     {
+        $backendCache = Core::get()->getTypoScriptUtility()
+            ->getExtensionConfigurationFromPath('settings.defaultBackendCache');
+
+        if (false === class_exists($backendCache)
+            && false === in_array(AbstractBackend::class, class_parents($backendCache))
+        ) {
+            throw new \Exception(
+                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
+                1459251263
+            );
+        }
+
         $serviceFactory = ServiceFactory::getInstance()
+            ->attach(ServiceInterface::SERVICE_CACHE)
+            ->with(ServiceInterface::SERVICE_CACHE)
+            ->setOption(CacheService::OPTION_CACHE_BACKEND, $backendCache)
             ->attach(ServiceInterface::SERVICE_PARENTS)
             ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
             ->attach(ServiceInterface::SERVICE_MIXED_TYPES);
-
-        ConfigurationServicesUtility::getInstance()
-            ->addCacheServiceToServiceFactory($serviceFactory);
 
         return $serviceFactory;
     }

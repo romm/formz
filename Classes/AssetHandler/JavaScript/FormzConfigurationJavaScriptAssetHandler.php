@@ -47,7 +47,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
         $cleanFormzConfigurationArray = [
             'view' => $formzConfigurationArray['view']
         ];
-        $jsonConfiguration = Core::arrayToJavaScriptJson($cleanFormzConfigurationArray);
+        $jsonConfiguration = Core::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
 
         return <<<JS
 (function() {

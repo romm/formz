@@ -2,27 +2,15 @@
 namespace Romm\Formz\Tests\Unit\Form;
 
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
-use Romm\ConfigurationObject\Tests\Unit\ConfigurationObjectUnitTestUtility;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\Tests\Unit\FormzUnitTestUtility;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
+use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
-class FormObjectTest extends UnitTestCase
+class FormObjectTest extends AbstractUnitTest
 {
-
-    use ConfigurationObjectUnitTestUtility;
-    use FormzUnitTestUtility;
 
     const FORM_OBJECT_DEFAULT_CLASS_NAME = \stdClass::class;
     const FORM_OBJECT_DEFAULT_NAME = 'foo';
-
-    protected function setUp()
-    {
-        $this->initializeConfigurationObjectTestServices();
-        $this->injectMockedConfigurationServicesUtility();
-        $this->injectTransientMemoryCacheInCore();
-    }
 
     /**
      * Checking that getter functions for constructor parameters work well.
@@ -136,7 +124,8 @@ class FormObjectTest extends UnitTestCase
     }
 
     /**
-     * The hash should be calculated only once, as it is
+     * The hash should be calculated only once, as it can lead to performance
+     * issues if the object is used many times.
      *
      * @test
      */

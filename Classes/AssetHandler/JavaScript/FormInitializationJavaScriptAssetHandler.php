@@ -35,7 +35,7 @@ class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
             ->addClassNameProperty($formConfigurationArray);
 
         $formName = GeneralUtility::quoteJSvalue($this->assetHandlerFactory->getFormData('name'));
-        $formConfigurationJson = Core::arrayToJavaScriptJson($formConfigurationArray);
+        $formConfigurationJson = Core::get()->arrayToJavaScriptJson($formConfigurationArray);
 
         $javaScriptCode = <<<JS
 (function() {

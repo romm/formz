@@ -88,7 +88,7 @@ abstract class AbstractConditionItem
     protected function getDefaultJavaScriptCall(array $data)
     {
         $conditionName = addslashes(get_class($this));
-        $data = Core::arrayToJavaScriptJson($data);
+        $data = Core::get()->arrayToJavaScriptJson($data);
 
         return <<<JS
 Formz.Condition.validateCondition('$conditionName', form, $data)

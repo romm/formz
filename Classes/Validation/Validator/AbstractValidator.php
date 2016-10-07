@@ -266,7 +266,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      */
     protected function getMessageFromKey($key, $extensionKey = null, array $arguments = [])
     {
-        return Core::translate($key, $extensionKey, $arguments);
+        return Core::get()->translate($key, $extensionKey, $arguments);
     }
 
     /**

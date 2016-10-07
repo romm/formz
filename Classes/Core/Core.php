@@ -24,6 +24,7 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
@@ -39,41 +40,66 @@ class Core implements SingletonInterface
     const GENERATED_FILES_PATH = 'typo3temp/Formz/';
 
     /**
-     * @var int|null
+     * @var Core
      */
-    private static $currentPageUid = -1;
+    protected static $instance;
 
     /**
-     * @var ObjectManager
+     * @var int|null
      */
-    private static $objectManager;
+    private $currentPageUid = -1;
+
+    /**
+     * @var ObjectManagerInterface
+     */
+    private $objectManager;
 
     /**
      * @var TypoScriptUtility
      */
-    private static $typoScriptUtility;
+    private $typoScriptUtility;
 
     /**
      * @var ConfigurationFactory
      */
-    private static $configurationFactory;
+    private $configurationFactory;
 
     /**
      * @var FormObjectFactory
      */
-    private static $formObjectFactory;
+    private $formObjectFactory;
 
     /**
      * Contains the actual language key.
      *
      * @var string
      */
-    private static $languageKey;
+    private $languageKey;
 
     /**
      * @var array
      */
-    private static $extensionConfiguration;
+    private $extensionConfiguration;
+
+    /**
+     * @var FrontendInterface
+     */
+    protected $cacheInstance;
+
+    /**
+     * @return Core
+     */
+    public static function get()
+    {
+        if (null === self::$instance) {
+            /** @var ObjectManager $objectManager */
+            $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+
+            self::$instance = $objectManager->get(self::class);
+        }
+
+        return self::$instance;
+    }
 
     /**
      * Translation handler. Does the same job as Extbase translation tools,
@@ -85,7 +111,7 @@ class Core implements SingletonInterface
      * @param    array  $arguments    Arguments passed over to vsprintf.
      * @return   string               The translated string.
      */
-    public static function translate($index, $extensionKey = null, $arguments = null)
+    public function translate($index, $extensionKey = null, $arguments = null)
     {
         $extensionKey = ($extensionKey) ?: self::EXTENSION_KEY;
         $result = LocalizationUtility::translate($index, $extensionKey, $arguments);
@@ -102,7 +128,7 @@ class Core implements SingletonInterface
      * @param array $array
      * @return string
      */
-    public static function arrayToJavaScriptJson(array $array)
+    public function arrayToJavaScriptJson(array $array)
     {
         return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
     }
@@ -114,14 +140,14 @@ class Core implements SingletonInterface
      *
      * @return int|null
      */
-    public static function getCurrentPageUid()
+    public function getCurrentPageUid()
     {
-        if (-1 === self::$currentPageUid) {
+        if (-1 === $this->currentPageUid) {
             /** @var EnvironmentService $environmentService */
             $environmentService = GeneralUtility::makeInstance(EnvironmentService::class);
 
             $id = ($environmentService->isEnvironmentInFrontendMode())
-                ? self::getPageController()->id
+                ? $this->getPageController()->id
                 : GeneralUtility::_GP('id');
 
             if (false === MathUtility::canBeInterpretedAsInteger($id)
@@ -130,10 +156,10 @@ class Core implements SingletonInterface
                 $id = null;
             }
 
-            self::$currentPageUid = $id;
+            $this->currentPageUid = $id;
         }
 
-        return self::$currentPageUid;
+        return $this->currentPageUid;
     }
 
     /**
@@ -142,33 +168,36 @@ class Core implements SingletonInterface
      *
      * @param int $uid The uid of the page.
      */
-    public static function setCurrentPageUid($uid)
+    public function setCurrentPageUid($uid)
     {
-        self::$currentPageUid = intval($uid);
+        $this->currentPageUid = intval($uid);
     }
-
-    /**
-     * @var FrontendInterface
-     */
-    protected static $cacheInstance;
 
     /**
      * Returns the cache instance for this extension.
      *
      * @return FrontendInterface
      */
-    public static function getCacheInstance()
+    public function getCacheInstance()
     {
-        if (null === self::$cacheInstance) {
+        if (null === $this->cacheInstance) {
             /** @var $cacheManager CacheManager */
-            $cacheManager = self::getObjectManager()->get(CacheManager::class);
+            $cacheManager = $this->getObjectManager()->get(CacheManager::class);
 
             if ($cacheManager->hasCache(self::CACHE_IDENTIFIER)) {
-                self::$cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
+                $this->cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
             }
         }
 
-        return self::$cacheInstance;
+        return $this->cacheInstance;
+    }
+
+    /**
+     * @param FrontendInterface $cacheInstance
+     */
+    public function setCacheInstance(FrontendInterface $cacheInstance)
+    {
+        $this->cacheInstance = $cacheInstance;
     }
 
     /**
@@ -179,7 +208,7 @@ class Core implements SingletonInterface
      * @param int    $maxLength
      * @return string
      */
-    public static function getCacheIdentifier($string, $formClassName, $maxLength = 55)
+    public function getCacheIdentifier($string, $formClassName, $maxLength = 55)
     {
         $explodedClassName = explode('\\', $formClassName);
 
@@ -199,20 +228,20 @@ class Core implements SingletonInterface
      * @param string $configurationName If null, returns the whole configuration. Otherwise, returns the asked configuration.
      * @return array
      */
-    public static function getExtensionConfiguration($configurationName = null)
+    public function getExtensionConfiguration($configurationName = null)
     {
-        if (null === self::$extensionConfiguration) {
-            self::$extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][self::EXTENSION_KEY]);
-            if (false === self::$extensionConfiguration) {
-                self::$extensionConfiguration = [];
+        if (null === $this->extensionConfiguration) {
+            $this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][self::EXTENSION_KEY]);
+            if (false === $this->extensionConfiguration) {
+                $this->extensionConfiguration = [];
             }
         }
 
         $result = null;
         if (null === $configurationName) {
-            $result = self::$extensionConfiguration;
-        } elseif (ArrayUtility::isValidPath(self::$extensionConfiguration, $configurationName, '.')) {
-            $result = ArrayUtility::getValueByPath(self::$extensionConfiguration, $configurationName, '.');
+            $result = $this->extensionConfiguration;
+        } elseif (ArrayUtility::isValidPath($this->extensionConfiguration, $configurationName, '.')) {
+            $result = ArrayUtility::getValueByPath($this->extensionConfiguration, $configurationName, '.');
         }
 
         return $result;
@@ -247,86 +276,102 @@ class Core implements SingletonInterface
      *
      * @return string
      */
-    public static function getLanguageKey()
+    public function getLanguageKey()
     {
-        if (null === self::$languageKey) {
-            self::$languageKey = 'default';
+        if (null === $this->languageKey) {
+            $this->languageKey = 'default';
 
             /** @var EnvironmentService $environmentService */
             $environmentService = GeneralUtility::makeInstance(EnvironmentService::class);
 
             if ($environmentService->isEnvironmentInFrontendMode()) {
-                $pageController = self::getPageController();
+                $pageController = $this->getPageController();
 
                 if (isset($pageController->config['config']['language'])) {
-                    self::$languageKey = $pageController->config['config']['language'];
+                    $this->languageKey = $pageController->config['config']['language'];
                 }
             } else {
-                $backendUser = self::getBackendUser();
+                $backendUser = $this->getBackendUser();
 
                 if (strlen($backendUser->uc['lang']) > 0) {
-                    self::$languageKey = $backendUser->uc['lang'];
+                    $this->languageKey = $backendUser->uc['lang'];
                 }
             }
         }
 
-        return self::$languageKey;
+        return $this->languageKey;
     }
 
     /**
      * @return bool
      */
-    public static function isInDebugMode()
+    public function isInDebugMode()
     {
-        return (bool)self::getExtensionConfiguration('debugMode');
+        return (bool)$this->getExtensionConfiguration('debugMode');
     }
 
     /**
-     * @return ObjectManager
+     * @return ObjectManagerInterface
      */
-    public static function getObjectManager()
+    public function getObjectManager()
     {
-        if (null === self::$objectManager) {
-            self::$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        }
+        return $this->objectManager;
+    }
 
-        return self::$objectManager;
+    /**
+     * @param ObjectManagerInterface $objectManager
+     */
+    public function injectObjectManager(ObjectManagerInterface $objectManager)
+    {
+        $this->objectManager = $objectManager;
     }
 
     /**
      * @return TypoScriptUtility
      */
-    public static function getTypoScriptUtility()
+    public function getTypoScriptUtility()
     {
-        if (null === self::$typoScriptUtility) {
-            self::$typoScriptUtility = self::getObjectManager()->get(TypoScriptUtility::class);
-        }
+        return $this->typoScriptUtility;
+    }
 
-        return self::$typoScriptUtility;
+    /**
+     * @param TypoScriptUtility $typoScriptUtility
+     */
+    public function injectTypoScriptUtility(TypoScriptUtility $typoScriptUtility)
+    {
+        $this->typoScriptUtility = $typoScriptUtility;
     }
 
     /**
      * @return ConfigurationFactory
      */
-    public static function getConfigurationFactory()
+    public function getConfigurationFactory()
     {
-        if (null === self::$configurationFactory) {
-            self::$configurationFactory = self::getObjectManager()->get(ConfigurationFactory::class);
-        }
+        return $this->configurationFactory;
+    }
 
-        return self::$configurationFactory;
+    /**
+     * @param ConfigurationFactory $configurationFactory
+     */
+    public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
+    {
+        $this->configurationFactory = $configurationFactory;
     }
 
     /**
      * @return FormObjectFactory
      */
-    public static function getFormObjectFactory()
+    public function getFormObjectFactory()
     {
-        if (null === self::$formObjectFactory) {
-            self::$formObjectFactory = self::getObjectManager()->get(FormObjectFactory::class);
-        }
+        return $this->formObjectFactory;
+    }
 
-        return self::$formObjectFactory;
+    /**
+     * @param FormObjectFactory $formObjectFactory
+     */
+    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
+    {
+        $this->formObjectFactory = $formObjectFactory;
     }
 
     /**
@@ -334,7 +379,7 @@ class Core implements SingletonInterface
      *
      * @return string
      */
-    public static function getExtensionKey()
+    public function getExtensionKey()
     {
         return self::EXTENSION_KEY;
     }
@@ -342,7 +387,7 @@ class Core implements SingletonInterface
     /**
      * @return TypoScriptFrontendController
      */
-    public static function getPageController()
+    public function getPageController()
     {
         return $GLOBALS['TSFE'];
     }
@@ -350,7 +395,7 @@ class Core implements SingletonInterface
     /**
      * @return BackendUserAuthentication
      */
-    public static function getBackendUser()
+    public function getBackendUser()
     {
         return $GLOBALS['BE_USER'];
     }

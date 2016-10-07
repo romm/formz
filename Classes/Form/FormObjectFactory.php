@@ -14,6 +14,7 @@
 namespace Romm\Formz\Form;
 
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -47,56 +48,84 @@ class FormObjectFactory implements SingletonInterface
      */
     public function getInstanceFromClassName($className, $name)
     {
-        if (false === in_array(FormInterface::class, class_implements($className))) {
-            throw new \Exception(
+        if (false === class_exists($className)
+            || false === in_array(FormInterface::class, class_implements($className))
+        ) {
+            throw new ClassNotFoundException(
                 'Invalid class name given: "' . $className . '"; the class must be an instance of "' . FormInterface::class . '".',
                 1467191011
             );
         }
 
-        $cacheIdentifier = Core::getCacheIdentifier('form-object-', $className . '-' . $name);
+        $cacheIdentifier = Core::get()->getCacheIdentifier('form-object-', $className . '-' . $name);
 
         if (false === isset($this->instances[$cacheIdentifier])) {
-            $cacheInstance = Core::getCacheInstance();
+            $cacheInstance = Core::get()->getCacheInstance();
 
             if ($cacheInstance->has($cacheIdentifier)) {
                 $this->instances[$cacheIdentifier] = $cacheInstance->get($cacheIdentifier);
             } else {
-                /** @var FormObject $instance */
-                $instance = GeneralUtility::makeInstance(FormObject::class, $className, $name);
-
-                /** @var ReflectionService $reflectionService */
-                $reflectionService = GeneralUtility::makeInstance(ReflectionService::class);
-                $reflectionProperties = $reflectionService->getClassPropertyNames($className);
-
-                $classReflection = new \ReflectionClass($className);
-                $publicProperties = $classReflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-                foreach ($reflectionProperties as $property) {
-                    if (false === in_array($property, self::$ignoredProperties)
-                        && false === $reflectionService->isPropertyTaggedWith($className, $property, self::IGNORE_PROPERTY)
-                        && ((true === in_array($property, $publicProperties))
-                            || $reflectionService->hasMethod($className, 'get' . ucfirst($property))
-                        )
-                    ) {
-                        $instance->addProperty($property);
-                    }
-                }
-
-                $formConfiguration = Core::getTypoScriptUtility()->getFormConfiguration($className);
-                $instance->setConfigurationArray($formConfiguration);
-                $instance->getHash();
-
-                $cacheInstance->set($cacheIdentifier, $instance);
-
+                $instance = $this->createInstance($className, $name);
                 $this->instances[$cacheIdentifier] = $instance;
-                unset($publicProperties);
+                $cacheInstance->set($cacheIdentifier, $instance);
             }
 
-            Core::getConfigurationFactory()
+            Core::get()->getConfigurationFactory()
                 ->addFormFromClassName($className, $name);
         }
 
         return $this->instances[$cacheIdentifier];
+    }
+
+    /**
+     * Creates and initializes a new `FormObject` instance.
+     *
+     * @param string $className
+     * @param string $name
+     * @return FormObject
+     */
+    protected function createInstance($className, $name)
+    {
+        /** @var FormObject $instance */
+        $instance = GeneralUtility::makeInstance(FormObject::class, $className, $name);
+
+        $this->insertObjectProperties($instance);
+
+        $formConfiguration = Core::get()->getTypoScriptUtility()->getFormConfiguration($className);
+        $instance->setConfigurationArray($formConfiguration);
+
+        $instance->getHash();
+
+        return $instance;
+    }
+
+    /**
+     * Will insert all the accessible properties of the given instance.
+     *
+     * @param FormObject $instance
+     */
+    protected function insertObjectProperties(FormObject $instance)
+    {
+        $className = $instance->getClassName();
+
+        /** @var ReflectionService $reflectionService */
+        $reflectionService = GeneralUtility::makeInstance(ReflectionService::class);
+        $reflectionProperties = $reflectionService->getClassPropertyNames($className);
+
+        $classReflection = new \ReflectionClass($className);
+        $publicProperties = $classReflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($reflectionProperties as $property) {
+            if (false === in_array($property, self::$ignoredProperties)
+                && false === $reflectionService->isPropertyTaggedWith($className, $property, self::IGNORE_PROPERTY)
+                && ((true === in_array($property, $publicProperties))
+                    || $reflectionService->hasMethod($className, 'get' . ucfirst($property))
+                )
+            ) {
+                $instance->addProperty($property);
+            }
+        }
+
+        unset($publicProperties);
     }
 }
