@@ -9,9 +9,6 @@ use Romm\Formz\Tests\Unit\AbstractUnitTest;
 class FormObjectTest extends AbstractUnitTest
 {
 
-    const FORM_OBJECT_DEFAULT_CLASS_NAME = \stdClass::class;
-    const FORM_OBJECT_DEFAULT_NAME = 'foo';
-
     /**
      * Checking that getter functions for constructor parameters work well.
      *
@@ -171,13 +168,5 @@ class FormObjectTest extends AbstractUnitTest
         $this->assertSame($configurationObject->getObject(true), $formObject->getConfiguration());
 
         unset($formObject);
-    }
-
-    /**
-     * @return FormObject
-     */
-    protected function getFormObject()
-    {
-        return new FormObject(self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME);
     }
 }
