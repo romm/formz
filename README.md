@@ -14,7 +14,7 @@
 
 Forms are **common elements in the conception of a website**, as they allow a **direct interaction** between the user and the application. Technically, setting up a form can quickly become **complex** and require a **lot of time**: many aspects must be considered: **style, displaying, validation, security**…
 
-This is why Formz was born: facilitate the **set up** and the **maintenance** of a form, by providing tools which are **simple and fast to use**, but also **powerful and flexible** to fulfill every need.
+This is why Formz was born: to facilitate the **set up** and the **maintenance** of a form, by providing tools which are **simple and fast to use**, but also **powerful and flexible** to fulfill every need.
 
 Formz helps with the following topics:
 
@@ -26,7 +26,7 @@ Formz helps with the following topics:
 
 - **UX** – a whole JavaScript API is provided to make a user experience as fast and as pleasant as possible.
 
-- **Code generation** – Formz can generate JavaScript and CSS, which are then injected in the page and will automatize a part of the client-sided behaviours.
+- **Code generation** – Formz can generate JavaScript and CSS, which are then injected into the page and will automatize a part of the client-sided behaviours.
 
 ## Example
 
