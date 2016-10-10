@@ -13,9 +13,9 @@ HTML/CSS cheat-sheet
 PhpStorm auto-completion
 ------------------------
 
-Formz provides a schema allowing to IDE like PhpStorm to give auto-completion for its ViewHelpers in Fluid templates.
+Formz provides a schema allowing IDEs like PhpStorm to give auto-completion for its ViewHelpers in Fluid templates.
 
-You can find a guide on integrating XSD files in IDE here: https://github.com/FluidTYPO3/schemaker/blob/development/README.md#how-to-use-xsd-in-ide
+You can find a guide on integrating XSD files in your IDE here: https://github.com/FluidTYPO3/schemaker/blob/development/README.md#how-to-use-xsd-in-ide
 
 **Example:**
 
@@ -57,7 +57,7 @@ List of attributes used on the tag ``<form>`` and which can be used with CSS:
 
 **Example of CSS:**
 
-In the example below, the block ``info-customer`` is hidden as long as the button “No” is no selected. It's the same as saying that it will be displayed only if the button “No” is selected.
+In the example below, the block ``info-customer`` is hidden as long as the button “No” is not selected. It's the same as saying that it will be displayed only if the button “No” is selected.
 
 .. code-block:: css
 

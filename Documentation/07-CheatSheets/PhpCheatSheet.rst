@@ -138,7 +138,7 @@ Form validator
         protected $form;
 
         /**
-         * Before validation begins, we check the user is still connected: if
+         * Before validation begins, we check if the user is still connected: if
          * not he will be automatically redirected.
          *
          * We also activate the rule `required` for the fields `name` and `first
@@ -261,7 +261,7 @@ Validators
 Utilities
 ---------
 
-The class :php:`Romm\Formz\Utility\FormUtility` contains functions that may help you during development:
+The class :php:`Romm\Formz\Utility\FormUtility` contains methods that may help you during development:
 
 Get form with errors
 ^^^^^^^^^^^^^^^^^^^^
