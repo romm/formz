@@ -2,6 +2,7 @@
 namespace Romm\Formz\Tests\Unit;
 
 use Romm\ConfigurationObject\Tests\Unit\ConfigurationObjectUnitTestUtility;
+use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
@@ -26,5 +27,19 @@ abstract class AbstractUnitTest extends UnitTestCase
     protected function getFormObject()
     {
         return new FormObject(self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME);
+    }
+
+    /**
+     * After every test, we reset some class which may have change and not be
+     * reset correctly.
+     */
+    protected function tearDown()
+    {
+        // Reset asset handler factory instances.
+        $reflectedCore = new \ReflectionClass(AssetHandlerFactory::class);
+        $objectManagerProperty = $reflectedCore->getProperty('instances');
+        $objectManagerProperty->setAccessible(true);
+        $objectManagerProperty->setValue([]);
+        $objectManagerProperty->setAccessible(false);
     }
 }
