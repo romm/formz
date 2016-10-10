@@ -21,6 +21,10 @@ call_user_func(
             \Romm\Formz\Condition\Items\FieldIsValidCondition::CONDITION_NAME,
             \Romm\Formz\Condition\Items\FieldIsValidCondition::class
         );
+        $conditionFactory->registerCondition(
+            \Romm\Formz\Condition\Items\FieldIsEmptyCondition::CONDITION_NAME,
+            \Romm\Formz\Condition\Items\FieldIsEmptyCondition::class
+        );
 
 		// Registering the cache.
 		if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][\Romm\Formz\Core\Core::CACHE_IDENTIFIER])) {
