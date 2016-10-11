@@ -43,38 +43,67 @@ class ConfigurationFactory implements SingletonInterface
     /**
      * Returns the global Formz configuration.
      *
+     * Two cache layers are used:
+     *
+     * - A local cache which will avoid fetching the configuration every time
+     *   the current script needs it.
+     * - A system cache, which will store the configuration instance when it has
+     *   been built, improving performance for next scripts.
+     *
      * @return ConfigurationObjectInstance
      */
     public function getFormzConfiguration()
     {
-        if (false === isset($this->cacheIdentifiers[Core::get()->getCurrentPageUid()])) {
-            $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
-            $this->cacheIdentifiers[Core::get()->getCurrentPageUid()] = 'formz-configuration-' . sha1(serialize($configuration));
-        }
-        $cacheIdentifier = $this->cacheIdentifiers[Core::get()->getCurrentPageUid()];
+        $cacheIdentifier = $this->getCacheIdentifier();
 
         if (null === $this->instances[$cacheIdentifier]) {
-            $cacheInstance = Core::get()->getCacheInstance();
-
-            if ($cacheInstance->has($cacheIdentifier)) {
-                $this->instances[$cacheIdentifier] = $cacheInstance->get($cacheIdentifier);
-            } else {
-                $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
-                $instance = ConfigurationObjectFactory::getInstance()
-                    ->get(Configuration::class, $configuration);
-                /** @var Configuration $instanceObject */
-                $instanceObject = $instance->getObject(true);
-                $instanceObject->calculateHashes();
-
-                $this->instances[$cacheIdentifier] = $instance;
-
-                if (false === $instance->getValidationResult()->hasErrors()) {
-                    $cacheInstance->set($cacheIdentifier, $instance);
-                }
-            }
+            $this->instances[$cacheIdentifier] = $this->getFormzConfigurationFromCache($cacheIdentifier);
         }
 
         return $this->instances[$cacheIdentifier];
+    }
+
+    /**
+     * Will fetch the configuration from cache, and build it if not found. It
+     * wont be stored in cache if any error is found. This is done this way to
+     * avoid the integrator to be forced to flush caches when errors are found.
+     *
+     * @param string $cacheIdentifier
+     * @return ConfigurationObjectInstance
+     */
+    protected function getFormzConfigurationFromCache($cacheIdentifier)
+    {
+        $cacheInstance = Core::get()->getCacheInstance();
+
+        if ($cacheInstance->has($cacheIdentifier)) {
+            $instance = $cacheInstance->get($cacheIdentifier);
+        } else {
+            $instance = $this->buildFormzConfiguration();
+
+            if (false === $instance->getValidationResult()->hasErrors()) {
+                $cacheInstance->set($cacheIdentifier, $instance);
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @see getFormzConfiguration()
+     *
+     * @return ConfigurationObjectInstance
+     */
+    protected function buildFormzConfiguration()
+    {
+        $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
+        $instance = ConfigurationObjectFactory::getInstance()
+            ->get(Configuration::class, $configuration);
+
+        /** @var Configuration $instanceObject */
+        $instanceObject = $instance->getObject(true);
+        $instanceObject->calculateHashes();
+
+        return $instance;
     }
 
     /**
@@ -121,5 +150,21 @@ class ConfigurationFactory implements SingletonInterface
             ->merge($formObject->getConfigurationObject()->getValidationResult());
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCacheIdentifier()
+    {
+        $pageUid = Core::get()->getCurrentPageUid();
+
+        if (false === array_key_exists($pageUid, $this->cacheIdentifiers)) {
+            $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
+
+            $this->cacheIdentifiers[$pageUid] = 'formz-configuration-' . sha1(serialize($configuration));
+        }
+
+        return $this->cacheIdentifiers[$pageUid];
     }
 }

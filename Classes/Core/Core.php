@@ -327,13 +327,11 @@ class Core implements SingletonInterface
      */
     public function getExtensionRelativePath($path = null)
     {
-        $result = ExtensionManagementUtility::siteRelPath('formz');
+        $relativePath = ExtensionManagementUtility::siteRelPath('formz');
 
-        if (null !== $path) {
-            $result .= $path;
-        }
-
-        return $result;
+        return (null !== $path)
+            ? $relativePath . $path
+            : $relativePath;
     }
 
     /**
