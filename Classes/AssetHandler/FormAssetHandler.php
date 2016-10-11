@@ -71,7 +71,7 @@ class FormAssetHandler implements SingletonInterface
     /**
      * @var bool
      */
-    protected static $assetsIncluded = false;
+    protected $assetsIncluded = false;
 
     /**
      * Storage for JavaScript files which were already included. It will handle
@@ -101,18 +101,25 @@ class FormAssetHandler implements SingletonInterface
     {
         /** @var FormAssetHandler $instance */
         $instance = GeneralUtility::makeInstance(self::class);
-        $instance->insertData($pageRenderer, $assetHandlerFactory);
+        $instance->setPageRenderer($pageRenderer);
+        $instance->setAssetHandlerFactory($assetHandlerFactory);
 
         return $instance;
     }
 
     /**
-     * @param PageRenderer        $pageRenderer
-     * @param AssetHandlerFactory $assetHandlerFactory
+     * @param PageRenderer $pageRenderer
      */
-    public function insertData(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory)
+    public function setPageRenderer(PageRenderer $pageRenderer)
     {
         $this->pageRenderer = $pageRenderer;
+    }
+
+    /**
+     * @param AssetHandlerFactory $assetHandlerFactory
+     */
+    public function setAssetHandlerFactory(AssetHandlerFactory $assetHandlerFactory)
+    {
         $this->assetHandlerFactory = $assetHandlerFactory;
     }
 
@@ -125,20 +132,20 @@ class FormAssetHandler implements SingletonInterface
      */
     public function includeAssets()
     {
-        if (false === self::$assetsIncluded) {
-            self::$assetsIncluded = true;
+        if (false === $this->assetsIncluded) {
+            $this->assetsIncluded = true;
 
             if (Core::get()->isInDebugMode()) {
                 self::$javaScriptFiles[] = 'Formz.Debug.js';
             }
 
             foreach (self::$javaScriptFiles as $file) {
-                $filePath = ExtensionManagementUtility::siteRelPath('formz') . 'Resources/Public/JavaScript/' . $file;
+                $filePath = Core::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
                 $this->pageRenderer->addJsFile($filePath);
             }
 
             foreach (self::$cssFiles as $file) {
-                $filePath = ExtensionManagementUtility::siteRelPath('formz') . 'Resources/Public/StyleSheets/' . $file;
+                $filePath = Core::get()->getExtensionRelativePath('Resources/Public/StyleSheets/' . $file);
                 $this->pageRenderer->addCssFile($filePath);
             }
 

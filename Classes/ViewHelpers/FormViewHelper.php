@@ -396,7 +396,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         /** @var $view \TYPO3\CMS\Fluid\View\StandaloneView */
         $view = $this->objectManager->get(StandaloneView::class);
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
-        $layoutRootPath = ExtensionManagementUtility::siteRelPath(Core::get()->getExtensionKey()) . '/Resources/Private/Layouts';
+        $layoutRootPath = Core::get()->getExtensionRelativePath('Resources/Private/Layouts');
         $view->setLayoutRootPaths([$layoutRootPath]);
         $view->assign('result', $result);
 
