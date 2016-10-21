@@ -2,6 +2,8 @@
 
 > [![Build Status](https://travis-ci.org/romm/formz.svg?branch=master)](https://travis-ci.org/romm/formz) [![Coverage Status](https://coveralls.io/repos/github/romm/formz/badge.svg?branch=master)](https://coveralls.io/github/romm/formz?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/romm/formz/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/romm/formz/?branch=master) [![Latest Stable Version](https://poser.pugx.org/romm/formz/v/stable)](https://packagist.org/packages/romm/formz) [![Total Downloads](https://poser.pugx.org/romm/formz/downloads)](https://packagist.org/packages/romm/formz) [![SensioLabs Insight](https://img.shields.io/sensiolabs/i/9ec58fe3-3e6c-4524-82bd-b6e2a14824a2.svg)](https://insight.sensiolabs.com/projects/9ec58fe3-3e6c-4524-82bd-b6e2a14824a2)
 
+> **→ [Formz official website](http://typo3-formz.com/)**
+
 > “Handle forms very easily with provided tools: TypoScript based validation, Fluid helpers, a whole JavaScript API, and more. Use pre-defined layouts for Twitter Bootstrap and Foundation to build good-looking forms in minutes. Need to build a basic form with only two fields? Need to build a huge registration form with dozens of fields? Use Formz, it will fulfill your needs!”
 
 > :heavy_exclamation_mark: *This PHP library has been developed for [![TYPO3](Resources/Public/Images/typo3-icon.png)TYPO3 CMS](https://typo3.org) and is intended to TYPO3 extension developers.*

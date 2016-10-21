@@ -11,6 +11,8 @@ Présentation
 Formz
 ^^^^^
 
+*Retrouvez le site officiel de Formz sur : http://typo3-formz.com/*
+
 Les formulaires sont des éléments **prédominants dans la conception d'un site internet** puisqu'ils permettent l'**interaction directe** entre l'utilisateur et l'application. Techniquement, la mise en place d'un formulaire peut rapidement devenir **complexe** et demander **beaucoup de temps** : de nombreux aspects sont à prendre en compte : **style, affichage, validation, sécurité**…
 
 C'est de ce constat que Formz est né : faciliter la **mise en place** et la **maintenance** d'un formulaire, en proposant des outils **simples et rapides d'utilisation**, pour autant **puissants** et **flexibles** pour répondre à tous les besoins.

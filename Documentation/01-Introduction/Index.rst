@@ -11,6 +11,8 @@ Introduction
 Formz
 ^^^^^
 
+*Check out Formz official website at: http://typo3-formz.com/*
+
 Forms are **common elements in the conception of a website**, as they allow a **direct interaction** between the user and the application. Technically, setting up a form can quickly become **complex** and require a **lot of time**: many aspects must be considered: **style, displaying, validation, security**…
 
 This is why Formz was born: facilitate the **set up** and the **maintenance** of a form, by providing tools which are **simple and fast to use**, but also **powerful and flexible** to fulfill every need.
