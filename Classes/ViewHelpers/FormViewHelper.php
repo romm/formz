@@ -25,7 +25,6 @@ use Romm\Formz\Utility\TimeTracker;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
