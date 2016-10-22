@@ -28,7 +28,6 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\ViewHelpers\FormViewHelper;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
