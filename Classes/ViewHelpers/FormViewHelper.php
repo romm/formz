@@ -158,8 +158,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             $this->formObject = Core::get()->getFormObjectFactory()
                 ->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
 
-            $formzValidationResult = Core::get()->getConfigurationFactory()
-                ->mergeValidationResultWithFormObject($this->formObject);
+            $formzValidationResult = $this->formObject->getConfigurationValidationResult();
 
             if ($formzValidationResult->hasErrors()) {
                 // If the form configuration is not valid, we display the errors list.

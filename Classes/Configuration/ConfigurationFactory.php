@@ -15,11 +15,9 @@ namespace Romm\Formz\Configuration;
 
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Error\Result;
 
 /**
  * This class is used to build and manage the whole Formz configuration: from a
@@ -112,44 +110,19 @@ class ConfigurationFactory implements SingletonInterface
      * the global Formz configuration - which you can access with the function
      * `getFormzConfiguration()`.
      *
-     * @param string $className
-     * @param string $name
+     * @param FormObject $form
      * @return $this
-     * @throws \Exception
      */
-    public function addFormFromClassName($className, $name)
+    public function addForm(FormObject $form)
     {
         /** @var Configuration $formzConfigurationObject */
         $formzConfigurationObject = $this->getFormzConfiguration()->getObject(true);
 
-        if (false === $formzConfigurationObject->hasForm($className, $name)) {
-            $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName($className, $name);
-            $formObjectConfiguration = $formObject->getConfigurationObject();
-            /** @var Form $formConfiguration */
-            $formConfiguration = $formObjectConfiguration->getObject(true);
-
-            $formzConfigurationObject->addForm($className, $name, $formConfiguration);
+        if (false === $formzConfigurationObject->hasForm($form->getClassName(), $form->getName())) {
+            $formzConfigurationObject->addForm($form);
         }
 
         return $this;
-    }
-
-    /**
-     * This function will merge the validation results of both the global Formz
-     * configuration object, and the given form configuration object.
-     *
-     * @param FormObject $formObject
-     * @return Result
-     */
-    public function mergeValidationResultWithFormObject(FormObject $formObject)
-    {
-        $result = new Result();
-        $result->merge($this->getFormzConfiguration()->getValidationResult());
-
-        $result->forProperty('forms.' . $formObject->getClassName())
-            ->merge($formObject->getConfigurationObject()->getValidationResult());
-
-        return $result;
     }
 
     /**

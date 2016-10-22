@@ -63,15 +63,15 @@ class FormObjectFactory implements SingletonInterface
             $cacheInstance = Core::get()->getCacheInstance();
 
             if ($cacheInstance->has($cacheIdentifier)) {
-                $this->instances[$cacheIdentifier] = $cacheInstance->get($cacheIdentifier);
+                $instance = $cacheInstance->get($cacheIdentifier);
             } else {
                 $instance = $this->createInstance($className, $name);
-                $this->instances[$cacheIdentifier] = $instance;
                 $cacheInstance->set($cacheIdentifier, $instance);
             }
 
-            Core::get()->getConfigurationFactory()
-                ->addFormFromClassName($className, $name);
+            Core::get()->getConfigurationFactory()->addForm($instance);
+
+            $this->instances[$cacheIdentifier] = $instance;
         }
 
         return $this->instances[$cacheIdentifier];

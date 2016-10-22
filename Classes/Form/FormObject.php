@@ -17,6 +17,7 @@ use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use TYPO3\CMS\Extbase\Error\Result;
 
 /**
  * This is the object representation of a form. In here we can manage which
@@ -200,6 +201,28 @@ class FormObject
         }
 
         return $this->configurationObject;
+    }
+
+    /**
+     * This function will merge and return the validation results of both the
+     * global Formz configuration object, and this form configuration object.
+     *
+     * @return Result
+     */
+    public function getConfigurationValidationResult()
+    {
+        $result = new Result();
+        $formzConfigurationValidationResult = Core::get()
+            ->getConfigurationFactory()
+            ->getFormzConfiguration()
+            ->getValidationResult();
+
+        $result->merge($formzConfigurationValidationResult);
+
+        $result->forProperty('forms.' . $this->getClassName())
+            ->merge($this->getConfigurationObject()->getValidationResult());
+
+        return $result;
     }
 
     /**

@@ -23,6 +23,7 @@ use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -108,14 +109,16 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      * function will also handle the parent service from the
      * `configuration_object` extension.
      *
-     * @param string $className
-     * @param string $name
-     * @param Form   $configuration
+     * @param FormObject $form
      */
-    public function addForm($className, $name, Form $configuration)
+    public function addForm(FormObject $form)
     {
+        $formObjectConfiguration = $form->getConfigurationObject();
+        /** @var Form $configuration */
+        $configuration = $formObjectConfiguration->getObject(true);
+
         $configuration->setParents([$this]);
-        $this->forms[$className][$name] = $configuration;
+        $this->forms[$form->getClassName()][$form->getName()] = $configuration;
     }
 
     /**
