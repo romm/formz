@@ -2,6 +2,7 @@
 namespace Romm\Formz\Tests\Unit\Form;
 
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
+use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -169,6 +170,43 @@ class FormObjectTest extends AbstractUnitTest
         $this->assertSame($configurationObject->getObject(true), $formObject->getConfiguration());
 
         unset($formObject);
+    }
+
+    /**
+     * Checks that the configuration object is stored in cache, so it is not
+     * built every time it is fetched.
+     *
+     * @test
+     */
+    public function configurationObjectIsStoredInCache()
+    {
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
+        $formObject = $this->getMock(FormObject::class, ['buildConfigurationObject'], [\stdClass::class, 'foo']);
+
+        $formzConfiguration = new Configuration();
+        $result = new Result();
+        $configurationObjectInstance = new ConfigurationObjectInstance($formzConfiguration, $result);
+
+        $formObject->expects($this->once())
+            ->method('buildConfigurationObject')
+            ->willReturn($configurationObjectInstance);
+
+        for ($i = 0; $i < 3; $i++) {
+            $formObject->getConfigurationObject();
+        }
+
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject2 */
+        $formObject2 = $this->getMock(FormObject::class, ['buildConfigurationObject'], [\stdClass::class, 'foo']);
+
+        $formObject2->expects($this->never())
+            ->method('buildConfigurationObject');
+
+        for ($i = 0; $i < 3; $i++) {
+            $formObject2->getConfigurationObject();
+        }
+
+        unset($formObject);
+        unset($formObject2);
     }
 
     /**

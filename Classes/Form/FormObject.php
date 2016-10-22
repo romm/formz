@@ -189,8 +189,7 @@ class FormObject
             if ($cacheInstance->has($cacheIdentifier)) {
                 $configurationObject = $cacheInstance->get($cacheIdentifier);
             } else {
-                $configurationObject = ConfigurationObjectFactory::getInstance()
-                    ->get(Form::class, $this->configurationArray);
+                $configurationObject = $this->buildConfigurationObject();
 
                 if (false === $configurationObject->getValidationResult()->hasErrors()) {
                     $cacheInstance->set($cacheIdentifier, $configurationObject);
@@ -223,6 +222,16 @@ class FormObject
             ->merge($this->getConfigurationObject()->getValidationResult());
 
         return $result;
+    }
+
+    /**
+     * @return ConfigurationObjectInstance
+     */
+    protected function buildConfigurationObject()
+    {
+        echo 'A';
+        return ConfigurationObjectFactory::getInstance()
+            ->get(Form::class, $this->configurationArray);
     }
 
     /**
