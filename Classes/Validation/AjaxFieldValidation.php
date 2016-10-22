@@ -55,7 +55,7 @@ class AjaxFieldValidation implements SingletonInterface
         if ($formClassName && $formName && $passObjectInstance && $fieldValue && $fieldName && $validatorName) {
             try {
                 $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName($formClassName, $formName);
-                $validationResult = Core::get()->getConfigurationFactory()->mergeValidationResultWithFormObject($formObject);
+                $validationResult = $formObject->getConfigurationValidationResult();
 
                 if (false === $validationResult->hasErrors()) {
                     $formConfiguration = $formObject->getConfiguration();

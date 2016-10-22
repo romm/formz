@@ -34,12 +34,21 @@ trait FormzUnitTestUtility
     protected $formConfiguration = [];
 
     /**
+     * @var array
+     */
+    protected $extensionConfiguration = [];
+
+    /**
      * Initializes correctly this extension `Core` class to be able to work
      * correctly in unit tests.
      */
     private function setUpFormzCore()
     {
-        $this->formzCoreMock = $this->getMock(Core::class, ['translate']);
+        $this->formzCoreMock = $this->getMock(
+            Core::class,
+            ['translate', 'getExtensionConfiguration', 'getExtensionRelativePath']
+        );
+
         $this->formzCoreMock->injectObjectManager($this->getFormzObjectManagerMock());
         $this->formzCoreMock->injectTypoScriptUtility(new TypoScriptUtility);
         $this->formzCoreMock->injectConfigurationFactory(new ConfigurationFactory);
@@ -59,6 +68,29 @@ trait FormzUnitTestUtility
                 $this->returnCallback(
                     function ($key, $extension) {
                         return 'LLL:' . $extension . ':' . $key;
+                    }
+                )
+            );
+
+        /*
+         * Will return a configuration that can be manipulated during tests.
+         */
+        $this->formzCoreMock->method('getExtensionConfiguration')
+            ->willReturn($this->extensionConfiguration);
+
+        /*
+         * The relative path can't be fetched during unit tests: we force a
+         * static value.
+         */
+        $this->formzCoreMock->method('getExtensionRelativePath')
+            ->will(
+                $this->returnCallback(
+                    function ($path = null) {
+                        $relativePath = '/tmp/formz/';
+
+                        return (null !== $path)
+                            ? $relativePath . $path
+                            : $relativePath;
                     }
                 )
             );
@@ -99,6 +131,23 @@ trait FormzUnitTestUtility
     protected function setFormConfigurationFromClassName($className, array $configuration)
     {
         $this->formConfiguration[$className] = $configuration;
+    }
+
+    /**
+     * @param array $extensionConfiguration
+     */
+    protected function setExtensionConfiguration(array $extensionConfiguration)
+    {
+        $this->extensionConfiguration = $extensionConfiguration;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     */
+    protected function setExtensionConfigurationValue($key, $value)
+    {
+        $this->extensionConfiguration[$key] = $value;
     }
 
     /**

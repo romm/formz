@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -318,6 +319,19 @@ class Core implements SingletonInterface
     public function isInDebugMode()
     {
         return (bool)$this->getExtensionConfiguration('debugMode');
+    }
+
+    /**
+     * @param string|null $path If a string is given, it will be precessed by the extension relative path and returned.
+     * @return string
+     */
+    public function getExtensionRelativePath($path = null)
+    {
+        $relativePath = ExtensionManagementUtility::siteRelPath('formz');
+
+        return (null !== $path)
+            ? $relativePath . $path
+            : $relativePath;
     }
 
     /**
