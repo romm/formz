@@ -5,6 +5,7 @@ use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use TYPO3\CMS\Extbase\Error\Result;
 
 class FormObjectTest extends AbstractUnitTest
 {
@@ -154,7 +155,7 @@ class FormObjectTest extends AbstractUnitTest
         $arrayConfiguration = [
             'fields' => [
                 'foo' => []
-            ],
+            ]
         ];
 
         $formObject->addProperty('foo');
@@ -166,6 +167,31 @@ class FormObjectTest extends AbstractUnitTest
         $this->assertEquals(Form::class, get_class($configurationObject->getObject(true)));
         $this->assertFalse($configurationObject->getValidationResult()->hasErrors());
         $this->assertSame($configurationObject->getObject(true), $formObject->getConfiguration());
+
+        unset($formObject);
+    }
+
+    /**
+     * Checks that the configuration validation result is correctly built and
+     * can be fetched.
+     *
+     * @test
+     */
+    public function configurationValidationResultCanBeGet()
+    {
+        $formObject = $this->getFormObject();
+        $arrayConfiguration = [
+            'fields' => [
+                'foo' => []
+            ]
+        ];
+
+        $formObject->addProperty('foo');
+        $formObject->setConfigurationArray($arrayConfiguration);
+
+        $validationResult = $formObject->getConfigurationValidationResult();
+        $this->assertInstanceOf(Result::class, $validationResult);
+        $this->assertFalse($validationResult->hasErrors());
 
         unset($formObject);
     }
