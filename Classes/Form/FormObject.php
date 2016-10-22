@@ -229,7 +229,6 @@ class FormObject
      */
     protected function buildConfigurationObject()
     {
-        echo 'A';
         return ConfigurationObjectFactory::getInstance()
             ->get(Form::class, $this->configurationArray);
     }

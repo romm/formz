@@ -113,9 +113,8 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public function addForm(FormObject $form)
     {
-        $formObjectConfiguration = $form->getConfigurationObject();
         /** @var Form $configuration */
-        $configuration = $formObjectConfiguration->getObject(true);
+        $configuration = $form->getConfigurationObject()->getObject(true);
 
         $configuration->setParents([$this]);
         $this->forms[$form->getClassName()][$form->getName()] = $configuration;

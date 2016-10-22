@@ -4,6 +4,7 @@ namespace Romm\Formz\Tests\Unit\Configuration;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -126,6 +127,32 @@ class ConfigurationFactoryTest extends AbstractUnitTest
         $this->assertEquals(serialize($configurationObjectInstanceFromFactory), serialize($configurationObjectInstance));
 
         unset($configurationInstance);
+        unset($configurationFactory);
+    }
+
+    /**
+     * Checks that adding a form the the configuration factory will actually add
+     * it to the list of registered forms.
+     *
+     * @test
+     */
+    public function addingFormAddsForm()
+    {
+        $formObject = $this->getFormObject();
+        $configurationFactory = Core::get()->getConfigurationFactory();
+
+        /** @var Configuration $formzConfigurationObject */
+        $formzConfigurationObject = $configurationFactory
+            ->getFormzConfiguration()
+            ->getObject(true);
+
+        $this->assertFalse($formzConfigurationObject->hasForm($formObject->getClassName(), $formObject->getName()));
+
+        $configurationFactory->addForm($formObject);
+
+        $this->assertTrue($formzConfigurationObject->hasForm($formObject->getClassName(), $formObject->getName()));
+
+        unset($formObject);
         unset($configurationFactory);
     }
 }
