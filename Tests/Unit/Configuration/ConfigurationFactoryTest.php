@@ -129,30 +129,4 @@ class ConfigurationFactoryTest extends AbstractUnitTest
         unset($configurationInstance);
         unset($configurationFactory);
     }
-
-    /**
-     * Checks that adding a form the the configuration factory will actually add
-     * it to the list of registered forms.
-     *
-     * @test
-     */
-    public function addingFormAddsForm()
-    {
-        $formObject = $this->getFormObject();
-        $configurationFactory = Core::get()->getConfigurationFactory();
-
-        /** @var Configuration $formzConfigurationObject */
-        $formzConfigurationObject = $configurationFactory
-            ->getFormzConfiguration()
-            ->getObject(true);
-
-        $this->assertFalse($formzConfigurationObject->hasForm($formObject->getClassName(), $formObject->getName()));
-
-        $configurationFactory->addForm($formObject);
-
-        $this->assertTrue($formzConfigurationObject->hasForm($formObject->getClassName(), $formObject->getName()));
-
-        unset($formObject);
-        unset($configurationFactory);
-    }
 }

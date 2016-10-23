@@ -23,6 +23,7 @@ use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -38,7 +39,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     protected $settings;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Form>
+     * @var FormObject[]
      */
     protected $forms = [];
 
@@ -92,14 +93,23 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      * `configuration_object` extension.
      *
      * @param FormObject $form
+     * @throws DuplicateEntryException
      */
     public function addForm(FormObject $form)
     {
+        if (true === $this->hasForm($form->getClassName(), $form->getName())) {
+            throw new DuplicateEntryException(
+                'The form "' . $form->getName() . '" of class "' . $form->getClassName() . '" was already registered. You can only register a form once. Check the function `hasForm()`.',
+                1477255145
+            );
+        }
+
         /** @var Form $configuration */
         $configuration = $form->getConfigurationObject()->getObject(true);
 
         $configuration->setParents([$this]);
-        $this->forms[$form->getClassName()][$form->getName()] = $configuration;
+
+        $this->forms[$form->getClassName()][$form->getName()] = $form;
     }
 
     /**
