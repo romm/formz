@@ -49,9 +49,9 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     protected $view;
 
     /**
-     * @var array
+     * @var string
      */
-    protected $hash = [];
+    protected $hash;
 
     /**
      * Constructor.
