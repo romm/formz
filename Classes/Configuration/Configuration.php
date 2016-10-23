@@ -103,14 +103,6 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     }
 
     /**
-     * @return Form[]
-     */
-    public function getForms()
-    {
-        return $this->forms;
-    }
-
-    /**
      * @param string $className
      * @param string $name
      * @return bool
