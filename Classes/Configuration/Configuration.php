@@ -32,9 +32,6 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     use DefaultConfigurationObjectTrait;
     use ArrayConversionTrait;
 
-    const HASH_FULL = 'full';
-    const HASH_CONFIGURATION = 'configuration';
-
     /**
      * @var \Romm\Formz\Configuration\Settings\Settings
      */
@@ -144,30 +141,27 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     }
 
     /**
-     * Calculates several hashes for the class and its sub-properties. Can be
-     * used as a unique identifier in further scripts.
+     * Calculates a hash for this configuration, which can be used as a unique
+     * identifier. It should be called once, before the configuration is put in
+     * cache, so it is not needed to call it again after being fetched from
+     * cache.
      */
-    public function calculateHashes()
+    public function calculateHash()
     {
         $fullArray = $this->toArray();
         $configurationArray = [
-            'view' => $fullArray['view']
+            'view'     => $fullArray['view'],
+            'settings' => $fullArray['settings']
         ];
 
-        $this->hash = [
-            self::HASH_FULL          => sha1(serialize($fullArray)),
-            self::HASH_CONFIGURATION => sha1(serialize($configurationArray))
-        ];
+        $this->hash = sha1(serialize($configurationArray));
     }
 
     /**
-     * @param string $identifier One of the `HASH_*` constants.
      * @return string
      */
-    public function getHash($identifier = self::HASH_FULL)
+    public function getHash()
     {
-        return (true === isset($this->hash[$identifier]))
-            ? $this->hash[$identifier]
-            : null;
+        return $this->hash;
     }
 }

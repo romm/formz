@@ -99,7 +99,7 @@ class ConfigurationFactory implements SingletonInterface
 
         /** @var Configuration $instanceObject */
         $instanceObject = $instance->getObject(true);
-        $instanceObject->calculateHashes();
+        $instanceObject->calculateHash();
 
         return $instance;
     }

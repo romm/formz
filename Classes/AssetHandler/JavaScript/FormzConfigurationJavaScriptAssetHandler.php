@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
-use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Core\Core;
 
 /**
@@ -30,7 +29,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
     {
         $hash = $this->getFormConfiguration()
             ->getFormzConfiguration()
-            ->getHash(Configuration::HASH_CONFIGURATION);
+            ->getHash();
 
         return Core::GENERATED_FILES_PATH . 'formz-config-' . $hash . '.js';
     }
