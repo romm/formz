@@ -24,7 +24,6 @@ use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
-use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
@@ -73,27 +72,13 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public static function getConfigurationObjectServices()
     {
-        $backendCache = Core::get()->getTypoScriptUtility()
-            ->getExtensionConfigurationFromPath('settings.defaultBackendCache');
-
-        if (false === class_exists($backendCache)
-            && false === in_array(AbstractBackend::class, class_parents($backendCache))
-        ) {
-            throw new \Exception(
-                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
-                1459251263
-            );
-        }
-
-        $serviceFactory = ServiceFactory::getInstance()
+        return ServiceFactory::getInstance()
             ->attach(ServiceInterface::SERVICE_CACHE)
             ->with(ServiceInterface::SERVICE_CACHE)
-            ->setOption(CacheService::OPTION_CACHE_BACKEND, $backendCache)
+            ->setOption(CacheService::OPTION_CACHE_BACKEND, Core::get()->getBackendCache())
             ->attach(ServiceInterface::SERVICE_PARENTS)
             ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
             ->attach(ServiceInterface::SERVICE_MIXED_TYPES);
-
-        return $serviceFactory;
     }
 
     /**
