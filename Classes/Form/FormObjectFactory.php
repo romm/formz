@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Form;
 
+use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -35,7 +36,7 @@ class FormObjectFactory implements SingletonInterface
     /**
      * @var array
      */
-    private static $ignoredProperties = ['formConfiguration', 'validationData', 'uid', 'pid', '_localizedUid', '_languageUid', '_versionedUid'];
+    private static $ignoredProperties = ['validationData', 'uid', 'pid', '_localizedUid', '_languageUid', '_versionedUid'];
 
     /**
      * Will create an instance of `FormObject` based on a class which implements
@@ -69,7 +70,15 @@ class FormObjectFactory implements SingletonInterface
                 $cacheInstance->set($cacheIdentifier, $instance);
             }
 
-            Core::get()->getConfigurationFactory()->addForm($instance);
+            /** @var Configuration $formzConfigurationObject */
+            $formzConfigurationObject = Core::get()
+                ->getConfigurationFactory()
+                ->getFormzConfiguration()
+                ->getObject(true);
+
+            if (false === $formzConfigurationObject->hasForm($instance->getClassName(), $instance->getName())) {
+                $formzConfigurationObject->addForm($instance);
+            }
 
             $this->instances[$cacheIdentifier] = $instance;
         }

@@ -17,6 +17,7 @@ use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -132,6 +133,30 @@ class Core implements SingletonInterface
     public function arrayToJavaScriptJson(array $array)
     {
         return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
+    }
+
+    /**
+     * Returns the type of backend cache defined in TypoScript at the path:
+     * `settings.defaultBackendCache`.
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function getBackendCache()
+    {
+        $backendCache = $this->getTypoScriptUtility()
+            ->getExtensionConfigurationFromPath('settings.defaultBackendCache');
+
+        if (false === class_exists($backendCache)
+            && false === in_array(AbstractBackend::class, class_parents($backendCache))
+        ) {
+            throw new \Exception(
+                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
+                1459251263
+            );
+        }
+
+        return $backendCache;
     }
 
     /**

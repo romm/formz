@@ -23,8 +23,8 @@ use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject;
-use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
@@ -33,16 +33,13 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     use DefaultConfigurationObjectTrait;
     use ArrayConversionTrait;
 
-    const HASH_FULL = 'full';
-    const HASH_CONFIGURATION = 'configuration';
-
     /**
      * @var \Romm\Formz\Configuration\Settings\Settings
      */
     protected $settings;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Form>
+     * @var FormObject[]
      */
     protected $forms = [];
 
@@ -73,27 +70,13 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public static function getConfigurationObjectServices()
     {
-        $backendCache = Core::get()->getTypoScriptUtility()
-            ->getExtensionConfigurationFromPath('settings.defaultBackendCache');
-
-        if (false === class_exists($backendCache)
-            && false === in_array(AbstractBackend::class, class_parents($backendCache))
-        ) {
-            throw new \Exception(
-                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
-                1459251263
-            );
-        }
-
-        $serviceFactory = ServiceFactory::getInstance()
+        return ServiceFactory::getInstance()
             ->attach(ServiceInterface::SERVICE_CACHE)
             ->with(ServiceInterface::SERVICE_CACHE)
-            ->setOption(CacheService::OPTION_CACHE_BACKEND, $backendCache)
+            ->setOption(CacheService::OPTION_CACHE_BACKEND, Core::get()->getBackendCache())
             ->attach(ServiceInterface::SERVICE_PARENTS)
             ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
             ->attach(ServiceInterface::SERVICE_MIXED_TYPES);
-
-        return $serviceFactory;
     }
 
     /**
@@ -110,22 +93,23 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      * `configuration_object` extension.
      *
      * @param FormObject $form
+     * @throws DuplicateEntryException
      */
     public function addForm(FormObject $form)
     {
+        if (true === $this->hasForm($form->getClassName(), $form->getName())) {
+            throw new DuplicateEntryException(
+                'The form "' . $form->getName() . '" of class "' . $form->getClassName() . '" was already registered. You can only register a form once. Check the function `hasForm()`.',
+                1477255145
+            );
+        }
+
         /** @var Form $configuration */
         $configuration = $form->getConfigurationObject()->getObject(true);
 
         $configuration->setParents([$this]);
-        $this->forms[$form->getClassName()][$form->getName()] = $configuration;
-    }
 
-    /**
-     * @return Form[]
-     */
-    public function getForms()
-    {
-        return $this->forms;
+        $this->forms[$form->getClassName()][$form->getName()] = $form;
     }
 
     /**
@@ -159,30 +143,27 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     }
 
     /**
-     * Calculates several hashes for the class and its sub-properties. Can be
-     * used as a unique identifier in further scripts.
+     * Calculates a hash for this configuration, which can be used as a unique
+     * identifier. It should be called once, before the configuration is put in
+     * cache, so it is not needed to call it again after being fetched from
+     * cache.
      */
-    public function calculateHashes()
+    public function calculateHash()
     {
         $fullArray = $this->toArray();
         $configurationArray = [
-            'view' => $fullArray['view']
+            'view'     => $fullArray['view'],
+            'settings' => $fullArray['settings']
         ];
 
-        $this->hash = [
-            self::HASH_FULL          => sha1(serialize($fullArray)),
-            self::HASH_CONFIGURATION => sha1(serialize($configurationArray))
-        ];
+        $this->hash = sha1(serialize($configurationArray));
     }
 
     /**
-     * @param string $identifier One of the `HASH_*` constants.
      * @return string
      */
-    public function getHash($identifier = self::HASH_FULL)
+    public function getHash()
     {
-        return (true === isset($this->hash[$identifier]))
-            ? $this->hash[$identifier]
-            : null;
+        return $this->hash;
     }
 }

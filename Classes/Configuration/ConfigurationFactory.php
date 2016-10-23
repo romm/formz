@@ -16,7 +16,6 @@ namespace Romm\Formz\Configuration;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\Formz\Core\Core;
-use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -99,30 +98,9 @@ class ConfigurationFactory implements SingletonInterface
 
         /** @var Configuration $instanceObject */
         $instanceObject = $instance->getObject(true);
-        $instanceObject->calculateHashes();
+        $instanceObject->calculateHash();
 
         return $instance;
-    }
-
-    /**
-     * Will fetch the TypoScript configuration for the given form class name,
-     * convert it to a configuration object, then add it to the list of forms in
-     * the global Formz configuration - which you can access with the function
-     * `getFormzConfiguration()`.
-     *
-     * @param FormObject $form
-     * @return $this
-     */
-    public function addForm(FormObject $form)
-    {
-        /** @var Configuration $formzConfigurationObject */
-        $formzConfigurationObject = $this->getFormzConfiguration()->getObject(true);
-
-        if (false === $formzConfigurationObject->hasForm($form->getClassName(), $form->getName())) {
-            $formzConfigurationObject->addForm($form);
-        }
-
-        return $this;
     }
 
     /**
