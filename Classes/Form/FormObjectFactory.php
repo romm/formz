@@ -35,7 +35,7 @@ class FormObjectFactory implements SingletonInterface
     /**
      * @var array
      */
-    private static $ignoredProperties = ['formConfiguration', 'validationData', 'uid', 'pid', '_localizedUid', '_languageUid', '_versionedUid'];
+    private static $ignoredProperties = ['validationData', 'uid', 'pid', '_localizedUid', '_languageUid', '_versionedUid'];
 
     /**
      * Will create an instance of `FormObject` based on a class which implements
