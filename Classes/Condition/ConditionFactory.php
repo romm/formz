@@ -14,6 +14,10 @@
 namespace Romm\Formz\Condition;
 
 use Romm\Formz\Condition\Items\AbstractConditionItem;
+use Romm\Formz\Condition\Items\FieldHasErrorCondition;
+use Romm\Formz\Condition\Items\FieldHasValueCondition;
+use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
+use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -39,6 +43,11 @@ class ConditionFactory implements SingletonInterface
     private $conditions = [];
 
     /**
+     * @var bool
+     */
+    private $defaultConditionsWereRegistered = false;
+
+    /**
      * Returns an instance of this class.
      *
      * @return ConditionFactory
@@ -62,6 +71,7 @@ class ConditionFactory implements SingletonInterface
      *
      * @param string $conditionName  The name of the condition, which will then be available for TypoScript conditions.
      * @param string $conditionClass Class which will process the condition.
+     * @return $this
      * @throws \Exception
      */
     public function registerCondition($conditionName, $conditionClass)
@@ -77,6 +87,8 @@ class ConditionFactory implements SingletonInterface
         }
 
         $this->conditions[$conditionName] = $conditionClass;
+
+        return $this;
     }
 
     /**
@@ -106,5 +118,29 @@ class ConditionFactory implements SingletonInterface
         }
 
         return $this->conditions[$conditionName];
+    }
+
+    /**
+     * Registers all default conditions from Formz core.
+     */
+    public function registerDefaultConditions()
+    {
+        if (false === $this->defaultConditionsWereRegistered) {
+            $this->defaultConditionsWereRegistered = true;
+
+            $this->registerCondition(
+                FieldHasValueCondition::CONDITION_NAME,
+                FieldHasValueCondition::class
+            )->registerCondition(
+                FieldHasErrorCondition::CONDITION_NAME,
+                FieldHasErrorCondition::class
+            )->registerCondition(
+                FieldIsValidCondition::CONDITION_NAME,
+                FieldIsValidCondition::class
+            )->registerCondition(
+                FieldIsEmptyCondition::CONDITION_NAME,
+                FieldIsEmptyCondition::class
+            );
+        }
     }
 }
