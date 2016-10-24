@@ -51,7 +51,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     {
         $result = [];
 
-        foreach ($this->getFormConfiguration()->getFields() as $fieldName => $fieldConfiguration) {
+        foreach ($this->getFormObject()->getProperties() as $fieldName) {
             if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
                 && $this->isPropertyGettable($formInstance, $fieldName)
             ) {
@@ -79,7 +79,10 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     {
         $objectPropertyIsGettable = (
             is_object($formInstance)
-            && ObjectAccess::isPropertyGettable($formInstance, $fieldName)
+            && (
+                in_array($fieldName, get_object_vars($formInstance))
+                || ObjectAccess::isPropertyGettable($formInstance, $fieldName)
+            )
         );
 
         $arrayPropertyGettable = (
