@@ -7,24 +7,7 @@ if (!defined('TYPO3_MODE')) {
 call_user_func(
 	function() {
 	    // Registering the default Formz conditions.
-        $conditionFactory = \Romm\Formz\Condition\ConditionFactory::get();
-
-        $conditionFactory->registerCondition(
-            \Romm\Formz\Condition\Items\FieldHasValueCondition::CONDITION_NAME,
-            \Romm\Formz\Condition\Items\FieldHasValueCondition::class
-        );
-        $conditionFactory->registerCondition(
-            \Romm\Formz\Condition\Items\FieldHasErrorCondition::CONDITION_NAME,
-            \Romm\Formz\Condition\Items\FieldHasErrorCondition::class
-        );
-        $conditionFactory->registerCondition(
-            \Romm\Formz\Condition\Items\FieldIsValidCondition::CONDITION_NAME,
-            \Romm\Formz\Condition\Items\FieldIsValidCondition::class
-        );
-        $conditionFactory->registerCondition(
-            \Romm\Formz\Condition\Items\FieldIsEmptyCondition::CONDITION_NAME,
-            \Romm\Formz\Condition\Items\FieldIsEmptyCondition::class
-        );
+        \Romm\Formz\Condition\ConditionFactory::get()->registerDefaultConditions();
 
 		// Registering the cache.
 		if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][\Romm\Formz\Core\Core::CACHE_IDENTIFIER])) {

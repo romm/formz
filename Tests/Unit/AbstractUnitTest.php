@@ -3,6 +3,11 @@ namespace Romm\Formz\Tests\Unit;
 
 use Romm\ConfigurationObject\Tests\Unit\ConfigurationObjectUnitTestUtility;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
+use Romm\Formz\Condition\ConditionFactory;
+use Romm\Formz\Condition\Items\FieldHasErrorCondition;
+use Romm\Formz\Condition\Items\FieldHasValueCondition;
+use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
+use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
@@ -19,6 +24,8 @@ abstract class AbstractUnitTest extends UnitTestCase
     {
         $this->initializeConfigurationObjectTestServices();
         $this->setUpFormzCore();
+
+        ConditionFactory::get()->registerDefaultConditions();
     }
 
     /**

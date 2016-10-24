@@ -16,4 +16,9 @@ class AbstractAssetHandlerTestClass extends AbstractUnitTest
     {
         return preg_replace('/\s+/', '', $string);
     }
+
+    protected function removeCssComments($string)
+    {
+        return preg_replace('#\/\*((?!\*\/).)*\*\/#', '', $string);
+    }
 }
