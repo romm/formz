@@ -1,0 +1,50 @@
+<?php
+namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
+
+use Romm\Formz\AssetHandler\AssetHandlerFactory;
+use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
+use Romm\Formz\Condition\Items\FieldIsValidCondition;
+use Romm\Formz\Core\Core;
+use Romm\Formz\Tests\Fixture\Form\DefaultForm;
+use Romm\Formz\Tests\Unit\AssetHandler\AbstractAssetHandlerTestClass;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
+
+class FieldsActivationCssAssetHandlerTest extends AbstractAssetHandlerTestClass
+{
+
+    /**
+     * Checks that the CSS code returned by the asset handler is valid.
+     *
+     * @test
+     */
+    public function fieldsActivationCssIsValid()
+    {
+        $expectedCss = 'form[name="foo"][formz-field-container="foo"]{display:none;}form[name="foo"][formz-valid-foo="1"][formz-field-container="foo"]{display:block;}';
+
+        $defaultFormConfiguration = [
+            'activationCondition' => [
+                'test' => [
+                    'type'      => FieldIsValidCondition::CONDITION_NAME,
+                    'fieldName' => 'foo'
+                ]
+            ],
+            'fields'              => [
+                'foo' => [
+                    'activation' => [
+                        'condition' => 'test'
+                    ]
+                ]
+            ]
+        ];
+        $this->setFormConfigurationFromClassName(DefaultForm::class, $defaultFormConfiguration);
+        $form = Core::get()->getFormObjectFactory()->getInstanceFromClassName(DefaultForm::class, 'foo');
+
+        $controllerContext = new ControllerContext();
+        $assetHandlerFactory = AssetHandlerFactory::get($form, $controllerContext);
+
+        $fieldsActivationCss = FieldsActivationCssAssetHandler::with($assetHandlerFactory)
+            ->getFieldsActivationCss();
+
+        $this->assertEquals($this->removeCssComments($this->trimString($fieldsActivationCss)), $expectedCss);
+    }
+}
