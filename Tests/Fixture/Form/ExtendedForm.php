@@ -1,12 +1,8 @@
 <?php
 namespace Romm\Formz\Tests\Fixture\Form;
 
-use Romm\Formz\Form\FormTrait;
-
 class ExtendedForm extends DefaultForm
 {
-
-    use FormTrait;
 
     /**
      * @var string
