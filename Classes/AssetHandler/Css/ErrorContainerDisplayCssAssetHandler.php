@@ -46,28 +46,4 @@ CSS;
 
         return implode(CRLF, $cssBlocks);
     }
-
-    /**
-     * This function is just here to make the class more readable.
-     *
-     * @param string $formName               Name of the form.
-     * @param string $fieldName              Name of the field.
-     * @param string $fieldContainerSelector Selector for the field container.
-     * @param string $nodesSelector          Nodes used to display the field container.
-     * @return string
-     */
-    protected function getSingleFieldCssBlock($formName, $fieldName, $fieldContainerSelector, $nodesSelector)
-    {
-        return <<<CSS
-/* Hiding the container of the field "$fieldName" by default */
-form[name="$formName"] $fieldContainerSelector {
-    display: none;
-}
-
-/* Showing the container of the field "$fieldName" */
-$nodesSelector {
-    display: block;
-}
-CSS;
-    }
 }
