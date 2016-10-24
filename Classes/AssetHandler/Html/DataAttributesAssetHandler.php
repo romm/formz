@@ -41,8 +41,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     /**
      * Handles the data attributes containing the values of the form fields.
      *
-     * Example:
-     *  formz-value-color="blue"
+     * Example: `formz-value-color="blue"`
      *
      * @param FormInterface|array $formInstance
      * @param FormResult          $requestResult
@@ -54,14 +53,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
 
         foreach ($this->getFormConfiguration()->getFields() as $fieldName => $fieldConfiguration) {
             if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
-                && ((
-                        is_object($formInstance)
-                        && ObjectAccess::isPropertyGettable($formInstance, $fieldName)
-                    )
-                    || (
-                        is_array($formInstance)
-                        && true === isset($formInstance[$fieldName])
-                    ))
+                && $this->isPropertyGettable($formInstance, $fieldName)
             ) {
                 $value = ObjectAccess::getProperty($formInstance, $fieldName);
                 $value = (is_array($value))
@@ -76,11 +68,34 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     }
 
     /**
+     * Checks if the given field name can be accessed within the form instance,
+     * whether it is an object or an array.
+     *
+     * @param FormInterface|array $formInstance
+     * @param string              $fieldName
+     * @return bool
+     */
+    protected function isPropertyGettable($formInstance, $fieldName)
+    {
+        $objectPropertyIsGettable = (
+            is_object($formInstance)
+            && ObjectAccess::isPropertyGettable($formInstance, $fieldName)
+        );
+
+        $arrayPropertyGettable = (
+            is_array($formInstance)
+            && true === isset($formInstance[$fieldName])
+        );
+
+        return ($objectPropertyIsGettable || $arrayPropertyGettable);
+    }
+
+    /**
      * Handles the data attributes for the fields which got errors.
      *
-     * Example:
-     *  - `formz-error-email="1"`
-     *  - `formz-error-email-rule-default="1"`
+     * Examples:
+     * - `formz-error-email="1"`
+     * - `formz-error-email-rule-default="1"`
      *
      * @param FormResult $requestResult
      * @return array
@@ -116,8 +131,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     /**
      * Handles the data attributes for the fields which are valid.
      *
-     * Example:
-     *  - `formz-valid-email="1"`
+     * Example: `formz-valid-email="1"`
      *
      * @param FormResult $requestResult
      * @return array
@@ -203,6 +217,10 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     protected function getFormDeactivatedFields(FormResult $requestResult)
     {
-        return array_keys($requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY));
+        $deactivatedFields = $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY);
+
+        return (is_array($deactivatedFields))
+            ? array_keys($deactivatedFields)
+            : [];
     }
 }
