@@ -17,14 +17,15 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
     use AssetHandlerTestTrait;
 
     /**
-     * Checks that the generated JavaScript code is valid.
+     * Checks that the generated JavaScript code is valid, and that the correct
+     * JavaScript file paths are returned.
      *
      * @test
      */
     public function checkJavaScriptCode()
     {
         // MD5 of the JavaScript code result.
-        $expectedResult = 'f82a498f94abf1eb693a731cdda56a75';
+        $expectedResult = '4ce1221868d92d2a9ee626e01de8c5ee';
 
         $defaultFormConfiguration = [
             'activationCondition' => [
@@ -52,7 +53,10 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
         $assetHandler = FieldsValidationJavaScriptAssetHandler::with($assetHandlerFactory)
             ->process();
 
-        $this->assertEquals($expectedResult, md5($this->removeMultiLinesComments($assetHandler->getJavaScriptCode())));
         $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $assetHandler->getJavaScriptValidationFiles());
+        $this->assertEquals(
+            $expectedResult,
+            md5($this->removeMultiLinesComments($this->trimString($assetHandler->getJavaScriptCode())))
+        );
     }
 }

@@ -23,7 +23,7 @@ class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitT
     public function checkJavaScriptCode()
     {
         // MD5 of the JavaScript code result.
-        $expectedResult = 'b455830065144d1d9f5cf438dbaa81a7';
+        $expectedResult = '6df49291aac60427681c1c9db74ef8c9';
 
         $defaultFormConfiguration = [
             'activationCondition' => [
@@ -53,6 +53,9 @@ class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitT
         $javaScriptCode = FieldsValidationActivationJavaScriptAssetHandler::with($assetHandlerFactory)
             ->getFieldsValidationActivationJavaScriptCode();
 
-        $this->assertEquals($expectedResult, md5($this->removeMultiLinesComments($javaScriptCode)));
+        $this->assertEquals(
+            $expectedResult,
+            md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
+        );
     }
 }
