@@ -87,19 +87,19 @@ JS;
         $fieldConditionExpression = implode(CRLF . str_repeat(' ', 20), $fieldConditionExpression);
 
         return <<<JS
-        field = form.getFieldByName($fieldName);
+            field = form.getFieldByName($fieldName);
 
-        if (null !== field) {
-            field.addActivationConditionForValidator(
-                '__auto',
-                $validatorName,
-                function (field, continueValidation) {
-                    var flag = false;
-                    $fieldConditionExpression
-                    continueValidation(flag);
-                }
-            );
-        }
+            if (null !== field) {
+                field.addActivationConditionForValidator(
+                    '__auto',
+                    $validatorName,
+                    function (field, continueValidation) {
+                        var flag = false;
+                        $fieldConditionExpression
+                        continueValidation(flag);
+                    }
+                );
+            }
 JS;
     }
 }
