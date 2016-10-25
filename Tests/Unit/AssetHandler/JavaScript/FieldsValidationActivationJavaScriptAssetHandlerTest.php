@@ -57,5 +57,8 @@ class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitT
             $expectedResult,
             md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
         );
+
+        unset($formObject);
+        unset($controllerContext);
     }
 }
