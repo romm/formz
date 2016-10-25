@@ -7,10 +7,13 @@ use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 class FieldsActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
+
+    use AssetHandlerTestTrait;
 
     /**
      * Checks that the generated JavaScript code is valid.
@@ -20,7 +23,7 @@ class FieldsActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         // MD5 of the JavaScript code result.
-        $expectedResult = 'e1f38c2417b4f693242e63a01cc297ae';
+        $expectedResult = 'cc6c604f57cf25b7b28a72782ef77ebd';
 
         $defaultFormConfiguration = [
             'activationCondition' => [
@@ -46,6 +49,6 @@ class FieldsActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
         $javaScriptCode = FieldsActivationJavaScriptAssetHandler::with($assetHandlerFactory)
             ->getFieldsActivationJavaScriptCode();
 
-        $this->assertEquals($expectedResult, md5($javaScriptCode));
+        $this->assertEquals($expectedResult, md5($this->removeMultiLinesComments($javaScriptCode)));
     }
 }
