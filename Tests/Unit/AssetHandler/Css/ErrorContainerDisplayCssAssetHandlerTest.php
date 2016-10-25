@@ -31,5 +31,8 @@ class ErrorContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
             ->getErrorContainerDisplayCss();
 
         $this->assertEquals($this->trimString($errorContainerDisplayCss), $expectedCss);
+
+        unset($form);
+        unset($controllerContext);
     }
 }

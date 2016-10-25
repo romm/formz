@@ -15,6 +15,12 @@ trait AssetHandlerTestTrait
         return preg_replace('/\s+/', '', $string);
     }
 
+    /**
+     * Returns the string without CSS comments.
+     *
+     * @param string $string
+     * @return string
+     */
     protected function removeCssComments($string)
     {
         return preg_replace('#\/\*((?!\*\/).)*\*\/#', '', $string);

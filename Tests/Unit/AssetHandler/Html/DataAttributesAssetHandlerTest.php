@@ -70,6 +70,10 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             ->getFieldsErrorsDataAttributes($requestResult);
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
+
+        unset($formObject);
+        unset($controllerContext);
+        unset($requestResult);
     }
 
     /**
@@ -172,5 +176,9 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             ->getFieldsValidDataAttributes($requestResult);
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
+
+        unset($formObject);
+        unset($controllerContext);
+        unset($requestResult);
     }
 }

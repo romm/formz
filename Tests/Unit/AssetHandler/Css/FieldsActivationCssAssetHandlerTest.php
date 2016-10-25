@@ -49,5 +49,8 @@ class FieldsActivationCssAssetHandlerTest extends AbstractUnitTest
             ->getFieldsActivationCss();
 
         $this->assertEquals($this->removeCssComments($this->trimString($fieldsActivationCss)), $expectedCss);
+
+        unset($form);
+        unset($controllerContext);
     }
 }
