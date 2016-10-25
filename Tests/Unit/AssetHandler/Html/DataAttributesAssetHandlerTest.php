@@ -21,8 +21,8 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
     public function fieldsValuesDataAttributesAreValid()
     {
         $expectedResult = [
-            'formz-value-foo' => 'foo',
-            'formz-value-bar' => 'john doe'
+            DataAttributesAssetHandler::getFieldDataValueKey('foo') => 'foo',
+            DataAttributesAssetHandler::getFieldDataValueKey('bar') => 'john doe'
         ];
 
         $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName(ExtendedForm::class, 'foo');
