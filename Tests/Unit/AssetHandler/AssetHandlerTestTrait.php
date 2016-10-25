@@ -16,13 +16,13 @@ trait AssetHandlerTestTrait
     }
 
     /**
-     * Returns the string without CSS comments.
+     * Returns the string without multi-lines comments.
      *
      * @param string $string
      * @return string
      */
-    protected function removeCssComments($string)
+    protected function removeMultiLinesComments($string)
     {
-        return preg_replace('#\/\*((?!\*\/).)*\*\/#', '', $string);
+        return preg_replace('#\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/#m', '', $string);
     }
 }

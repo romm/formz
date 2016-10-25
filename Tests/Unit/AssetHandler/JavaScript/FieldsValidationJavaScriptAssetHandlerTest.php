@@ -2,28 +2,30 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
-use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
+use Romm\Formz\Validation\Validator\RequiredValidator;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
-class FieldsActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
+class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
 
     use AssetHandlerTestTrait;
 
     /**
-     * Checks that the generated JavaScript code is valid.
+     * Checks that the generated JavaScript code is valid, and that the correct
+     * JavaScript file paths are returned.
      *
      * @test
      */
     public function checkJavaScriptCode()
     {
         // MD5 of the JavaScript code result.
-        $expectedResult = '2356be2c08235e95dccbcf5532c87184';
+        $expectedResult = '4ce1221868d92d2a9ee626e01de8c5ee';
 
         $defaultFormConfiguration = [
             'activationCondition' => [
@@ -34,8 +36,10 @@ class FieldsActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
             ],
             'fields'              => [
                 'foo' => [
-                    'activation' => [
-                        'condition' => 'test'
+                    'validation' => [
+                        'required' => [
+                            'className' => RequiredValidator::class
+                        ]
                     ]
                 ]
             ]
@@ -46,12 +50,13 @@ class FieldsActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
         $controllerContext = new ControllerContext();
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
 
-        $javaScriptCode = FieldsActivationJavaScriptAssetHandler::with($assetHandlerFactory)
-            ->getFieldsActivationJavaScriptCode();
+        $assetHandler = FieldsValidationJavaScriptAssetHandler::with($assetHandlerFactory)
+            ->process();
 
+        $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $assetHandler->getJavaScriptValidationFiles());
         $this->assertEquals(
             $expectedResult,
-            md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
+            md5($this->removeMultiLinesComments($this->trimString($assetHandler->getJavaScriptCode())))
         );
     }
 }
