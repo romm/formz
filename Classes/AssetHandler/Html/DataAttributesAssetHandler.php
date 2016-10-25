@@ -107,23 +107,21 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     {
         $result = [];
 
+        /** @var Result $fieldResult */
         foreach ($requestResult->getSubResults() as $fieldName => $fieldResult) {
             if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
                 && true === $this->getFormConfiguration()->hasField($fieldName)
+                && true === $fieldResult->hasErrors()
+                && null === $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName)
             ) {
-                /** @var Result $fieldResult */
-                if (true === $fieldResult->hasErrors()
-                    && null === $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName)
-                ) {
-                    $result[self::getFieldDataErrorKey($fieldName)] = '1';
+                $result[self::getFieldDataErrorKey($fieldName)] = '1';
 
-                    foreach ($fieldResult->getErrors() as $error) {
-                        /** @var Error $error */
-                        $errorTitle = ($error->getTitle())
-                            ? $error->getTitle()
-                            : 'default';
-                        $result[self::getFieldDataValidationErrorKey($fieldName, $errorTitle)] = '1';
-                    }
+                foreach ($fieldResult->getErrors() as $error) {
+                    /** @var Error $error */
+                    $errorTitle = ($error->getTitle())
+                        ? $error->getTitle()
+                        : 'default';
+                    $result[self::getFieldDataValidationErrorKey($fieldName, $errorTitle)] = '1';
                 }
             }
         }
