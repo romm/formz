@@ -76,10 +76,10 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
     public function checkFieldsErrorsDataAttributesDataProvider()
     {
         return [
-            'defaultSingleErrorCheck' => [
+            'defaultSingleErrorCheck'  => [
                 [
-                    'formz-error-foo'         => '1',
-                    'formz-error-foo-default' => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                      => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'default') => '1'
                 ],
                 [
                     'foo' => [
@@ -89,10 +89,10 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                     ]
                 ]
             ],
-            'customSingleErrorCheck'  => [
+            'customSingleErrorCheck'   => [
                 [
-                    'formz-error-foo'             => '1',
-                    'formz-error-foo-hello-world' => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello-world') => '1'
                 ],
                 [
                     'foo' => [
@@ -103,11 +103,11 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                     ]
                 ]
             ],
-            'multipleErrorCheck'  => [
+            'multipleErrorCheck'       => [
                 [
-                    'formz-error-foo'             => '1',
-                    'formz-error-foo-default'     => '1',
-                    'formz-error-foo-hello-world' => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'default')     => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello-world') => '1'
                 ],
                 [
                     'foo' => [
@@ -121,13 +121,13 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                     ]
                 ]
             ],
-            'multipleFieldsErrorCheck'  => [
+            'multipleFieldsErrorCheck' => [
                 [
-                    'formz-error-foo'             => '1',
-                    'formz-error-foo-default'     => '1',
-                    'formz-error-bar'             => '1',
-                    'formz-error-bar-default'     => '1',
-                    'formz-error-bar-hello-world' => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'default')     => '1',
+                    DataAttributesAssetHandler::getFieldDataErrorKey('bar')                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'default')     => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'hello-world') => '1'
                 ],
                 [
                     'foo' => [
