@@ -16,7 +16,6 @@ namespace Romm\Formz\AssetHandler\Html;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -52,7 +51,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         $result = [];
 
         foreach ($this->getFormObject()->getProperties() as $fieldName) {
-            if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
+            if (false === $requestResult->fieldIsDeactivated($fieldName)
                 && $this->isPropertyGettable($formInstance, $fieldName)
             ) {
                 $value = ObjectAccess::getProperty($formInstance, $fieldName);
@@ -109,10 +108,10 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
 
         /** @var Result $fieldResult */
         foreach ($requestResult->getSubResults() as $fieldName => $fieldResult) {
-            if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
+            if (false === $requestResult->fieldIsDeactivated($fieldName)
                 && true === $this->getFormConfiguration()->hasField($fieldName)
                 && true === $fieldResult->hasErrors()
-                && null === $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName)
+                && false === $requestResult->fieldIsDeactivated($fieldName)
             ) {
                 $result[self::getFieldDataErrorKey($fieldName)] = '1';
 
@@ -144,9 +143,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         foreach ($this->getFormConfiguration()->getFields() as $field) {
             $fieldName = $field->getFieldName();
 
-            if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
+            if (false === $requestResult->fieldIsDeactivated($fieldName)
                 && false === $requestResult->forProperty($fieldName)->hasErrors()
-                && null === $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName)
+                && false === $requestResult->fieldIsDeactivated($fieldName)
             ) {
                 $result[self::getFieldDataValidKey($fieldName)] = '1';
             }
@@ -210,18 +209,5 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public static function getFieldCleanName($fieldName)
     {
         return str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($fieldName));
-    }
-
-    /**
-     * @param FormResult $requestResult
-     * @return array
-     */
-    protected function getFormDeactivatedFields(FormResult $requestResult)
-    {
-        $deactivatedFields = $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY);
-
-        return (is_array($deactivatedFields))
-            ? array_keys($deactivatedFields)
-            : [];
     }
 }

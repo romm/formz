@@ -88,8 +88,6 @@ use TYPO3\CMS\Extbase\Validation\Validator\GenericObjectValidator;
 abstract class AbstractFormValidator extends GenericObjectValidator
 {
 
-    const RESULT_KEY_ACTIVATION_PROPERTY = 'activation';
-
     /**
      * @inheritdoc
      */
@@ -207,7 +205,6 @@ abstract class AbstractFormValidator extends GenericObjectValidator
         $formClassName = get_class($form);
         $formName = $this->options['name'];
         $this->result = new FormResult();
-        $this->result->setData(self::RESULT_KEY_ACTIVATION_PROPERTY, []);
 
         $this->formObject = Core::get()->getFormObjectFactory()
             ->getInstanceFromClassName($formClassName, $formName);
@@ -378,9 +375,9 @@ abstract class AbstractFormValidator extends GenericObjectValidator
             }
 
             if (true === in_array($fieldName, $this->deactivatedFields)
-                && null === $this->result->getData(self::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName)
+                && null === $this->result->fieldIsDeactivated($fieldName)
             ) {
-                $this->result->setData(self::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName, true);
+                $this->result->deactivateField($fieldName);
             }
         }
     }
