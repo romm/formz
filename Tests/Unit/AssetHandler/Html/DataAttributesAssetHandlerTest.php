@@ -6,10 +6,10 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
-use Romm\Formz\Tests\Unit\AssetHandler\AbstractAssetHandlerTestClass;
+use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
-class DataAttributesAssetHandlerTest extends AbstractAssetHandlerTestClass
+class DataAttributesAssetHandlerTest extends AbstractUnitTest
 {
 
     /**

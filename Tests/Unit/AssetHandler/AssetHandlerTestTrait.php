@@ -1,9 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler;
 
-use Romm\Formz\Tests\Unit\AbstractUnitTest;
-
-class AbstractAssetHandlerTestClass extends AbstractUnitTest
+trait AssetHandlerTestTrait
 {
 
     /**
