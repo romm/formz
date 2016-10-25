@@ -6,11 +6,14 @@ use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
-use Romm\Formz\Tests\Unit\AssetHandler\AbstractAssetHandlerTestClass;
+use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
-class FieldsActivationCssAssetHandlerTest extends AbstractAssetHandlerTestClass
+class FieldsActivationCssAssetHandlerTest extends AbstractUnitTest
 {
+
+    use AssetHandlerTestTrait;
 
     /**
      * Checks that the CSS code returned by the asset handler is valid.

@@ -16,7 +16,6 @@ namespace Romm\Formz\AssetHandler\Html;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -41,8 +40,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     /**
      * Handles the data attributes containing the values of the form fields.
      *
-     * Example:
-     *  formz-value-color="blue"
+     * Example: `formz-value-color="blue"`
      *
      * @param FormInterface|array $formInstance
      * @param FormResult          $requestResult
@@ -52,16 +50,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     {
         $result = [];
 
-        foreach ($this->getFormConfiguration()->getFields() as $fieldName => $fieldConfiguration) {
-            if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
-                && ((
-                        is_object($formInstance)
-                        && ObjectAccess::isPropertyGettable($formInstance, $fieldName)
-                    )
-                    || (
-                        is_array($formInstance)
-                        && true === isset($formInstance[$fieldName])
-                    ))
+        foreach ($this->getFormObject()->getProperties() as $fieldName) {
+            if (false === $requestResult->fieldIsDeactivated($fieldName)
+                && $this->isPropertyGettable($formInstance, $fieldName)
             ) {
                 $value = ObjectAccess::getProperty($formInstance, $fieldName);
                 $value = (is_array($value))
@@ -76,11 +67,37 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     }
 
     /**
+     * Checks if the given field name can be accessed within the form instance,
+     * whether it is an object or an array.
+     *
+     * @param FormInterface|array $formInstance
+     * @param string              $fieldName
+     * @return bool
+     */
+    protected function isPropertyGettable($formInstance, $fieldName)
+    {
+        $objectPropertyIsGettable = (
+            is_object($formInstance)
+            && (
+                in_array($fieldName, get_object_vars($formInstance))
+                || ObjectAccess::isPropertyGettable($formInstance, $fieldName)
+            )
+        );
+
+        $arrayPropertyGettable = (
+            is_array($formInstance)
+            && true === isset($formInstance[$fieldName])
+        );
+
+        return ($objectPropertyIsGettable || $arrayPropertyGettable);
+    }
+
+    /**
      * Handles the data attributes for the fields which got errors.
      *
-     * Example:
-     *  - `formz-error-email="1"`
-     *  - `formz-error-email-rule-default="1"`
+     * Examples:
+     * - `formz-error-email="1"`
+     * - `formz-error-email-rule-default="1"`
      *
      * @param FormResult $requestResult
      * @return array
@@ -89,23 +106,21 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     {
         $result = [];
 
+        /** @var Result $fieldResult */
         foreach ($requestResult->getSubResults() as $fieldName => $fieldResult) {
-            if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
+            if (false === $requestResult->fieldIsDeactivated($fieldName)
                 && true === $this->getFormConfiguration()->hasField($fieldName)
+                && true === $fieldResult->hasErrors()
+                && false === $requestResult->fieldIsDeactivated($fieldName)
             ) {
-                /** @var Result $fieldResult */
-                if (true === $fieldResult->hasErrors()
-                    && null === $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName)
-                ) {
-                    $result[self::getFieldDataErrorKey($fieldName)] = '1';
+                $result[self::getFieldDataErrorKey($fieldName)] = '1';
 
-                    foreach ($fieldResult->getErrors() as $error) {
-                        /** @var Error $error */
-                        $errorTitle = ($error->getTitle())
-                            ? $error->getTitle()
-                            : 'default';
-                        $result[self::getFieldDataValidationErrorKey($fieldName, $errorTitle)] = '1';
-                    }
+                foreach ($fieldResult->getErrors() as $error) {
+                    /** @var Error $error */
+                    $errorTitle = ($error->getTitle())
+                        ? $error->getTitle()
+                        : 'default';
+                    $result[self::getFieldDataValidationErrorKey($fieldName, $errorTitle)] = '1';
                 }
             }
         }
@@ -116,8 +131,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     /**
      * Handles the data attributes for the fields which are valid.
      *
-     * Example:
-     *  - `formz-valid-email="1"`
+     * Example: `formz-valid-email="1"`
      *
      * @param FormResult $requestResult
      * @return array
@@ -129,9 +143,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         foreach ($this->getFormConfiguration()->getFields() as $field) {
             $fieldName = $field->getFieldName();
 
-            if (false === in_array($fieldName, $this->getFormDeactivatedFields($requestResult))
+            if (false === $requestResult->fieldIsDeactivated($fieldName)
                 && false === $requestResult->forProperty($fieldName)->hasErrors()
-                && null === $requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $fieldName)
+                && false === $requestResult->fieldIsDeactivated($fieldName)
             ) {
                 $result[self::getFieldDataValidKey($fieldName)] = '1';
             }
@@ -195,14 +209,5 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public static function getFieldCleanName($fieldName)
     {
         return str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($fieldName));
-    }
-
-    /**
-     * @param FormResult $requestResult
-     * @return array
-     */
-    protected function getFormDeactivatedFields(FormResult $requestResult)
-    {
-        return array_keys($requestResult->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY));
     }
 }

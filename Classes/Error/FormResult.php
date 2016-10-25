@@ -24,4 +24,30 @@ class FormResult extends Result
 {
 
     use StoreDataTrait;
+
+    /**
+     * @var array
+     */
+    protected $deactivatedFields = [];
+
+    /**
+     * Flags the given field as deactivated.
+     *
+     * @param string $fieldName
+     */
+    public function deactivateField($fieldName)
+    {
+        $this->deactivatedFields[$fieldName] = $fieldName;
+    }
+
+    /**
+     * Returns true if the given field is flagged as deactivated.
+     *
+     * @param string $fieldName
+     * @return bool
+     */
+    public function fieldIsDeactivated($fieldName)
+    {
+        return in_array($fieldName, $this->deactivatedFields);
+    }
 }

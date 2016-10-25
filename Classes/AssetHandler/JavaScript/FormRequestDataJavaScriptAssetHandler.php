@@ -80,8 +80,8 @@ JS;
         ) {
             $result = $originalRequest->getArgument($formName);
         } elseif (is_object($formInstance)) {
-            foreach ($this->getFormConfiguration()->getFields() as $field) {
-                $result[$field->getFieldName()] = ObjectAccess::getProperty($formInstance, $field->getFieldName());
+            foreach ($this->getFormObject()->getProperties() as $fieldName) {
+                $result[$fieldName] = ObjectAccess::getProperty($formInstance, $fieldName);
             }
         }
 

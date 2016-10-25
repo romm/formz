@@ -65,7 +65,7 @@ class FieldIsValidCondition extends AbstractConditionItem
 
         return (
             false === $result->forProperty($this->fieldName)->hasErrors()
-            && null === $result->getData(AbstractFormValidator::RESULT_KEY_ACTIVATION_PROPERTY . '.' . $this->fieldName)
+            && false === $result->fieldIsDeactivated($this->fieldName)
         );
     }
 
