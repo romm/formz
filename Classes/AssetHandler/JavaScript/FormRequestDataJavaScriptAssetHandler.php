@@ -14,10 +14,8 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\Form\FormInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Extbase\Validation\Error;
 
 /**
@@ -30,21 +28,25 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractJavaScriptAssetHandl
     /**
      * See class description.
      *
-     * @param FormInterface $formInstance
      * @return string
      */
-    public function getFormRequestDataJavaScriptCode($formInstance)
+    public function getFormRequestDataJavaScriptCode()
     {
-        $submittedFormValues = Core::get()->arrayToJavaScriptJson($this->getSubmittedFormValues($formInstance));
-        $fieldsExistingErrors = Core::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
-
+        $submittedFormValues = [];
+        $fieldsExistingErrors = [];
         $originalRequest = $this->assetHandlerFactory
             ->getControllerContext()
             ->getRequest()
             ->getOriginalRequest();
+
         $formWasSubmitted = (null !== $originalRequest)
             ? 'true'
             : 'false';
+
+        if ($formWasSubmitted) {
+            $submittedFormValues = Core::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
+            $fieldsExistingErrors = Core::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
+        }
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
 
@@ -63,26 +65,21 @@ JS;
      * Will fetch the values of the fields of the submitted form, if a form has
      * been submitted.
      *
-     * @param FormInterface $formInstance
      * @return array
      */
-    protected function getSubmittedFormValues($formInstance)
+    protected function getSubmittedFormValues()
     {
         $result = [];
         $formName = $this->getFormObject()->getName();
-
         $originalRequest = $this->assetHandlerFactory
             ->getControllerContext()
             ->getRequest()
             ->getOriginalRequest();
+
         if (null !== $originalRequest
             && $originalRequest->hasArgument($formName)
         ) {
             $result = $originalRequest->getArgument($formName);
-        } elseif (is_object($formInstance)) {
-            foreach ($this->getFormObject()->getProperties() as $fieldName) {
-                $result[$fieldName] = ObjectAccess::getProperty($formInstance, $fieldName);
-            }
         }
 
         return $result;
@@ -97,25 +94,25 @@ JS;
     protected function getFieldsExistingErrors()
     {
         $fieldsErrors = [];
-        $controllerContext = $this->assetHandlerFactory->getControllerContext();
-        $formObject = $this->assetHandlerFactory->getFormObject();
-        $formConfiguration = $formObject->getConfiguration();
+        $request = $this->assetHandlerFactory
+            ->getControllerContext()
+            ->getRequest();
 
-        if (null !== $controllerContext->getRequest()->getOriginalRequest()) {
-            $requestResult = $controllerContext->getRequest()->getOriginalRequestMappingResults();
+        if (null !== $request->getOriginalRequest()) {
+            $requestResult = $request->getOriginalRequestMappingResults();
             /** @var Result[] $formFieldsResult */
             $formFieldsResult = $requestResult->forProperty($this->getFormObject()->getName())->getSubResults();
 
-            foreach ($formConfiguration->getFields() as $field) {
-                $fieldName = $field->getFieldName();
-                if (isset($formFieldsResult[$fieldName])) {
-                    if ($formFieldsResult[$fieldName]->hasErrors()) {
-                        $fieldsErrors[$fieldName] = [];
-                        foreach ($formFieldsResult[$fieldName]->getErrors() as $error) {
-                            /** @var Error $error */
-                            list($validationName, $errorName) = explode(':', $error->getTitle());
-                            $fieldsErrors[$fieldName][$validationName] = [$errorName => $error->getMessage()];
-                        }
+            foreach ($this->getFormObject()->getProperties() as $fieldName) {
+                if (array_key_exists($fieldName, $formFieldsResult)
+                    && $formFieldsResult[$fieldName]->hasErrors()
+                ) {
+                    $fieldsErrors[$fieldName] = [];
+
+                    foreach ($formFieldsResult[$fieldName]->getErrors() as $error) {
+                        /** @var Error $error */
+                        list($validationName, $errorName) = explode(':', $error->getTitle());
+                        $fieldsErrors[$fieldName][$validationName] = [$errorName => $error->getMessage()];
                     }
                 }
             }
