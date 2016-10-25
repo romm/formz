@@ -49,7 +49,6 @@ class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitT
 
         $javaScriptCode = FieldsValidationActivationJavaScriptAssetHandler::with($assetHandlerFactory)
             ->getFieldsValidationActivationJavaScriptCode();
-        echo md5($javaScriptCode);
 
         $this->assertEquals($expectedResult, md5($javaScriptCode));
     }
