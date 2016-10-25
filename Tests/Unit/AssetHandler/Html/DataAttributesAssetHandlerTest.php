@@ -44,6 +44,8 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
     }
 
     /**
+     * Checks that the field error data attributes are valid.
+     *
      * @param array $expectedResult
      * @param array $fieldErrors
      *
@@ -147,5 +149,28 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                 ]
             ]
         ];
+    }
+
+    /**
+     * Checks that the field valid data attributes are valid.
+     *
+     * @test
+     */
+    public function checkFieldsValidDataAttributes()
+    {
+        $expectedResult = [
+            DataAttributesAssetHandler::getFieldDataValidKey('foo') => '1',
+            DataAttributesAssetHandler::getFieldDataValidKey('bar') => '1'
+        ];
+
+        $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName(ExtendedForm::class, 'foo');
+        $controllerContext = new ControllerContext();
+        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+        $requestResult = new FormResult();
+
+        $dataAttributesValues = DataAttributesAssetHandler::with($assetHandlerFactory)
+            ->getFieldsValidDataAttributes($requestResult);
+
+        $this->assertEquals($expectedResult, $dataAttributesValues);
     }
 }
