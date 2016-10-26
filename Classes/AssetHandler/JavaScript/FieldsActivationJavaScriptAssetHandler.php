@@ -32,11 +32,12 @@ class FieldsActivationJavaScriptAssetHandler extends AbstractJavaScriptAssetHand
     public function getFieldsActivationJavaScriptCode()
     {
         $javaScriptBlocks = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
         /** @var JavaScriptProcessor $javaScriptProcessor */
         $javaScriptProcessor = GeneralUtility::makeInstance(JavaScriptProcessor::class, $this->getFormObject());
 
-        foreach ($this->getFormConfiguration()->getFields() as $fieldName => $field) {
+        foreach ($formConfiguration->getFields() as $fieldName => $field) {
             $activationConditionTree = $javaScriptProcessor->getFieldActivationConditionTree($field);
 
             if (null !== $activationConditionTree) {

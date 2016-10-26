@@ -25,7 +25,6 @@ use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
 use Romm\Formz\Condition\Items\AbstractConditionItem;
 use Romm\Formz\Condition\Node\ConditionNode;
 use Romm\Formz\Core\Core;
-use Romm\Formz\ViewHelpers\FormViewHelper;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -148,8 +147,10 @@ class FormAssetHandler implements SingletonInterface
                 $this->pageRenderer->addCssFile($filePath);
             }
 
-            $formzConfigurationJavaScriptAssetHandler = FormzConfigurationJavaScriptAssetHandler::with($this->assetHandlerFactory);
+            /** @var FormzConfigurationJavaScriptAssetHandler $formzConfigurationJavaScriptAssetHandler */
+            $formzConfigurationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
             $formzConfigurationJavaScriptFileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
+
             if (false === file_exists(GeneralUtility::getFileAbsFileName($formzConfigurationJavaScriptFileName))) {
                 GeneralUtility::writeFileToTypo3tempDir(
                     GeneralUtility::getFileAbsFileName($formzConfigurationJavaScriptFileName),
@@ -175,11 +176,20 @@ class FormAssetHandler implements SingletonInterface
     public function includeGeneratedCss()
     {
         $filePath = $this->getFormzGeneratedFilePath() . '.css';
+
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
-            $css = ErrorContainerDisplayCssAssetHandler::with($this->assetHandlerFactory)->getErrorContainerDisplayCss() . LF;
-            $css .= FieldsActivationCssAssetHandler::with($this->assetHandlerFactory)->getFieldsActivationCss();
+            /** @var ErrorContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
+            $errorContainerDisplayCssAssetHandler = $this->assetHandlerFactory->getAssetHandler(ErrorContainerDisplayCssAssetHandler::class);
+
+            /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
+            $fieldsActivationCssAssetHandler = $this->assetHandlerFactory->getAssetHandler(FieldsActivationCssAssetHandler::class);
+
+            $css = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss() . LF;
+            $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss();
+
             GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $css);
         }
+
         $this->pageRenderer->addCssFile($filePath);
 
         return $this;
@@ -200,14 +210,25 @@ class FormAssetHandler implements SingletonInterface
         $cacheInstance = Core::get()->getCacheInstance();
         $javaScriptValidationFilesCacheIdentifier = Core::get()->getCacheIdentifier('js-files-', $this->assetHandlerFactory->getFormObject()->getClassName());
 
+        /** @var FieldsValidationJavaScriptAssetHandler $fieldValidationConfigurationAssetHandler */
+        $fieldValidationConfigurationAssetHandler =  $this->assetHandlerFactory->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
+
+        /** @var FieldsActivationJavaScriptAssetHandler $fieldsActivationJavaScriptAssetHandler */
+        $fieldsActivationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
+
+        /** @var FieldsValidationActivationJavaScriptAssetHandler $fieldsValidationActivationJavaScriptAssetHandler */
+        $fieldsValidationActivationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
+
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
             ConditionNode::distinctUsedConditions();
-            $fieldValidationConfigurationAssetHandler = FieldsValidationJavaScriptAssetHandler::with($this->assetHandlerFactory)->process();
 
-            $javaScriptCode = FormInitializationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFormInitializationJavaScriptCode() . LF;
-            $javaScriptCode .= $fieldValidationConfigurationAssetHandler->getJavaScriptCode() . LF;
-            $javaScriptCode .= FieldsActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsActivationJavaScriptCode() . LF;
-            $javaScriptCode .= FieldsValidationActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsValidationActivationJavaScriptCode();
+            /** @var FormInitializationJavaScriptAssetHandler $formInitializationJavaScriptAssetHandler */
+            $formInitializationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
+
+            $javaScriptCode = $formInitializationJavaScriptAssetHandler->getFormInitializationJavaScriptCode() . LF;
+            $javaScriptCode .= $fieldValidationConfigurationAssetHandler->process()->getJavaScriptCode() . LF;
+            $javaScriptCode .= $fieldsActivationJavaScriptAssetHandler->getFieldsActivationJavaScriptCode() . LF;
+            $javaScriptCode .= $fieldsValidationActivationJavaScriptAssetHandler->getFieldsValidationActivationJavaScriptCode();
 
             GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $javaScriptCode);
 
@@ -220,10 +241,10 @@ class FormAssetHandler implements SingletonInterface
             if ($cacheInstance->has($javaScriptValidationFilesCacheIdentifier)) {
                 $javaScriptFiles = $cacheInstance->get($javaScriptValidationFilesCacheIdentifier);
             } else {
-                $fieldValidationConfigurationAssetHandler = FieldsValidationJavaScriptAssetHandler::with($this->assetHandlerFactory)->process();
+                $fieldValidationConfigurationAssetHandler = $fieldValidationConfigurationAssetHandler->process();
                 ConditionNode::distinctUsedConditions();
-                FieldsActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsActivationJavaScriptCode();
-                FieldsValidationActivationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFieldsValidationActivationJavaScriptCode();
+                $fieldsActivationJavaScriptAssetHandler->getFieldsActivationJavaScriptCode();
+                $fieldsValidationActivationJavaScriptAssetHandler->getFieldsValidationActivationJavaScriptCode();
 
                 $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
                     $javaScriptValidationFilesCacheIdentifier,
@@ -237,7 +258,10 @@ class FormAssetHandler implements SingletonInterface
         $this->includeJavaScriptValidationFiles($javaScriptFiles);
 
         // Here we generate the JavaScript code containing the submitted values, and the existing errors.
-        $javaScriptCode = FormRequestDataJavaScriptAssetHandler::with($this->assetHandlerFactory)->getFormRequestDataJavaScriptCode(FormViewHelper::getVariable(FormViewHelper::FORM_INSTANCE));
+        /** @var FormRequestDataJavaScriptAssetHandler $formRequestDataJavaScriptAssetHandler */
+        $formRequestDataJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
+
+        $javaScriptCode = $formRequestDataJavaScriptAssetHandler->getFormRequestDataJavaScriptCode();
 
         if (Core::get()->isInDebugMode()) {
             $javaScriptCode .= LF;
@@ -297,7 +321,10 @@ class FormAssetHandler implements SingletonInterface
         $filePath = $this->getFormzGeneratedFilePath('local-' . Core::get()->getLanguageKey()) . '.js';
 
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
-            $javaScriptCode = FormzLocalizationJavaScriptAssetHandler::with($this->assetHandlerFactory)
+            /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
+            $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+
+            $javaScriptCode = $formzLocalizationJavaScriptAssetHandler
                 ->injectTranslationsForFormFieldsValidation()
                 ->getJavaScriptCode();
 

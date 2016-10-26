@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\AssetHandler;
 
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
@@ -28,19 +28,14 @@ abstract class AbstractAssetHandler
 {
 
     /**
-     * @var AssetHandlerFactory
-     */
-    protected $assetHandlerFactory;
-
-    /**
      * @var ObjectManagerInterface
      */
     protected $objectManager;
 
     /**
-     * @var AbstractAssetHandler[]
+     * @var AssetHandlerFactory
      */
-    protected static $instances = [];
+    protected $assetHandlerFactory;
 
     /**
      * Constructor, will set up variables.
@@ -54,34 +49,6 @@ abstract class AbstractAssetHandler
     }
 
     /**
-     * Use this function to instantiate a new instance of the class which calls
-     * the function. The instance is then directly usable.
-     *
-     * Example:
-     * `MyAssetHandler::with($assetHandlerFactory)->doSomeStuff();`
-     *
-     * @param AssetHandlerFactory $assetHandlerFactory
-     * @return $this
-     */
-    public static function with(AssetHandlerFactory $assetHandlerFactory)
-    {
-        $hash = spl_object_hash($assetHandlerFactory);
-        $className = get_called_class();
-
-        if (false === isset(self::$instances[$hash])) {
-            self::$instances[$hash] = [];
-        }
-
-        if (false === isset(self::$instances[$hash][$className])) {
-            /** @noinspection PhpMethodParametersCountMismatchInspection */
-            self::$instances[$hash][$className] = Core::get()->getObjectManager()
-                ->get($className, $assetHandlerFactory);
-        }
-
-        return self::$instances[$hash][$className];
-    }
-
-    /**
      * Just an alias to get the form object faster.
      *
      * @return FormObject
@@ -92,12 +59,12 @@ abstract class AbstractAssetHandler
     }
 
     /**
-     * Just an alias to get the form configuration faster.
+     * Just an alias to get the controller context faster.
      *
-     * @return Form
+     * @return ControllerContext
      */
-    public function getFormConfiguration()
+    public function getControllerContext()
     {
-        return $this->getFormObject()->getConfiguration();
+        return $this->assetHandlerFactory->getControllerContext();
     }
 }

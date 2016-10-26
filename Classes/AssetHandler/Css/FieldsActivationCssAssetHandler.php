@@ -36,13 +36,13 @@ class FieldsActivationCssAssetHandler extends AbstractAssetHandler
      */
     public function getFieldsActivationCss()
     {
-
         $cssBlocks = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
         /** @var CssProcessor $cssProcessor */
         $cssProcessor = GeneralUtility::makeInstance(CssProcessor::class, $this->getFormObject());
 
-        foreach ($this->getFormConfiguration()->getFields() as $fieldName => $field) {
+        foreach ($formConfiguration->getFields() as $fieldName => $field) {
             $activationConditionTree = $cssProcessor->getFieldActivationConditionTree($field);
 
             if (null !== $activationConditionTree) {

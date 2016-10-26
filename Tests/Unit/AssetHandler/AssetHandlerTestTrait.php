@@ -1,8 +1,24 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler;
 
+use Romm\Formz\AssetHandler\AssetHandlerFactory;
+use Romm\Formz\Core\Core;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
+
 trait AssetHandlerTestTrait
 {
+
+    /**
+     * @param string $formClassName
+     * @return AssetHandlerFactory
+     */
+    protected function getAssetHandlerFactoryInstance($formClassName)
+    {
+        $form = Core::get()->getFormObjectFactory()->getInstanceFromClassName($formClassName, 'foo');
+        $controllerContext = new ControllerContext();
+
+        return AssetHandlerFactory::get($form, $controllerContext);
+    }
 
     /**
      * Returns the same string, but without any space/tab/new line.

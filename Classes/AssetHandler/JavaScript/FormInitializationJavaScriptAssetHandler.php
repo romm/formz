@@ -30,7 +30,7 @@ class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
      */
     public function getFormInitializationJavaScriptCode()
     {
-        $formConfigurationArray = $this->getFormConfiguration()->toArray();
+        $formConfigurationArray = $this->getFormObject()->getConfiguration()->toArray();
         $this->removeFieldsValidationConfiguration($formConfigurationArray)
             ->addClassNameProperty($formConfigurationArray);
 
@@ -74,8 +74,6 @@ JS;
      */
     protected function addClassNameProperty(array &$formConfiguration)
     {
-        $formObject = $this->assetHandlerFactory->getFormObject();
-
-        $formConfiguration['className'] = $formObject->getClassName();
+        $formConfiguration['className'] = $this->getFormObject()->getClassName();
     }
 }

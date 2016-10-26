@@ -1,17 +1,17 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
 
-use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use TYPO3\CMS\Extbase\Error\Error;
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 class DataAttributesAssetHandlerTest extends AbstractUnitTest
 {
+
+    use AssetHandlerTestTrait;
 
     /**
      * Checks that the field values data attributes are valid.
@@ -25,21 +25,20 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             DataAttributesAssetHandler::getFieldDataValueKey('bar') => 'john doe'
         ];
 
-        $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName(ExtendedForm::class, 'foo');
-        $controllerContext = new ControllerContext();
-        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(ExtendedForm::class);
+
         $requestResult = new FormResult();
         $form = new ExtendedForm();
         $form->setFoo('foo');
         $form->setBar(['john', 'doe']);
 
-        $dataAttributesValues = DataAttributesAssetHandler::with($assetHandlerFactory)
-            ->getFieldsValuesDataAttributes($form, $requestResult);
+        /** @var DataAttributesAssetHandler $dataAttributesValuesAssetHandler */
+        $dataAttributesValuesAssetHandler = $assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
+        $dataAttributesValues = $dataAttributesValuesAssetHandler->getFieldsValuesDataAttributes($form, $requestResult);
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
 
-        unset($formObject);
-        unset($controllerContext);
+        unset($assetHandlerFactory);
         unset($requestResult);
     }
 
@@ -54,9 +53,7 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
      */
     public function checkFieldsErrorsDataAttributes(array $expectedResult, array $fieldErrors)
     {
-        $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName(ExtendedForm::class, 'foo');
-        $controllerContext = new ControllerContext();
-        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(ExtendedForm::class);
         $requestResult = new FormResult();
 
         foreach ($fieldErrors as $fieldName => $errors) {
@@ -66,13 +63,13 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             }
         }
 
-        $dataAttributesValues = DataAttributesAssetHandler::with($assetHandlerFactory)
-            ->getFieldsErrorsDataAttributes($requestResult);
+        /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
+        $dataAttributesAssetHandler = $assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
+        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($requestResult);
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
 
-        unset($formObject);
-        unset($controllerContext);
+        unset($assetHandlerFactory);
         unset($requestResult);
     }
 
@@ -167,18 +164,16 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             DataAttributesAssetHandler::getFieldDataValidKey('bar') => '1'
         ];
 
-        $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName(ExtendedForm::class, 'foo');
-        $controllerContext = new ControllerContext();
-        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(ExtendedForm::class);
         $requestResult = new FormResult();
 
-        $dataAttributesValues = DataAttributesAssetHandler::with($assetHandlerFactory)
-            ->getFieldsValidDataAttributes($requestResult);
+        /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
+        $dataAttributesAssetHandler = $assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
+        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsValidDataAttributes($requestResult);
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
 
-        unset($formObject);
-        unset($controllerContext);
+        unset($assetHandlerFactory);
         unset($requestResult);
     }
 }

@@ -50,8 +50,9 @@ class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHand
     {
         $this->javaScriptValidationFiles = [];
         $fieldsJavaScriptCode = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        foreach ($this->getFormConfiguration()->getFields() as $field) {
+        foreach ($formConfiguration->getFields() as $field) {
             $fieldsJavaScriptCode[] = $this->processField($field);
         }
 
@@ -129,7 +130,10 @@ JS;
             ->cloneValidator($validatorConfiguration->getClassName())
             ->acceptsEmptyValues();
 
-        $messages = FormzLocalizationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getTranslationKeysForFieldValidation($field, $validationName);
+        /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
+        $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+
+        $messages = $formzLocalizationJavaScriptAssetHandler->getTranslationKeysForFieldValidation($field, $validationName);
         $javaScriptValidationName = GeneralUtility::quoteJSvalue($validationName);
         $validatorName = addslashes($validatorConfiguration->getClassName());
         $validatorConfigurationFinal = [
