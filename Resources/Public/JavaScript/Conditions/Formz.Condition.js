@@ -64,7 +64,7 @@ Formz.Condition = (function () {
             if (this.hasCondition(name)) {
                 result = this.getCondition(name).validate(form, data);
             } else {
-                Formz.Debug.debug('Trying to validate a non-existing condition: "' + name + '".', Formz.TYPE_ERROR);
+                Formz.debug('Trying to validate a non-existing condition: "' + name + '".', Formz.TYPE_ERROR);
             }
 
             return result;
