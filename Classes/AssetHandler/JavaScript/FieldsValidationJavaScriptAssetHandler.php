@@ -125,6 +125,42 @@ JS;
      */
     protected function getInlineJavaScriptValidationCode(Field $field, $validationName, Validation $validatorConfiguration)
     {
+        $javaScriptValidationName = GeneralUtility::quoteJSvalue($validationName);
+        $validatorName = addslashes($validatorConfiguration->getClassName());
+        $validatorConfigurationFinal = $this->getValidationConfiguration($field, $validationName, $validatorConfiguration);
+        $validatorConfigurationFinal = $this->handleValidationConfiguration($validatorConfigurationFinal);
+
+        return <<<JS
+                /*
+                 * Validation rule "$validationName"
+                 */
+                field.addValidation($javaScriptValidationName, '$validatorName', $validatorConfigurationFinal);
+
+JS;
+    }
+
+    /**
+     * This function is here to help unit tests mocking.
+     *
+     * @param string $jsonValidationConfiguration
+     * @return string
+     */
+    protected function handleValidationConfiguration($jsonValidationConfiguration)
+    {
+        return $jsonValidationConfiguration;
+    }
+
+    /**
+     * Returns a JSON array containing the validation configuration needed by
+     * JavaScript.
+     *
+     * @param Field      $field
+     * @param string     $validationName
+     * @param Validation $validatorConfiguration
+     * @return string
+     */
+    protected function getValidationConfiguration(Field $field, $validationName, Validation $validatorConfiguration)
+    {
         $acceptsEmptyValues = $this
             ->getDummyValidator()
             ->cloneValidator($validatorConfiguration->getClassName())
@@ -134,24 +170,13 @@ JS;
         $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
 
         $messages = $formzLocalizationJavaScriptAssetHandler->getTranslationKeysForFieldValidation($field, $validationName);
-        $javaScriptValidationName = GeneralUtility::quoteJSvalue($validationName);
-        $validatorName = addslashes($validatorConfiguration->getClassName());
-        $validatorConfigurationFinal = [
+
+        return Core::get()->arrayToJavaScriptJson([
             'options'            => $validatorConfiguration->getOptions(),
             'messages'           => $messages,
             'settings'           => $validatorConfiguration->toArray(),
             'acceptsEmptyValues' => $acceptsEmptyValues
-        ];
-
-        $validatorConfigurationFinal = Core::get()->arrayToJavaScriptJson($validatorConfigurationFinal);
-
-        return <<<JS
-                /*
-                 * Validation rule "$validationName"
-                 */
-                field.addValidation($javaScriptValidationName, '$validatorName', $validatorConfigurationFinal);
-
-JS;
+        ]);
     }
 
     /**

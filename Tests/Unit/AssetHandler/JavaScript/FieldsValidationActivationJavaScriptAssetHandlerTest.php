@@ -19,8 +19,9 @@ class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitT
      */
     public function checkJavaScriptCode()
     {
-        // MD5 of the JavaScript code result.
-        $expectedResult = '6df49291aac60427681c1c9db74ef8c9';
+        $expectedResult = <<<TXT
+(function(){Formz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addActivationConditionForValidator('__auto','required',function(field,continueValidation){varflag=false;flag=flag||(Formz.Condition.validateCondition('Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsValidCondition',form,{"fieldName":"foo"}));continueValidation(flag);});}form.refreshAllFields();});})();
+TXT;
 
         $defaultFormConfiguration = [
             'activationCondition' => [
@@ -51,7 +52,7 @@ class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitT
 
         $this->assertEquals(
             $expectedResult,
-            md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
+            $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
         unset($assetHandlerFactory);

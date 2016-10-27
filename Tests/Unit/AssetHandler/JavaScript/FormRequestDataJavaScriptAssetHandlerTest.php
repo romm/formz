@@ -21,8 +21,9 @@ class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
      */
     public function checkJavaScriptCode()
     {
-        // MD5 of the JavaScript code result.
-        $expectedResult = '51b1cc8b830784a363efb9bd1488599b';
+        $expectedResult = <<<TXT
+(function(){Formz.Form.beforeInitialization('foo',function(form){form.injectRequestData({"foo":"foo"},{"foo":{"foo":{"bar":"error"}}},true)});})();
+TXT;
 
         $originalRequest = new Request();
         $originalRequest->setArgument('foo', ['foo' => 'foo']);
@@ -45,7 +46,7 @@ class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
 
         $this->assertEquals(
             $expectedResult,
-            md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
+            $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
         unset($assetHandlerFactory);

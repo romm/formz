@@ -19,17 +19,30 @@ class FormInitializationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         // MD5 of the JavaScript code result.
-        $expectedResult = '890a5bc88b7c6e37a641aef1825839b7';
+        $expectedResult = <<<TXT
+(function(){Formz.Form.register('foo',#CONFIGURATION#);})();
+TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
-        /** @var FormInitializationJavaScriptAssetHandler $formInitializationJavaScriptAssetHandler */
-        $formInitializationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
+        /** @var FormInitializationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formInitializationJavaScriptAssetHandler */
+        $formInitializationJavaScriptAssetHandler = $this->getMock(FormInitializationJavaScriptAssetHandler::class, ['handleFormConfiguration'], [$assetHandlerFactory]);
+
+        $jsonFormConfiguration = '';
+        $formInitializationJavaScriptAssetHandler->method('handleFormConfiguration')
+            ->willReturnCallback(
+                function ($formConfiguration) use (&$jsonFormConfiguration) {
+                    $jsonFormConfiguration = $formConfiguration;
+
+                    return $formConfiguration;
+                }
+            );
+
         $javaScriptCode = $formInitializationJavaScriptAssetHandler->getFormInitializationJavaScriptCode();
 
         $this->assertEquals(
-            $expectedResult,
-            md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
+            str_replace('#CONFIGURATION#', $this->trimString($jsonFormConfiguration), $expectedResult),
+            $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
         unset($assetHandlerFactory);

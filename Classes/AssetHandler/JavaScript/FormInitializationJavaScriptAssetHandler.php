@@ -30,12 +30,8 @@ class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
      */
     public function getFormInitializationJavaScriptCode()
     {
-        $formConfigurationArray = $this->getFormObject()->getConfiguration()->toArray();
-        $this->removeFieldsValidationConfiguration($formConfigurationArray)
-            ->addClassNameProperty($formConfigurationArray);
-
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
-        $formConfigurationJson = Core::get()->arrayToJavaScriptJson($formConfigurationArray);
+        $formConfigurationJson = $this->handleFormConfiguration($this->getFormConfiguration());
 
         $javaScriptCode = <<<JS
 (function() {
@@ -44,6 +40,31 @@ class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
 JS;
 
         return $javaScriptCode;
+    }
+
+    /**
+     * This function is here to help unit tests mocking.
+     *
+     * @param string $formConfiguration
+     * @return string
+     */
+    protected function handleFormConfiguration($formConfiguration)
+    {
+        return $formConfiguration;
+    }
+
+    /**
+     * Returns a JSON array containing the form configuration.
+     *
+     * @return string
+     */
+    protected function getFormConfiguration()
+    {
+        $formConfigurationArray = $this->getFormObject()->getConfiguration()->toArray();
+        $this->removeFieldsValidationConfiguration($formConfigurationArray)
+            ->addClassNameProperty($formConfigurationArray);
+
+        return Core::get()->arrayToJavaScriptJson($formConfigurationArray);
     }
 
     /**

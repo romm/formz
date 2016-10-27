@@ -21,8 +21,9 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
      */
     public function checkJavaScriptCode()
     {
-        // MD5 of the JavaScript code result.
-        $expectedResult = '4ce1221868d92d2a9ee626e01de8c5ee';
+        $expectedResult = <<<TXT
+(function(){Formz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('required','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',#CONFIGURATION#);}});})();
+TXT;
 
         $defaultFormConfiguration = [
             'activationCondition' => [
@@ -45,14 +46,25 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
-        /** @var FieldsValidationJavaScriptAssetHandler $fieldsValidationJavaScriptAssetHandler */
-        $fieldsValidationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
+        /** @var FieldsValidationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $fieldsValidationJavaScriptAssetHandler */
+        $fieldsValidationJavaScriptAssetHandler = $this->getMock(FieldsValidationJavaScriptAssetHandler::class, ['handleValidationConfiguration'], [$assetHandlerFactory]);
+
+        $jsonValidationConfiguration = '';
+        $fieldsValidationJavaScriptAssetHandler->method('handleValidationConfiguration')
+            ->willReturnCallback(
+                function ($validationConfiguration) use (&$jsonValidationConfiguration) {
+                    $jsonValidationConfiguration = $validationConfiguration;
+
+                    return $validationConfiguration;
+                }
+            );
+
         $fieldsValidationJavaScriptAssetHandler->process();
 
         $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $fieldsValidationJavaScriptAssetHandler->getJavaScriptValidationFiles());
         $this->assertEquals(
-            $expectedResult,
-            md5($this->removeMultiLinesComments($this->trimString($fieldsValidationJavaScriptAssetHandler->getJavaScriptCode())))
+            $this->trimString(str_replace('#CONFIGURATION#', $jsonValidationConfiguration, $expectedResult)),
+            $this->removeMultiLinesComments($this->trimString($fieldsValidationJavaScriptAssetHandler->getJavaScriptCode()))
         );
 
         unset($assetHandlerFactory);

@@ -80,7 +80,7 @@ class AssetHandlerFactory
     }
 
     /**
-     * @todo
+     * Return an instance of the wanted asset handler. Local storage is handled.
      *
      * @param string $className
      * @return AbstractAssetHandler
