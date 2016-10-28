@@ -18,7 +18,6 @@ class FormInitializationJavaScriptAssetHandlerTest extends AbstractUnitTest
      */
     public function checkJavaScriptCode()
     {
-        // MD5 of the JavaScript code result.
         $expectedResult = <<<TXT
 (function(){Formz.Form.register('foo',#CONFIGURATION#);})();
 TXT;

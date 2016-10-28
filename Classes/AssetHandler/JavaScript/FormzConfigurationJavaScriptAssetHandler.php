@@ -40,6 +40,33 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
      */
     public function getJavaScriptCode()
     {
+        $jsonFormzConfiguration = $this->handleFormzConfiguration($this->getFormzConfiguration());
+
+        return <<<JS
+(function() {
+    Formz.setConfiguration($jsonFormzConfiguration);
+})();
+JS;
+    }
+
+    /**
+     * This function is here to help unit tests mocking.
+     *
+     * @param string $formzConfiguration
+     * @return string
+     */
+    protected function handleFormzConfiguration($formzConfiguration)
+    {
+        return $formzConfiguration;
+    }
+
+    /**
+     * Returns a JSON array containing the formz configuration.
+     *
+     * @return string
+     */
+    protected function getFormzConfiguration()
+    {
         $formzConfigurationArray = $this->getFormObject()
             ->getConfiguration()
             ->getFormzConfiguration()
@@ -48,12 +75,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
         $cleanFormzConfigurationArray = [
             'view' => $formzConfigurationArray['view']
         ];
-        $jsonConfiguration = Core::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
 
-        return <<<JS
-(function() {
-    Formz.setConfiguration($jsonConfiguration);
-})();
-JS;
+        return Core::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
     }
 }
