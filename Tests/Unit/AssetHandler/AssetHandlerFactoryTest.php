@@ -30,5 +30,10 @@ class AssetHandlerFactoryTest extends AbstractUnitTest
         $assetHandlerFactory2 = AssetHandlerFactory::get($formObject, $controllerContext);
 
         $this->assertSame($assetHandlerFactory, $assetHandlerFactory2);
+
+        $formObject2 = clone $formObject;
+        $assetHandlerFactory3 = AssetHandlerFactory::get($formObject2, $controllerContext);
+
+        $this->assertNotSame($assetHandlerFactory, $assetHandlerFactory3);
     }
 }

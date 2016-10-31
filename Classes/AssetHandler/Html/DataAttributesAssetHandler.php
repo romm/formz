@@ -105,11 +105,12 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public function getFieldsErrorsDataAttributes(FormResult $requestResult)
     {
         $result = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
         /** @var Result $fieldResult */
         foreach ($requestResult->getSubResults() as $fieldName => $fieldResult) {
             if (false === $requestResult->fieldIsDeactivated($fieldName)
-                && true === $this->getFormConfiguration()->hasField($fieldName)
+                && true === $formConfiguration->hasField($fieldName)
                 && true === $fieldResult->hasErrors()
                 && false === $requestResult->fieldIsDeactivated($fieldName)
             ) {
@@ -139,8 +140,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public function getFieldsValidDataAttributes(FormResult $requestResult)
     {
         $result = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        foreach ($this->getFormConfiguration()->getFields() as $field) {
+        foreach ($formConfiguration->getFields() as $field) {
             $fieldName = $field->getFieldName();
 
             if (false === $requestResult->fieldIsDeactivated($fieldName)

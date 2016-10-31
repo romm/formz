@@ -1,13 +1,10 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
-use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 class FormInitializationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
@@ -21,22 +18,33 @@ class FormInitializationJavaScriptAssetHandlerTest extends AbstractUnitTest
      */
     public function checkJavaScriptCode()
     {
-        // MD5 of the JavaScript code result.
-        $expectedResult = '890a5bc88b7c6e37a641aef1825839b7';
+        $expectedResult = <<<TXT
+(function(){Formz.Form.register('foo',#CONFIGURATION#);})();
+TXT;
 
-        $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName(DefaultForm::class, 'foo');
-        $controllerContext = new ControllerContext();
-        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
-        $javaScriptCode = FormInitializationJavaScriptAssetHandler::with($assetHandlerFactory)
-            ->getFormInitializationJavaScriptCode();
+        /** @var FormInitializationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formInitializationJavaScriptAssetHandler */
+        $formInitializationJavaScriptAssetHandler = $this->getMock(FormInitializationJavaScriptAssetHandler::class, ['handleFormConfiguration'], [$assetHandlerFactory]);
 
+        $jsonFormConfiguration = '';
+        $formInitializationJavaScriptAssetHandler->method('handleFormConfiguration')
+            ->willReturnCallback(
+                function ($formConfiguration) use (&$jsonFormConfiguration) {
+                    $jsonFormConfiguration = $formConfiguration;
+
+                    return $formConfiguration;
+                }
+            );
+
+        $javaScriptCode = $formInitializationJavaScriptAssetHandler->getFormInitializationJavaScriptCode();
+
+        $this->assertNotNull($jsonFormConfiguration);
         $this->assertEquals(
-            $expectedResult,
-            md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
+            str_replace('#CONFIGURATION#', $this->trimString($jsonFormConfiguration), $expectedResult),
+            $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
-        unset($formObject);
-        unset($controllerContext);
+        unset($assetHandlerFactory);
     }
 }

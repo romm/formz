@@ -23,8 +23,9 @@ class AbstractAssetHandlerTest extends AbstractUnitTest
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
 
-        $defaultAssetHandler = DefaultAssetHandler::with($assetHandlerFactory)
-            ->callFunction(
+        /** @var DefaultAssetHandler $defaultAssetHandler */
+        $defaultAssetHandler = $assetHandlerFactory->getAssetHandler(DefaultAssetHandler::class);
+        $defaultAssetHandler->callFunction(
                 function () use (&$foo, $bar) {
                     $foo = $bar;
                 }
@@ -32,21 +33,22 @@ class AbstractAssetHandlerTest extends AbstractUnitTest
 
         $this->assertEquals($foo, $bar);
         $this->assertSame($formObject, $defaultAssetHandler->getFormObject());
-        $this->assertSame($formObject->getConfiguration(), $defaultAssetHandler->getFormConfiguration());
 
         /*
          * Getting the same asset handler type with the same factory must return
          * the same instance.
          */
-        $defaultAssetHandler2 = DefaultAssetHandler::with($assetHandlerFactory);
+        /** @var DefaultAssetHandler $defaultAssetHandler2 */
+        $defaultAssetHandler2 = $assetHandlerFactory->getAssetHandler(DefaultAssetHandler::class);
         $this->assertSame($defaultAssetHandler, $defaultAssetHandler2);
 
         /*
          * Getting the same asset handler type with another factory must return
          * a new instance.
          */
-        $assetHandlerFactory2 = clone $assetHandlerFactory;
-        $defaultAssetHandler3 = DefaultAssetHandler::with($assetHandlerFactory2);
+        $formObject2 = clone $formObject;
+        $assetHandlerFactory2 = AssetHandlerFactory::get($formObject2, $controllerContext);
+        $defaultAssetHandler3 = $assetHandlerFactory2->getAssetHandler(DefaultAssetHandler::class);
         $this->assertNotSame($defaultAssetHandler, $defaultAssetHandler3);
     }
 }

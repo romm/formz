@@ -13,7 +13,10 @@
 
 namespace Romm\Formz\AssetHandler;
 
+use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\FormObject;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 /**
@@ -28,11 +31,16 @@ class AssetHandlerFactory
 {
 
     /**
-     * Contains the instances of this class for every form.
+     * Contains the instances of factory for every form/controller context.
      *
      * @var array
      */
-    protected static $instances = [];
+    protected static $factoryInstances = [];
+
+    /**
+     * @var AbstractAssetHandler[]
+     */
+    protected $instances = [];
 
     /**
      * @var FormObject
@@ -62,11 +70,46 @@ class AssetHandlerFactory
      */
     public static function get(FormObject $formObject, ControllerContext $controllerContext)
     {
-        if (false === isset(self::$instances[$formObject->getClassName()])) {
-            self::$instances[$formObject->getClassName()] = new AssetHandlerFactory($formObject, $controllerContext);
+        $hash = md5(spl_object_hash($formObject) . spl_object_hash($controllerContext));
+
+        if (false === array_key_exists($hash, self::$factoryInstances)) {
+            self::$factoryInstances[$hash] = new AssetHandlerFactory($formObject, $controllerContext);
         }
 
-        return self::$instances[$formObject->getClassName()];
+        return self::$factoryInstances[$hash];
+    }
+
+    /**
+     * Return an instance of the wanted asset handler. Local storage is handled.
+     *
+     * @param string $className
+     * @return AbstractAssetHandler
+     * @throws ClassNotFoundException
+     * @throws InvalidArgumentTypeException
+     */
+    public function getAssetHandler($className)
+    {
+        if (false === array_key_exists($className, $this->instances)) {
+            if (false === class_exists($className)) {
+                throw new ClassNotFoundException(
+                    'Trying to get an asset handler with a wrong class name: "' . $className . '".',
+                    1477468381
+                );
+            }
+
+            $instance = GeneralUtility::makeInstance($className, $this);
+
+            if (false === $instance instanceof AbstractAssetHandler) {
+                throw new InvalidArgumentTypeException(
+                    'The asset handler object must be an instance of "' . AbstractAssetHandler::class . '", current type: "' . get_class($instance) . '".',
+                    1477468571
+                );
+            }
+
+            $this->instances[$className] = $instance;
+        }
+
+        return $this->instances[$className];
     }
 
     /**

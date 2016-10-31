@@ -119,7 +119,9 @@ JS;
      */
     public function injectTranslationsForFormFieldsValidation()
     {
-        foreach ($this->getFormConfiguration()->getFields() as $field) {
+        $formConfiguration = $this->getFormObject()->getConfiguration();
+
+        foreach ($formConfiguration->getFields() as $field) {
             if (false === $this->translationsForFieldValidationWereInjected($field)) {
                 $this->storeTranslationsForFieldValidation($field);
             }

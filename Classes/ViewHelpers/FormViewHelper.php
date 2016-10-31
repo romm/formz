@@ -362,17 +362,20 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $object = self::$staticVariables[self::FORM_INSTANCE];
         $requestResult = self::$staticVariables[self::FORM_RESULT];
 
+        /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
+        $dataAttributesAssetHandler =  $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
+
         $dataAttributes = [];
         if (false !== $object) {
-            $dataAttributes += DataAttributesAssetHandler::with($this->assetHandlerFactory)->getFieldsValuesDataAttributes($object, $requestResult);
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($object, $requestResult);
         }
 
         if (false !== $requestResult) {
-            $dataAttributes += DataAttributesAssetHandler::with($this->assetHandlerFactory)->getFieldsValidDataAttributes($requestResult);
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($requestResult);
 
             if (true === self::$staticVariables[self::FORM_WAS_SUBMITTED]) {
                 $dataAttributes += ['formz-submission-done' => '1'];
-                $dataAttributes += DataAttributesAssetHandler::with($this->assetHandlerFactory)->getFieldsErrorsDataAttributes($requestResult);
+                $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($requestResult);
             }
         }
 

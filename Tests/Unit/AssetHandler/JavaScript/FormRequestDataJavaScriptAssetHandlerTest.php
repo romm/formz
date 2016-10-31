@@ -1,15 +1,12 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
-use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Mvc\Request;
 
 class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
@@ -24,10 +21,9 @@ class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
      */
     public function checkJavaScriptCode()
     {
-        // MD5 of the JavaScript code result.
-        $expectedResult = '51b1cc8b830784a363efb9bd1488599b';
-
-        $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $expectedResult = <<<TXT
+(function(){Formz.Form.beforeInitialization('foo',function(form){form.injectRequestData({"foo":"foo"},{"foo":{"foo":{"bar":"error"}}},true)});})();
+TXT;
 
         $originalRequest = new Request();
         $originalRequest->setArgument('foo', ['foo' => 'foo']);
@@ -41,20 +37,18 @@ class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
             ->addError(new Error('error', 42, [], 'foo:bar'));
         $request->setOriginalRequestMappingResults($result);
 
-        $controllerContext = new ControllerContext();
-        $controllerContext->setRequest($request);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
+        $assetHandlerFactory->getControllerContext()->setRequest($request);
 
-        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
-
-        $javaScriptCode = FormRequestDataJavaScriptAssetHandler::with($assetHandlerFactory)
-            ->getFormRequestDataJavaScriptCode();
+        /** @var FormRequestDataJavaScriptAssetHandler $formRequestDataJavaScriptAssetHandler */
+        $formRequestDataJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
+        $javaScriptCode = $formRequestDataJavaScriptAssetHandler->getFormRequestDataJavaScriptCode();
 
         $this->assertEquals(
             $expectedResult,
-            md5($this->removeMultiLinesComments($this->trimString($javaScriptCode)))
+            $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
-        unset($formObject);
-        unset($controllerContext);
+        unset($assetHandlerFactory);
     }
 }

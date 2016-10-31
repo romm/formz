@@ -34,8 +34,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractJavaScriptAssetHandl
     {
         $submittedFormValues = [];
         $fieldsExistingErrors = [];
-        $originalRequest = $this->assetHandlerFactory
-            ->getControllerContext()
+        $originalRequest = $this->getControllerContext()
             ->getRequest()
             ->getOriginalRequest();
 
@@ -71,8 +70,7 @@ JS;
     {
         $result = [];
         $formName = $this->getFormObject()->getName();
-        $originalRequest = $this->assetHandlerFactory
-            ->getControllerContext()
+        $originalRequest = $this->getControllerContext()
             ->getRequest()
             ->getOriginalRequest();
 
@@ -94,8 +92,7 @@ JS;
     protected function getFieldsExistingErrors()
     {
         $fieldsErrors = [];
-        $request = $this->assetHandlerFactory
-            ->getControllerContext()
+        $request = $this->getControllerContext()
             ->getRequest();
 
         if (null !== $request->getOriginalRequest()) {

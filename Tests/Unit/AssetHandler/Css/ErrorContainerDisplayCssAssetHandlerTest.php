@@ -1,13 +1,10 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
 
-use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Css\ErrorContainerDisplayCssAssetHandler;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
-use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 class ErrorContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
 {
@@ -23,16 +20,14 @@ class ErrorContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
     {
         $expectedCss = 'form[name="foo"]:not([formz-error-foo="1"])[formz-field-feedback-container="foo"]{display:none!important;}';
 
-        $form = Core::get()->getFormObjectFactory()->getInstanceFromClassName(DefaultForm::class, 'foo');
-        $controllerContext = new ControllerContext();
-        $assetHandlerFactory = AssetHandlerFactory::get($form, $controllerContext);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
-        $errorContainerDisplayCss = ErrorContainerDisplayCssAssetHandler::with($assetHandlerFactory)
-            ->getErrorContainerDisplayCss();
+        /** @var ErrorContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
+        $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(ErrorContainerDisplayCssAssetHandler::class);
+        $errorContainerDisplayCss = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss();
 
         $this->assertEquals($this->trimString($errorContainerDisplayCss), $expectedCss);
 
-        unset($form);
-        unset($controllerContext);
+        unset($assetHandlerFactory);
     }
 }

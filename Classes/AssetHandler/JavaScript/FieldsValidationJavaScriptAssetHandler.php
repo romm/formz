@@ -50,8 +50,9 @@ class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHand
     {
         $this->javaScriptValidationFiles = [];
         $fieldsJavaScriptCode = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        foreach ($this->getFormConfiguration()->getFields() as $field) {
+        foreach ($formConfiguration->getFields() as $field) {
             $fieldsJavaScriptCode[] = $this->processField($field);
         }
 
@@ -124,22 +125,10 @@ JS;
      */
     protected function getInlineJavaScriptValidationCode(Field $field, $validationName, Validation $validatorConfiguration)
     {
-        $acceptsEmptyValues = $this
-            ->getDummyValidator()
-            ->cloneValidator($validatorConfiguration->getClassName())
-            ->acceptsEmptyValues();
-
-        $messages = FormzLocalizationJavaScriptAssetHandler::with($this->assetHandlerFactory)->getTranslationKeysForFieldValidation($field, $validationName);
         $javaScriptValidationName = GeneralUtility::quoteJSvalue($validationName);
         $validatorName = addslashes($validatorConfiguration->getClassName());
-        $validatorConfigurationFinal = [
-            'options'            => $validatorConfiguration->getOptions(),
-            'messages'           => $messages,
-            'settings'           => $validatorConfiguration->toArray(),
-            'acceptsEmptyValues' => $acceptsEmptyValues
-        ];
-
-        $validatorConfigurationFinal = Core::get()->arrayToJavaScriptJson($validatorConfigurationFinal);
+        $validatorConfigurationFinal = $this->getValidationConfiguration($field, $validationName, $validatorConfiguration);
+        $validatorConfigurationFinal = $this->handleValidationConfiguration($validatorConfigurationFinal);
 
         return <<<JS
                 /*
@@ -148,6 +137,46 @@ JS;
                 field.addValidation($javaScriptValidationName, '$validatorName', $validatorConfigurationFinal);
 
 JS;
+    }
+
+    /**
+     * This function is here to help unit tests mocking.
+     *
+     * @param string $jsonValidationConfiguration
+     * @return string
+     */
+    protected function handleValidationConfiguration($jsonValidationConfiguration)
+    {
+        return $jsonValidationConfiguration;
+    }
+
+    /**
+     * Returns a JSON array containing the validation configuration needed by
+     * JavaScript.
+     *
+     * @param Field      $field
+     * @param string     $validationName
+     * @param Validation $validatorConfiguration
+     * @return string
+     */
+    protected function getValidationConfiguration(Field $field, $validationName, Validation $validatorConfiguration)
+    {
+        $acceptsEmptyValues = $this
+            ->getDummyValidator()
+            ->cloneValidator($validatorConfiguration->getClassName())
+            ->acceptsEmptyValues();
+
+        /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
+        $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+
+        $messages = $formzLocalizationJavaScriptAssetHandler->getTranslationKeysForFieldValidation($field, $validationName);
+
+        return Core::get()->arrayToJavaScriptJson([
+            'options'            => $validatorConfiguration->getOptions(),
+            'messages'           => $messages,
+            'settings'           => $validatorConfiguration->toArray(),
+            'acceptsEmptyValues' => $acceptsEmptyValues
+        ]);
     }
 
     /**

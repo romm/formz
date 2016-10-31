@@ -31,8 +31,9 @@ class ErrorContainerDisplayCssAssetHandler extends AbstractAssetHandler
     public function getErrorContainerDisplayCss()
     {
         $cssBlocks = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        foreach ($this->getFormConfiguration()->getFields() as $fieldName => $field) {
+        foreach ($formConfiguration->getFields() as $fieldName => $field) {
             $formName = $this->getFormObject()->getName();
             $errorSelector = DataAttributesAssetHandler::getFieldDataErrorKey($fieldName);
             $errorContainerCss = $field->getSettings()->getFeedbackContainerSelector();

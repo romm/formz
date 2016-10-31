@@ -44,7 +44,7 @@ abstract class AbstractUnitTest extends UnitTestCase
     {
         // Reset asset handler factory instances.
         $reflectedCore = new \ReflectionClass(AssetHandlerFactory::class);
-        $objectManagerProperty = $reflectedCore->getProperty('instances');
+        $objectManagerProperty = $reflectedCore->getProperty('factoryInstances');
         $objectManagerProperty->setAccessible(true);
         $objectManagerProperty->setValue([]);
         $objectManagerProperty->setAccessible(false);

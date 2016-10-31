@@ -32,11 +32,12 @@ class FieldsValidationActivationJavaScriptAssetHandler extends AbstractJavaScrip
     public function getFieldsValidationActivationJavaScriptCode()
     {
         $javaScriptBlocks = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
         /** @var JavaScriptProcessor $javaScriptProcessor */
         $javaScriptProcessor = GeneralUtility::makeInstance(JavaScriptProcessor::class, $this->getFormObject());
 
-        foreach ($this->getFormConfiguration()->getFields() as $fieldName => $field) {
+        foreach ($formConfiguration->getFields() as $fieldName => $field) {
             foreach ($field->getValidation() as $validatorName => $validation) {
                 $fieldJavaScript = $javaScriptProcessor->getFieldValidationActivationConditionTree($field, $validation);
 
