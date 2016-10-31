@@ -64,6 +64,9 @@ class AssetHandlerFactory
     }
 
     /**
+     * Returns a factory instance. The same instance will be returned for the
+     * same `$formObject` and `$controllerContext` parameters.
+     *
      * @param FormObject        $formObject Configuration of the form.
      * @param ControllerContext $controllerContext
      * @return AssetHandlerFactory
