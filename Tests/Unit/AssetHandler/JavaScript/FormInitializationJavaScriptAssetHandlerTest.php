@@ -39,6 +39,7 @@ TXT;
 
         $javaScriptCode = $formInitializationJavaScriptAssetHandler->getFormInitializationJavaScriptCode();
 
+        $this->assertNotNull($jsonFormConfiguration);
         $this->assertEquals(
             str_replace('#CONFIGURATION#', $this->trimString($jsonFormConfiguration), $expectedResult),
             $this->removeMultiLinesComments($this->trimString($javaScriptCode))

@@ -39,6 +39,7 @@ TXT;
 
         $javaScriptCode = $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
 
+        $this->assertNotNull($jsonFormzConfiguration);
         $this->assertEquals(
             str_replace('#CONFIGURATION#', $this->trimString($jsonFormzConfiguration), $expectedResult),
             $this->removeMultiLinesComments($this->trimString($javaScriptCode))

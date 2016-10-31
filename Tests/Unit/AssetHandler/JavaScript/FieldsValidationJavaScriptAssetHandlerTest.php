@@ -61,6 +61,7 @@ TXT;
 
         $fieldsValidationJavaScriptAssetHandler->process();
 
+        $this->assertNotNull($jsonValidationConfiguration);
         $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $fieldsValidationJavaScriptAssetHandler->getJavaScriptValidationFiles());
         $this->assertEquals(
             $this->trimString(str_replace('#CONFIGURATION#', $jsonValidationConfiguration, $expectedResult)),
