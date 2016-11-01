@@ -50,18 +50,6 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHan
     protected $injectedTranslationKeysForFieldValidation = [];
 
     /**
-     * Adds a global translation value which will be added to the Formz
-     * JavaScript localization service.
-     *
-     * @param string $key
-     * @param string $value
-     */
-    public function addTranslation($key, $value)
-    {
-        $this->translations[(string)$key] = (string)$value;
-    }
-
-    /**
      * Will generate and return the JavaScript code which add all registered
      * translations to the JavaScript library.
      *
@@ -78,8 +66,8 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHan
             $translationsBinding[$key] = $hash;
         }
 
-        $jsonRealTranslations = Core::get()->arrayToJavaScriptJson($realTranslations);
-        $jsonTranslationsBinding = Core::get()->arrayToJavaScriptJson($translationsBinding);
+        $jsonRealTranslations = $this->handleRealTranslations(Core::get()->arrayToJavaScriptJson($realTranslations));
+        $jsonTranslationsBinding = $this->handleTranslationsBinding(Core::get()->arrayToJavaScriptJson($translationsBinding));
 
         return <<<JS
 Formz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);
@@ -101,9 +89,7 @@ JS;
         if (true === $field->hasValidation($validationName)) {
             $key = $field->getFieldName() . '-' . $validationName;
 
-            if (false === $this->translationsForFieldValidationWereInjected($field)) {
-                $this->storeTranslationsForFieldValidation($field);
-            }
+            $this->storeTranslationsForFieldValidation($field);
 
             $result = $this->translationKeysForFieldValidation[$key];
         }
@@ -122,9 +108,7 @@ JS;
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
         foreach ($formConfiguration->getFields() as $field) {
-            if (false === $this->translationsForFieldValidationWereInjected($field)) {
-                $this->storeTranslationsForFieldValidation($field);
-            }
+            $this->storeTranslationsForFieldValidation($field);
         }
 
         return $this;
@@ -139,32 +123,46 @@ JS;
      */
     protected function storeTranslationsForFieldValidation(Field $field)
     {
-        $fieldName = $field->getFieldName();
+        if (false === $this->translationsForFieldValidationWereInjected($field)) {
+            $fieldName = $field->getFieldName();
 
-        foreach ($field->getValidation() as $validationName => $validationConfiguration) {
-            $dummyValidator = $this->getDummyValidator()
-                ->cloneValidator($validationConfiguration->getClassName());
+            foreach ($field->getValidation() as $validationName => $validationConfiguration) {
+                $dummyValidator = $this->getDummyValidator()
+                    ->cloneValidator($validationConfiguration->getClassName());
 
-            $messages = $dummyValidator->setExternalMessages($validationConfiguration->getMessages())
-                ->getMessages();
+                $messages = $dummyValidator->setExternalMessages($validationConfiguration->getMessages())
+                    ->getMessages();
 
-            foreach ($messages as $key => $message) {
-                $message = $dummyValidator->getMessage($key, ['{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}']);
+                foreach ($messages as $key => $message) {
+                    $message = $dummyValidator->getMessage($key, ['{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}']);
 
-                $message = (is_string($message)) ? $message : '';
+                    $message = (is_string($message)) ? $message : '';
 
-                $localizationKey = $this->getIdentifierForFieldValidationName($field, $validationName, $key);
-                $this->addTranslation($localizationKey, $message);
-                $messages[$key] = $localizationKey;
+                    $localizationKey = $this->getIdentifierForFieldValidationName($field, $validationName, $key);
+                    $this->addTranslation($localizationKey, $message);
+                    $messages[$key] = $localizationKey;
+                }
+
+                $this->translationKeysForFieldValidation[$fieldName . '-' . $validationName] = $messages;
+
+                $key = $this->getFormObject()->getClassName() . '-' . $field->getFieldName();
+                $this->injectedTranslationKeysForFieldValidation[$key] = true;
             }
-
-            $this->translationKeysForFieldValidation[$fieldName . '-' . $validationName] = $messages;
-
-            $key = $this->getFormObject()->getClassName() . '-' . $field->getFieldName();
-            $this->injectedTranslationKeysForFieldValidation[$key] = true;
         }
 
         return $this;
+    }
+
+    /**
+     * Adds a global translation value which will be added to the Formz
+     * JavaScript localization service.
+     *
+     * @param string $key
+     * @param string $value
+     */
+    protected function addTranslation($key, $value)
+    {
+        $this->translations[(string)$key] = (string)$value;
     }
 
     /**
@@ -190,5 +188,27 @@ JS;
     protected function getIdentifierForFieldValidationName(Field $field, $validationName, $messageKey)
     {
         return str_replace(['\\', '_'], '', $this->getFormObject()->getClassName()) . '-' . $field->getFieldName() . '-' . $validationName . '-' . $messageKey;
+    }
+
+    /**
+     * This function is here to help unit tests mocking.
+     *
+     * @param string $realTranslations
+     * @return string
+     */
+    protected function handleRealTranslations($realTranslations)
+    {
+        return $realTranslations;
+    }
+
+    /**
+     * This function is here to help unit tests mocking.
+     *
+     * @param string $translationsBinding
+     * @return string
+     */
+    protected function handleTranslationsBinding($translationsBinding)
+    {
+        return $translationsBinding;
     }
 }
