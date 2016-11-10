@@ -9,9 +9,7 @@
 </f:section>
 
 <f:section name="Field">
-	<div formz-field-container="{fieldName}">
-		<formz:renderSection section="Field" />
-	</div>
+    <formz:renderSection section="Field" />
 </f:section>
 
 <f:section name="Feedback">
@@ -21,9 +19,11 @@
 		<formz:renderSection section="Feedback.In.Before" />
 
 		<div formz-field-feedback-list="{fieldName}">
-			<f:for each="{validationResults.errors}" as="error">
-				<formz:formatMessage message="{error}" />
-			</f:for>
+            <f:form.validationResults for="{formName}.{fieldName}">
+                <f:for each="{validationResults.errors}" as="error">
+                    <formz:formatMessage message="{error}" />
+                </f:for>
+            </f:form.validationResults>
 		</div>
 
 		<formz:renderSection section="Feedback.In.After" />
