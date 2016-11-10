@@ -131,7 +131,7 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
         SectionViewHelper::resetSectionClosures();
         OptionViewHelper::resetOptions();
 
-        self::restoreOriginalArguments($renderingContext, $originalArguments);
+        self::restoreOriginalArguments($renderingContext, $templateArguments, $originalArguments);
 
         return $result;
     }
@@ -204,11 +204,20 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
      * Will restore original arguments in the template variable container.
      *
      * @param RenderingContextInterface $renderingContext
+     * @param array                     $templateArguments
      * @param array                     $originalArguments
      */
-    protected static function restoreOriginalArguments(RenderingContextInterface $renderingContext, array $originalArguments)
+    protected static function restoreOriginalArguments(RenderingContextInterface $renderingContext, array $templateArguments, array $originalArguments)
     {
         $templateVariableContainer = $renderingContext->getTemplateVariableContainer();
+
+        $identifiers = $templateVariableContainer->getAllIdentifiers();
+        foreach ($identifiers as $identifier) {
+            if (array_key_exists($identifier, $templateArguments)) {
+                $templateVariableContainer->remove($identifier);
+            }
+        }
+
         foreach ($originalArguments as $key => $value) {
             if (null !== $value) {
                 if ($templateVariableContainer->exists($key)) {
