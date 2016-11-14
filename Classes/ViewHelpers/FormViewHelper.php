@@ -20,7 +20,7 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\AssetHandler\FormAssetHandler;
+use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorFactory;
 use Romm\Formz\Utility\TimeTracker;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
@@ -198,17 +198,17 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             ->addDefaultClass()
             ->handleDataAttributes();
 
-        $formResourcesHandler = FormAssetHandler::get($this->pageRenderer, $this->assetHandlerFactory);
-        $formResourcesHandler->includeAssets()
-            ->includeGeneratedCss()
-            ->includeGeneratedJavaScript();
+        $assetHandlerConnectorFactory = AssetHandlerConnectorFactory::get($this->pageRenderer, $this->assetHandlerFactory);
+        $assetHandlerConnectorFactory->includeDefaultAssets();
+        $assetHandlerConnectorFactory->getJavaScriptAssetHandlerConnector()->includeGeneratedJavaScript();
+        $assetHandlerConnectorFactory->getCssAssetHandlerConnector()->includeGeneratedCss();
 
         $this->timeTracker->logTime('pre-render');
 
         // Renders the whole Fluid template.
         $result = call_user_func_array([$this, 'parent::render'], func_get_args());
 
-        $formResourcesHandler->handleJavaScriptLocalization();
+        $assetHandlerConnectorFactory->getJavaScriptAssetHandlerConnector()->handleJavaScriptLocalization();
 
         $this->resetVariables();
 
@@ -402,7 +402,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $view->assign('result', $result);
 
         $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
-        $this->pageRenderer->addCssFile(FormAssetHandler::getResourceRelativePath($templatePath));
+        $this->pageRenderer->addCssFile(Core::get()->getResourceRelativePath($templatePath));
 
         return $view->render();
     }

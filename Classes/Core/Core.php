@@ -25,6 +25,7 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
@@ -357,6 +358,21 @@ class Core implements SingletonInterface
         return (null !== $path)
             ? $relativePath . $path
             : $relativePath;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function getResourceRelativePath($path)
+    {
+        return rtrim(
+            PathUtility::getRelativePath(
+                GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT'),
+                GeneralUtility::getFileAbsFileName($path)
+            ),
+            '/'
+        );
     }
 
     /**
