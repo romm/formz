@@ -104,8 +104,8 @@ class AssetHandlerConnectorFactory
         if (false === $this->assetHandlerConnectorStates->defaultAssetsWereIncluded()) {
             $this->assetHandlerConnectorStates->markDefaultAssetsAsIncluded();
 
-            $this->javaScriptAssetHandlerConnector->includeDefaultJavaScriptFiles();
-            $this->cssAssetHandlerConnector->includeDefaultCssFiles();
+            $this->getJavaScriptAssetHandlerConnector()->includeDefaultJavaScriptFiles();
+            $this->getCssAssetHandlerConnector()->includeDefaultCssFiles();
         }
 
         return $this;
