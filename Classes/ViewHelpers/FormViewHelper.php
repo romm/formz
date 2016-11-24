@@ -20,7 +20,7 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorFactory;
+use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\Utility\TimeTracker;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
@@ -198,17 +198,17 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             ->addDefaultClass()
             ->handleDataAttributes();
 
-        $assetHandlerConnectorFactory = AssetHandlerConnectorFactory::get($this->pageRenderer, $this->assetHandlerFactory);
-        $assetHandlerConnectorFactory->includeDefaultAssets();
-        $assetHandlerConnectorFactory->getJavaScriptAssetHandlerConnector()->includeGeneratedJavaScript();
-        $assetHandlerConnectorFactory->getCssAssetHandlerConnector()->includeGeneratedCss();
+        $assetHandlerConnectorManager = AssetHandlerConnectorManager::get($this->pageRenderer, $this->assetHandlerFactory);
+        $assetHandlerConnectorManager->includeDefaultAssets();
+        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->includeGeneratedJavaScript();
+        $assetHandlerConnectorManager->getCssAssetHandlerConnector()->includeGeneratedCss();
 
         $this->timeTracker->logTime('pre-render');
 
         // Renders the whole Fluid template.
         $result = call_user_func_array([$this, 'parent::render'], func_get_args());
 
-        $assetHandlerConnectorFactory->getJavaScriptAssetHandlerConnector()->handleJavaScriptLocalization();
+        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->handleJavaScriptLocalization();
 
         $this->resetVariables();
 

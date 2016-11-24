@@ -16,15 +16,16 @@ namespace Romm\Formz\AssetHandler\Connector;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * This factory is used to create instances of connectors, which will be used to
+ * This manager is used to create instances of connectors, which will be used to
  * gather every asset used for a form, mainly JavaScript and CSS code.
  */
-class AssetHandlerConnectorFactory
+class AssetHandlerConnectorManager
 {
     /**
-     * @var AssetHandlerConnectorFactory[]
+     * @var AssetHandlerConnectorManager[]
      */
     private static $instances = [];
 
@@ -76,7 +77,7 @@ class AssetHandlerConnectorFactory
     /**
      * @param PageRenderer        $pageRenderer
      * @param AssetHandlerFactory $assetHandlerFactory
-     * @return AssetHandlerConnectorFactory
+     * @return AssetHandlerConnectorManager
      */
     public static function get(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory)
     {
@@ -125,6 +126,54 @@ class AssetHandlerConnectorFactory
             : '';
 
         return Core::GENERATED_FILES_PATH . Core::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
+    }
+
+    /**
+     * This function will check if the file at the given path exists. If it does
+     * not, the callback is called to get the content of the file, which is put
+     * in the created file.
+     *
+     * @param string   $relativePath
+     * @param callable $callback
+     * @return string
+     */
+    public function createFileInTemporaryDirectory($relativePath, callable $callback)
+    {
+        $result = true;
+        $absolutePath = GeneralUtility::getFileAbsFileName($relativePath);
+
+        if (false === $this->fileExists($absolutePath)) {
+            $content = call_user_func($callback);
+
+            $result = $this->writeTemporaryFile($absolutePath, $content);
+        }
+
+        return $result;
+    }
+
+    /**
+     * This function is mocked in unit tests.
+     *
+     * @param string $absolutePath
+     * @return bool
+     */
+    protected function fileExists($absolutePath)
+    {
+        return file_exists($absolutePath);
+    }
+
+    /**
+     * This function is mocked in unit tests.
+     *
+     * @param string $absolutePath
+     * @param string $content
+     * @return bool
+     */
+    protected function writeTemporaryFile($absolutePath, $content)
+    {
+        $result = GeneralUtility::writeFileToTypo3tempDir($absolutePath, $content);
+
+        return (null === $result);
     }
 
     /**

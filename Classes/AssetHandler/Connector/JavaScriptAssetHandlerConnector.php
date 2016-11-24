@@ -51,16 +51,16 @@ class JavaScriptAssetHandlerConnector
     ];
 
     /**
-     * @var AssetHandlerConnectorFactory
+     * @var AssetHandlerConnectorManager
      */
-    private $formAssetHandler;
+    private $assetHandlerConnectorManager;
 
     /**
-     * @param AssetHandlerConnectorFactory $formAssetHandler
+     * @param AssetHandlerConnectorManager $assetHandlerConnectorManager
      */
-    public function __construct(AssetHandlerConnectorFactory $formAssetHandler)
+    public function __construct(AssetHandlerConnectorManager $assetHandlerConnectorManager)
     {
-        $this->formAssetHandler = $formAssetHandler;
+        $this->assetHandlerConnectorManager = $assetHandlerConnectorManager;
     }
 
     /**
@@ -78,11 +78,11 @@ class JavaScriptAssetHandlerConnector
 
         foreach ($this->javaScriptFiles as $file) {
             $filePath = Core::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
-            $this->formAssetHandler->getPageRenderer()->addJsFile($filePath);
+            $this->assetHandlerConnectorManager->getPageRenderer()->addJsFile($filePath);
         }
 
         /** @var FormzConfigurationJavaScriptAssetHandler $formzConfigurationJavaScriptAssetHandler */
-        $formzConfigurationJavaScriptAssetHandler = $this->formAssetHandler
+        $formzConfigurationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
 
@@ -96,7 +96,7 @@ class JavaScriptAssetHandlerConnector
             );
         }
 
-        $this->formAssetHandler->getPageRenderer()->addJsFooterFile($formzConfigurationJavaScriptFileName);
+        $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($formzConfigurationJavaScriptFileName);
 
         return $this;
     }
@@ -113,23 +113,23 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeGeneratedJavaScript()
     {
-        $filePath = $this->formAssetHandler->getFormzGeneratedFilePath() . '.js';
+        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.js';
         $cacheInstance = Core::get()->getCacheInstance();
-        $formClassName = $this->formAssetHandler->getAssetHandlerFactory()->getFormObject()->getClassName();
+        $formClassName = $this->assetHandlerConnectorManager->getAssetHandlerFactory()->getFormObject()->getClassName();
         $javaScriptValidationFilesCacheIdentifier = Core::get()->getCacheIdentifier('js-files-', $formClassName);
 
         /** @var FieldsValidationJavaScriptAssetHandler $fieldValidationConfigurationAssetHandler */
-        $fieldValidationConfigurationAssetHandler = $this->formAssetHandler
+        $fieldValidationConfigurationAssetHandler = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
 
         /** @var FieldsActivationJavaScriptAssetHandler $fieldsActivationJavaScriptAssetHandler */
-        $fieldsActivationJavaScriptAssetHandler = $this->formAssetHandler
+        $fieldsActivationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
 
         /** @var FieldsValidationActivationJavaScriptAssetHandler $fieldsValidationActivationJavaScriptAssetHandler */
-        $fieldsValidationActivationJavaScriptAssetHandler = $this->formAssetHandler
+        $fieldsValidationActivationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
 
@@ -137,7 +137,7 @@ class JavaScriptAssetHandlerConnector
             ConditionNode::distinctUsedConditions();
 
             /** @var FormInitializationJavaScriptAssetHandler $formInitializationJavaScriptAssetHandler */
-            $formInitializationJavaScriptAssetHandler = $this->formAssetHandler
+            $formInitializationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
                 ->getAssetHandlerFactory()
                 ->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
 
@@ -169,13 +169,13 @@ class JavaScriptAssetHandlerConnector
             }
         }
 
-        $this->formAssetHandler->getPageRenderer()->addJsFooterFile($filePath);
+        $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($filePath);
 
         $this->includeJavaScriptValidationFiles($javaScriptFiles);
 
         // Here we generate the JavaScript code containing the submitted values, and the existing errors.
         /** @var FormRequestDataJavaScriptAssetHandler $formRequestDataJavaScriptAssetHandler */
-        $formRequestDataJavaScriptAssetHandler = $this->formAssetHandler
+        $formRequestDataJavaScriptAssetHandler = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
 
@@ -198,7 +198,7 @@ class JavaScriptAssetHandlerConnector
         $javaScriptCode .= LF;
         $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
 
-        $this->formAssetHandler
+        $this->assetHandlerConnectorManager
             ->getPageRenderer()
             ->addJsFooterInlineCode('Formz - Initialization ' . $formClassName, $javaScriptCode);
 
@@ -238,11 +238,11 @@ class JavaScriptAssetHandlerConnector
      */
     public function handleJavaScriptLocalization()
     {
-        $filePath = $this->formAssetHandler->getFormzGeneratedFilePath('local-' . Core::get()->getLanguageKey()) . '.js';
+        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('local-' . Core::get()->getLanguageKey()) . '.js';
 
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
             /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
-            $formzLocalizationJavaScriptAssetHandler = $this->formAssetHandler->getAssetHandlerFactory()->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+            $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerConnectorManager->getAssetHandlerFactory()->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
 
             $javaScriptCode = $formzLocalizationJavaScriptAssetHandler
                 ->injectTranslationsForFormFieldsValidation()
@@ -251,7 +251,7 @@ class JavaScriptAssetHandlerConnector
             GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $javaScriptCode);
         }
 
-        $this->formAssetHandler->getPageRenderer()->addJsFooterFile($filePath);
+        $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($filePath);
 
         return $this;
     }
@@ -265,12 +265,12 @@ class JavaScriptAssetHandlerConnector
     protected function includeJavaScriptValidationFiles(array $javaScriptValidationFiles)
     {
         $javaScriptValidationFiles = array_unique($javaScriptValidationFiles);
-        $assetHandlerConnectorStates = $this->formAssetHandler->getAssetHandlerConnectorStates();
+        $assetHandlerConnectorStates = $this->assetHandlerConnectorManager->getAssetHandlerConnectorStates();
 
         foreach ($javaScriptValidationFiles as $file) {
             if (false === in_array($file, $assetHandlerConnectorStates->getAlreadyIncludedValidationJavaScriptFiles())) {
                 $path = Core::get()->getResourceRelativePath($file);
-                $this->formAssetHandler->getPageRenderer()->addJsFooterFile($path);
+                $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($path);
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
             }
         }

@@ -31,16 +31,16 @@ class CssAssetHandlerConnector
     ];
 
     /**
-     * @var AssetHandlerConnectorFactory
+     * @var AssetHandlerConnectorManager
      */
-    private $formAssetHandler;
+    private $assetHandlerConnectorManager;
 
     /**
-     * @param AssetHandlerConnectorFactory $formAssetHandler
+     * @param AssetHandlerConnectorManager $assetHandlerConnectorManager
      */
-    public function __construct(AssetHandlerConnectorFactory $formAssetHandler)
+    public function __construct(AssetHandlerConnectorManager $assetHandlerConnectorManager)
     {
-        $this->formAssetHandler = $formAssetHandler;
+        $this->assetHandlerConnectorManager = $assetHandlerConnectorManager;
     }
 
     /**
@@ -53,7 +53,10 @@ class CssAssetHandlerConnector
     {
         foreach ($this->cssFiles as $file) {
             $filePath = Core::get()->getExtensionRelativePath('Resources/Public/StyleSheets/' . $file);
-            $this->formAssetHandler->getPageRenderer()->addCssFile($filePath);
+
+            $this->assetHandlerConnectorManager
+                ->getPageRenderer()
+                ->addCssFile($filePath);
         }
 
         return $this;
@@ -70,22 +73,31 @@ class CssAssetHandlerConnector
      */
     public function includeGeneratedCss()
     {
-        $filePath = $this->formAssetHandler->getFormzGeneratedFilePath() . '.css';
+        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.css';
 
-        if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
-            /** @var ErrorContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
-            $errorContainerDisplayCssAssetHandler = $this->formAssetHandler->getAssetHandlerFactory()->getAssetHandler(ErrorContainerDisplayCssAssetHandler::class);
+        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
+            $filePath,
+            function() {
+                /** @var ErrorContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
+                $errorContainerDisplayCssAssetHandler = $this->assetHandlerConnectorManager
+                    ->getAssetHandlerFactory()
+                    ->getAssetHandler(ErrorContainerDisplayCssAssetHandler::class);
 
-            /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
-            $fieldsActivationCssAssetHandler = $this->formAssetHandler->getAssetHandlerFactory()->getAssetHandler(FieldsActivationCssAssetHandler::class);
+                /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
+                $fieldsActivationCssAssetHandler = $this->assetHandlerConnectorManager
+                    ->getAssetHandlerFactory()
+                    ->getAssetHandler(FieldsActivationCssAssetHandler::class);
 
-            $css = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss() . LF;
-            $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss();
+                $css = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss() . LF;
+                $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss();
 
-            GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $css);
-        }
+                return $css;
+            }
+        );
 
-        $this->formAssetHandler->getPageRenderer()->addCssFile($filePath);
+        $this->assetHandlerConnectorManager
+            ->getPageRenderer()
+            ->addCssFile($filePath);
 
         return $this;
     }
