@@ -16,7 +16,6 @@ namespace Romm\Formz\AssetHandler\Connector;
 use Romm\Formz\AssetHandler\Css\ErrorContainerDisplayCssAssetHandler;
 use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
 use Romm\Formz\Core\Core;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CssAssetHandlerConnector
 {
