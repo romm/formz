@@ -81,24 +81,33 @@ class JavaScriptAssetHandlerConnector
             $this->assetHandlerConnectorManager->getPageRenderer()->addJsFile($filePath);
         }
 
+        $this->includeFormzConfigurationJavaScriptFile();
+
+        return $this;
+    }
+
+    /**
+     * Includes Formz configuration JavaScript declaration. If the file exists,
+     * it is directly included, otherwise the JavaScript code is calculated,
+     * then put in the cache file.
+     */
+    private function includeFormzConfigurationJavaScriptFile()
+    {
         /** @var FormzConfigurationJavaScriptAssetHandler $formzConfigurationJavaScriptAssetHandler */
         $formzConfigurationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
 
         $formzConfigurationJavaScriptFileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
-        $filePath = GeneralUtility::getFileAbsFileName($formzConfigurationJavaScriptFileName);
 
-        if (false === file_exists($filePath)) {
-            GeneralUtility::writeFileToTypo3tempDir(
-                $filePath,
-                $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode()
-            );
-        }
+        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
+            $formzConfigurationJavaScriptFileName,
+            function() use ($formzConfigurationJavaScriptAssetHandler) {
+                return $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
+            }
+        );
 
         $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($formzConfigurationJavaScriptFileName);
-
-        return $this;
     }
 
     /**
@@ -113,33 +122,26 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeGeneratedJavaScript()
     {
+        $assetHandlerFactory = $this->assetHandlerConnectorManager->getAssetHandlerFactory();
         $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.js';
         $cacheInstance = Core::get()->getCacheInstance();
-        $formClassName = $this->assetHandlerConnectorManager->getAssetHandlerFactory()->getFormObject()->getClassName();
+        $formClassName = $assetHandlerFactory->getFormObject()->getClassName();
         $javaScriptValidationFilesCacheIdentifier = Core::get()->getCacheIdentifier('js-files-', $formClassName);
 
         /** @var FieldsValidationJavaScriptAssetHandler $fieldValidationConfigurationAssetHandler */
-        $fieldValidationConfigurationAssetHandler = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
+        $fieldValidationConfigurationAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
 
         /** @var FieldsActivationJavaScriptAssetHandler $fieldsActivationJavaScriptAssetHandler */
-        $fieldsActivationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
+        $fieldsActivationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
 
         /** @var FieldsValidationActivationJavaScriptAssetHandler $fieldsValidationActivationJavaScriptAssetHandler */
-        $fieldsValidationActivationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
+        $fieldsValidationActivationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
 
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
             ConditionNode::distinctUsedConditions();
 
             /** @var FormInitializationJavaScriptAssetHandler $formInitializationJavaScriptAssetHandler */
-            $formInitializationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-                ->getAssetHandlerFactory()
-                ->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
+            $formInitializationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
 
             $javaScriptCode = $formInitializationJavaScriptAssetHandler->getFormInitializationJavaScriptCode() . LF;
             $javaScriptCode .= $fieldValidationConfigurationAssetHandler->process()->getJavaScriptCode() . LF;
@@ -175,9 +177,7 @@ class JavaScriptAssetHandlerConnector
 
         // Here we generate the JavaScript code containing the submitted values, and the existing errors.
         /** @var FormRequestDataJavaScriptAssetHandler $formRequestDataJavaScriptAssetHandler */
-        $formRequestDataJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
+        $formRequestDataJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
 
         $javaScriptCode = $formRequestDataJavaScriptAssetHandler->getFormRequestDataJavaScriptCode();
 
@@ -242,7 +242,9 @@ class JavaScriptAssetHandlerConnector
 
         if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
             /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
-            $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerConnectorManager->getAssetHandlerFactory()->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+            $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
+                ->getAssetHandlerFactory()
+                ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
 
             $javaScriptCode = $formzLocalizationJavaScriptAssetHandler
                 ->injectTranslationsForFormFieldsValidation()
