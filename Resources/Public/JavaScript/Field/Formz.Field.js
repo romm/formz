@@ -348,11 +348,12 @@ Formz.Field = (function () {
                     if (typeof element.type !== 'undefined') {
                         if (element.type === 'radio') {
                             element.onclick = validateCallback;
+                        } else if (element.type === 'checkbox') {
+                            element.addEventListener('change', validateCallback);
                         } else if (element.type.substr(0, 6) === 'select') {
                             element.addEventListener('change', validateCallback);
                         } else {
                             element.addEventListener('blur', validateCallback);
-                            element.addEventListener('change', validateCallback);
                         }
                     }
                 }
