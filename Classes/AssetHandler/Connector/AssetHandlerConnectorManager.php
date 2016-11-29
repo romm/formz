@@ -135,11 +135,11 @@ class AssetHandlerConnectorManager
      *
      * @param string   $relativePath
      * @param callable $callback
-     * @return string
+     * @return bool
      */
     public function createFileInTemporaryDirectory($relativePath, callable $callback)
     {
-        $result = true;
+        $result = false;
         $absolutePath = GeneralUtility::getFileAbsFileName($relativePath);
 
         if (false === $this->fileExists($absolutePath)) {

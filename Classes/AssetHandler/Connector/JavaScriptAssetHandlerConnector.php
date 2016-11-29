@@ -87,30 +87,6 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * Includes Formz configuration JavaScript declaration. If the file exists,
-     * it is directly included, otherwise the JavaScript code is calculated,
-     * then put in the cache file.
-     */
-    private function includeFormzConfigurationJavaScriptFile()
-    {
-        /** @var FormzConfigurationJavaScriptAssetHandler $formzConfigurationJavaScriptAssetHandler */
-        $formzConfigurationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
-
-        $formzConfigurationJavaScriptFileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
-
-        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
-            $formzConfigurationJavaScriptFileName,
-            function() use ($formzConfigurationJavaScriptAssetHandler) {
-                return $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
-            }
-        );
-
-        $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($formzConfigurationJavaScriptFileName);
-    }
-
-    /**
      * Will take care of generating the JavaScript with the
      * `AssetHandlerFactory`. The code will be put in a `.js` file in the
      * `typo3temp` directory.
@@ -122,109 +98,10 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeGeneratedJavaScript()
     {
-        $assetHandlerFactory = $this->assetHandlerConnectorManager->getAssetHandlerFactory();
-        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.js';
-        $cacheInstance = Core::get()->getCacheInstance();
-        $formClassName = $assetHandlerFactory->getFormObject()->getClassName();
-        $javaScriptValidationFilesCacheIdentifier = Core::get()->getCacheIdentifier('js-files-', $formClassName);
-
-        /** @var FieldsValidationJavaScriptAssetHandler $fieldValidationConfigurationAssetHandler */
-        $fieldValidationConfigurationAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
-
-        /** @var FieldsActivationJavaScriptAssetHandler $fieldsActivationJavaScriptAssetHandler */
-        $fieldsActivationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
-
-        /** @var FieldsValidationActivationJavaScriptAssetHandler $fieldsValidationActivationJavaScriptAssetHandler */
-        $fieldsValidationActivationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
-
-        if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
-            ConditionNode::distinctUsedConditions();
-
-            /** @var FormInitializationJavaScriptAssetHandler $formInitializationJavaScriptAssetHandler */
-            $formInitializationJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
-
-            $javaScriptCode = $formInitializationJavaScriptAssetHandler->getFormInitializationJavaScriptCode() . LF;
-            $javaScriptCode .= $fieldValidationConfigurationAssetHandler->process()->getJavaScriptCode() . LF;
-            $javaScriptCode .= $fieldsActivationJavaScriptAssetHandler->getFieldsActivationJavaScriptCode() . LF;
-            $javaScriptCode .= $fieldsValidationActivationJavaScriptAssetHandler->getFieldsValidationActivationJavaScriptCode();
-
-            GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $javaScriptCode);
-
-            $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
-                $javaScriptValidationFilesCacheIdentifier,
-                $fieldValidationConfigurationAssetHandler->getJavaScriptValidationFiles()
-            );
-        } else {
-            // Including all JavaScript files required by used validation rules and conditions.
-            if ($cacheInstance->has($javaScriptValidationFilesCacheIdentifier)) {
-                $javaScriptFiles = $cacheInstance->get($javaScriptValidationFilesCacheIdentifier);
-            } else {
-                $fieldValidationConfigurationAssetHandler = $fieldValidationConfigurationAssetHandler->process();
-                ConditionNode::distinctUsedConditions();
-                $fieldsActivationJavaScriptAssetHandler->getFieldsActivationJavaScriptCode();
-                $fieldsValidationActivationJavaScriptAssetHandler->getFieldsValidationActivationJavaScriptCode();
-
-                $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
-                    $javaScriptValidationFilesCacheIdentifier,
-                    $fieldValidationConfigurationAssetHandler->getJavaScriptValidationFiles()
-                );
-            }
-        }
-
-        $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($filePath);
-
-        $this->includeJavaScriptValidationFiles($javaScriptFiles);
-
-        // Here we generate the JavaScript code containing the submitted values, and the existing errors.
-        /** @var FormRequestDataJavaScriptAssetHandler $formRequestDataJavaScriptAssetHandler */
-        $formRequestDataJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
-
-        $javaScriptCode = $formRequestDataJavaScriptAssetHandler->getFormRequestDataJavaScriptCode();
-
-        if (Core::get()->isInDebugMode()) {
-            $javaScriptCode .= LF;
-            $javaScriptCode .= 'Formz.Debug.activate();';
-        }
-
-        /** @var UriBuilder $uriBuilder */
-        $uriBuilder = Core::get()->getObjectManager()->get(UriBuilder::class);
-        $uri = $uriBuilder->reset()
-            ->setTargetPageType(1473682545)
-            ->setNoCache(true)
-            ->setUseCacheHash(false)
-            ->setCreateAbsoluteUri(true)
-            ->build();
-
-        $javaScriptCode .= LF;
-        $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
-
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterInlineCode('Formz - Initialization ' . $formClassName, $javaScriptCode);
+        $this->generateAndIncludeJavaScript();
+        $this->generateAndIncludeInlineJavaScript();
 
         return $this;
-    }
-
-    /**
-     * Will save in cache and return the list of files which must be included in
-     * order to make validation rules and conditions work properly.
-     *
-     * @param string $cacheIdentifier
-     * @param array  $javaScriptFiles
-     * @return array
-     */
-    protected function saveAndGetJavaScriptFiles($cacheIdentifier, array $javaScriptFiles)
-    {
-        /** @var AbstractConditionItem[] $conditions */
-        $conditions = ConditionNode::getDistinctUsedConditions();
-
-        foreach ($conditions as $condition) {
-            $javaScriptFiles = array_merge($javaScriptFiles, $condition::getJavaScriptFiles());
-        }
-
-        Core::get()->getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
-
-        return $javaScriptFiles;
     }
 
     /**
@@ -259,6 +136,170 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
+     * Includes Formz configuration JavaScript declaration. If the file exists,
+     * it is directly included, otherwise the JavaScript code is calculated,
+     * then put in the cache file.
+     */
+    private function includeFormzConfigurationJavaScriptFile()
+    {
+        /** @var FormzConfigurationJavaScriptAssetHandler $formzConfigurationJavaScriptAssetHandler */
+        $formzConfigurationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
+
+        $formzConfigurationJavaScriptFileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
+
+        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
+            $formzConfigurationJavaScriptFileName,
+            function () use ($formzConfigurationJavaScriptAssetHandler) {
+                return $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
+            }
+        );
+
+        $this->assetHandlerConnectorManager
+            ->getPageRenderer()
+            ->addJsFooterFile($formzConfigurationJavaScriptFileName);
+    }
+
+    /**
+     * @todo
+     */
+    private function generateAndIncludeJavaScript()
+    {
+        $formClassName = $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getFormObject()
+            ->getClassName();
+
+        $javaScriptValidationFilesCacheIdentifier = Core::get()
+            ->getCacheIdentifier('js-files-', $formClassName);
+
+        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.js';
+
+        $aze = $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
+            $filePath,
+            function () {
+                ConditionNode::distinctUsedConditions();
+
+                return $this->getFormInitializationJavaScriptAssetHandler()
+                        ->getFormInitializationJavaScriptCode() .
+                    LF .
+                    $this->getFieldsValidationJavaScriptAssetHandler()
+                        ->process()
+                        ->getJavaScriptCode() .
+                    LF .
+                    $this->getFieldsActivationJavaScriptAssetHandler()
+                        ->getFieldsActivationJavaScriptCode() .
+                    LF .
+                    $this->getFieldsValidationActivationJavaScriptAssetHandler()
+                        ->getFieldsValidationActivationJavaScriptCode();
+            }
+        );
+
+        if (true === $aze) {
+            $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
+                $javaScriptValidationFilesCacheIdentifier,
+                $this->getFieldsValidationJavaScriptAssetHandler()->getJavaScriptValidationFiles()
+            );
+        } else {
+            $javaScriptFiles = $this->getJavaScriptFiles($javaScriptValidationFilesCacheIdentifier);
+        }
+
+        $this->assetHandlerConnectorManager
+            ->getPageRenderer()
+            ->addJsFooterFile($filePath);
+
+        $this->includeJavaScriptValidationFiles($javaScriptFiles);
+    }
+
+    /**
+     * @todo
+     *
+     * @param string $cacheIdentifier
+     * @return array
+     */
+    private function getJavaScriptFiles($cacheIdentifier)
+    {
+        $cacheInstance = Core::get()->getCacheInstance();
+
+        if ($cacheInstance->has($cacheIdentifier)) {
+            $javaScriptFiles = $cacheInstance->get($cacheIdentifier);
+        } else {
+            $fieldValidationConfigurationAssetHandler = $this->getFieldsValidationJavaScriptAssetHandler()->process();
+            ConditionNode::distinctUsedConditions();
+            $this->getFieldsActivationJavaScriptAssetHandler()->getFieldsActivationJavaScriptCode();
+            $this->getFieldsValidationActivationJavaScriptAssetHandler()->getFieldsValidationActivationJavaScriptCode();
+
+            $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
+                $cacheIdentifier,
+                $fieldValidationConfigurationAssetHandler->getJavaScriptValidationFiles()
+            );
+        }
+
+        return $javaScriptFiles;
+    }
+
+    /**
+     * Here we generate the JavaScript code containing the submitted values, and
+     * the existing errors, which is dynamically created at each request.
+     *
+     * The code is then injected as inline code in the DOM.
+     */
+    private function generateAndIncludeInlineJavaScript()
+    {
+        $formClassName = $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getFormObject()
+            ->getClassName();
+
+        $javaScriptCode = $this->getFormRequestDataJavaScriptAssetHandler()
+            ->getFormRequestDataJavaScriptCode();
+
+        if (Core::get()->isInDebugMode()) {
+            $javaScriptCode .= LF;
+            $javaScriptCode .= 'Formz.Debug.activate();';
+        }
+
+        /** @var UriBuilder $uriBuilder */
+        $uriBuilder = Core::get()->getObjectManager()->get(UriBuilder::class);
+        $uri = $uriBuilder->reset()
+            ->setTargetPageType(1473682545)
+            ->setNoCache(true)
+            ->setUseCacheHash(false)
+            ->setCreateAbsoluteUri(true)
+            ->build();
+
+        $javaScriptCode .= LF;
+        $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
+
+        $this->assetHandlerConnectorManager
+            ->getPageRenderer()
+            ->addJsFooterInlineCode('Formz - Initialization ' . $formClassName, $javaScriptCode);
+    }
+
+    /**
+     * Will save in cache and return the list of files which must be included in
+     * order to make validation rules and conditions work properly.
+     *
+     * @param string $cacheIdentifier
+     * @param array  $javaScriptFiles
+     * @return array
+     */
+    protected function saveAndGetJavaScriptFiles($cacheIdentifier, array $javaScriptFiles)
+    {
+        /** @var AbstractConditionItem[] $conditions */
+        $conditions = ConditionNode::getDistinctUsedConditions();
+
+        foreach ($conditions as $condition) {
+            $javaScriptFiles = array_merge($javaScriptFiles, $condition::getJavaScriptFiles());
+        }
+
+        Core::get()->getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
+
+        return $javaScriptFiles;
+    }
+
+    /**
      * Will include all new JavaScript files given, by checking that every given
      * file was not already included.
      *
@@ -276,5 +317,55 @@ class JavaScriptAssetHandlerConnector
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
             }
         }
+    }
+
+    /**
+     * @return FormInitializationJavaScriptAssetHandler
+     */
+    protected function getFormInitializationJavaScriptAssetHandler()
+    {
+        return $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
+    }
+
+    /**
+     * @return FieldsValidationJavaScriptAssetHandler
+     */
+    protected function getFieldsValidationJavaScriptAssetHandler()
+    {
+        return $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
+    }
+
+    /**
+     * @return FieldsActivationJavaScriptAssetHandler
+     */
+    protected function getFieldsActivationJavaScriptAssetHandler()
+    {
+        return $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
+    }
+
+    /**
+     * @return FieldsValidationActivationJavaScriptAssetHandler
+     */
+    protected function getFieldsValidationActivationJavaScriptAssetHandler()
+    {
+        return $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
+    }
+
+    /**
+     * @return FormRequestDataJavaScriptAssetHandler
+     */
+    protected function getFormRequestDataJavaScriptAssetHandler()
+    {
+        return $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
     }
 }
