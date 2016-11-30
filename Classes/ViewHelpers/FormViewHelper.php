@@ -208,7 +208,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         // Renders the whole Fluid template.
         $result = call_user_func_array([$this, 'parent::render'], func_get_args());
 
-        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->handleJavaScriptLocalization();
+        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->includeLanguageJavaScriptFiles();
 
         $this->resetVariables();
 

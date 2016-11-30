@@ -23,7 +23,6 @@ use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
 use Romm\Formz\Condition\Items\AbstractConditionItem;
 use Romm\Formz\Condition\Node\ConditionNode;
 use Romm\Formz\Core\Core;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 class JavaScriptAssetHandlerConnector
@@ -105,7 +104,7 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * This function will handle the JavaScript localization files.
+     * This function will handle the JavaScript language files.
      *
      * A file will be created for the current language (there can be as many
      * files as languages), containing the translations handling for JavaScript.
@@ -113,24 +112,27 @@ class JavaScriptAssetHandlerConnector
      *
      * @return $this
      */
-    public function handleJavaScriptLocalization()
+    public function includeLanguageJavaScriptFiles()
     {
         $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('local-' . Core::get()->getLanguageKey()) . '.js';
 
-        if (false === file_exists(GeneralUtility::getFileAbsFileName($filePath))) {
-            /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
-            $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-                ->getAssetHandlerFactory()
-                ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
+            $filePath,
+            function() {
+                /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
+                $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
+                    ->getAssetHandlerFactory()
+                    ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
 
-            $javaScriptCode = $formzLocalizationJavaScriptAssetHandler
-                ->injectTranslationsForFormFieldsValidation()
-                ->getJavaScriptCode();
+                return $formzLocalizationJavaScriptAssetHandler
+                    ->injectTranslationsForFormFieldsValidation()
+                    ->getJavaScriptCode();
+            }
+        );
 
-            GeneralUtility::writeFileToTypo3tempDir(GeneralUtility::getFileAbsFileName($filePath), $javaScriptCode);
-        }
-
-        $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($filePath);
+        $this->assetHandlerConnectorManager
+            ->getPageRenderer()
+            ->addJsFooterFile($filePath);
 
         return $this;
     }
@@ -162,7 +164,8 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * @todo
+     * Will include the generated JavaScript, from multiple asset handlers
+     * sources.
      */
     private function generateAndIncludeJavaScript()
     {
@@ -176,7 +179,7 @@ class JavaScriptAssetHandlerConnector
 
         $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.js';
 
-        $aze = $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
+        $fileWasCreated = $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
             function () {
                 ConditionNode::distinctUsedConditions();
@@ -196,7 +199,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        if (true === $aze) {
+        if (true === $fileWasCreated) {
             $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
                 $javaScriptValidationFilesCacheIdentifier,
                 $this->getFieldsValidationJavaScriptAssetHandler()->getJavaScriptValidationFiles()
@@ -213,7 +216,8 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * @todo
+     * Returns the list of JavaScript files which are used for the current form
+     * object.
      *
      * @param string $cacheIdentifier
      * @return array
