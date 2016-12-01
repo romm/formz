@@ -133,6 +133,9 @@ class AssetHandlerConnectorManager
      * not, the callback is called to get the content of the file, which is put
      * in the created file.
      *
+     * A boolean is returned: if the file did not exist, and it was created
+     * without error, `true` is returned. Otherwise, `false` is returned.
+     *
      * @param string   $relativePath
      * @param callable $callback
      * @return bool
