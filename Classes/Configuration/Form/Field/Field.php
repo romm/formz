@@ -16,7 +16,8 @@ namespace Romm\Formz\Configuration\Form\Field;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Field\Activation\Activation;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour;
 use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
@@ -39,15 +40,15 @@ class Field extends AbstractFormzConfiguration
     protected $behaviours = [];
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Field\Activation\Activation
+     * @var \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
-    protected $activation = null;
+    protected $activation;
 
     /**
      * @var \Romm\Formz\Configuration\Form\Field\Settings\FieldSettings
      */
-    protected $settings = null;
+    protected $settings;
 
     /**
      * Name of the field. By default, it is the key of this field in the array
@@ -64,6 +65,8 @@ class Field extends AbstractFormzConfiguration
     {
         $this->settings = new FieldSettings();
         $this->settings->setParents([$this]);
+
+        $this->activation = EmptyActivation::get();
     }
 
     /**
@@ -108,7 +111,7 @@ class Field extends AbstractFormzConfiguration
     }
 
     /**
-     * @return Activation
+     * @return ActivationInterface
      */
     public function getActivation()
     {
@@ -120,7 +123,7 @@ class Field extends AbstractFormzConfiguration
      */
     public function hasActivation()
     {
-        return (null !== $this->activation);
+        return !($this->activation instanceof EmptyActivation);
     }
 
     /**

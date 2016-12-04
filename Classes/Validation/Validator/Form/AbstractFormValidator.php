@@ -14,7 +14,9 @@
 namespace Romm\Formz\Validation\Validator\Form;
 
 use Romm\Formz\Behaviours\BehavioursManager;
-use Romm\Formz\Condition\Processor\PhpProcessor;
+use Romm\Formz\Condition\Processor\ConditionProcessor;
+use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
+use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
@@ -141,9 +143,9 @@ abstract class AbstractFormValidator extends GenericObjectValidator
     protected $objectManager;
 
     /**
-     * @var PhpProcessor
+     * @var ConditionProcessor
      */
-    private $phpProcessor;
+    private $conditionProcessor;
 
     /**
      * Array of arbitral data which are handled by validators.
@@ -213,7 +215,8 @@ abstract class AbstractFormValidator extends GenericObjectValidator
         $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
         $behavioursManager->applyBehaviourOnFormInstance($this->form, $this->formObject);
 
-        $this->phpProcessor = GeneralUtility::makeInstance(PhpProcessor::class, $this->formObject, $this->form, $this);
+        $this->conditionProcessor = ConditionProcessorFactory::getInstance()
+            ->get($this->formObject);
 
         $this->checkFieldsActivation();
         $this->beforeValidationProcess();
@@ -347,24 +350,35 @@ abstract class AbstractFormValidator extends GenericObjectValidator
             if (false === in_array($fieldName, $this->fieldsActivationChecked)
                 && false === in_array($fieldName, $this->deactivatedFields)
             ) {
+                $phpConditionDataObject = new PhpConditionDataObject;
+                $phpConditionDataObject->setForm($this->form);
+                $phpConditionDataObject->setFormValidator($this);
+
                 if ($field->hasActivation()
                     && false === isset($this->fieldsActivationChecking[$fieldName])
                 ) {
                     $this->fieldsActivationChecking[$fieldName] = true;
 
-                    $activationConditionTree = $this->phpProcessor->getFieldActivationConditionTree($field);
-                    if (false === $activationConditionTree) {
+                    $activation = $this->conditionProcessor
+                        ->getActivationConditionTreeForField($field)
+                        ->getPhpResult($phpConditionDataObject);
+
+                    if (false === $activation) {
                         $this->deactivatedFields[] = $fieldName;
                     }
                 }
 
                 foreach ($field->getValidation() as $validationName => $validation) {
                     if ($validation->hasActivation()) {
-                        $validationActivationConditionTree = $this->phpProcessor->getFieldValidationActivationConditionTree($field, $validation);
-                        if (false === $validationActivationConditionTree) {
+                        $activation = $this->conditionProcessor
+                            ->getActivationConditionTreeForValidation($validation)
+                            ->getPhpResult($phpConditionDataObject);
+
+                        if (false === $activation) {
                             if (false === isset($this->deactivatedFieldsValidators[$fieldName])) {
                                 $this->deactivatedFieldsValidators[$fieldName] = [];
                             }
+
                             $this->deactivatedFieldsValidators[$fieldName][] = $validationName;
                         }
                     }

@@ -11,12 +11,13 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Condition\Processor;
+namespace Romm\Formz\Configuration\Form\Condition\Activation;
 
-/**
- * JavaScript implementation of the condition processors.
- */
-class JavaScriptProcessor extends AbstractProcessor
+class Activation extends AbstractActivation
 {
-
+    /**
+     * @var string
+     * @validate NotEmpty
+     */
+    protected $condition;
 }

@@ -20,8 +20,7 @@ use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
-use Romm\Formz\Condition\Items\AbstractConditionItem;
-use Romm\Formz\Condition\Node\ConditionNode;
+use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
@@ -182,18 +181,20 @@ class JavaScriptAssetHandlerConnector
         $fileWasCreated = $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
             function () {
-                ConditionNode::distinctUsedConditions();
-
+                // Form initialization code.
                 return $this->getFormInitializationJavaScriptAssetHandler()
                         ->getFormInitializationJavaScriptCode() .
                     LF .
+                    // Fields validation code.
                     $this->getFieldsValidationJavaScriptAssetHandler()
                         ->process()
                         ->getJavaScriptCode() .
                     LF .
+                    // Fields activation conditions code.
                     $this->getFieldsActivationJavaScriptAssetHandler()
                         ->getFieldsActivationJavaScriptCode() .
                     LF .
+                    // Fields validation activation conditions code.
                     $this->getFieldsValidationActivationJavaScriptAssetHandler()
                         ->getFieldsValidationActivationJavaScriptCode();
             }
@@ -230,15 +231,36 @@ class JavaScriptAssetHandlerConnector
             $javaScriptFiles = $cacheInstance->get($cacheIdentifier);
         } else {
             $fieldValidationConfigurationAssetHandler = $this->getFieldsValidationJavaScriptAssetHandler()->process();
-            ConditionNode::distinctUsedConditions();
-            $this->getFieldsActivationJavaScriptAssetHandler()->getFieldsActivationJavaScriptCode();
-            $this->getFieldsValidationActivationJavaScriptAssetHandler()->getFieldsValidationActivationJavaScriptCode();
 
             $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
                 $cacheIdentifier,
                 $fieldValidationConfigurationAssetHandler->getJavaScriptValidationFiles()
             );
         }
+
+        return $javaScriptFiles;
+    }
+
+    /**
+     * Will save in cache and return the list of files which must be included in
+     * order to make validation rules and conditions work properly.
+     *
+     * @param string $cacheIdentifier
+     * @param array  $javaScriptFiles
+     * @return array
+     */
+    private function saveAndGetJavaScriptFiles($cacheIdentifier, array $javaScriptFiles)
+    {
+        $formObject = $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getFormObject();
+
+        $conditionProcessor = ConditionProcessorFactory::getInstance()
+            ->get($formObject);
+
+        $javaScriptFiles = array_merge($javaScriptFiles, $conditionProcessor->getJavaScriptFiles());
+
+        Core::get()->getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
 
         return $javaScriptFiles;
     }
@@ -279,28 +301,6 @@ class JavaScriptAssetHandlerConnector
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
             ->addJsFooterInlineCode('Formz - Initialization ' . $formClassName, $javaScriptCode);
-    }
-
-    /**
-     * Will save in cache and return the list of files which must be included in
-     * order to make validation rules and conditions work properly.
-     *
-     * @param string $cacheIdentifier
-     * @param array  $javaScriptFiles
-     * @return array
-     */
-    protected function saveAndGetJavaScriptFiles($cacheIdentifier, array $javaScriptFiles)
-    {
-        /** @var AbstractConditionItem[] $conditions */
-        $conditions = ConditionNode::getDistinctUsedConditions();
-
-        foreach ($conditions as $condition) {
-            $javaScriptFiles = array_merge($javaScriptFiles, $condition::getJavaScriptFiles());
-        }
-
-        Core::get()->getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
-
-        return $javaScriptFiles;
     }
 
     /**

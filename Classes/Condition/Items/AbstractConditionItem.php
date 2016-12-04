@@ -15,8 +15,6 @@ namespace Romm\Formz\Condition\Items;
 
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 use Romm\Formz\Core\Core;
-use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 
 /**
  * This class must be extended by every registered condition item. When it is
@@ -42,7 +40,7 @@ use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
  * @see \Romm\Formz\Condition\Items\FieldHasErrorCondition
  * @see \Romm\Formz\Condition\Items\FieldIsValidCondition
  */
-abstract class AbstractConditionItem
+abstract class AbstractConditionItem implements ConditionItemInterface
 {
 
     use MagicMethodsTrait;
@@ -59,23 +57,6 @@ abstract class AbstractConditionItem
      * @var array
      */
     protected static $javaScriptFiles = [];
-
-    /**
-     * @return string
-     */
-    abstract public function getCssResult();
-
-    /**
-     * @param FormInterface         $form
-     * @param AbstractFormValidator $formValidator
-     * @return bool
-     */
-    abstract public function getPhpResult(FormInterface $form, AbstractFormValidator $formValidator);
-
-    /**
-     * @return string
-     */
-    abstract public function getJavaScriptResult();
 
     /**
      * Returns a generic JavaScript code which uses Formz API to validate a
@@ -98,7 +79,7 @@ JS;
     /**
      * @return array
      */
-    public static function getJavaScriptFiles()
+    public function getJavaScriptFiles()
     {
         return static::$javaScriptFiles;
     }

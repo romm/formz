@@ -23,7 +23,7 @@ use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\Form\Settings\FormSettings;
 use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Condition\AbstractConditionItem;
+use Romm\Formz\Configuration\Form\Condition\ConditionItemResolver;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Form extends AbstractFormzConfiguration implements ConfigurationObjectInterface
@@ -41,7 +41,7 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     protected $fields = [];
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Condition\AbstractConditionItem>
+     * @var \ArrayObject<Romm\Formz\Configuration\Form\Condition\ConditionItemResolver>
      */
     protected $activationCondition = [];
 
@@ -111,7 +111,7 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     }
 
     /**
-     * @return AbstractConditionItem[]
+     * @return ConditionItemResolver[]
      */
     public function getActivationCondition()
     {

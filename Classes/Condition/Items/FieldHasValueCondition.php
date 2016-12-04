@@ -14,8 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
@@ -89,9 +88,9 @@ class FieldHasValueCondition extends AbstractConditionItem
     /**
      * @inheritdoc
      */
-    public function getPhpResult(FormInterface $form, AbstractFormValidator $formValidator)
+    public function getPhpResult(PhpConditionDataObject $dataObject)
     {
-        $value = ObjectAccess::getProperty($form, $this->fieldName);
+        $value = ObjectAccess::getProperty($dataObject->getForm(), $this->fieldName);
 
         return (is_array($value))
             ? (true === in_array($this->fieldValue, $value))

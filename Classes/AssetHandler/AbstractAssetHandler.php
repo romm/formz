@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\AssetHandler;
 
+use Romm\Formz\Condition\Processor\ConditionProcessor;
+use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -38,6 +40,11 @@ abstract class AbstractAssetHandler
     protected $assetHandlerFactory;
 
     /**
+     * @var ConditionProcessor
+     */
+    protected $conditionProcessor;
+
+    /**
      * Constructor, will set up variables.
      *
      * @param AssetHandlerFactory $assetHandlerFactory
@@ -46,6 +53,8 @@ abstract class AbstractAssetHandler
     {
         $this->assetHandlerFactory = $assetHandlerFactory;
         $this->objectManager = Core::get()->getObjectManager();
+        $this->conditionProcessor = ConditionProcessorFactory::getInstance()
+            ->get($assetHandlerFactory->getFormObject());
     }
 
     /**

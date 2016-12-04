@@ -14,8 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 
 /**
  * This condition will match when a field is valid (its validation returned no
@@ -59,9 +58,10 @@ class FieldIsValidCondition extends AbstractConditionItem
     /**
      * @inheritdoc
      */
-    public function getPhpResult(FormInterface $form, AbstractFormValidator $formValidator)
+    public function getPhpResult(PhpConditionDataObject $dataObject)
     {
-        $result = $formValidator->validateField($this->fieldName);
+        $result = $dataObject->getFormValidator()
+            ->validateField($this->fieldName);
 
         return (
             false === $result->forProperty($this->fieldName)->hasErrors()
