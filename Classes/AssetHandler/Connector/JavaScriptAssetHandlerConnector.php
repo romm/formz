@@ -145,15 +145,11 @@ class JavaScriptAssetHandlerConnector
      */
     private function includeFormzConfigurationJavaScriptFile()
     {
-        /** @var FormzConfigurationJavaScriptAssetHandler $formzConfigurationJavaScriptAssetHandler */
-        $formzConfigurationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
-
-        $formzConfigurationJavaScriptFileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
+        $formzConfigurationJavaScriptAssetHandler = $this->getFormzConfigurationJavaScriptAssetHandler();
+        $fileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
 
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
-            $formzConfigurationJavaScriptFileName,
+            $fileName,
             function () use ($formzConfigurationJavaScriptAssetHandler) {
                 return $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
             }
@@ -161,14 +157,14 @@ class JavaScriptAssetHandlerConnector
 
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
-            ->addJsFooterFile($formzConfigurationJavaScriptFileName);
+            ->addJsFooterFile($fileName);
     }
 
     /**
      * Will include the generated JavaScript, from multiple asset handlers
      * sources.
      */
-    private function generateAndIncludeJavaScript()
+    protected function generateAndIncludeJavaScript()
     {
         $formClassName = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
@@ -274,7 +270,7 @@ class JavaScriptAssetHandlerConnector
      *
      * The code is then injected as inline code in the DOM.
      */
-    private function generateAndIncludeInlineJavaScript()
+    protected function generateAndIncludeInlineJavaScript()
     {
         $formClassName = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
@@ -324,6 +320,16 @@ class JavaScriptAssetHandlerConnector
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
             }
         }
+    }
+
+    /**
+     * @return FormzConfigurationJavaScriptAssetHandler
+     */
+    protected function getFormzConfigurationJavaScriptAssetHandler()
+    {
+        return $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
     }
 
     /**

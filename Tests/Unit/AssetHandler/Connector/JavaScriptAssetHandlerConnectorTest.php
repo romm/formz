@@ -4,6 +4,7 @@ namespace Romm\Formz\Tests\Unit\AssetHandler\Connector;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Connector\JavaScriptAssetHandlerConnector;
+use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -11,11 +12,12 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
 {
     /**
-     * Checks that the default CSS files are included with the page renderer.
+     * Checks that the default JavaScript files are included with the page
+     * renderer.
      *
      * @test
      */
-    public function defaultCssFilesAreIncluded()
+    public function defaultJavaScriptFilesAreIncluded()
     {
         $this->setExtensionConfigurationValue('debugMode', false);
 
@@ -60,5 +62,50 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
         $javaScriptAssetHandlerConnectorBis->includeDefaultJavaScriptFiles();
 
         $this->assertGreaterThan($filesIncluded, $filesIncludedBis);
+    }
+
+    /**
+     * Checks that the Formz JavaScript configuration is correctly included with
+     * the page renderer.
+     *
+     * @test
+     */
+    public function formzConfigurationIsGeneratedAndIncluded()
+    {
+        $formObject = $this->getFormObject();
+        $controllerContext = new ControllerContext;
+
+        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+
+        $pageRendererMock = $this->getMock(PageRenderer::class, ['addJsFooterFile']);
+        $pageRendererMock->expects($this->once())
+            ->method('addJsFooterFile');
+
+        $assetHandlerConnectorManager = new AssetHandlerConnectorManager($pageRendererMock, $assetHandlerFactory);
+
+        /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
+        $javaScriptAssetHandlerConnector = $this->getMock(
+            JavaScriptAssetHandlerConnector::class,
+            ['getFormzConfigurationJavaScriptAssetHandler', 'generateAndIncludeJavaScript', 'generateAndIncludeInlineJavaScript'],
+            [$assetHandlerConnectorManager]
+        );
+
+        /** @var FormzConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzConfigurationJavaScriptAssetHandlerMock */
+        $formzConfigurationJavaScriptAssetHandlerMock = $this->getMock(
+            FormzConfigurationJavaScriptAssetHandler::class,
+            ['getJavaScriptFileName', 'getJavaScriptCode'],
+            [$assetHandlerFactory]
+        );
+
+        $formzConfigurationJavaScriptAssetHandlerMock->method('getJavaScriptFileName')
+            ->willReturn('foo');
+
+        $formzConfigurationJavaScriptAssetHandlerMock->method('getJavaScriptCode')
+            ->willReturn('foo');
+
+        $javaScriptAssetHandlerConnector->method('getFormzConfigurationJavaScriptAssetHandler')
+            ->willReturn($formzConfigurationJavaScriptAssetHandlerMock);
+
+        $javaScriptAssetHandlerConnector->includeGeneratedJavaScript();
     }
 }
