@@ -46,7 +46,7 @@ trait FormzUnitTestUtility
     {
         $this->formzCoreMock = $this->getMock(
             Core::class,
-            ['translate', 'getExtensionConfiguration', 'getExtensionRelativePath']
+            ['translate', 'getFullExtensionConfiguration', 'getExtensionRelativePath']
         );
 
         $this->formzCoreMock->injectObjectManager($this->getFormzObjectManagerMock());
@@ -75,8 +75,10 @@ trait FormzUnitTestUtility
         /*
          * Will return a configuration that can be manipulated during tests.
          */
-        $this->formzCoreMock->method('getExtensionConfiguration')
-            ->willReturn($this->extensionConfiguration);
+        $this->formzCoreMock->method('getFullExtensionConfiguration')
+            ->willReturnCallback(function () {
+                return $this->extensionConfiguration;
+            });
 
         /*
          * The relative path can't be fetched during unit tests: we force a

@@ -250,28 +250,39 @@ class Core implements SingletonInterface
     }
 
     /**
-     * Return the extension configuration.
+     * Return the wanted extension configuration.
      *
-     * @param string $configurationName If null, returns the whole configuration. Otherwise, returns the asked configuration.
+     * @param string $configurationName
+     * @return mixed
+     */
+    public function getExtensionConfiguration($configurationName)
+    {
+        $result = null;
+        $extensionConfiguration = $this->getFullExtensionConfiguration();
+
+        if (null === $configurationName) {
+            $result = $extensionConfiguration;
+        } elseif (ArrayUtility::isValidPath($extensionConfiguration, $configurationName, '.')) {
+            $result = ArrayUtility::getValueByPath($extensionConfiguration, $configurationName, '.');
+        }
+
+        return $result;
+    }
+
+    /**
      * @return array
      */
-    public function getExtensionConfiguration($configurationName = null)
+    protected function getFullExtensionConfiguration()
     {
         if (null === $this->extensionConfiguration) {
             $this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][self::EXTENSION_KEY]);
+
             if (false === $this->extensionConfiguration) {
                 $this->extensionConfiguration = [];
             }
         }
 
-        $result = null;
-        if (null === $configurationName) {
-            $result = $this->extensionConfiguration;
-        } elseif (ArrayUtility::isValidPath($this->extensionConfiguration, $configurationName, '.')) {
-            $result = ArrayUtility::getValueByPath($this->extensionConfiguration, $configurationName, '.');
-        }
-
-        return $result;
+        return $this->extensionConfiguration;
     }
 
     /**

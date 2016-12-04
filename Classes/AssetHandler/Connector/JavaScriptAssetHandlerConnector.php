@@ -76,10 +76,11 @@ class JavaScriptAssetHandlerConnector
 
         foreach ($this->javaScriptFiles as $file) {
             $filePath = Core::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
-            $this->assetHandlerConnectorManager->getPageRenderer()->addJsFile($filePath);
-        }
 
-        $this->includeFormzConfigurationJavaScriptFile();
+            $this->assetHandlerConnectorManager
+                ->getPageRenderer()
+                ->addJsFile($filePath);
+        }
 
         return $this;
     }
@@ -96,6 +97,7 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeGeneratedJavaScript()
     {
+        $this->includeFormzConfigurationJavaScriptFile();
         $this->generateAndIncludeJavaScript();
         $this->generateAndIncludeInlineJavaScript();
 
@@ -181,8 +183,9 @@ class JavaScriptAssetHandlerConnector
         $fileWasCreated = $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
             function () {
-                // Form initialization code.
-                return $this->getFormInitializationJavaScriptAssetHandler()
+                return
+                    // Form initialization code.
+                    $this->getFormInitializationJavaScriptAssetHandler()
                         ->getFormInitializationJavaScriptCode() .
                     LF .
                     // Fields validation code.
