@@ -114,8 +114,8 @@ class ConditionParser implements SingletonInterface
             }
 
             $currentExpression = $this->scope->getExpression();
-            $this->processToken($currentExpression[0])
-                ->processLogicalAndNode();
+            $this->processToken($currentExpression[0]);
+            $this->processLogicalAndNode();
         }
 
         $this->processLastLogicalOperatorNode();
