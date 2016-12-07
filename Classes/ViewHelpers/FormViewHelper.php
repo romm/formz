@@ -200,7 +200,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
         $assetHandlerConnectorManager = AssetHandlerConnectorManager::get($this->pageRenderer, $this->assetHandlerFactory);
         $assetHandlerConnectorManager->includeDefaultAssets();
-        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->includeGeneratedJavaScript();
+        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()
+            ->generateAndIncludeFormzConfigurationJavaScript()
+            ->generateAndIncludeJavaScript()
+            ->generateAndIncludeInlineJavaScript()
+            ->includeJavaScriptValidationFiles();
         $assetHandlerConnectorManager->getCssAssetHandlerConnector()->includeGeneratedCss();
 
         $this->timeTracker->logTime('pre-render');

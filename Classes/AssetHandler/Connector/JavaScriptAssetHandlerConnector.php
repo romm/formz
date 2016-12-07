@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\Connector;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
@@ -86,25 +87,6 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * Will take care of generating the JavaScript with the
-     * `AssetHandlerFactory`. The code will be put in a `.js` file in the
-     * `typo3temp` directory.
-     *
-     * If the file already exists, it is included directly before the code
-     * generation.
-     *
-     * @return $this
-     */
-    public function includeGeneratedJavaScript()
-    {
-        $this->includeFormzConfigurationJavaScriptFile();
-        $this->generateAndIncludeJavaScript();
-        $this->generateAndIncludeInlineJavaScript();
-
-        return $this;
-    }
-
-    /**
      * This function will handle the JavaScript language files.
      *
      * A file will be created for the current language (there can be as many
@@ -142,8 +124,10 @@ class JavaScriptAssetHandlerConnector
      * Includes Formz configuration JavaScript declaration. If the file exists,
      * it is directly included, otherwise the JavaScript code is calculated,
      * then put in the cache file.
+     *
+     * @return $this
      */
-    private function includeFormzConfigurationJavaScriptFile()
+    public function generateAndIncludeFormzConfigurationJavaScript()
     {
         $formzConfigurationJavaScriptAssetHandler = $this->getFormzConfigurationJavaScriptAssetHandler();
         $fileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
@@ -158,25 +142,21 @@ class JavaScriptAssetHandlerConnector
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
             ->addJsFooterFile($fileName);
+
+        return $this;
     }
 
     /**
      * Will include the generated JavaScript, from multiple asset handlers
      * sources.
+     *
+     * @return $this
      */
-    protected function generateAndIncludeJavaScript()
+    public function generateAndIncludeJavaScript()
     {
-        $formClassName = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getFormObject()
-            ->getClassName();
-
-        $javaScriptValidationFilesCacheIdentifier = Core::get()
-            ->getCacheIdentifier('js-files-', $formClassName);
-
         $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.js';
 
-        $fileWasCreated = $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
+        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
             function () {
                 return
@@ -186,7 +166,6 @@ class JavaScriptAssetHandlerConnector
                     LF .
                     // Fields validation code.
                     $this->getFieldsValidationJavaScriptAssetHandler()
-                        ->process()
                         ->getJavaScriptCode() .
                     LF .
                     // Fields activation conditions code.
@@ -199,69 +178,11 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        if (true === $fileWasCreated) {
-            $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
-                $javaScriptValidationFilesCacheIdentifier,
-                $this->getFieldsValidationJavaScriptAssetHandler()->getJavaScriptValidationFiles()
-            );
-        } else {
-            $javaScriptFiles = $this->getJavaScriptFiles($javaScriptValidationFilesCacheIdentifier);
-        }
-
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
             ->addJsFooterFile($filePath);
 
-        $this->includeJavaScriptValidationFiles($javaScriptFiles);
-    }
-
-    /**
-     * Returns the list of JavaScript files which are used for the current form
-     * object.
-     *
-     * @param string $cacheIdentifier
-     * @return array
-     */
-    private function getJavaScriptFiles($cacheIdentifier)
-    {
-        $cacheInstance = Core::get()->getCacheInstance();
-
-        if ($cacheInstance->has($cacheIdentifier)) {
-            $javaScriptFiles = $cacheInstance->get($cacheIdentifier);
-        } else {
-            $fieldValidationConfigurationAssetHandler = $this->getFieldsValidationJavaScriptAssetHandler()->process();
-
-            $javaScriptFiles = $this->saveAndGetJavaScriptFiles(
-                $cacheIdentifier,
-                $fieldValidationConfigurationAssetHandler->getJavaScriptValidationFiles()
-            );
-        }
-
-        return $javaScriptFiles;
-    }
-
-    /**
-     * Will save in cache and return the list of files which must be included in
-     * order to make validation rules and conditions work properly.
-     *
-     * @param string $cacheIdentifier
-     * @param array  $javaScriptFiles
-     * @return array
-     */
-    private function saveAndGetJavaScriptFiles($cacheIdentifier, array $javaScriptFiles)
-    {
-        $formObject = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getFormObject();
-
-        $conditionProcessor = ConditionProcessorFactory::getInstance()
-            ->get($formObject);
-
-        $javaScriptFiles = array_merge($javaScriptFiles, $conditionProcessor->getJavaScriptFiles());
-
-        Core::get()->getCacheInstance()->set($cacheIdentifier, $javaScriptFiles);
-
-        return $javaScriptFiles;
+        return $this;
     }
 
     /**
@@ -269,8 +190,10 @@ class JavaScriptAssetHandlerConnector
      * the existing errors, which is dynamically created at each request.
      *
      * The code is then injected as inline code in the DOM.
+     *
+     * @return $this
      */
-    protected function generateAndIncludeInlineJavaScript()
+    public function generateAndIncludeInlineJavaScript()
     {
         $formClassName = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
@@ -300,17 +223,19 @@ class JavaScriptAssetHandlerConnector
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
             ->addJsFooterInlineCode('Formz - Initialization ' . $formClassName, $javaScriptCode);
+
+        return $this;
     }
 
     /**
      * Will include all new JavaScript files given, by checking that every given
      * file was not already included.
      *
-     * @param array $javaScriptValidationFiles List of JavaScript validation files.
+     * @return $this
      */
-    protected function includeJavaScriptValidationFiles(array $javaScriptValidationFiles)
+    public function includeJavaScriptValidationFiles()
     {
-        $javaScriptValidationFiles = array_unique($javaScriptValidationFiles);
+        $javaScriptValidationFiles = $this->getJavaScriptFiles();
         $assetHandlerConnectorStates = $this->assetHandlerConnectorManager->getAssetHandlerConnectorStates();
 
         foreach ($javaScriptValidationFiles as $file) {
@@ -320,10 +245,35 @@ class JavaScriptAssetHandlerConnector
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
             }
         }
+
+        return $this;
     }
 
     /**
-     * @return FormzConfigurationJavaScriptAssetHandler
+     * Returns the list of JavaScript files which are used for the current form
+     * object.
+     *
+     * @return array
+     */
+    protected function getJavaScriptFiles()
+    {
+        $formObject = $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getFormObject();
+
+        $javaScriptFiles = $this->getFieldsValidationJavaScriptAssetHandler()
+            ->getJavaScriptValidationFiles();
+
+        $conditionProcessor = ConditionProcessorFactory::getInstance()
+            ->get($formObject);
+
+        $javaScriptFiles = array_merge($javaScriptFiles, $conditionProcessor->getJavaScriptFiles());
+
+        return $javaScriptFiles;
+    }
+
+    /**
+     * @return FormzConfigurationJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFormzConfigurationJavaScriptAssetHandler()
     {
@@ -333,7 +283,7 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * @return FormInitializationJavaScriptAssetHandler
+     * @return FormInitializationJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFormInitializationJavaScriptAssetHandler()
     {
@@ -343,7 +293,7 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * @return FieldsValidationJavaScriptAssetHandler
+     * @return FieldsValidationJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFieldsValidationJavaScriptAssetHandler()
     {
@@ -353,7 +303,7 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * @return FieldsActivationJavaScriptAssetHandler
+     * @return FieldsActivationJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFieldsActivationJavaScriptAssetHandler()
     {
@@ -363,7 +313,7 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * @return FieldsValidationActivationJavaScriptAssetHandler
+     * @return FieldsValidationActivationJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFieldsValidationActivationJavaScriptAssetHandler()
     {
@@ -373,7 +323,7 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * @return FormRequestDataJavaScriptAssetHandler
+     * @return FormRequestDataJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFormRequestDataJavaScriptAssetHandler()
     {
