@@ -195,34 +195,26 @@ class JavaScriptAssetHandlerConnector
      */
     public function generateAndIncludeInlineJavaScript()
     {
-        $formClassName = $this->assetHandlerConnectorManager
+        $formName = $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getFormObject()
-            ->getClassName();
+            ->getName();
 
         $javaScriptCode = $this->getFormRequestDataJavaScriptAssetHandler()
             ->getFormRequestDataJavaScriptCode();
 
         if (Core::get()->isInDebugMode()) {
-            $javaScriptCode .= LF;
-            $javaScriptCode .= 'Formz.Debug.activate();';
+            $javaScriptCode .= LF . $this->getDebugActivationCode();
         }
 
-        /** @var UriBuilder $uriBuilder */
-        $uriBuilder = Core::get()->getObjectManager()->get(UriBuilder::class);
-        $uri = $uriBuilder->reset()
-            ->setTargetPageType(1473682545)
-            ->setNoCache(true)
-            ->setUseCacheHash(false)
-            ->setCreateAbsoluteUri(true)
-            ->build();
+        $uri = $this->getAjaxUrl();
 
         $javaScriptCode .= LF;
         $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
 
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
-            ->addJsFooterInlineCode('Formz - Initialization ' . $formClassName, $javaScriptCode);
+            ->addJsFooterInlineCode('Formz - Initialization ' . $formName, $javaScriptCode);
 
         return $this;
     }
@@ -270,6 +262,30 @@ class JavaScriptAssetHandlerConnector
         $javaScriptFiles = array_merge($javaScriptFiles, $conditionProcessor->getJavaScriptFiles());
 
         return $javaScriptFiles;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAjaxUrl()
+    {
+        /** @var UriBuilder $uriBuilder */
+        $uriBuilder = Core::get()->getObjectManager()->get(UriBuilder::class);
+
+        return $uriBuilder->reset()
+            ->setTargetPageType(1473682545)
+            ->setNoCache(true)
+            ->setUseCacheHash(false)
+            ->setCreateAbsoluteUri(true)
+            ->build();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDebugActivationCode()
+    {
+        return 'Formz.Debug.activate();';
     }
 
     /**

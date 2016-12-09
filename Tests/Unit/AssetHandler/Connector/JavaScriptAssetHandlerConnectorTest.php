@@ -8,6 +8,7 @@ use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -165,7 +166,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             [$assetHandlerConnectorManagerMock]
         );
 
-        /** @var FormInitializationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formInitializationJavaScriptAssetHandlerMock */
         $formInitializationJavaScriptAssetHandlerMock = $this->getMock(
             FormInitializationJavaScriptAssetHandler::class,
             ['getFormInitializationJavaScriptCode'],
@@ -181,7 +181,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ->method('getFormInitializationJavaScriptAssetHandler')
             ->willReturn($formInitializationJavaScriptAssetHandlerMock);
 
-        /** @var FieldsValidationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formInitializationJavaScriptAssetHandlerMock */
         $fieldsValidationJavaScriptAssetHandlerMock = $this->getMock(
             FieldsValidationJavaScriptAssetHandler::class,
             ['getJavaScriptCode'],
@@ -197,7 +196,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ->method('getFieldsValidationJavaScriptAssetHandler')
             ->willReturn($fieldsValidationJavaScriptAssetHandlerMock);
 
-        /** @var FieldsActivationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formInitializationJavaScriptAssetHandlerMock */
         $fieldsActivationJavaScriptAssetHandlerMock = $this->getMock(
             FieldsActivationJavaScriptAssetHandler::class,
             ['getFieldsActivationJavaScriptCode'],
@@ -230,5 +228,81 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ->willReturn($fieldsValidationActivationJavaScriptAssetHandlerMock);
 
         $javaScriptAssetHandlerConnector->generateAndIncludeJavaScript();
+    }
+
+    /**
+     * Checks that inline JavaScript code is generated and added to the page.
+     *
+     * @param bool                                             $activateDebugMode
+     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $debugExpect
+     * @dataProvider inlineJavaScriptIsGeneratedAndIncludedDataProvider
+     * @test
+     */
+    public function inlineJavaScriptIsGeneratedAndIncluded($activateDebugMode, \PHPUnit_Framework_MockObject_Matcher_Invocation $debugExpect)
+    {
+        $formObject = $this->getFormObject();
+        $controllerContext = new ControllerContext;
+
+        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+
+        /** @var PageRenderer|\PHPUnit_Framework_MockObject_MockObject $pageRendererMock */
+        $pageRendererMock = $this->getMock(PageRenderer::class, ['addJsFooterInlineCode']);
+        $pageRendererMock->expects($this->once())
+            ->method('addJsFooterInlineCode');
+
+        $assetHandlerConnectorManager = new AssetHandlerConnectorManager($pageRendererMock, $assetHandlerFactory);
+
+        /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
+        $javaScriptAssetHandlerConnector = $this->getMock(
+            JavaScriptAssetHandlerConnector::class,
+            [
+                'getFormRequestDataJavaScriptAssetHandler',
+                'getAjaxUrl',
+                'getDebugActivationCode'
+            ],
+            [$assetHandlerConnectorManager]
+        );
+
+        /** @var FormRequestDataJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formRequestDataJavaScriptAssetHandlerMock */
+        $formRequestDataJavaScriptAssetHandlerMock = $this->getMock(
+            FormRequestDataJavaScriptAssetHandler::class,
+            ['getFormRequestDataJavaScriptCode'],
+            [$assetHandlerFactory]
+        );
+
+        $formRequestDataJavaScriptAssetHandlerMock
+            ->expects($this->once())
+            ->method('getFormRequestDataJavaScriptCode')
+            ->willReturn('foo');
+
+        $javaScriptAssetHandlerConnector
+            ->method('getFormRequestDataJavaScriptAssetHandler')
+            ->willReturn($formRequestDataJavaScriptAssetHandlerMock);
+
+        $javaScriptAssetHandlerConnector
+            ->method('getAjaxUrl')
+            ->willReturn('foo');
+
+        $this->setExtensionConfigurationValue('debugMode', $activateDebugMode);
+
+        $javaScriptAssetHandlerConnector
+            ->expects($debugExpect)
+            ->method('getDebugActivationCode')
+            ->willReturn('foo');
+
+        $javaScriptAssetHandlerConnector->generateAndIncludeInlineJavaScript();
+    }
+
+    /**
+     * Data provider for function `inlineJavaScriptIsGeneratedAndIncluded`.
+     *
+     * @return array
+     */
+    public function inlineJavaScriptIsGeneratedAndIncludedDataProvider()
+    {
+        return [
+            [false, $this->never()],
+            [true, $this->once()]
+        ];
     }
 }
