@@ -10,6 +10,7 @@ use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -263,7 +264,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             [$assetHandlerConnectorManager]
         );
 
-        /** @var FormRequestDataJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formRequestDataJavaScriptAssetHandlerMock */
         $formRequestDataJavaScriptAssetHandlerMock = $this->getMock(
             FormRequestDataJavaScriptAssetHandler::class,
             ['getFormRequestDataJavaScriptCode'],
@@ -304,5 +304,66 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             [false, $this->never()],
             [true, $this->once()]
         ];
+    }
+
+    /**
+     * Checks that the language JavaScript files are generated and included.
+     *
+     * @test
+     */
+    public function languageJavaScriptFilesAreIncluded()
+    {
+        $formObject = $this->getFormObject();
+        $controllerContext = new ControllerContext;
+
+        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+
+        /** @var PageRenderer|\PHPUnit_Framework_MockObject_MockObject $pageRendererMock */
+        $pageRendererMock = $this->getMock(PageRenderer::class, ['addJsFooterFile']);
+        $pageRendererMock->expects($this->once())
+            ->method('addJsFooterFile');
+
+        /** @var AssetHandlerConnectorManager|\PHPUnit_Framework_MockObject_MockObject $assetHandlerConnectorManagerMock */
+        $assetHandlerConnectorManagerMock = $this->getMock(
+            AssetHandlerConnectorManager::class,
+            ['fileExists', 'writeTemporaryFile'],
+            [$pageRendererMock, $assetHandlerFactory]
+        );
+
+        $assetHandlerConnectorManagerMock
+            ->method('fileExists')
+            ->willReturn(false);
+
+        $assetHandlerConnectorManagerMock
+            ->method('writeTemporaryFile')
+            ->willReturn(true);
+
+        /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
+        $javaScriptAssetHandlerConnector = $this->getMock(
+            JavaScriptAssetHandlerConnector::class,
+            ['getFormzLocalizationJavaScriptAssetHandler'],
+            [$assetHandlerConnectorManagerMock]
+        );
+
+        $formzLocalizationJavaScriptAssetHandlerMock = $this->getMock(
+            FormzLocalizationJavaScriptAssetHandler::class,
+            ['injectTranslationsForFormFieldsValidation', 'getJavaScriptCode'],
+            [$assetHandlerFactory]
+        );
+
+        $formzLocalizationJavaScriptAssetHandlerMock
+            ->expects($this->once())
+            ->method('injectTranslationsForFormFieldsValidation')
+            ->willReturn($formzLocalizationJavaScriptAssetHandlerMock);
+
+        $formzLocalizationJavaScriptAssetHandlerMock
+            ->expects($this->once())
+            ->method('getJavaScriptCode');
+
+        $javaScriptAssetHandlerConnector
+            ->method('getFormzLocalizationJavaScriptAssetHandler')
+            ->willReturn($formzLocalizationJavaScriptAssetHandlerMock);
+
+        $javaScriptAssetHandlerConnector->includeLanguageJavaScriptFiles();
     }
 }

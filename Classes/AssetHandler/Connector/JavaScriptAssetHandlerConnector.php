@@ -101,13 +101,8 @@ class JavaScriptAssetHandlerConnector
 
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
-            function() {
-                /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
-                $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerConnectorManager
-                    ->getAssetHandlerFactory()
-                    ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
-
-                return $formzLocalizationJavaScriptAssetHandler
+            function () {
+                return $this->getFormzLocalizationJavaScriptAssetHandler()
                     ->injectTranslationsForFormFieldsValidation()
                     ->getJavaScriptCode();
             }
@@ -346,5 +341,15 @@ class JavaScriptAssetHandlerConnector
         return $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
+    }
+
+    /**
+     * @return FormzLocalizationJavaScriptAssetHandler|AbstractAssetHandler
+     */
+    protected function getFormzLocalizationJavaScriptAssetHandler()
+    {
+        return $this->assetHandlerConnectorManager
+            ->getAssetHandlerFactory()
+            ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
     }
 }
