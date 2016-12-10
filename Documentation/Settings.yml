@@ -6,8 +6,8 @@
 conf.py:
   copyright: 2016
   project: Formz
-  version: 0.2.0
-  release: 0.2.0
+  version: 0.3.0
+  release: 0.3.0
   latex_documents:
   - - Index
     - formz.tex
