@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Validation\Validator\Internal;
 
-use Romm\Formz\Condition\ConditionParser;
-use Romm\Formz\Configuration\Form\Field\Activation\Activation;
+use Romm\Formz\Condition\Parser\ConditionParser;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 
 class ConditionIsValidValidator extends AbstractValidator
@@ -33,19 +33,20 @@ class ConditionIsValidValidator extends AbstractValidator
     /**
      * Checks if the value is a valid condition string.
      *
-     * @param Activation $condition The condition instance that should be validated.
+     * @param ActivationInterface $condition The condition instance that should be validated.
      */
     public function isValid($condition)
     {
-        $conditionParser = ConditionParser::parse($condition);
+        $conditionTree = ConditionParser::get()
+            ->parse($condition);
 
-        if (true === $conditionParser->getResult()->hasErrors()) {
+        if (true === $conditionTree->getValidationResult()->hasErrors()) {
             $this->addError(
                 'default',
                 1457621104,
                 [
                     $condition->getCondition(),
-                    $conditionParser->getResult()->getFirstError()->getMessage()
+                    $conditionTree->getValidationResult()->getFirstError()->getMessage()
                 ]
             );
         }

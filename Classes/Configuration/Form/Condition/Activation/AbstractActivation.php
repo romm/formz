@@ -11,13 +11,12 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Configuration\Form\Field\Activation;
+namespace Romm\Formz\Configuration\Form\Condition\Activation;
 
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Condition\ActivationInterface;
+use Romm\Formz\Configuration\Form\Condition\ConditionItemResolver;
 use Romm\Formz\Configuration\Form\Form;
-use Romm\Formz\Configuration\Form\Condition\AbstractConditionItem;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface
@@ -27,12 +26,11 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
 
     /**
      * @var string
-     * @validate NotEmpty
      */
     protected $condition;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\ActivationCondition\AbstractConditionItem>
+     * @var \ArrayObject<Romm\Formz\Configuration\Form\Condition\ConditionItemResolver>
      * @validate NotEmpty
      */
     protected $items = [];
@@ -49,7 +47,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
      * Will merge the items with the ones from the `$activationCondition`
      * property of the root form configuration.
      *
-     * @return AbstractConditionItem[]
+     * @return ConditionItemResolver[]
      */
     public function getItems()
     {

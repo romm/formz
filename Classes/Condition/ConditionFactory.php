@@ -36,6 +36,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ConditionFactory implements SingletonInterface
 {
+    /**
+     * @var ConditionFactory
+     */
+    private static $instance;
 
     /**
      * @var array
@@ -54,7 +58,11 @@ class ConditionFactory implements SingletonInterface
      */
     public static function get()
     {
-        return GeneralUtility::makeInstance(self::class);
+        if (null === self::$instance) {
+            self::$instance = GeneralUtility::makeInstance(self::class);
+        }
+
+        return self::$instance;
     }
 
     /**

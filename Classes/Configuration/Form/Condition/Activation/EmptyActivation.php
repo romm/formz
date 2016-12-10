@@ -11,12 +11,24 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Condition\Processor;
+namespace Romm\Formz\Configuration\Form\Condition\Activation;
 
-/**
- * CSS implementation of the condition processors.
- */
-class CssProcessor extends AbstractProcessor
+class EmptyActivation extends AbstractActivation
 {
+    /**
+     * @var EmptyActivation
+     */
+    private static $instance;
 
+    /**
+     * @return EmptyActivation
+     */
+    public static function get()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self;
+        }
+
+        return self::$instance;
+    }
 }

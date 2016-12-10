@@ -22,7 +22,7 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('required','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',#CONFIGURATION#);}});})();
+(function(){Formz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('required','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-required-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"condition":null,"items":{"test":{"javaScriptFiles":["EXT:formz\/Resources\/Public\/JavaScript\/Conditions\/Formz.Condition.FieldIsValid.js"],"fieldName":"foo"}}},"useAjax":false},"acceptsEmptyValues":false});}});})();
 TXT;
 
         $defaultFormConfiguration = [
@@ -58,8 +58,6 @@ TXT;
                     return $validationConfiguration;
                 }
             );
-
-        $fieldsValidationJavaScriptAssetHandler->process();
 
         $this->assertNotNull($jsonValidationConfiguration);
         $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $fieldsValidationJavaScriptAssetHandler->getJavaScriptValidationFiles());

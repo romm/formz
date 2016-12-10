@@ -11,7 +11,9 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Configuration\Form\Condition;
+namespace Romm\Formz\Configuration\Form\Condition\Activation;
+
+use Romm\Formz\Condition\Items\AbstractConditionItem;
 
 /**
  * Interface which must be implemented by the activation classes which will be

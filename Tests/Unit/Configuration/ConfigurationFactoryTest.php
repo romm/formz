@@ -4,7 +4,6 @@ namespace Romm\Formz\Tests\Unit\Configuration;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;

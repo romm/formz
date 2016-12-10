@@ -14,8 +14,6 @@
 namespace Romm\Formz\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
-use Romm\Formz\Condition\Processor\CssProcessor;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This asset handler generates the CSS code which will automatically hide
@@ -39,18 +37,18 @@ class FieldsActivationCssAssetHandler extends AbstractAssetHandler
         $cssBlocks = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        /** @var CssProcessor $cssProcessor */
-        $cssProcessor = GeneralUtility::makeInstance(CssProcessor::class, $this->getFormObject());
-
         foreach ($formConfiguration->getFields() as $fieldName => $field) {
-            $activationConditionTree = $cssProcessor->getFieldActivationConditionTree($field);
+            $formName = $this->getFormObject()->getName();
+            $fieldContainerSelector = $field->getSettings()->getFieldContainerSelector();
 
-            if (null !== $activationConditionTree) {
-                $formName = $this->getFormObject()->getName();
-                $fieldContainerSelector = $field->getSettings()->getFieldContainerSelector();
+            $cssTree = $this->conditionProcessor
+                ->getActivationConditionTreeForField($field)
+                ->getCssConditions();
 
+            if (false === empty($cssTree)) {
                 $fullNodeData = [];
-                foreach ($activationConditionTree as $node) {
+
+                foreach ($cssTree as $node) {
                     $fullNodeData[] = 'form[name="' . $formName . '"]' . $node . ' ' . $fieldContainerSelector;
                 }
 

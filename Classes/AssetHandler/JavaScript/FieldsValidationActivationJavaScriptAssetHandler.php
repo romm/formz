@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
-use Romm\Formz\Condition\Processor\JavaScriptProcessor;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -34,19 +33,16 @@ class FieldsValidationActivationJavaScriptAssetHandler extends AbstractJavaScrip
         $javaScriptBlocks = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        /** @var JavaScriptProcessor $javaScriptProcessor */
-        $javaScriptProcessor = GeneralUtility::makeInstance(JavaScriptProcessor::class, $this->getFormObject());
-
         foreach ($formConfiguration->getFields() as $fieldName => $field) {
             foreach ($field->getValidation() as $validatorName => $validation) {
-                $fieldJavaScript = $javaScriptProcessor->getFieldValidationActivationConditionTree($field, $validation);
+                $fieldConditionExpression = [];
+                $javaScriptTree = $this->conditionProcessor
+                    ->getActivationConditionTreeForValidation($validation)
+                    ->getJavaScriptConditions();
 
-                if (null !== $fieldJavaScript) {
-                    $fieldConditionExpression = [];
-                    foreach ($fieldJavaScript as $javaScript) {
-                        if (false === empty($javaScript)) {
-                            $fieldConditionExpression[] = 'flag = flag || (' . $javaScript . ');';
-                        }
+                if (false === empty($javaScriptTree)) {
+                    foreach ($javaScriptTree as $node) {
+                        $fieldConditionExpression[] = 'flag = flag || (' . $node . ');';
                     }
 
                     $javaScriptBlocks[] = $this->getSingleFieldActivationConditionFunction($fieldName, $validatorName, $fieldConditionExpression);

@@ -21,34 +21,26 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This asset handler generates the JavaScript code which will initialize the
- * validation rules for every field of the form.
+ * validation rules for every field of the form. Call the function
+ * `getJavaScriptCode()`.
  *
- * First, call the function `process()`, then:
- *  - To get the generated JavaScript code: `getJavaScriptCode()`.
- *  - To get the list of files which must be included in order to make the form
- *    run correctly: `getJavaScriptValidationFiles()`
+ * It can also return the list of files which must be included in order to make
+ * the form run correctly. Call the function `getJavaScriptValidationFiles()`.
  */
 class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
 {
-
-    /**
-     * @var string
-     */
-    protected $javaScriptCode;
-
     /**
      * @var array
      */
-    protected $javaScriptValidationFiles = [];
+    protected $javaScriptValidationFiles;
 
     /**
      * Main function of this asset handler. See class description.
      *
-     * @return $this
+     * @return string
      */
-    public function process()
+    public function getJavaScriptCode()
     {
-        $this->javaScriptValidationFiles = [];
         $fieldsJavaScriptCode = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
@@ -59,7 +51,7 @@ class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHand
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
         $fieldsJavaScriptCode = implode(CRLF, $fieldsJavaScriptCode);
 
-        $this->javaScriptCode = <<<JS
+        return <<<JS
 (function() {
     Formz.Form.get(
         $formName,
@@ -71,14 +63,10 @@ $fieldsJavaScriptCode
     );
 })();
 JS;
-
-        return $this;
     }
 
     /**
-     * Will run the process for the given field. You can get back the result
-     * with the functions `getJavaScriptValidationFiles()` and
-     * `getJavaScriptCode()`.
+     * Will run the process for the given field.
      *
      * @param Field $field
      * @return string
@@ -89,12 +77,9 @@ JS;
         $fieldName = $field->getFieldName();
 
         foreach ($field->getValidation() as $validationName => $validationConfiguration) {
-            /** @var AbstractValidator $validatorClassName */
             $validatorClassName = $validationConfiguration->getClassName();
 
             if (in_array(AbstractValidator::class, class_parents($validatorClassName))) {
-                // Adding the validator JavaScript validation files to the list.
-                $this->javaScriptValidationFiles = array_merge($this->javaScriptValidationFiles, $validatorClassName::getJavaScriptValidationFiles());
                 $javaScriptCode[] = (string)$this->getInlineJavaScriptValidationCode($field, $validationName, $validationConfiguration);
             }
         }
@@ -180,18 +165,29 @@ JS;
     }
 
     /**
-     * @return string
-     */
-    public function getJavaScriptCode()
-    {
-        return (string)$this->javaScriptCode;
-    }
-
-    /**
      * @return array
      */
     public function getJavaScriptValidationFiles()
     {
-        return array_unique($this->javaScriptValidationFiles);
+        if (null === $this->javaScriptValidationFiles) {
+            $this->javaScriptValidationFiles = [];
+
+            $formConfiguration = $this->getFormObject()->getConfiguration();
+
+            foreach ($formConfiguration->getFields() as $field) {
+                foreach ($field->getValidation() as $validationConfiguration) {
+                    /** @var AbstractValidator $validatorClassName */
+                    $validatorClassName = $validationConfiguration->getClassName();
+
+                    if (in_array(AbstractValidator::class, class_parents($validatorClassName))) {
+                        $this->javaScriptValidationFiles = array_merge($this->javaScriptValidationFiles, $validatorClassName::getJavaScriptValidationFiles());
+                    }
+                }
+            }
+
+            $this->javaScriptValidationFiles = array_unique($this->javaScriptValidationFiles);
+        }
+
+        return $this->javaScriptValidationFiles;
     }
 }

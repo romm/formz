@@ -14,8 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use TYPO3\CMS\Extbase\Error\Error;
 
 /**
@@ -80,10 +79,13 @@ class FieldHasErrorCondition extends AbstractConditionItem
     /**
      * @inheritdoc
      */
-    public function getPhpResult(FormInterface $form, AbstractFormValidator $formValidator)
+    public function getPhpResult(PhpConditionDataObject $dataObject)
     {
         $flag = false;
-        $result = $formValidator->validateField($this->fieldName)->forProperty($this->fieldName);
+        $result = $dataObject->getFormValidator()
+            ->validateField($this->fieldName)
+            ->forProperty($this->fieldName);
+
         foreach ($result->getErrors() as $error) {
             /** @var Error $error */
             if ($this->getErrorTitle() === $error->getTitle()) {

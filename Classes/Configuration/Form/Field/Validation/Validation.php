@@ -13,15 +13,20 @@
 
 namespace Romm\Formz\Configuration\Form\Field\Validation;
 
+use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Configuration\Form\Field\Field;
 
 class Validation extends AbstractFormzConfiguration
 {
 
     use StoreArrayIndexTrait;
     use ArrayConversionTrait;
+    use ParentsTrait;
 
     /**
      * @var string
@@ -47,15 +52,23 @@ class Validation extends AbstractFormzConfiguration
     protected $messages = [];
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Field\Validation\Activation
+     * @var \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
-    protected $activation = null;
+    protected $activation;
 
     /**
      * @var bool
      */
     protected $useAjax = false;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->activation = EmptyActivation::get();
+    }
 
     /**
      * @return string
@@ -101,7 +114,7 @@ class Validation extends AbstractFormzConfiguration
     }
 
     /**
-     * @return Activation
+     * @return ActivationInterface
      */
     public function getActivation()
     {
@@ -113,7 +126,7 @@ class Validation extends AbstractFormzConfiguration
      */
     public function hasActivation()
     {
-        return (null !== $this->activation);
+        return !($this->activation instanceof EmptyActivation);
     }
 
     /**
@@ -130,5 +143,13 @@ class Validation extends AbstractFormzConfiguration
     public function doesUseAjax()
     {
         return (bool) $this->useAjax;
+    }
+
+    /**
+     * @return Field
+     */
+    public function getParentField()
+    {
+        return $this->getFirstParent(Field::class);
     }
 }

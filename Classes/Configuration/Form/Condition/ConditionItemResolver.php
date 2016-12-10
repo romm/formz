@@ -19,7 +19,7 @@ use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use TYPO3\CMS\Extbase\Error\Error;
 
-abstract class AbstractConditionItem extends AbstractFormzConfiguration implements MixedTypesInterface
+abstract class ConditionItemResolver extends AbstractFormzConfiguration implements MixedTypesInterface
 {
 
     /**
