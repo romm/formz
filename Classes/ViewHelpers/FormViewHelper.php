@@ -204,7 +204,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             ->generateAndIncludeFormzConfigurationJavaScript()
             ->generateAndIncludeJavaScript()
             ->generateAndIncludeInlineJavaScript()
-            ->includeJavaScriptValidationFiles();
+            ->includeJavaScriptValidationAndConditionFiles();
         $assetHandlerConnectorManager->getCssAssetHandlerConnector()->includeGeneratedCss();
 
         $this->timeTracker->logTime('pre-render');

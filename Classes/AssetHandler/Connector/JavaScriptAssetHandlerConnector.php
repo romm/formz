@@ -21,8 +21,10 @@ use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
+use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 class JavaScriptAssetHandlerConnector
@@ -220,16 +222,20 @@ class JavaScriptAssetHandlerConnector
      *
      * @return $this
      */
-    public function includeJavaScriptValidationFiles()
+    public function includeJavaScriptValidationAndConditionFiles()
     {
         $javaScriptValidationFiles = $this->getJavaScriptFiles();
-        $assetHandlerConnectorStates = $this->assetHandlerConnectorManager->getAssetHandlerConnectorStates();
+        $assetHandlerConnectorStates = $this->assetHandlerConnectorManager
+            ->getAssetHandlerConnectorStates();
 
         foreach ($javaScriptValidationFiles as $file) {
             if (false === in_array($file, $assetHandlerConnectorStates->getAlreadyIncludedValidationJavaScriptFiles())) {
                 $path = Core::get()->getResourceRelativePath($file);
-                $this->assetHandlerConnectorManager->getPageRenderer()->addJsFooterFile($path);
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
+
+                $this->assetHandlerConnectorManager
+                    ->getPageRenderer()
+                    ->addJsFooterFile($path);
             }
         }
 
@@ -251,8 +257,7 @@ class JavaScriptAssetHandlerConnector
         $javaScriptFiles = $this->getFieldsValidationJavaScriptAssetHandler()
             ->getJavaScriptValidationFiles();
 
-        $conditionProcessor = ConditionProcessorFactory::getInstance()
-            ->get($formObject);
+        $conditionProcessor = $this->getConditionProcessor($formObject);
 
         $javaScriptFiles = array_merge($javaScriptFiles, $conditionProcessor->getJavaScriptFiles());
 
@@ -281,6 +286,16 @@ class JavaScriptAssetHandlerConnector
     protected function getDebugActivationCode()
     {
         return 'Formz.Debug.activate();';
+    }
+
+    /**
+     * @param FormObject $formObject
+     * @return ConditionProcessor
+     */
+    protected function getConditionProcessor(FormObject $formObject)
+    {
+        return ConditionProcessorFactory::getInstance()
+            ->get($formObject);
     }
 
     /**

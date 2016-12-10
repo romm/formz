@@ -3,6 +3,7 @@ namespace Romm\Formz\Tests\Unit\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
+use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorStates;
 use Romm\Formz\AssetHandler\Connector\JavaScriptAssetHandlerConnector;
 use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAssetHandler;
@@ -11,6 +12,7 @@ use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
+use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -365,5 +367,117 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ->willReturn($formzLocalizationJavaScriptAssetHandlerMock);
 
         $javaScriptAssetHandlerConnector->includeLanguageJavaScriptFiles();
+    }
+
+    /**
+     * Checks that the JavaScript files required by validation rules and
+     * conditions are correctly included, and only once by file.
+     *
+     * @test
+     */
+    public function javaScriptValidationAndConditionFilesAreIncludedOnce()
+    {
+        $formObject = $this->getFormObject();
+        $controllerContext = new ControllerContext;
+
+        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+
+        /** @var PageRenderer|\PHPUnit_Framework_MockObject_MockObject $pageRendererMock */
+        $pageRendererMock = $this->getMock(PageRenderer::class, ['addJsFooterFile']);
+        $pageRendererMock->expects($this->exactly(3))
+            ->method('addJsFooterFile');
+
+        $assetHandlerConnectorManager = new AssetHandlerConnectorManager($pageRendererMock, $assetHandlerFactory);
+
+        $assetHandlerConnectorStates = new AssetHandlerConnectorStates;
+        $assetHandlerConnectorManager->injectAssetHandlerConnectorStates($assetHandlerConnectorStates);
+
+        /*
+         * We will test on a first connector: one validation file and one
+         * condition file will be included.
+         */
+        /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
+        $javaScriptAssetHandlerConnector = $this->getMock(
+            JavaScriptAssetHandlerConnector::class,
+            ['getConditionProcessor', 'getFieldsValidationJavaScriptAssetHandler'],
+            [$assetHandlerConnectorManager]
+        );
+
+        $conditionProcessorMock = $this->getMock(
+            ConditionProcessor::class,
+            ['getJavaScriptFiles'],
+            [$formObject]
+        );
+
+        $conditionProcessorMock
+            ->expects($this->once())
+            ->method('getJavaScriptFiles')
+            ->willReturn(['foo']);
+
+        $javaScriptAssetHandlerConnector
+            ->method('getConditionProcessor')
+            ->willReturn($conditionProcessorMock);
+
+
+        $fieldsValidationJavaScriptAssetHandlerMock = $this->getMock(
+            FieldsValidationJavaScriptAssetHandler::class,
+            ['getJavaScriptValidationFiles'],
+            [$assetHandlerFactory]
+        );
+
+        $fieldsValidationJavaScriptAssetHandlerMock
+            ->expects($this->once())
+            ->method('getJavaScriptValidationFiles')
+            ->willReturn(['bar']);
+
+        $javaScriptAssetHandlerConnector
+            ->method('getFieldsValidationJavaScriptAssetHandler')
+            ->willReturn($fieldsValidationJavaScriptAssetHandlerMock);
+
+        $javaScriptAssetHandlerConnector->includeJavaScriptValidationAndConditionFiles();
+
+        /*
+         * Second part: a second connector will include more JavaScript files,
+         * but on three files, only one is new since the last connector.
+         */
+        /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
+        $javaScriptAssetHandlerConnector = $this->getMock(
+            JavaScriptAssetHandlerConnector::class,
+            ['getConditionProcessor', 'getFieldsValidationJavaScriptAssetHandler'],
+            [$assetHandlerConnectorManager]
+        );
+
+        $conditionProcessorMock = $this->getMock(
+            ConditionProcessor::class,
+            ['getJavaScriptFiles'],
+            [$formObject]
+        );
+
+        $conditionProcessorMock
+            ->expects($this->once())
+            ->method('getJavaScriptFiles')
+            ->willReturn(['foo', 'hello']);
+
+        $javaScriptAssetHandlerConnector
+            ->method('getConditionProcessor')
+            ->willReturn($conditionProcessorMock);
+
+
+        $fieldsValidationJavaScriptAssetHandlerMock = $this->getMock(
+            FieldsValidationJavaScriptAssetHandler::class,
+            ['getJavaScriptValidationFiles'],
+            [$assetHandlerFactory]
+        );
+
+        $fieldsValidationJavaScriptAssetHandlerMock
+            ->expects($this->once())
+            ->method('getJavaScriptValidationFiles')
+            ->willReturn(['bar']);
+
+        $javaScriptAssetHandlerConnector
+            ->method('getFieldsValidationJavaScriptAssetHandler')
+            ->willReturn($fieldsValidationJavaScriptAssetHandlerMock);
+
+        $javaScriptAssetHandlerConnector->includeJavaScriptValidationAndConditionFiles();
     }
 }
