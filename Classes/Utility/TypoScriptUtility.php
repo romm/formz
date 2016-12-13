@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\Utility;
 
+use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use Romm\Formz\Core\Core;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Service\TypoScriptService;
 
@@ -24,7 +24,6 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService;
  */
 class TypoScriptUtility implements SingletonInterface
 {
-
     const EXTENSION_CONFIGURATION_PATH = 'config.tx_formz';
 
     const PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER = 'ts-conf-hash-pages';

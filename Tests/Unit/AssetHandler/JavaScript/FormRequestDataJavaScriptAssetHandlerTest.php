@@ -11,7 +11,6 @@ use TYPO3\CMS\Extbase\Mvc\Request;
 
 class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
-
     use AssetHandlerTestTrait;
 
     /**

@@ -13,10 +13,10 @@
 
 namespace Romm\Formz\Configuration\Form\Condition;
 
+use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesResolver;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use TYPO3\CMS\Extbase\Error\Error;
 
 abstract class ConditionItemResolver extends AbstractFormzConfiguration implements MixedTypesInterface

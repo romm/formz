@@ -38,7 +38,6 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
 {
-
     const FIELD_INSTANCE = 'FieldInstance';
 
     /**

@@ -20,7 +20,6 @@ use Romm\Formz\Configuration\Form\Field\Field;
 
 class FieldSettings extends AbstractFormzConfiguration
 {
-
     use ParentsTrait;
 
     /**

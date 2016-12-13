@@ -76,7 +76,7 @@ class CssAssetHandlerConnector
 
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
-            function() {
+            function () {
                 /** @var ErrorContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
                 $errorContainerDisplayCssAssetHandler = $this->assetHandlerConnectorManager
                     ->getAssetHandlerFactory()

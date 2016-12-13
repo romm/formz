@@ -22,7 +22,6 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class FormResult extends Result
 {
-
     use StoreDataTrait;
 
     /**

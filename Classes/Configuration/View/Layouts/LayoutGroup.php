@@ -18,7 +18,6 @@ use Romm\Formz\Configuration\AbstractFormzConfiguration;
 
 class LayoutGroup extends AbstractFormzConfiguration
 {
-
     use StoreArrayIndexTrait;
 
     /**
@@ -54,7 +53,7 @@ class LayoutGroup extends AbstractFormzConfiguration
      */
     public function hasItem($itemName)
     {
-        return (true === isset($this->items[$itemName]));
+        return true === isset($this->items[$itemName]);
     }
 
     /**

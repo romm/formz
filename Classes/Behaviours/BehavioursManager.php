@@ -67,7 +67,6 @@ class BehavioursManager implements SingletonInterface
     {
         if (is_object($formInstance)) {
             foreach ($formObject->getConfiguration()->getFields() as $fieldName => $field) {
-
                 if (ObjectAccess::isPropertyGettable($formInstance, $fieldName)
                     && ObjectAccess::isPropertySettable($formInstance, $fieldName)
                 ) {

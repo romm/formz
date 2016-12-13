@@ -21,5 +21,4 @@ namespace Romm\Formz\Validation\Validator\Form;
  */
 class DefaultFormValidator extends AbstractFormValidator
 {
-
 }

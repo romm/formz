@@ -141,8 +141,8 @@ class ConditionParser implements SingletonInterface
             case '(':
                 $this->processTokenOpeningParenthesis();
                 break;
-            case ConditionParser::LOGICAL_OR:
-            case ConditionParser::LOGICAL_AND:
+            case self::LOGICAL_OR:
+            case self::LOGICAL_AND:
                 $this->processTokenLogicalOperator($token);
                 break;
             default:
@@ -201,7 +201,7 @@ class ConditionParser implements SingletonInterface
         if (null === $this->scope->getNode()) {
             $this->addError('Logical operator must be preceded by a valid operation.', 1457544986);
         } else {
-            if (ConditionParser::LOGICAL_OR === $operator) {
+            if (self::LOGICAL_OR === $operator) {
                 if (null !== $this->scope->getLastOrNode()) {
                     /*
                      * If a `or` node was already registered, we create a new
@@ -289,7 +289,7 @@ class ConditionParser implements SingletonInterface
         } elseif (null !== $this->scope->getLastOrNode()) {
             $node = $this->getNode(
                 BooleanNode::class,
-                [$this->scope->getLastOrNode(), $this->scope->getNode(), ConditionParser::LOGICAL_OR]
+                [$this->scope->getLastOrNode(), $this->scope->getNode(), self::LOGICAL_OR]
             );
             $this->scope->setNode($node);
         }

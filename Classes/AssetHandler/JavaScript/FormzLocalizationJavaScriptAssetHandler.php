@@ -176,7 +176,7 @@ JS;
     {
         $key = $this->getFormObject()->getClassName() . '-' . $field->getFieldName();
 
-        return (true === isset($this->injectedTranslationKeysForFieldValidation[$key]));
+        return true === isset($this->injectedTranslationKeysForFieldValidation[$key]);
     }
 
     /**

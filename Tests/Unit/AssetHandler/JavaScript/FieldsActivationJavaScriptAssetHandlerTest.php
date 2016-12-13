@@ -9,7 +9,6 @@ use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 
 class FieldsActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
-
     use AssetHandlerTestTrait;
 
     /**

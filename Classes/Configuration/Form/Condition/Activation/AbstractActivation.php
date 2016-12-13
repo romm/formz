@@ -21,7 +21,6 @@ use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface
 {
-
     use ParentsTrait;
 
     /**
@@ -69,7 +68,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     {
         $items = $this->getItems();
 
-        return (true === isset($items[$itemName]));
+        return true === isset($items[$itemName]);
     }
 
     /**

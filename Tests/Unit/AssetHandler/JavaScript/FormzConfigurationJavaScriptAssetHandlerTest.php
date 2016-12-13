@@ -8,7 +8,6 @@ use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 
 class FormzConfigurationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
-
     use AssetHandlerTestTrait;
 
     /**

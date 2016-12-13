@@ -22,7 +22,6 @@ use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
  */
 class FieldIsValidCondition extends AbstractConditionItem
 {
-
     const CONDITION_NAME = 'fieldIsValid';
 
     /**
@@ -63,10 +62,10 @@ class FieldIsValidCondition extends AbstractConditionItem
         $result = $dataObject->getFormValidator()
             ->validateField($this->fieldName);
 
-        return (
+        return
             false === $result->forProperty($this->fieldName)->hasErrors()
             && false === $result->fieldIsDeactivated($this->fieldName)
-        );
+        ;
     }
 
     /**

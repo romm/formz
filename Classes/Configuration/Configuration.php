@@ -29,7 +29,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
 {
-
     use DefaultConfigurationObjectTrait;
     use ArrayConversionTrait;
 
@@ -119,7 +118,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public function hasForm($className, $name)
     {
-        return (true === isset($this->forms[$className][$name]));
+        return true === isset($this->forms[$className][$name]);
     }
 
     /**

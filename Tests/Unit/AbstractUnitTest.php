@@ -9,7 +9,6 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 abstract class AbstractUnitTest extends UnitTestCase
 {
-
     use ConfigurationObjectUnitTestUtility;
     use FormzUnitTestUtility;
 

@@ -37,7 +37,6 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  */
 class Core implements SingletonInterface
 {
-
     const EXTENSION_KEY = 'formz';
     const CACHE_IDENTIFIER = 'cache_formz';
     const GENERATED_FILES_PATH = 'typo3temp/Formz/';
@@ -347,7 +346,7 @@ class Core implements SingletonInterface
      */
     public function isTypoScriptIncluded()
     {
-        return (null !== $this->getTypoScriptUtility()->getExtensionConfigurationFromPath('settings.typoScriptIncluded'));
+        return null !== $this->getTypoScriptUtility()->getExtensionConfigurationFromPath('settings.typoScriptIncluded');
     }
 
     /**

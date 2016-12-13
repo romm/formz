@@ -68,10 +68,10 @@ class BooleanNode extends AbstractNode
     public function getCssResult()
     {
         return $this->getLogicalResult(
-            function() {
+            function () {
                 return $this->processLogicalAndCss($this->leftSide, $this->rightSide);
             },
-            function() {
+            function () {
                 return $this->processLogicalOrCss($this->leftSide, $this->rightSide);
             }
         );
@@ -83,10 +83,10 @@ class BooleanNode extends AbstractNode
     public function getJavaScriptResult()
     {
         return $this->getLogicalResult(
-            function() {
+            function () {
                 return $this->processLogicalAndJavaScript($this->leftSide, $this->rightSide);
             },
-            function() {
+            function () {
                 return $this->processLogicalOrJavaScript($this->leftSide, $this->rightSide);
             }
         );
@@ -98,10 +98,10 @@ class BooleanNode extends AbstractNode
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
         return $this->getLogicalResult(
-            function() use ($dataObject) {
+            function () use ($dataObject) {
                 return $this->processLogicalAndPhp($this->leftSide, $this->rightSide, $dataObject);
             },
-            function() use ($dataObject) {
+            function () use ($dataObject) {
                 return $this->processLogicalOrPhp($this->leftSide, $this->rightSide, $dataObject);
             }
         );
@@ -238,7 +238,7 @@ class BooleanNode extends AbstractNode
      */
     protected function processLogicalAndPhp(NodeInterface $left, NodeInterface $right, PhpConditionDataObject $dataObject)
     {
-        return ($left->getPhpResult($dataObject) && $right->getPhpResult($dataObject));
+        return $left->getPhpResult($dataObject) && $right->getPhpResult($dataObject);
     }
 
     /**
@@ -251,6 +251,6 @@ class BooleanNode extends AbstractNode
      */
     protected function processLogicalOrPhp(NodeInterface $left, NodeInterface $right, PhpConditionDataObject $dataObject)
     {
-        return ($left->getPhpResult($dataObject) || $right->getPhpResult($dataObject));
+        return $left->getPhpResult($dataObject) || $right->getPhpResult($dataObject);
     }
 }

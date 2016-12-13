@@ -14,11 +14,11 @@
 namespace Romm\Formz\Validation\Validator;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Configuration\Form\Field\Validation\Message;
+use Romm\Formz\Core\Core;
+use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
@@ -162,7 +162,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      * Creates a new validation error object and adds it to `$this->errors`.
      *
      * @param string  $key       The key of the error message (from $this->messages).
-     * @param integer $code      The error code (a unix timestamp)
+     * @param int $code      The error code (a unix timestamp)
      * @param array   $arguments Arguments to be replaced in message
      * @param string  $title
      * @throws \Exception
@@ -227,7 +227,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      */
     protected function hasMessage($messageKey)
     {
-        return (true === isset($messageKey));
+        return true === isset($messageKey);
     }
 
     /**

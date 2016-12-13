@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Utility;
 
-use \TYPO3\CMS\Core\TimeTracker\TimeTracker as TYPO3TimeTracker;
+use TYPO3\CMS\Core\TimeTracker\TimeTracker as TYPO3TimeTracker;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -33,7 +33,7 @@ class TimeTracker extends TYPO3TimeTracker
     public static function getAndStart()
     {
         /** @var TimeTracker $timeTracker */
-        $timeTracker = GeneralUtility::makeInstance(TimeTracker::class);
+        $timeTracker = GeneralUtility::makeInstance(self::class);
         $timeTracker->start();
 
         return $timeTracker;

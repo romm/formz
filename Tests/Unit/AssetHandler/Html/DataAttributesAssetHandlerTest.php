@@ -10,7 +10,6 @@ use TYPO3\CMS\Extbase\Error\Error;
 
 class DataAttributesAssetHandlerTest extends AbstractUnitTest
 {
-
     use AssetHandlerTestTrait;
 
     /**

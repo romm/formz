@@ -18,7 +18,6 @@ use Romm\Formz\Configuration\AbstractFormzConfiguration;
 
 class Message extends AbstractFormzConfiguration
 {
-
     use ArrayConversionTrait;
 
     /**
