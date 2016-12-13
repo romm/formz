@@ -21,5 +21,4 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 abstract class AbstractBehaviour implements BehaviourInterface, SingletonInterface
 {
-
 }

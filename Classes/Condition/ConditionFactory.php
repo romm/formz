@@ -105,7 +105,7 @@ class ConditionFactory implements SingletonInterface
      */
     public function hasCondition($conditionName)
     {
-        return (true === array_key_exists($conditionName, $this->conditions));
+        return true === array_key_exists($conditionName, $this->conditions);
     }
 
     /**

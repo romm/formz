@@ -83,7 +83,7 @@ class View extends AbstractFormzConfiguration
      */
     public function hasLayout($layoutName)
     {
-        return (true === isset($this->layouts[$layoutName]));
+        return true === isset($this->layouts[$layoutName]);
     }
 
     /**

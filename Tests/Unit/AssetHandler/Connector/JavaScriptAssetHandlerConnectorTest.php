@@ -418,7 +418,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ->method('getConditionProcessor')
             ->willReturn($conditionProcessorMock);
 
-
         $fieldsValidationJavaScriptAssetHandlerMock = $this->getMock(
             FieldsValidationJavaScriptAssetHandler::class,
             ['getJavaScriptValidationFiles'],
@@ -461,7 +460,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
         $javaScriptAssetHandlerConnector
             ->method('getConditionProcessor')
             ->willReturn($conditionProcessorMock);
-
 
         $fieldsValidationJavaScriptAssetHandlerMock = $this->getMock(
             FieldsValidationJavaScriptAssetHandler::class,

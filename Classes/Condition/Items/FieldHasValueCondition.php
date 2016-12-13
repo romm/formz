@@ -22,7 +22,6 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class FieldHasValueCondition extends AbstractConditionItem
 {
-
     const CONDITION_NAME = 'fieldHasValue';
 
     /**

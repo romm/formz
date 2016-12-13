@@ -18,5 +18,4 @@ namespace Romm\Formz\Exceptions;
  */
 class Exception extends \Exception
 {
-
 }

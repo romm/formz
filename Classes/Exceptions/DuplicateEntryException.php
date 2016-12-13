@@ -15,5 +15,4 @@ namespace Romm\Formz\Exceptions;
 
 class DuplicateEntryException extends Exception
 {
-
 }

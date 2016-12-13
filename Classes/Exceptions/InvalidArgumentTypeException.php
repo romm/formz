@@ -15,5 +15,4 @@ namespace Romm\Formz\Exceptions;
 
 class InvalidArgumentTypeException extends Exception
 {
-
 }

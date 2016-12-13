@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Configuration;
 
-use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
+use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 

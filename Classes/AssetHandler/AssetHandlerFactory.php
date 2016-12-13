@@ -76,7 +76,7 @@ class AssetHandlerFactory
         $hash = md5(spl_object_hash($formObject) . spl_object_hash($controllerContext));
 
         if (false === array_key_exists($hash, self::$factoryInstances)) {
-            self::$factoryInstances[$hash] = new AssetHandlerFactory($formObject, $controllerContext);
+            self::$factoryInstances[$hash] = new self($formObject, $controllerContext);
         }
 
         return self::$factoryInstances[$hash];

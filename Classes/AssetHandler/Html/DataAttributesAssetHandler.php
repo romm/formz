@@ -89,7 +89,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
             && true === isset($formInstance[$fieldName])
         );
 
-        return ($objectPropertyIsGettable || $arrayPropertyGettable);
+        return $objectPropertyIsGettable || $arrayPropertyGettable;
     }
 
     /**

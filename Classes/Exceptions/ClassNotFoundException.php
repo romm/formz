@@ -15,5 +15,4 @@ namespace Romm\Formz\Exceptions;
 
 class ClassNotFoundException extends Exception
 {
-
 }

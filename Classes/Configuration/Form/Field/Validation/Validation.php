@@ -23,7 +23,6 @@ use Romm\Formz\Configuration\Form\Field\Field;
 
 class Validation extends AbstractFormzConfiguration
 {
-
     use StoreArrayIndexTrait;
     use ArrayConversionTrait;
     use ParentsTrait;

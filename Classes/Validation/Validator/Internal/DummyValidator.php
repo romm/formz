@@ -107,10 +107,10 @@ class DummyValidator extends AbstractValidator implements SingletonInterface
      */
     protected function currentValidatorIsValid()
     {
-        return (
+        return
             null !== $this->currentValidator
             && in_array(AbstractValidator::class, class_parents($this->currentValidator))
-        );
+        ;
     }
 
     /**

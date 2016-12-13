@@ -23,9 +23,9 @@ use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Utility\FormUtility;
 use Romm\Formz\Validation\Validator\AbstractValidator;
-use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
+use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\GenericObjectValidator;
 
 /**

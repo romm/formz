@@ -25,7 +25,6 @@ use Romm\Formz\Configuration\Form\Form;
 
 class Field extends AbstractFormzConfiguration
 {
-
     use StoreArrayIndexTrait;
     use ParentsTrait;
 
@@ -83,7 +82,7 @@ class Field extends AbstractFormzConfiguration
      */
     public function hasValidation($validationName)
     {
-        return (true === isset($this->validation[$validationName]));
+        return true === isset($this->validation[$validationName]);
     }
 
     /**

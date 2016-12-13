@@ -61,7 +61,7 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
 
         $fileExists = false;
         $assetHandlerConnectorManager->method('fileExists')
-            ->willReturnCallback(function() use (&$fileExists) {
+            ->willReturnCallback(function () use (&$fileExists) {
                 $result = $fileExists;
                 $fileExists = true;
 

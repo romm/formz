@@ -25,7 +25,6 @@ use TYPO3\CMS\Extbase\Reflection\ReflectionService;
  */
 class FormObjectFactory implements SingletonInterface
 {
-
     const IGNORE_PROPERTY = 'formz-ignore';
 
     /**

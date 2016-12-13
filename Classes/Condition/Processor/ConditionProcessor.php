@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Condition\Processor;
 
-use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\ConditionParserFactory;
+use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Configuration\Form\Field\Field;

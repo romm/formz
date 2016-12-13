@@ -44,7 +44,6 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  */
 class ClassViewHelper extends AbstractViewHelper implements CompilableInterface
 {
-
     const CLASS_ERRORS = 'errors';
     const CLASS_VALID = 'valid';
 

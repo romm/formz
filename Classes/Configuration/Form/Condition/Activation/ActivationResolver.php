@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Configuration\Form\Condition\Activation;
 
-
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesResolver;
 

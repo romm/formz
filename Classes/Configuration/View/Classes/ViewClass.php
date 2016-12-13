@@ -58,7 +58,7 @@ class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorIn
      */
     public function hasItem($itemName)
     {
-        return (true === isset($this->items[$itemName]));
+        return true === isset($this->items[$itemName]);
     }
 
     /**

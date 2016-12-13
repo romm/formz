@@ -176,7 +176,7 @@ class AssetHandlerConnectorManager
     {
         $result = GeneralUtility::writeFileToTypo3tempDir($absolutePath, $content);
 
-        return (null === $result);
+        return null === $result;
     }
 
     /**

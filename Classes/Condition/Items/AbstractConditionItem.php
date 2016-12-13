@@ -42,7 +42,6 @@ use Romm\Formz\Core\Core;
  */
 abstract class AbstractConditionItem implements ConditionItemInterface
 {
-
     use MagicMethodsTrait;
 
     /**

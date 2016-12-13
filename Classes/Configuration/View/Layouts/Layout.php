@@ -20,7 +20,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Layout extends AbstractFormzConfiguration
 {
-
     use StoreArrayIndexTrait;
     use ParentsTrait;
 

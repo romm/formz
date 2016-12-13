@@ -17,6 +17,5 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 
 class AbstractFormzConfiguration
 {
-
     use MagicMethodsTrait;
 }

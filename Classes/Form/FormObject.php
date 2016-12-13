@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Form;
 
-use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
+use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Extbase\Error\Result;

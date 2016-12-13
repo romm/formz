@@ -21,7 +21,6 @@ use Romm\Formz\Core\Core;
 
 class FormSettings extends AbstractFormzConfiguration
 {
-
     use ParentsTrait;
 
     /**
