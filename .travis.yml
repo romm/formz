@@ -6,8 +6,21 @@ php:
   - 7.0
 
 env:
-  matrix:
-    - TYPO3_VERSION=7.6.9
+  - TYPO3_VERSION=^6.2 COVERAGE=0
+  - TYPO3_VERSION=^7.6 COVERAGE=0
+
+matrix:
+  include:
+  - env: TYPO3_VERSION=^7.6 COVERAGE=1
+    php: 7.0
+  exclude:
+    # We must exclude TYPO3 6.2 with PHP 7, because the build just doesn't work (have no clue why).
+  - env: TYPO3_VERSION=^6.2 COVERAGE=0
+    php: 7.0
+    # Excluding this matrix, because the same one with coverage enabled is included above.
+  - env: TYPO3_VERSION=^7.6 COVERAGE=0
+    php: 7.0
+
 
 sudo: false
 
@@ -32,9 +45,20 @@ before_script:
 
 script:
   - >
-    echo;
-    echo "Running unit tests";
-    .Build/bin/phpunit --colors --coverage-text --coverage-clover build/logs/clover.xml Tests/Unit/
+    if [[ "$COVERAGE" == "0" ]]; then
+      echo;
+      echo "Running unit tests";
+      .Build/bin/phpunit --colors Tests/Unit/
+    fi
+  - >
+    if [[ "$COVERAGE" == "1" ]]; then
+      echo;
+      echo "Running unit tests with coverage";
+      .Build/bin/phpunit --colors --coverage-text --coverage-clover build/logs/clover.xml Tests/Unit/
+    fi
 
 after_script:
-  - travis_retry php .Build/bin/coveralls -v
+  - >
+    if [[ "$COVERAGE" == "1" ]]; then
+      travis_retry php .Build/bin/coveralls -v
+    fi
