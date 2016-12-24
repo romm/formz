@@ -23,6 +23,10 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  */
 class RenderSectionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
+    /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
 
     /**
      * @inheritdoc

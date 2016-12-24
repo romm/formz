@@ -48,6 +48,11 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
     protected static $view;
 
     /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
+    /**
      * @inheritdoc
      */
     public function initializeArguments()
