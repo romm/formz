@@ -142,10 +142,10 @@ class ClassViewHelper extends AbstractViewHelper
         $this->fieldName = $this->arguments['field'];
 
         if (null === $this->fieldName
-            && $this->service->fieldContextExists($this->renderingContext)
+            && $this->service->fieldContextExists()
         ) {
             $this->fieldName = $this->service
-                ->getCurrentField($this->renderingContext)
+                ->getCurrentField()
                 ->getFieldName();
         }
 
@@ -165,9 +165,12 @@ class ClassViewHelper extends AbstractViewHelper
      */
     protected function initializeClassValue()
     {
-        /** @var FormViewHelper $form */
-        $form = FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
-        $classesConfiguration = $form->getFormzConfiguration()->getView()->getClasses();
+        $classesConfiguration = $this->service
+            ->getFormObject()
+            ->getConfiguration()
+            ->getFormzConfiguration()
+            ->getView()
+            ->getClasses();
 
         /** @var ViewClass $class */
         $class = ObjectAccess::getProperty($classesConfiguration, $this->classNameSpace);
@@ -191,11 +194,10 @@ class ClassViewHelper extends AbstractViewHelper
      */
     protected function getRequestResultForProperty($property)
     {
-        /** @var Result $requestResult */
-        $requestResult = FormViewHelper::getVariable(FormViewHelper::FORM_RESULT);
+        $formResult = $this->service->getFormResult();
 
-        return (false !== $requestResult)
-            ? $requestResult->forProperty($property)
+        return ($formResult)
+            ? $formResult->forProperty($property)
             : null;
     }
 }

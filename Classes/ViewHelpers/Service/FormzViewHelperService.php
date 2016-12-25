@@ -14,15 +14,19 @@
 namespace Romm\Formz\ViewHelpers\Service;
 
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormViewHelper;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 
 /**
- * This class contains methods that help ViewHelpers to manipulate data and know
- * more things concerning the current form state.
+ * This class contains methods that help view helpers to manipulate data and
+ * know more things concerning the current form state.
+ *
+ * It is mainly configured inside the `FormViewHelper`, and used in other
+ * view helpers.
  */
 class FormzViewHelperService implements SingletonInterface
 {
@@ -33,15 +37,63 @@ class FormzViewHelperService implements SingletonInterface
     protected static $instance;
 
     /**
-     * @return FormzViewHelperService
+     * @var bool
      */
-    public static function get()
+    protected $formContext;
+
+    /**
+     * @var array|FormInterface
+     */
+    protected $formInstance;
+
+    /**
+     * @var Field
+     */
+    protected $currentField;
+
+    /**
+     * @var bool
+     */
+    protected $formWasSubmitted;
+
+    /**
+     * @var FormResult
+     */
+    protected $formResult;
+
+    /**
+     * @var FormObject
+     */
+    protected $formObject;
+
+    /**
+     * Reset every state that can be used by this service.
+     */
+    public function resetState()
     {
-        if (null === self::$instance) {
-            self::$instance = GeneralUtility::makeInstance(self::class);
+        $this->formContext = false;
+        $this->formInstance = null;
+        $this->formResult = null;
+        $this->formWasSubmitted = false;
+        $this->currentField = null;
+    }
+
+    /**
+     * Will activate the form context, changing the result returned by the
+     * function `formContextExists`.
+     *
+     * @throws \Exception
+     */
+    public function activateFormContext()
+    {
+        if (true === $this->formContext) {
+            throw new \Exception(
+                'You can not use a form view helper inside another one.',
+                1465242575
+            );
         }
 
-        return self::$instance;
+        $this->formContext = true;
     }
 
     /**
@@ -51,7 +103,16 @@ class FormzViewHelperService implements SingletonInterface
      */
     public function formContextExists()
     {
-        return null !== FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
+        return $this->formContext;
+    }
+
+    /**
+     * Will mark the form as submitted (change the result returned by the
+     * function `formWasSubmitted()`).
+     */
+    public function markFormAsSubmitted()
+    {
+        $this->formWasSubmitted = true;
     }
 
     /**
@@ -61,19 +122,18 @@ class FormzViewHelperService implements SingletonInterface
      */
     public function formWasSubmitted()
     {
-        return true === FormViewHelper::getVariable(FormViewHelper::FORM_WAS_SUBMITTED);
+        return $this->formWasSubmitted;
     }
 
     /**
      * Checks that the `FieldViewHelper` has been called. If not, an exception
      * is thrown.
      *
-     * @param RenderingContextInterface $renderingContext
      * @return bool
      */
-    public function fieldContextExists(RenderingContextInterface $renderingContext)
+    public function fieldContextExists()
     {
-        return null !== $this->getCurrentField($renderingContext);
+        return $this->currentField instanceof Field;
     }
 
     /**
@@ -81,22 +141,109 @@ class FormzViewHelperService implements SingletonInterface
      *
      * Returns null if no current field was found.
      *
-     * @param RenderingContextInterface $renderingContext
      * @return Field|null
      */
-    public function getCurrentField(RenderingContextInterface $renderingContext)
+    public function getCurrentField()
     {
-        $result = null;
-        $viewHelperVariableContainer = $renderingContext->getViewHelperVariableContainer();
+        return $this->currentField;
+    }
 
-        if (true === $viewHelperVariableContainer->exists(FieldViewHelper::class, FieldViewHelper::FIELD_INSTANCE)) {
-            $fieldInstance = $viewHelperVariableContainer->get(FieldViewHelper::class, FieldViewHelper::FIELD_INSTANCE);
+    /**
+     * @param Field $field
+     */
+    public function setCurrentField(Field $field)
+    {
+        $this->currentField = $field;
+    }
 
-            if ($fieldInstance instanceof Field) {
-                $result = $fieldInstance;
-            }
+    /**
+     * Unset the current field.
+     */
+    public function removeCurrentField()
+    {
+        $this->currentField = null;
+    }
+
+    /**
+     * Checks that the current `FormViewHelper` exists. If not, an exception is
+     * thrown.
+     *
+     * @throws \Exception
+     */
+    public function checkIsInsideFormViewHelper()
+    {
+        if (false === $this->formContextExists()) {
+            throw new \Exception(
+                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FormViewHelper::class . '".',
+                1465243085
+            );
         }
+    }
 
-        return $result;
+    /**
+     * Checks that the `FieldViewHelper` has been called. If not, an exception
+     * is thrown.
+     *
+     * @throws \Exception
+     */
+    public function checkIsInsideFieldViewHelper()
+    {
+        if (false === $this->fieldContextExists()) {
+            throw new \Exception(
+                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
+                1465243085
+            );
+        }
+    }
+
+    /**
+     * If the form was submitted by the user, contains the array containing the
+     * submitted values.
+     *
+     * @param array|FormInterface $formInstance
+     */
+    public function setFormInstance($formInstance)
+    {
+        $this->formInstance = $formInstance;
+    }
+
+    /**
+     * @return array|FormInterface
+     */
+    public function getFormInstance()
+    {
+        return $this->formInstance;
+    }
+
+    /**
+     * @return FormResult
+     */
+    public function getFormResult()
+    {
+        return $this->formResult;
+    }
+
+    /**
+     * @param FormResult $formResult
+     */
+    public function setFormResult(FormResult $formResult)
+    {
+        $this->formResult = $formResult;
+    }
+
+    /**
+     * @return FormObject
+     */
+    public function getFormObject()
+    {
+        return $this->formObject;
+    }
+
+    /**
+     * @param FormObject $formObject
+     */
+    public function setFormObject(FormObject $formObject)
+    {
+        $this->formObject = $formObject;
     }
 }

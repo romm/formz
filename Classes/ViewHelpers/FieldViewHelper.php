@@ -20,7 +20,6 @@ use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -36,10 +35,8 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  * `bootstrap`, the layout `default` will be used, only if it does exist of
  * course).
  */
-class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
+class FieldViewHelper extends AbstractViewHelper
 {
-    const FIELD_INSTANCE = 'FieldInstance';
-
     /**
      * Unique instance of view, stored to save some performance.
      *
@@ -62,41 +59,36 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        $this->checkIsInsideFormViewHelper();
+        $this->service->checkIsInsideFormViewHelper();
 
-        return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
-    }
+        $formObject = $this->service->getFormObject();
 
-    /**
-     * @inheritdoc
-     */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
-    {
-        /** @var FormViewHelper $form */
-        $form = FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
-        $viewConfiguration = $form->getFormzConfiguration()->getView();
-        $formConfiguration = $form->getFormObject()->getConfiguration();
-        $fieldName = $arguments['name'];
+        $formConfiguration = $formObject->getConfiguration();
 
-        if (false === is_string($arguments['name'])) {
+        $viewConfiguration = $formConfiguration->getFormzConfiguration()->getView();
+        $fieldName = $this->arguments['name'];
+
+        if (false === is_string($this->arguments['name'])) {
             throw new \Exception('The argument "name" of the view helper "' . __CLASS__ . '" must be a string.', 1465243479);
         } elseif (false === $formConfiguration->hasField($fieldName)) {
-            throw new \Exception('The form "' . $form->getFormObject()->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.', 1465243619);
+            throw new \Exception('The form "' . $formObject->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.', 1465243619);
         }
 
-        $renderingContext->getViewHelperVariableContainer()->addOrUpdate(__CLASS__, self::FIELD_INSTANCE, $formConfiguration->getField($fieldName));
 
-        $renderChildrenClosure();
+        $this->service->setCurrentField($formConfiguration->getField($fieldName));
 
-        $layout = self::getLayout($arguments, $viewConfiguration);
+        $closure = $this->buildRenderChildrenClosure();
+        $closure();
+
+        $layout = self::getLayout($this->arguments, $viewConfiguration);
 
         /** @var StandaloneView $view */
         $view = self::$view = (null === self::$view)
             ? Core::get()->getObjectManager()->get(StandaloneView::class)
             : self::$view;
 
-        $templateArguments = is_array($arguments['arguments'])
-            ? $arguments['arguments']
+        $templateArguments = is_array($this->arguments['arguments'])
+            ? $this->arguments['arguments']
             : [];
         $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, OptionViewHelper::getOption());
 
@@ -105,32 +97,37 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
          * replaced in the section, to restore them at the end of the view
          * helper.
          */
-        $originalArguments = self::getOriginalArguments($renderingContext);
+        $originalArguments = self::getOriginalArguments($this->renderingContext);
 
         $templateArguments['layout'] = $layout->getLayout();
-        $templateArguments['formName'] = $form->getFormObject()->getName();
+        $templateArguments['formName'] = $formObject->getName();
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = (true === isset($templateArguments['fieldId']))
             ? $templateArguments['fieldId']
-            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $form->getFormObject()->getName() . '-' . $fieldName);
+            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $formObject->getName() . '-' . $fieldName);
 
-        $currentView = $renderingContext->getViewHelperVariableContainer()->getView();
+        $currentView = $this->renderingContext
+            ->getViewHelperVariableContainer()
+            ->getView();
 
         $view->setTemplatePathAndFilename($layout->getTemplateFile());
         $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
         $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
-        $view->setRenderingContext($renderingContext);
+        $view->setRenderingContext($this->renderingContext);
         $view->assignMultiple($templateArguments);
 
         $result = $view->render();
 
-        $renderingContext->getViewHelperVariableContainer()->setView($currentView);
+        $this->renderingContext
+            ->getViewHelperVariableContainer()
+            ->setView($currentView);
 
-        $renderingContext->getViewHelperVariableContainer()->remove(__CLASS__, self::FIELD_INSTANCE);
+        $this->service->removeCurrentField();
+
         SectionViewHelper::resetSectionClosures();
         OptionViewHelper::resetOptions();
 
-        self::restoreOriginalArguments($renderingContext, $templateArguments, $originalArguments);
+        self::restoreOriginalArguments($this->renderingContext, $templateArguments, $originalArguments);
 
         return $result;
     }

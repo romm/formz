@@ -13,57 +13,9 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
+use Romm\Formz\ViewHelpers\Service\FormzViewHelperServiceInjectionTrait;
 
 abstract class AbstractViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {
-
-    /**
-     * @var FormzViewHelperService
-     */
-    protected $service;
-
-    /**
-     * Initializes any ViewHelper correctly.
-     */
-    public function initialize()
-    {
-        $this->service = FormzViewHelperService::get();
-    }
-
-    /**
-     * Checks that the current `FormViewHelper` exists. If not, an exception is
-     * thrown.
-     *
-     * @throws \Exception
-     */
-    protected function checkIsInsideFormViewHelper()
-    {
-        $flag = $this->service->formContextExists();
-
-        if (false === $flag) {
-            throw new \Exception(
-                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FormViewHelper::class . '".',
-                1465243085
-            );
-        }
-    }
-
-    /**
-     * Checks that the `FieldViewHelper` has been called. If not, an exception
-     * is thrown.
-     *
-     * @throws \Exception
-     */
-    protected function checkIsInsideFieldViewHelper()
-    {
-        $flag = $this->service->fieldContextExists($this->renderingContext);
-
-        if (false === $flag) {
-            throw new \Exception(
-                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
-                1465243085
-            );
-        }
-    }
+    use FormzViewHelperServiceInjectionTrait;
 }

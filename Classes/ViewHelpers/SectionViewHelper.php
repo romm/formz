@@ -49,7 +49,7 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function render()
     {
-        $this->checkIsInsideFieldViewHelper();
+        $this->service->checkIsInsideFieldViewHelper();
 
         self::addSectionClosure($this->arguments['name'], $this->buildRenderChildrenClosure());
     }

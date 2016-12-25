@@ -15,14 +15,11 @@ namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
 use TYPO3\CMS\Extbase\Error\Warning;
 use TYPO3\CMS\Extbase\Validation\Error;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
  * This view helper can format the validation result messages of a field.
@@ -37,7 +34,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  * #KEY#' : Key of the message (usually `default`);
  * #MESSAGE# : The message itself.
  */
-class FormatMessageViewHelper extends AbstractViewHelper implements CompilableInterface
+class FormatMessageViewHelper extends AbstractViewHelper
 {
 
     /**
@@ -54,28 +51,18 @@ class FormatMessageViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public function render()
     {
-        return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
-    }
-
-    /**
-     * See class description.
-     *
-     * @inheritdoc
-     */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
-    {
-        $message = $arguments['message'];
+        $message = $this->arguments['message'];
         if (false === $message instanceof Message) {
             throw new \Exception('The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . Message::class . '".', 1467021406);
         }
 
-        $fieldName = $arguments['field'];
+        $fieldName = $this->arguments['field'];
 
         if (null === $fieldName
-            && null !== FormzViewHelperService::get()->getCurrentField($renderingContext)
+            && null !== $this->service->getCurrentField()
         ) {
             /** @var Field $field */
-            $field = FormzViewHelperService::get()->getCurrentField($renderingContext);
+            $field = $this->service->getCurrentField();
             $fieldName = $field->getFieldName();
         }
 
@@ -86,20 +73,19 @@ class FormatMessageViewHelper extends AbstractViewHelper implements CompilableIn
             );
         }
 
-        /** @var FormViewHelper $form */
-        $form = FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
+        $formObject = $this->service->getFormObject();
 
-        if (false === $form->getFormObject()->getConfiguration()->hasField($fieldName)) {
+        if (false === $formObject->getConfiguration()->hasField($fieldName)) {
             throw new \Exception(
                 vsprintf(
                     'The Form "%s" does not have a field "%s"',
-                    [$form->getFormObject()->getName(), $fieldName]
+                    [$formObject->getName(), $fieldName]
                 ),
                 1473084335
             );
         }
 
-        $field = $form->getFormObject()->getConfiguration()->getField($fieldName);
+        $field = $formObject->getConfiguration()->getField($fieldName);
 
         if ($message instanceof Error) {
             $messageType = 'error';
@@ -113,9 +99,10 @@ class FormatMessageViewHelper extends AbstractViewHelper implements CompilableIn
 
         list($ruleName, $messageKey) = GeneralUtility::trimExplode(':', $message->getTitle());
 
-        $fieldId = ($renderingContext->getTemplateVariableContainer()->exists('fieldId'))
-            ? $renderingContext->getTemplateVariableContainer()->get('fieldId')
-            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $form->getFormObject()->getName() . '-' . $fieldName);
+        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+        $fieldId = ($templateVariableContainer->exists('fieldId'))
+            ? $templateVariableContainer->get('fieldId')
+            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $formObject->getName() . '-' . $fieldName);
 
         $result = str_replace(
             [

@@ -17,13 +17,12 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
-use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
 use Romm\Formz\Utility\TimeTracker;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
+use Romm\Formz\ViewHelpers\Service\FormzViewHelperServiceInjectionTrait;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -65,10 +64,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 {
-    const FORM_VIEW_HELPER = 'FormViewHelper';
-    const FORM_INSTANCE = 'FormInstance';
-    const FORM_RESULT = 'FormResult';
-    const FORM_WAS_SUBMITTED = 'FormWasSubmitted';
+    use FormzViewHelperServiceInjectionTrait;
 
     /**
      * @var PageRenderer
@@ -81,16 +77,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $formObjectClassName;
 
     /**
-     * @var Configuration
-     */
-    protected $formzConfiguration;
-
-    /**
-     * @var FormObject
-     */
-    protected $formObject;
-
-    /**
      * @var AssetHandlerFactory
      */
     protected $assetHandlerFactory;
@@ -99,11 +85,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * @var TimeTracker
      */
     protected $timeTracker;
-
-    /**
-     * @var array
-     */
-    protected static $staticVariables = [];
 
     /**
      * @inheritdoc
@@ -120,30 +101,30 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     /**
      * Render the form.
      *
-     * @param string  $action                               Target action
-     * @param array   $arguments                            Arguments
-     * @param string  $controller                           Target controller
-     * @param string  $extensionName                        Target Extension Name (without "tx_" prefix and no underscores). If NULL the current extension name is used
-     * @param string  $pluginName                           Target plugin. If empty, the current plugin name is used
-     * @param int $pageUid                              Target page uid
-     * @param mixed   $object                               Object to use for the form. Use in conjunction with the "property" attribute on the sub tags
-     * @param int $pageType                             Target page type
-     * @param bool $noCache                              set this to disable caching for the target page. You should not need this.
-     * @param bool $noCacheHash                          set this to suppress the cHash query parameter created by TypoLink. You should not need this.
-     * @param string  $section                              The anchor to be added to the action URI (only active if $actionUri is not set)
-     * @param string  $format                               The requested format (e.g. ".html") of the target page (only active if $actionUri is not set)
-     * @param array   $additionalParams                     additional action URI query parameters that won't be prefixed like $arguments (overrule $arguments) (only active if $actionUri is not set)
-     * @param bool $absolute                             If set, an absolute action URI is rendered (only active if $actionUri is not set)
-     * @param bool $addQueryString                       If set, the current query parameters will be kept in the action URI (only active if $actionUri is not set)
-     * @param array   $argumentsToBeExcludedFromQueryString arguments to be removed from the action URI. Only active if $addQueryString = TRUE and $actionUri is not set
-     * @param string  $fieldNamePrefix                      Prefix that will be added to all field names within this form. If not set the prefix will be tx_yourExtension_plugin
-     * @param string  $actionUri                            can be used to overwrite the "action" attribute of the form tag
-     * @param string  $objectName                           name of the object that is bound to this form. If this argument is not specified, the name attribute of this form is used to determine the FormObjectName
-     * @param string  $hiddenFieldClassName
+     * @param string $action                               Target action
+     * @param array  $arguments                            Arguments
+     * @param string $controller                           Target controller
+     * @param string $extensionName                        Target Extension Name (without "tx_" prefix and no underscores). If NULL the current extension name is used
+     * @param string $pluginName                           Target plugin. If empty, the current plugin name is used
+     * @param int    $pageUid                              Target page uid
+     * @param mixed  $object                               Object to use for the form. Use in conjunction with the "property" attribute on the sub tags
+     * @param int    $pageType                             Target page type
+     * @param bool   $noCache                              set this to disable caching for the target page. You should not need this.
+     * @param bool   $noCacheHash                          set this to suppress the cHash query parameter created by TypoLink. You should not need this.
+     * @param string $section                              The anchor to be added to the action URI (only active if $actionUri is not set)
+     * @param string $format                               The requested format (e.g. ".html") of the target page (only active if $actionUri is not set)
+     * @param array  $additionalParams                     additional action URI query parameters that won't be prefixed like $arguments (overrule $arguments) (only active if $actionUri is not set)
+     * @param bool   $absolute                             If set, an absolute action URI is rendered (only active if $actionUri is not set)
+     * @param bool   $addQueryString                       If set, the current query parameters will be kept in the action URI (only active if $actionUri is not set)
+     * @param array  $argumentsToBeExcludedFromQueryString arguments to be removed from the action URI. Only active if $addQueryString = TRUE and $actionUri is not set
+     * @param string $fieldNamePrefix                      Prefix that will be added to all field names within this form. If not set the prefix will be tx_yourExtension_plugin
+     * @param string $actionUri                            can be used to overwrite the "action" attribute of the form tag
+     * @param string $objectName                           name of the object that is bound to this form. If this argument is not specified, the name attribute of this form is used to determine the FormObjectName
+     * @param string $hiddenFieldClassName
+     * @param string $addQueryStringMethod
      * @return string rendered form
-     * @throws \Exception
      */
-    public function render($action = null, array $arguments = [], $controller = null, $extensionName = null, $pluginName = null, $pageUid = null, $object = null, $pageType = 0, $noCache = false, $noCacheHash = false, $section = '', $format = '', array $additionalParams = [], $absolute = false, $addQueryString = false, array $argumentsToBeExcludedFromQueryString = [], $fieldNamePrefix = null, $actionUri = null, $objectName = null, $hiddenFieldClassName = null)
+    public function render($action = null, array $arguments = [], $controller = null, $extensionName = null, $pluginName = null, $pageUid = null, $object = null, $pageType = 0, $noCache = false, $noCacheHash = false, $section = '', $format = '', array $additionalParams = [], $absolute = false, $addQueryString = false, array $argumentsToBeExcludedFromQueryString = [], $fieldNamePrefix = null, $actionUri = null, $objectName = null, $hiddenFieldClassName = null, $addQueryStringMethod = '')
     {
         $this->timeTracker = TimeTracker::getAndStart();
         $result = '';
@@ -153,17 +134,19 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 $result = Core::get()->translate('form.typoscript_not_included.error_message');
             }
         } else {
-            $this->formObject = Core::get()->getFormObjectFactory()
+            $formObject = Core::get()
+                ->getFormObjectFactory()
                 ->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
 
-            $formzValidationResult = $this->formObject->getConfigurationValidationResult();
+            $this->service->setFormObject($formObject);
+            $formzValidationResult = $formObject->getConfigurationValidationResult();
 
             if ($formzValidationResult->hasErrors()) {
                 // If the form configuration is not valid, we display the errors list.
                 $result = $this->getErrorText($formzValidationResult);
             } else {
                 // Everything is ok, we render the form.
-                $result = $this->renderForm();
+                $result = $this->renderForm(func_get_args());
             }
 
             unset($formzValidationResult);
@@ -173,26 +156,24 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $result = $this->timeTracker->getHTMLCommentLogs() . LF . $result;
         unset($this->timeTracker);
 
+        $this->service->resetState();
+
         return $result;
     }
 
     /**
      * Will render the whole form and return the HTML result.
      *
+     * @param array $arguments
      * @return string
      */
-    protected function renderForm()
+    protected function renderForm(array $arguments)
     {
-        $this->formzConfiguration = Core::get()->getConfigurationFactory()
-            ->getFormzConfiguration()
-            ->getObject();
-
         $this->timeTracker->logTime('post-config');
 
-        $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
+        $this->assetHandlerFactory = AssetHandlerFactory::get($this->service->getFormObject(), $this->controllerContext);
 
-        $this->injectFormInstance()
-            ->injectObjectAndRequestResult()
+        $this->injectObjectAndRequestResult()
             ->applyBehavioursOnSubmittedForm()
             ->addDefaultClass()
             ->handleDataAttributes();
@@ -209,30 +190,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->timeTracker->logTime('pre-render');
 
         // Renders the whole Fluid template.
-        $result = call_user_func_array([$this, 'parent::render'], func_get_args());
+        $result = call_user_func_array([$this, 'parent::render'], $arguments);
 
         $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->includeLanguageJavaScriptFiles();
 
-        $this->resetVariables();
-
         return $result;
-    }
-
-    /**
-     * Stores this class instance in the variable container for further usage.
-     *
-     * @throws \Exception
-     * @return $this
-     */
-    protected function injectFormInstance()
-    {
-        if (true === isset(self::$staticVariables[self::FORM_VIEW_HELPER])) {
-            throw new \Exception('You can not use a form view helper inside another one.', 1465242575);
-        }
-
-        self::$staticVariables[self::FORM_VIEW_HELPER] = $this;
-
-        return $this;
     }
 
     /**
@@ -245,69 +207,43 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function injectObjectAndRequestResult()
     {
-        if (false === isset(self::$staticVariables[self::FORM_INSTANCE])
-            || false === isset(self::$staticVariables[self::FORM_RESULT])
+        $this->service->activateFormContext();
+
+        $originalRequest = $this->controllerContext
+            ->getRequest()
+            ->getOriginalRequest();
+
+        if (null !== $originalRequest
+            && $originalRequest->hasArgument($this->getFormObjectName())
         ) {
-            $formInstance = false;
-            $formRequestResult = false;
+            /** @var array $formInstance */
+            $formInstance = $originalRequest->getArgument($this->getFormObjectName());
 
-            $originalRequest = $this->controllerContext
-                ->getRequest()
-                ->getOriginalRequest();
+            $formRequestResult = AbstractFormValidator::getFormValidationResult(
+                $this->getFormObjectClassName(),
+                $this->getFormObjectName()
+            );
 
-            if (null !== $originalRequest
-                && $originalRequest->hasArgument($this->getFormObjectName())
-            ) {
-                $formInstance = $originalRequest->getArgument($this->getFormObjectName());
-                $formRequestResult = AbstractFormValidator::getFormValidationResult(
-                    $this->getFormObjectClassName(),
-                    $this->getFormObjectName()
-                );
+            $this->service->setFormInstance($formInstance);
+            $this->service->setFormResult($formRequestResult);
+            $this->service->markFormAsSubmitted();
+        } elseif (null !== $this->arguments['object']) {
+            $formInstance = $this->arguments['object'];
 
-                self::$staticVariables[self::FORM_WAS_SUBMITTED] = true;
-            } elseif (null !== $this->arguments['object']) {
-                $formInstance = $this->arguments['object'];
-                /*
-                 * @todo: pas forcément un DefaultFormValidator: comment je gère ça?
-                 * + ça prend quand même un peu de temps cette manière. Peut-on faire autrement ?
-                 */
-                /** @var DefaultFormValidator $formValidator */
-                $formValidator = GeneralUtility::makeInstance(
-                    DefaultFormValidator::class,
-                    ['name' => $this->getFormObjectName()]
-                );
-                $formRequestResult = $formValidator->validate($formInstance);
-            }
+            /*
+             * @todo: pas forcément un DefaultFormValidator: comment je gère ça?
+             * + ça prend quand même un peu de temps cette manière. Peut-on faire autrement ?
+             */
+            /** @var DefaultFormValidator $formValidator */
+            $formValidator = GeneralUtility::makeInstance(
+                DefaultFormValidator::class,
+                ['name' => $this->getFormObjectName()]
+            );
+            $formRequestResult = $formValidator->validate($formInstance);
 
-            self::$staticVariables[self::FORM_INSTANCE] = $formInstance;
-            self::$staticVariables[self::FORM_RESULT] = $formRequestResult;
+            $this->service->setFormInstance($formInstance);
+            $this->service->setFormResult($formRequestResult);
         }
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return mixed|null
-     */
-    public static function getVariable($name)
-    {
-        return (isset(self::$staticVariables[$name]))
-            ? self::$staticVariables[$name]
-            : null;
-    }
-
-    /**
-     * Deletes the values stored in the variable container.
-     *
-     * @return $this
-     */
-    protected function resetVariables()
-    {
-        unset(self::$staticVariables[self::FORM_VIEW_HELPER]);
-        unset(self::$staticVariables[self::FORM_INSTANCE]);
-        unset(self::$staticVariables[self::FORM_RESULT]);
-        self::$staticVariables[self::FORM_WAS_SUBMITTED] = false;
 
         return $this;
     }
@@ -320,17 +256,20 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function applyBehavioursOnSubmittedForm()
     {
-        $originalRequest = $this->controllerContext->getRequest()->getOriginalRequest();
-        if (null !== $originalRequest) {
-            if ($originalRequest->hasArgument($this->getFormObjectName())) {
-                /** @var BehavioursManager $behavioursManager */
-                $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
+        $originalRequest = $this->controllerContext
+            ->getRequest()
+            ->getOriginalRequest();
 
-                /** @var array $formProperties */
-                $formProperties = $originalRequest->getArgument($this->getFormObjectName());
-                $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray($formProperties, $this->formObject->getConfiguration());
-                $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
-            }
+        if ($this->service->formWasSubmitted()) {
+            /** @var BehavioursManager $behavioursManager */
+            $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
+
+            $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
+                $this->service->getFormInstance(),
+                $this->service->getFormObject()->getConfiguration()
+            );
+
+            $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
         }
 
         return $this;
@@ -346,9 +285,18 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function addDefaultClass()
     {
+        $formDefaultClass = $this->service
+            ->getFormObject()
+            ->getConfiguration()
+            ->getSettings()
+            ->getDefaultClass();
+
         $class = $this->tag->getAttribute('class');
-        $formDefaultClass = $this->formObject->getConfiguration()->getSettings()->getDefaultClass();
-        $class = $class . ((!empty($class)) ? ' ' : '') . $formDefaultClass;
+
+        if (false === empty($formDefaultClass)) {
+            $class = ((!empty($class)) ? $class . ' ' : '') . $formDefaultClass;
+        }
+
         $this->tag->addAttribute('class', $class);
 
         return $this;
@@ -362,23 +310,23 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function handleDataAttributes()
     {
-        $object = self::$staticVariables[self::FORM_INSTANCE];
-        $requestResult = self::$staticVariables[self::FORM_RESULT];
+        $object = $this->service->getFormInstance();
+        $formResult = $this->service->getFormResult();
 
         /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
         $dataAttributesAssetHandler =  $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
 
         $dataAttributes = [];
-        if (false !== $object) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($object, $requestResult);
+        if ($object) {
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($object, $formResult);
         }
 
-        if (false !== $requestResult) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($requestResult);
+        if ($formResult) {
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($formResult);
 
-            if (true === self::$staticVariables[self::FORM_WAS_SUBMITTED]) {
+            if (true === $this->service->formWasSubmitted()) {
                 $dataAttributes += ['formz-submission-done' => '1'];
-                $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($requestResult);
+                $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($formResult);
             }
         }
 
@@ -472,21 +420,5 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     public function injectPageRenderer(PageRenderer $pageRenderer)
     {
         $this->pageRenderer = $pageRenderer;
-    }
-
-    /**
-     * @return Configuration
-     */
-    public function getFormzConfiguration()
-    {
-        return $this->formzConfiguration;
-    }
-
-    /**
-     * @return FormObject
-     */
-    public function getFormObject()
-    {
-        return $this->formObject;
     }
 }

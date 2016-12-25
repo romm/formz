@@ -63,7 +63,7 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        $this->checkIsInsideFieldViewHelper();
+        $this->service->checkIsInsideFieldViewHelper();
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
