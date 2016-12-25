@@ -37,6 +37,8 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public function render()
     {
+        $this->checkIsInsideFieldViewHelper();
+
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -48,8 +50,6 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        self::checkIsInsideFieldViewHelper($renderingContext);
-
         $closure = SectionViewHelper::getSectionClosure($arguments['section']);
 
         return (null !== $closure)

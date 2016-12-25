@@ -18,8 +18,6 @@ use Romm\Formz\Configuration\View\Classes\ViewClass;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
  * This view helper is used to manage the properties set in TypoScript at the
@@ -42,7 +40,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  * one with the data attribute `formz-field-container`). You may encounter
  * strange behaviours if you do not respect this requirement.
  */
-class ClassViewHelper extends AbstractViewHelper implements CompilableInterface
+class ClassViewHelper extends AbstractViewHelper
 {
     const CLASS_ERRORS = 'errors';
     const CLASS_VALID = 'valid';
@@ -51,6 +49,26 @@ class ClassViewHelper extends AbstractViewHelper implements CompilableInterface
      * @var array
      */
     protected static $acceptedClassesNameSpace = [self::CLASS_ERRORS, self::CLASS_VALID];
+
+    /**
+     * @var Field
+     */
+    protected $fieldName;
+
+    /**
+     * @var string
+     */
+    protected $classValue;
+
+    /**
+     * @var string
+     */
+    protected $classNameSpace;
+
+    /**
+     * @var string
+     */
+    protected $className;
 
     /**
      * @inheritdoc
@@ -66,79 +84,25 @@ class ClassViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
-    }
+        $this->initializeClassNames();
+        $this->initializeClassValue();
+        $this->initializeFieldName();
 
-    /**
-     * See class description.
-     *
-     * @inheritdoc
-     */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
-    {
-        $viewHelperVariableContainer = $renderingContext->getViewHelperVariableContainer();
+        $result = 'formz-' . $this->classNameSpace . '-' . str_replace(' ', '-', $this->classValue);
 
-        if (null === FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER)) {
-            throw new \Exception(
-                'The view helper "' . self::class . '" must be used inside the view helper "' . FormViewHelper::class . '".',
-                1467623374
-            );
-        }
-
-        list($classNameSpace, $className) = GeneralUtility::trimExplode('.', $arguments['name']);
-
-        if (false === in_array($classNameSpace, self::$acceptedClassesNameSpace)) {
-            throw new \Exception(
-                'The class "' . $arguments['name'] . '" is not valid: the namespace of the error must be one of the following: ' . implode(', ', self::$acceptedClassesNameSpace) . '.',
-                1467623504
-            );
-        }
-
-        /** @var FormViewHelper $form */
-        $form = FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
-        $classesConfiguration = $form->getFormzConfiguration()->getView()->getClasses();
-
-        /** @var ViewClass $class */
-        $class = ObjectAccess::getProperty($classesConfiguration, $classNameSpace);
-
-        if (false === $class->hasItem($className)) {
-            throw new \Exception(
-                'The class "' . $arguments['name'] . '" is not valid: the class name "' . $className . '" was not found in the namespace "' . $classNameSpace . '".',
-                1467623662
-            );
-        }
-
-        /** @var Field $field */
-        $field = $arguments['field'];
-        if (null === $field
-            && $viewHelperVariableContainer->exists(FieldViewHelper::class, FieldViewHelper::FIELD_INSTANCE)
-        ) {
-            $field = $viewHelperVariableContainer->get(FieldViewHelper::class, FieldViewHelper::FIELD_INSTANCE);
-        }
-
-        if (null === $field) {
-            throw new \Exception(
-                'The field could not be fetched for the class "' . $arguments['name'] . '": please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
-                1467623761
-            );
-        }
-
-        $classValue = $class->getItem($className);
-        $result = 'formz-' . $classNameSpace . '-' . str_replace(' ', '-', $classValue);
-
-        if (true === FormViewHelper::getVariable(FormViewHelper::FORM_WAS_SUBMITTED)) {
-            $propertyResult = self::getRequestResultForProperty($field->getFieldName());
+        if ($this->service->formWasSubmitted()) {
+            $propertyResult = $this->getRequestResultForProperty($this->fieldName);
 
             if (null !== $propertyResult) {
-                switch ($classNameSpace) {
+                switch ($this->classNameSpace) {
                     case self::CLASS_ERRORS:
                         if (true === $propertyResult->hasErrors()) {
-                            $result .= ' ' . $classValue;
+                            $result .= ' ' . $this->classValue;
                         }
                         break;
                     case self::CLASS_VALID:
                         if (false === $propertyResult->hasErrors()) {
-                            $result .= ' ' . $classValue;
+                            $result .= ' ' . $this->classValue;
                         }
                         break;
                 }
@@ -149,13 +113,83 @@ class ClassViewHelper extends AbstractViewHelper implements CompilableInterface
     }
 
     /**
+     * Will initialize the namespace and name of the class which is given as
+     * argument to this ViewHelper.
+     *
+     * @throws \Exception
+     */
+    protected function initializeClassNames()
+    {
+        list($this->classNameSpace, $this->className) = GeneralUtility::trimExplode('.', $this->arguments['name']);
+
+        if (false === in_array($this->classNameSpace, self::$acceptedClassesNameSpace)) {
+            throw new \Exception(
+                'The class "' . $this->arguments['name'] . '" is not valid: the namespace of the error must be one of the following: ' . implode(', ', self::$acceptedClassesNameSpace) . '.',
+                1467623504
+            );
+        }
+    }
+
+    /**
+     * Fetches the name of the field which should refer to this class. It can
+     * either be a given value, or be empty if the ViewHelper is used inside a
+     * `FieldViewHelper`.
+     *
+     * @throws \Exception
+     */
+    protected function initializeFieldName()
+    {
+        $this->fieldName = $this->arguments['field'];
+
+        if (null === $this->fieldName
+            && $this->service->fieldContextExists($this->renderingContext)
+        ) {
+            $this->fieldName = $this->service
+                ->getCurrentField($this->renderingContext)
+                ->getFieldName();
+        }
+
+        if (null === $this->fieldName) {
+            throw new \Exception(
+                'The field could not be fetched for the class "' . $this->arguments['name'] . '": please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
+                1467623761
+            );
+        }
+    }
+
+    /**
+     * Fetches the corresponding value of this class, which was defined in
+     * TypoScript.
+     *
+     * @throws \Exception
+     */
+    protected function initializeClassValue()
+    {
+        /** @var FormViewHelper $form */
+        $form = FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
+        $classesConfiguration = $form->getFormzConfiguration()->getView()->getClasses();
+
+        /** @var ViewClass $class */
+        $class = ObjectAccess::getProperty($classesConfiguration, $this->classNameSpace);
+
+        if (false === $class->hasItem($this->className)) {
+            throw new \Exception(
+                'The class "' . $this->arguments['name'] . '" is not valid: the class name "' . $this->className . '" was not found in the namespace "' . $this->classNameSpace . '".',
+                1467623662
+            );
+        }
+
+        $this->classValue = $class->getItem($this->className);
+    }
+
+    /**
      * Returns the result for the given property only if the current request has
      * a result for the form.
      *
      * @param string $property
      * @return Result|null
      */
-    protected static function getRequestResultForProperty($property)
+    protected function getRequestResultForProperty($property)
     {
         /** @var Result $requestResult */
         $requestResult = FormViewHelper::getVariable(FormViewHelper::FORM_RESULT);

@@ -49,7 +49,7 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function render()
     {
-        self::checkIsInsideFieldViewHelper($this->renderingContext);
+        $this->checkIsInsideFieldViewHelper();
 
         self::addSectionClosure($this->arguments['name'], $this->buildRenderChildrenClosure());
     }
@@ -62,7 +62,6 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function compile($argumentsVariableName, $renderChildrenClosureVariableName, &$initializationPhpCode, AbstractNode $syntaxTreeNode, TemplateCompiler $templateCompiler)
     {
-        $initializationPhpCode .= self::class . '::checkIsInsideFieldViewHelper($renderingContext);' . LF;
         $initializationPhpCode .= self::class . '::addSectionClosure(' . $argumentsVariableName . "['name'], " . $renderChildrenClosureVariableName . ');' . LF;
 
         return '""';

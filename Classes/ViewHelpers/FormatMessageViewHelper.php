@@ -15,6 +15,7 @@ namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -71,10 +72,10 @@ class FormatMessageViewHelper extends AbstractViewHelper implements CompilableIn
         $fieldName = $arguments['field'];
 
         if (null === $fieldName
-            && null !== self::getCurrentField($renderingContext)
+            && null !== FormzViewHelperService::get()->getCurrentField($renderingContext)
         ) {
             /** @var Field $field */
-            $field = self::getCurrentField($renderingContext);
+            $field = FormzViewHelperService::get()->getCurrentField($renderingContext);
             $fieldName = $field->getFieldName();
         }
 

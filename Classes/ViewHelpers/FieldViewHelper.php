@@ -62,6 +62,8 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
+        $this->checkIsInsideFormViewHelper();
+
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -70,8 +72,6 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        self::checkIsInsideFormViewHelper();
-
         /** @var FormViewHelper $form */
         $form = FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
         $viewConfiguration = $form->getFormzConfiguration()->getView();
