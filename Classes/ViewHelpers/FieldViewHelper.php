@@ -74,7 +74,6 @@ class FieldViewHelper extends AbstractViewHelper
             throw new \Exception('The form "' . $formObject->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.', 1465243619);
         }
 
-
         $this->service->setCurrentField($formConfiguration->getField($fieldName));
 
         $closure = $this->buildRenderChildrenClosure();
