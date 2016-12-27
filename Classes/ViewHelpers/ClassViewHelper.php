@@ -13,8 +13,10 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidEntryException;
+use Romm\Formz\Exceptions\UnregisteredConfigurationException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -51,7 +53,7 @@ class ClassViewHelper extends AbstractViewHelper
     protected static $acceptedClassesNameSpace = [self::CLASS_ERRORS, self::CLASS_VALID];
 
     /**
-     * @var Field
+     * @var string
      */
     protected $fieldName;
 
@@ -88,26 +90,15 @@ class ClassViewHelper extends AbstractViewHelper
         $this->initializeClassValue();
         $this->initializeFieldName();
 
-        $result = 'formz-' . $this->classNameSpace . '-' . str_replace(' ', '-', $this->classValue);
+        $result = vsprintf(
+            'formz-%s-%s',
+            [
+                $this->classNameSpace,
+                str_replace(' ', '-', $this->classValue)
+            ]
+        );
 
-        if ($this->service->formWasSubmitted()) {
-            $propertyResult = $this->getRequestResultForProperty($this->fieldName);
-
-            if (null !== $propertyResult) {
-                switch ($this->classNameSpace) {
-                    case self::CLASS_ERRORS:
-                        if (true === $propertyResult->hasErrors()) {
-                            $result .= ' ' . $this->classValue;
-                        }
-                        break;
-                    case self::CLASS_VALID:
-                        if (false === $propertyResult->hasErrors()) {
-                            $result .= ' ' . $this->classValue;
-                        }
-                        break;
-                }
-            }
-        }
+        $result .= $this->getFormResultClass();
 
         return $result;
     }
@@ -123,7 +114,7 @@ class ClassViewHelper extends AbstractViewHelper
         list($this->classNameSpace, $this->className) = GeneralUtility::trimExplode('.', $this->arguments['name']);
 
         if (false === in_array($this->classNameSpace, self::$acceptedClassesNameSpace)) {
-            throw new \Exception(
+            throw new InvalidEntryException(
                 'The class "' . $this->arguments['name'] . '" is not valid: the namespace of the error must be one of the following: ' . implode(', ', self::$acceptedClassesNameSpace) . '.',
                 1467623504
             );
@@ -141,7 +132,7 @@ class ClassViewHelper extends AbstractViewHelper
     {
         $this->fieldName = $this->arguments['field'];
 
-        if (null === $this->fieldName
+        if (empty($this->fieldName)
             && $this->service->fieldContextExists()
         ) {
             $this->fieldName = $this->service
@@ -150,7 +141,7 @@ class ClassViewHelper extends AbstractViewHelper
         }
 
         if (null === $this->fieldName) {
-            throw new \Exception(
+            throw new EntryNotFoundException(
                 'The field could not be fetched for the class "' . $this->arguments['name'] . '": please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
                 1467623761
             );
@@ -176,13 +167,45 @@ class ClassViewHelper extends AbstractViewHelper
         $class = ObjectAccess::getProperty($classesConfiguration, $this->classNameSpace);
 
         if (false === $class->hasItem($this->className)) {
-            throw new \Exception(
+            throw new UnregisteredConfigurationException(
                 'The class "' . $this->arguments['name'] . '" is not valid: the class name "' . $this->className . '" was not found in the namespace "' . $this->classNameSpace . '".',
                 1467623662
             );
         }
 
         $this->classValue = $class->getItem($this->className);
+    }
+
+    /**
+     * Checks if the form was submitted, then parses its result to handle
+     * classes depending on TypoScript configuration.
+     *
+     * @return string
+     */
+    protected function getFormResultClass()
+    {
+        $result = '';
+
+        if ($this->service->formWasSubmitted()) {
+            $propertyResult = $this->getRequestResultForProperty($this->fieldName);
+
+            if (null !== $propertyResult) {
+                switch ($this->classNameSpace) {
+                    case self::CLASS_ERRORS:
+                        if (true === $propertyResult->hasErrors()) {
+                            $result .= ' ' . $this->classValue;
+                        }
+                        break;
+                    case self::CLASS_VALID:
+                        if (false === $propertyResult->hasErrors()) {
+                            $result .= ' ' . $this->classValue;
+                        }
+                        break;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
