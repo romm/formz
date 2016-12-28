@@ -184,43 +184,37 @@ class ClassViewHelper extends AbstractViewHelper
      */
     protected function getFormResultClass()
     {
-        $result = '';
+        $formResult = $this->service->getFormResult();
+        $propertyResult = ($formResult)
+            ? $formResult->forProperty($this->fieldName)
+            : null;
 
-        if ($this->service->formWasSubmitted()) {
-            $propertyResult = $this->getRequestResultForProperty($this->fieldName);
-
-            if (null !== $propertyResult) {
-                switch ($this->classNameSpace) {
-                    case self::CLASS_ERRORS:
-                        if (true === $propertyResult->hasErrors()) {
-                            $result .= ' ' . $this->classValue;
-                        }
-                        break;
-                    case self::CLASS_VALID:
-                        if (false === $propertyResult->hasErrors()) {
-                            $result .= ' ' . $this->classValue;
-                        }
-                        break;
-                }
-            }
-        }
-
-        return $result;
+        return ($this->service->formWasSubmitted() && null !== $propertyResult)
+            ? $this->getPropertyResultClass($propertyResult)
+            : '';
     }
 
     /**
-     * Returns the result for the given property only if the current request has
-     * a result for the form.
-     *
-     * @param string $property
-     * @return Result|null
+     * @param Result $propertyResult
+     * @return string
      */
-    protected function getRequestResultForProperty($property)
+    protected function getPropertyResultClass(Result $propertyResult)
     {
-        $formResult = $this->service->getFormResult();
+        $result = '';
 
-        return ($formResult)
-            ? $formResult->forProperty($property)
-            : null;
+        switch ($this->classNameSpace) {
+            case self::CLASS_ERRORS:
+                if (true === $propertyResult->hasErrors()) {
+                    $result .= ' ' . $this->classValue;
+                }
+                break;
+            case self::CLASS_VALID:
+                if (false === $propertyResult->hasErrors()) {
+                    $result .= ' ' . $this->classValue;
+                }
+                break;
+        }
+
+        return $result;
     }
 }
