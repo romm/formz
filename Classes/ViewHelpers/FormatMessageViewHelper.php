@@ -15,7 +15,7 @@ namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Romm\Formz\Error\FormzMessageInterface;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -42,7 +42,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
      */
     public function initializeArguments()
     {
-        $this->registerArgument('message', 'string', 'The message which will be formatted.', true);
+        $this->registerArgument('message', 'object', 'The message which will be formatted.', true);
         $this->registerArgument('field', 'string', 'Name of the field which will be managed. By default, it is the field from the current `FieldViewHelper`.');
     }
 
@@ -57,7 +57,13 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $field = $this->getField();
         $formObject = $this->service->getFormObject();
 
-        list($ruleName, $messageKey) = GeneralUtility::trimExplode(':', $message->getTitle());
+        $validationName = ($message instanceof FormzMessageInterface)
+            ? $message->getValidationName()
+            : 'unknown';
+
+        $messageKey = ($message instanceof FormzMessageInterface)
+            ? $message->getMessageKey()
+            : 'unknown';
 
         $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
 
@@ -77,7 +83,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
             [
                 $fieldName,
                 $fieldId,
-                $ruleName,
+                $validationName,
                 $messageType,
                 $messageKey,
                 $message->getMessage()
@@ -89,7 +95,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @return Message
+     * @return Message|FormzMessageInterface
      * @throws \Exception
      */
     protected function getMessage()
@@ -107,7 +113,8 @@ class FormatMessageViewHelper extends AbstractViewHelper
      * @param Message $message
      * @return string
      */
-    protected function getMessageType(Message $message) {
+    protected function getMessageType(Message $message)
+    {
         if ($message instanceof Error) {
             $messageType = 'error';
         } elseif ($message instanceof Warning) {

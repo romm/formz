@@ -14,9 +14,10 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\Core\Core;
+use Romm\Formz\Error\FormzMessageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Validation\Error;
 
 /**
  * Will handle the "one time run" data needed by JavaScript: the submitted
@@ -108,8 +109,15 @@ JS;
 
                     foreach ($formFieldsResult[$fieldName]->getErrors() as $error) {
                         /** @var Error $error */
-                        list($validationName, $errorName) = explode(':', $error->getTitle());
-                        $fieldsErrors[$fieldName][$validationName] = [$errorName => $error->getMessage()];
+                        $validationName = ($error instanceof FormzMessageInterface)
+                            ? $error->getValidationName()
+                            : 'unknown';
+
+                        $messageKey = ($error instanceof FormzMessageInterface)
+                            ? $error->getMessageKey()
+                            : 'unknown';
+
+                        $fieldsErrors[$fieldName][$validationName] = [$messageKey => $error->render()];
                     }
                 }
             }

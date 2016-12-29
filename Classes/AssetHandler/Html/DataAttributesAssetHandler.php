@@ -15,9 +15,9 @@ namespace Romm\Formz\AssetHandler\Html;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -117,11 +117,15 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
                 $result[self::getFieldDataErrorKey($fieldName)] = '1';
 
                 foreach ($fieldResult->getErrors() as $error) {
-                    /** @var Error $error */
-                    $errorTitle = ($error->getTitle())
-                        ? $error->getTitle()
-                        : 'default';
-                    $result[self::getFieldDataValidationErrorKey($fieldName, $errorTitle)] = '1';
+                    $validationName = ($error instanceof FormzMessageInterface)
+                        ? $error->getValidationName()
+                        : 'unknown';
+
+                    $messageKey = ($error instanceof FormzMessageInterface)
+                        ? $error->getMessageKey()
+                        : 'unknown';
+
+                    $result[self::getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)] = '1';
                 }
             }
         }
@@ -193,13 +197,21 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      * Formats the data error attribute key for a given failed validation for
      * the given field name.
      *
-     * @param string $fieldName  Name of the field.
-     * @param string $errorTitle Title of the error.
+     * @param string $fieldName
+     * @param string $validationName
+     * @param string $messageKey
      * @return string
      */
-    public static function getFieldDataValidationErrorKey($fieldName, $errorTitle)
+    public static function getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)
     {
-        return 'formz-error-' . self::getFieldCleanName($fieldName) . '-' . self::getFieldCleanName(str_replace(':', '-', $errorTitle));
+        return vsprintf(
+            'formz-error-%s-%s-%s',
+            [
+                self::getFieldCleanName($fieldName),
+                self::getFieldCleanName($validationName),
+                self::getFieldCleanName($messageKey)
+            ]
+        );
     }
 
     /**

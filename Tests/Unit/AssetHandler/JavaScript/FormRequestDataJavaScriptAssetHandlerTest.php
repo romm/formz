@@ -2,10 +2,10 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
+use Romm\Formz\Error\Error;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
-use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Request;
 
@@ -31,9 +31,18 @@ TXT;
         $request->setOriginalRequest($originalRequest);
 
         $result = new Result();
+        $error = new Error(
+            'error',
+            42,
+            [],
+            '',
+            'foo',
+            'bar'
+        );
+
         $result->forProperty('foo')
             ->forProperty('foo')
-            ->addError(new Error('error', 42, [], 'foo:bar'));
+            ->addError($error);
         $request->setOriginalRequestMappingResults($result);
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
