@@ -16,10 +16,10 @@ namespace Romm\Formz\ViewHelpers;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
 use TYPO3\CMS\Extbase\Error\Warning;
-use TYPO3\CMS\Extbase\Validation\Error;
 
 /**
  * This view helper can format the validation result messages of a field.
@@ -51,55 +51,16 @@ class FormatMessageViewHelper extends AbstractViewHelper
      */
     public function render()
     {
-        $message = $this->arguments['message'];
-        if (false === $message instanceof Message) {
-            throw new \Exception('The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . Message::class . '".', 1467021406);
-        }
-
-        $fieldName = $this->arguments['field'];
-
-        if (null === $fieldName
-            && null !== $this->service->getCurrentField()
-        ) {
-            /** @var Field $field */
-            $field = $this->service->getCurrentField();
-            $fieldName = $field->getFieldName();
-        }
-
-        if (null === $fieldName) {
-            throw new \Exception(
-                'The field could not be fetched, please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
-                1467624152
-            );
-        }
-
+        $message = $this->getMessage();
+        $messageType = $this->getMessageType($message);
+        $fieldName = $this->getFieldName();
+        $field = $this->getField();
         $formObject = $this->service->getFormObject();
-
-        if (false === $formObject->getConfiguration()->hasField($fieldName)) {
-            throw new \Exception(
-                vsprintf(
-                    'The Form "%s" does not have a field "%s"',
-                    [$formObject->getName(), $fieldName]
-                ),
-                1473084335
-            );
-        }
-
-        $field = $formObject->getConfiguration()->getField($fieldName);
-
-        if ($message instanceof Error) {
-            $messageType = 'error';
-        } elseif ($message instanceof Warning) {
-            $messageType = 'warning';
-        } elseif ($message instanceof Notice) {
-            $messageType = 'notice';
-        } else {
-            $messageType = 'message';
-        }
 
         list($ruleName, $messageKey) = GeneralUtility::trimExplode(':', $message->getTitle());
 
         $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+
         $fieldId = ($templateVariableContainer->exists('fieldId'))
             ? $templateVariableContainer->get('fieldId')
             : DataAttributesAssetHandler::getFieldCleanName('formz-' . $formObject->getName() . '-' . $fieldName);
@@ -125,5 +86,85 @@ class FormatMessageViewHelper extends AbstractViewHelper
         );
 
         return $result;
+    }
+
+    /**
+     * @return Message
+     * @throws \Exception
+     */
+    protected function getMessage()
+    {
+        $message = $this->arguments['message'];
+
+        if (false === $message instanceof Message) {
+            throw new \Exception('The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . Message::class . '".', 1467021406);
+        }
+
+        return $message;
+    }
+
+    /**
+     * @param Message $message
+     * @return string
+     */
+    protected function getMessageType(Message $message) {
+        if ($message instanceof Error) {
+            $messageType = 'error';
+        } elseif ($message instanceof Warning) {
+            $messageType = 'warning';
+        } elseif ($message instanceof Notice) {
+            $messageType = 'notice';
+        } else {
+            $messageType = 'message';
+        }
+
+        return $messageType;
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    protected function getFieldName()
+    {
+        $fieldName = $this->arguments['field'];
+
+        if (null === $fieldName
+            && null !== $this->service->getCurrentField()
+        ) {
+            $field = $this->service->getCurrentField();
+            $fieldName = $field->getFieldName();
+        }
+
+        if (null === $fieldName) {
+            throw new \Exception(
+                'The field could not be fetched, please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
+                1467624152
+            );
+        }
+
+        return $fieldName;
+    }
+
+    /**
+     * @return Field
+     * @throws \Exception
+     */
+    protected function getField()
+    {
+        $formObject = $this->service->getFormObject();
+        $fieldName = $this->getFieldName();
+
+        if (false === $formObject->getConfiguration()->hasField($fieldName)) {
+            throw new \Exception(
+                vsprintf(
+                    'The Form "%s" does not have a field "%s"',
+                    [$formObject->getName(), $fieldName]
+                ),
+                1473084335
+            );
+        }
+
+        return $formObject->getConfiguration()->getField($fieldName);
     }
 }
