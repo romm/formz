@@ -108,6 +108,27 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     /**
      * @inheritdoc
      */
+    public function initialize()
+    {
+        parent::initialize();
+
+        /*
+         * Important: we need to instantiate the page renderer with this instead
+         * of Extbase object manager (or with an inject function).
+         *
+         * This is due to some TYPO3 low level behaviour which overrides the
+         * page renderer singleton instance, whenever a new request is used. The
+         * problem is that the instance is not updated on Extbase side.
+         *
+         * Using Extbase injection can lead to old page renderer instance being
+         * used, resulting in a leak of assets inclusion, and maybe more issues.
+         */
+        $this->pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function initializeArguments()
     {
         parent::initializeArguments();
@@ -464,14 +485,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         }
 
         return $this->formObjectClassName;
-    }
-
-    /**
-     * @param PageRenderer $pageRenderer
-     */
-    public function injectPageRenderer(PageRenderer $pageRenderer)
-    {
-        $this->pageRenderer = $pageRenderer;
     }
 
     /**
