@@ -10,7 +10,6 @@ use Romm\Formz\Validation\Validator\RequiredValidator;
 
 class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
-
     use AssetHandlerTestTrait;
 
     /**

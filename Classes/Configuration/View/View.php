@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -83,7 +83,7 @@ class View extends AbstractFormzConfiguration
      */
     public function hasLayout($layoutName)
     {
-        return (true === isset($this->layouts[$layoutName]));
+        return true === isset($this->layouts[$layoutName]);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -22,7 +22,6 @@ use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
  */
 class FieldIsValidCondition extends AbstractConditionItem
 {
-
     const CONDITION_NAME = 'fieldIsValid';
 
     /**
@@ -63,10 +62,10 @@ class FieldIsValidCondition extends AbstractConditionItem
         $result = $dataObject->getFormValidator()
             ->validateField($this->fieldName);
 
-        return (
+        return
             false === $result->forProperty($this->fieldName)->hasErrors()
             && false === $result->fieldIsDeactivated($this->fieldName)
-        );
+        ;
     }
 
     /**

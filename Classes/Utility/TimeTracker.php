@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Utility;
 
-use \TYPO3\CMS\Core\TimeTracker\TimeTracker as TYPO3TimeTracker;
+use TYPO3\CMS\Core\TimeTracker\TimeTracker as TYPO3TimeTracker;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -33,7 +33,7 @@ class TimeTracker extends TYPO3TimeTracker
     public static function getAndStart()
     {
         /** @var TimeTracker $timeTracker */
-        $timeTracker = GeneralUtility::makeInstance(TimeTracker::class);
+        $timeTracker = GeneralUtility::makeInstance(self::class);
         $timeTracker->start();
 
         return $timeTracker;

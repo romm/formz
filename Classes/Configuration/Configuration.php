@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -29,7 +29,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
 {
-
     use DefaultConfigurationObjectTrait;
     use ArrayConversionTrait;
 
@@ -119,7 +118,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public function hasForm($className, $name)
     {
-        return (true === isset($this->forms[$className][$name]));
+        return true === isset($this->forms[$className][$name]);
     }
 
     /**

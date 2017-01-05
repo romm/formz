@@ -6,7 +6,6 @@ use Romm\Formz\Form\FormTrait;
 
 class DefaultForm implements FormInterface
 {
-
     use FormTrait;
 
     /**

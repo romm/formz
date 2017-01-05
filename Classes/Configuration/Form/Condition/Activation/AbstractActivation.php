@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -21,7 +21,6 @@ use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface
 {
-
     use ParentsTrait;
 
     /**
@@ -31,7 +30,6 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
 
     /**
      * @var \ArrayObject<Romm\Formz\Configuration\Form\Condition\ConditionItemResolver>
-     * @validate NotEmpty
      */
     protected $items = [];
 
@@ -69,7 +67,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     {
         $items = $this->getItems();
 
-        return (true === isset($items[$itemName]));
+        return true === isset($items[$itemName]);
     }
 
     /**

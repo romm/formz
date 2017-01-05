@@ -6,8 +6,8 @@
 conf.py:
   copyright: 2016
   project: Formz
-  version: 0.3.0
-  release: 0.3.0
+  version: 0.3.1
+  release: 0.3.1
   language: fr
   pdf_language: fr_FR
   latex_documents:

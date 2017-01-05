@@ -9,7 +9,6 @@ use Romm\Formz\Validation\Validator\RequiredValidator;
 
 class FormzLocalizationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
-
     use AssetHandlerTestTrait;
 
     /**
@@ -49,14 +48,14 @@ TXT;
         $jsonTranslationsBinding = '';
 
         $formzLocalizationJavaScriptAssetHandler->method('handleRealTranslations')
-            ->willReturnCallback(function($realTranslations) use (&$jsonRealTranslations) {
+            ->willReturnCallback(function ($realTranslations) use (&$jsonRealTranslations) {
                 $jsonRealTranslations = $realTranslations;
 
                 return $realTranslations;
             });
 
         $formzLocalizationJavaScriptAssetHandler->method('handleTranslationsBinding')
-            ->willReturnCallback(function($translationsBinding) use (&$jsonTranslationsBinding) {
+            ->willReturnCallback(function ($translationsBinding) use (&$jsonTranslationsBinding) {
                 $jsonTranslationsBinding = $translationsBinding;
 
                 return $translationsBinding;

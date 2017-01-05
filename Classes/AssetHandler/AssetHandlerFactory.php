@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -76,7 +76,7 @@ class AssetHandlerFactory
         $hash = md5(spl_object_hash($formObject) . spl_object_hash($controllerContext));
 
         if (false === array_key_exists($hash, self::$factoryInstances)) {
-            self::$factoryInstances[$hash] = new AssetHandlerFactory($formObject, $controllerContext);
+            self::$factoryInstances[$hash] = new self($formObject, $controllerContext);
         }
 
         return self::$factoryInstances[$hash];

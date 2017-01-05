@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -23,9 +23,9 @@ use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Utility\FormUtility;
 use Romm\Formz\Validation\Validator\AbstractValidator;
-use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
+use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\GenericObjectValidator;
 
 /**

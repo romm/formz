@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Condition\Processor;
 
-use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\ConditionParserFactory;
+use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Configuration\Form\Field\Field;
