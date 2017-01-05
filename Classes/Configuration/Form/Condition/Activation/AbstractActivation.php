@@ -30,7 +30,6 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
 
     /**
      * @var \ArrayObject<Romm\Formz\Configuration\Form\Condition\ConditionItemResolver>
-     * @validate NotEmpty
      */
     protected $items = [];
 
