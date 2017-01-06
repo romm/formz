@@ -14,8 +14,8 @@
 namespace Romm\Formz\AssetHandler\Html;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -117,13 +117,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
                 $result[self::getFieldDataErrorKey($fieldName)] = '1';
 
                 foreach ($fieldResult->getErrors() as $error) {
-                    $validationName = ($error instanceof FormzMessageInterface)
-                        ? $error->getValidationName()
-                        : 'unknown';
-
-                    $messageKey = ($error instanceof FormzMessageInterface)
-                        ? $error->getMessageKey()
-                        : 'unknown';
+                    $validationName = Core::get()->getMessageValidationName($error);
+                    $messageKey = Core::get()->getMessageKey($error);
 
                     $result[self::getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)] = '1';
                 }

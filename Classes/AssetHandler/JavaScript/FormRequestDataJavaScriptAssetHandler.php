@@ -14,7 +14,6 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\Error\FormzMessageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -109,13 +108,8 @@ JS;
 
                     foreach ($formFieldsResult[$fieldName]->getErrors() as $error) {
                         /** @var Error $error */
-                        $validationName = ($error instanceof FormzMessageInterface)
-                            ? $error->getValidationName()
-                            : 'unknown';
-
-                        $messageKey = ($error instanceof FormzMessageInterface)
-                            ? $error->getMessageKey()
-                            : 'unknown';
+                        $validationName = Core::get()->getMessageValidationName($error);
+                        $messageKey = Core::get()->getMessageKey($error);
 
                         $fieldsErrors[$fieldName][$validationName] = [$messageKey => $error->render()];
                     }

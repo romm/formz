@@ -14,6 +14,7 @@
 namespace Romm\Formz\Core;
 
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -26,6 +27,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
@@ -383,6 +385,36 @@ class Core implements SingletonInterface
             ),
             '/'
         );
+    }
+
+    /**
+     * Returns the validation name of a message: if it is an instance of
+     * `FormzMessageInterface`, we can fetch it, otherwise `unknown` is
+     * returned.
+     *
+     * @param Message $message
+     * @return string
+     */
+    public function getMessageValidationName(Message $message)
+    {
+        return ($message instanceof FormzMessageInterface)
+            ? $message->getValidationName()
+            : 'unknown';
+    }
+
+    /**
+     * Returns the key of a message: if it is an instance of
+     * `FormzMessageInterface`, we can fetch it, otherwise `unknown` is
+     * returned.
+     *
+     * @param Message $message
+     * @return string
+     */
+    public function getMessageKey(Message $message)
+    {
+        return ($message instanceof FormzMessageInterface)
+            ? $message->getMessageKey()
+            : 'unknown';
     }
 
     /**

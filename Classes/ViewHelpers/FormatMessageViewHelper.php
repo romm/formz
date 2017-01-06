@@ -15,6 +15,7 @@ namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormzMessageInterface;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
@@ -52,18 +53,9 @@ class FormatMessageViewHelper extends AbstractViewHelper
     public function render()
     {
         $message = $this->getMessage();
-        $messageType = $this->getMessageType($message);
         $fieldName = $this->getFieldName();
         $field = $this->getField();
         $formObject = $this->service->getFormObject();
-
-        $validationName = ($message instanceof FormzMessageInterface)
-            ? $message->getValidationName()
-            : 'unknown';
-
-        $messageKey = ($message instanceof FormzMessageInterface)
-            ? $message->getMessageKey()
-            : 'unknown';
 
         $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
 
@@ -75,17 +67,17 @@ class FormatMessageViewHelper extends AbstractViewHelper
             [
                 '#FIELD#',
                 '#FIELD_ID#',
-                '#VALIDATOR#',
                 '#TYPE#',
+                '#VALIDATOR#',
                 '#KEY#',
                 '#MESSAGE#'
             ],
             [
                 $fieldName,
                 $fieldId,
-                $validationName,
-                $messageType,
-                $messageKey,
+                $this->getMessageType($message),
+                Core::get()->getMessageValidationName($message),
+                Core::get()->getMessageKey($message),
                 $message->getMessage()
             ],
             $field->getSettings()->getMessageTemplate()
