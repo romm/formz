@@ -23,6 +23,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      * @param array                  $arguments Arguments sent to the view helper.
      * @param FormzViewHelperService $service
      * @param string                 $expectedException
+     *
      * @test
      * @dataProvider renderViewHelperDataProvider
      */
@@ -68,6 +69,8 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
 
     /**
      * Data provider for function `renderViewHelper()`.
+     *
+     * @return array
      */
     public function renderViewHelperDataProvider()
     {
