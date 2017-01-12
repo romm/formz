@@ -10,7 +10,7 @@ abstract class AbstractViewHelperUnitTest extends ViewHelperBaseTestcase
     use ConfigurationObjectUnitTestUtility;
     use FormzUnitTestUtility;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
@@ -21,7 +21,7 @@ abstract class AbstractViewHelperUnitTest extends ViewHelperBaseTestcase
      * After every test, we reset some class which may have change and not be
      * reset correctly.
      */
-    protected function tearDown()
+    public function tearDown()
     {
         $this->formzTearDown();
     }
