@@ -20,12 +20,12 @@ class Error extends \TYPO3\CMS\Extbase\Validation\Error implements FormzMessageI
     /**
      * @param string $message
      * @param int    $code
-     * @param array  $arguments
-     * @param string $title
      * @param string $validationName
      * @param string $messageKey
+     * @param array  $arguments
+     * @param string $title
      */
-    public function __construct($message, $code, array $arguments = [], $title = '', $validationName, $messageKey)
+    public function __construct($message, $code, $validationName, $messageKey, array $arguments = [], $title = '')
     {
         parent::__construct($message, $code, $arguments, $title);
 
