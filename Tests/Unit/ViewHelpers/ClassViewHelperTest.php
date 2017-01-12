@@ -1,5 +1,5 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Form;
+namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormResult;
@@ -8,12 +8,11 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
-use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
 use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
 use TYPO3\CMS\Extbase\Error\Error;
 
-class ClassViewHelperTest extends AbstractUnitTest
+class ClassViewHelperTest extends AbstractViewHelperUnitTest
 {
     /**
      * Main function that is used to call the view helper with several scopes
