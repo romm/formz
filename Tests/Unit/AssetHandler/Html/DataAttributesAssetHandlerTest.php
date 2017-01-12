@@ -60,10 +60,10 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                 $error = new Error(
                     $errorData['message'],
                     42,
-                    [],
-                    '',
                     $errorData['validationName'],
-                    $errorData['messageKey']
+                    $errorData['messageKey'],
+                    [],
+                    ''
                 );
                 $requestResult->forProperty($fieldName)->addError($error);
             }

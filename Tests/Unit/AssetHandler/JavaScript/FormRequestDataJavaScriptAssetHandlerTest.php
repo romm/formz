@@ -34,10 +34,10 @@ TXT;
         $error = new Error(
             'error',
             42,
-            [],
-            '',
             'foo',
-            'bar'
+            'bar',
+            [],
+            ''
         );
 
         $result->forProperty('foo')
