@@ -1,8 +1,11 @@
 <?php
 namespace Romm\Formz\Tests\Unit;
 
+use Romm\Formz\AssetHandler\AssetHandlerFactory;
+use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
 use Romm\Formz\Utility\TypoScriptUtility;
@@ -37,6 +40,41 @@ trait FormzUnitTestUtility
      * @var array
      */
     protected $extensionConfiguration = [];
+
+    /**
+     * Can be used in the `setUp()` function of every unit test.
+     */
+    protected function formzSetUp()
+    {
+        $this->initializeConfigurationObjectTestServices();
+        $this->setUpFormzCore();
+
+        ConditionFactory::get()->registerDefaultConditions();
+    }
+
+    /**
+     * Can be used in the `tearDown()` function of every unit test.
+     */
+    protected function formzTearDown()
+    {
+        // Reset asset handler factory instances.
+        $reflectedCore = new \ReflectionClass(AssetHandlerFactory::class);
+        $objectManagerProperty = $reflectedCore->getProperty('factoryInstances');
+        $objectManagerProperty->setAccessible(true);
+        $objectManagerProperty->setValue([]);
+        $objectManagerProperty->setAccessible(false);
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getFormObject()
+    {
+        return new FormObject(
+            AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
+            AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
+        );
+    }
 
     /**
      * Initializes correctly this extension `Core` class to be able to work
