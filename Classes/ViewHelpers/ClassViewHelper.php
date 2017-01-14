@@ -107,7 +107,7 @@ class ClassViewHelper extends AbstractViewHelper
      * Will initialize the namespace and name of the class which is given as
      * argument to this ViewHelper.
      *
-     * @throws \Exception
+     * @throws InvalidEntryException
      */
     protected function initializeClassNames()
     {
@@ -126,7 +126,7 @@ class ClassViewHelper extends AbstractViewHelper
      * either be a given value, or be empty if the ViewHelper is used inside a
      * `FieldViewHelper`.
      *
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     protected function initializeFieldName()
     {
@@ -152,7 +152,7 @@ class ClassViewHelper extends AbstractViewHelper
      * Fetches the corresponding value of this class, which was defined in
      * TypoScript.
      *
-     * @throws \Exception
+     * @throws UnregisteredConfigurationException
      */
     protected function initializeClassValue()
     {

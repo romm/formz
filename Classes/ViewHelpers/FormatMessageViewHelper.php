@@ -17,6 +17,9 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormzMessageInterface;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Exceptions\InvalidEntryException;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -95,7 +98,10 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $message = $this->arguments['message'];
 
         if (false === $message instanceof Message) {
-            throw new \Exception('The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . Message::class . '".', 1467021406);
+            throw new InvalidArgumentTypeException(
+                'The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . Message::class . '".',
+                1467021406
+            );
         }
 
         return $message;
@@ -128,15 +134,15 @@ class FormatMessageViewHelper extends AbstractViewHelper
     {
         $fieldName = $this->arguments['field'];
 
-        if (null === $fieldName
-            && null !== $this->service->getCurrentField()
+        if (empty($fieldName)
+            && $this->service->fieldContextExists()
         ) {
             $field = $this->service->getCurrentField();
             $fieldName = $field->getFieldName();
         }
 
         if (null === $fieldName) {
-            throw new \Exception(
+            throw new InvalidEntryException(
                 'The field could not be fetched, please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
                 1467624152
             );
@@ -155,7 +161,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $fieldName = $this->getFieldName();
 
         if (false === $formObject->getConfiguration()->hasField($fieldName)) {
-            throw new \Exception(
+            throw new EntryNotFoundException(
                 vsprintf(
                     'The Form "%s" does not have a field "%s"',
                     [$formObject->getName(), $fieldName]

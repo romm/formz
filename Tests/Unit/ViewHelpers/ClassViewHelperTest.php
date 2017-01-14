@@ -18,14 +18,14 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      * Main function that is used to call the view helper with several scopes
      * and data, sent by the data provider.
      *
+     * @test
+     * @dataProvider renderViewHelperDataProvider
+     *
      * @param string                 $expects   The expected result returned by the view helper.
      * @param array                  $classes   Array of classes which will be injected in the Formz configuration object.
      * @param array                  $arguments Arguments sent to the view helper.
      * @param FormzViewHelperService $service
      * @param string                 $expectedException
-     *
-     * @test
-     * @dataProvider renderViewHelperDataProvider
      */
     public function renderViewHelper(
         $expects,
