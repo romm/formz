@@ -89,7 +89,7 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments = is_array($this->arguments['arguments'])
             ? $this->arguments['arguments']
             : [];
-        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, OptionViewHelper::getOption());
+        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, $this->service->getFieldOptions());
 
         /*
          * Keeping a trace of potential original arguments which will be
@@ -121,10 +121,10 @@ class FieldViewHelper extends AbstractViewHelper
             ->getViewHelperVariableContainer()
             ->setView($currentView);
 
-        $this->service->removeCurrentField();
-
+        $this->service
+            ->removeCurrentField()
+            ->resetFieldOptions();
         SectionViewHelper::resetSectionClosures();
-        OptionViewHelper::resetOptions();
 
         self::restoreOriginalArguments($this->renderingContext, $templateArguments, $originalArguments);
 

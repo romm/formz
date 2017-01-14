@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -73,34 +75,9 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        self::$options[$arguments['name']] = $arguments['value'];
-    }
+        /** @var FormzViewHelperService $service */
+        $service = GeneralUtility::makeInstance(FormzViewHelperService::class);
 
-    /**
-     * Returns a given option if `$name` is specified, otherwise it returns the
-     * full options array.
-     *
-     * @param string $name
-     * @return mixed|null
-     */
-    public static function getOption($name = null)
-    {
-        if (null === $name) {
-            $result = self::$options;
-        } else {
-            $result = (isset(self::$options[$name]))
-                ? self::$options[$name]
-                : null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Resets the options array.
-     */
-    public static function resetOptions()
-    {
-        self::$options = [];
+        $service->setFieldOption($arguments['name'], $arguments['value']);
     }
 }

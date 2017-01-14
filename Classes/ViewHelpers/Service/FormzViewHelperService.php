@@ -30,12 +30,6 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class FormzViewHelperService implements SingletonInterface
 {
-
-    /**
-     * @var FormzViewHelperService
-     */
-    protected static $instance;
-
     /**
      * @var bool
      */
@@ -65,6 +59,11 @@ class FormzViewHelperService implements SingletonInterface
      * @var FormObject
      */
     protected $formObject;
+
+    /**
+     * @var array
+     */
+    protected $fieldOptions = [];
 
     /**
      * Reset every state that can be used by this service.
@@ -157,11 +156,42 @@ class FormzViewHelperService implements SingletonInterface
     }
 
     /**
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function setFieldOption($name, $value)
+    {
+        $this->fieldOptions[$name] = $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldOptions()
+    {
+        return $this->fieldOptions;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetFieldOptions()
+    {
+        $this->fieldOptions = [];
+
+        return $this;
+    }
+
+    /**
      * Unset the current field.
+     *
+     * @return $this
      */
     public function removeCurrentField()
     {
         $this->currentField = null;
+
+        return $this;
     }
 
     /**
