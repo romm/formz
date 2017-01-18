@@ -123,7 +123,16 @@ Formz.Form = (function () {
              * @returns {HTMLFormElement}
              */
             getElement: function () {
-                return element;
+                var formElements = window.document.getElementsByName(name);
+
+                if (formElements.length === 0) {
+                    Formz.debug(
+                        'Could not get the DOM element for the form "' + name + '"!',
+                        Formz.TYPE_ERROR
+                    )
+                }
+
+                return formElements[0];
             },
 
             getConfiguration: function () {
@@ -198,23 +207,23 @@ Formz.Form = (function () {
 
         /**
          * When a field is validated, the form is entirely checked to see if all
-		 * fields are valid, in which case an attribute is added to the form DOM
-		 * element: `formz-valid`.
-		 *
-		 * Several usages can be found for this: for instance, the submission
-		 * button can be shown only when the form is valid (logical behaviour
-		 * since the submission is canceled whenever an error is found).
+         * fields are valid, in which case an attribute is added to the form DOM
+         * element: `formz-valid`.
+         *
+         * Several usages can be found for this: for instance, the submission
+         * button can be shown only when the form is valid (logical behaviour
+         * since the submission is canceled whenever an error is found).
          */
-        Formz.Form.get(name, function() {
-            var checkFormIsValid = function() {
+        Formz.Form.get(name, function () {
+            var checkFormIsValid = function () {
                 var globalFlag = true;
                 var fieldsNumber = Formz.objectSize(fields);
                 var fieldsChecked = 0;
 
                 /**
                  * Function called every time a field has been checked. When all
-				 * fields have been checked, the form attribute is added or
-				 * removed, depending on if errors were found.
+                 * fields have been checked, the form attribute is added or
+                 * removed, depending on if errors were found.
                  */
                 var checkAllFieldsWereProcessed = function () {
                     if (fieldsNumber === fieldsChecked) {
@@ -228,18 +237,18 @@ Formz.Form = (function () {
 
                 /**
                  * Checks if the given field is valid. There can be several
-				 * steps, for instance depending on if the field was already
-				 * validated.
+                 * steps, for instance depending on if the field was already
+                 * validated.
                  *
                  * @param {Formz.FullField} field
                  */
-                var checkFieldIsValid = function(field) {
+                var checkFieldIsValid = function (field) {
                     var flag = false;
                     fieldsChecked++;
 
                     field.getActivatedValidationRules(function (validationRules) {
                         if (0 === Formz.objectSize(validationRules)) {
-							// If the field does not have any validation rule, it is obviously considered valid.
+                            // If the field does not have any validation rule, it is obviously considered valid.
                             flag = true;
                         } else {
                             if (field.wasValidated()) {
@@ -349,22 +358,15 @@ Formz.Form = (function () {
          * @param {string} configuration
          */
         register: function (name, configuration) {
-            var formElements = window.document.getElementsByName(name);
+            var form = formPrototype({
+                name: name,
+                configuration: configuration
+            });
 
-            if (formElements.length > 0) {
-                var element = formElements[0];
-                var states = {
-                    name: name,
-                    element: element,
-                    configuration: configuration
-                };
-
-                var form = formPrototype(states);
-                formsRepository[name] = Formz.extend(
-                    form,
-                    Formz.Form.SubmissionService.get(name)
-                );
-            }
+            formsRepository[name] = Formz.extend(
+                form,
+                Formz.Form.SubmissionService.get(name)
+            );
         },
 
         /**
