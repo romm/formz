@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -114,7 +114,7 @@ class FormatMessageViewHelper extends AbstractViewHelper implements CompilableIn
 
         $fieldId = ($renderingContext->getTemplateVariableContainer()->exists('fieldId'))
             ? $renderingContext->getTemplateVariableContainer()->get('fieldId')
-            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $form->getFormObject()->getName() . '-' . $fieldName);
+            : Core::get()->sanitizeString('formz-' . $form->getFormObject()->getName() . '-' . $fieldName);
 
         $result = str_replace(
             [
