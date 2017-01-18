@@ -364,6 +364,10 @@ class Core implements SingletonInterface
     {
         $relativePath = ExtensionManagementUtility::siteRelPath('formz');
 
+        if ($this->environmentService->isEnvironmentInBackendMode()) {
+            $relativePath = '../' . $relativePath;
+        }
+
         return (null !== $path)
             ? $relativePath . $path
             : $relativePath;
@@ -375,13 +379,19 @@ class Core implements SingletonInterface
      */
     public function getResourceRelativePath($path)
     {
-        return rtrim(
+        $relativePath = rtrim(
             PathUtility::getRelativePath(
                 GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT'),
                 GeneralUtility::getFileAbsFileName($path)
             ),
             '/'
         );
+
+        if ($this->environmentService->isEnvironmentInBackendMode()) {
+            $relativePath = '../' . $relativePath;
+        }
+
+        return $relativePath;
     }
 
     /**
