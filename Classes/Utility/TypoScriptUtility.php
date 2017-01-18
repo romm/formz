@@ -134,17 +134,16 @@ class TypoScriptUtility implements SingletonInterface
 
         if (null === $result) {
             $result = $this->getConfiguration($pageUid);
-
             $result = (ArrayUtility::isValidPath($result, self::EXTENSION_CONFIGURATION_PATH, '.'))
                 ? ArrayUtility::getValueByPath($result, self::EXTENSION_CONFIGURATION_PATH, '.')
                 : [];
 
-            $hash = 'ts-conf-page-' . sha1(serialize($result));
-
-            $cacheInstance->set($hash, $result);
-
-            $this->pagesConfigurationHashes[$pageUid] = $hash;
-            $cacheInstance->set(self::PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER, $this->pagesConfigurationHashes);
+            if (ArrayUtility::isValidPath($result, 'settings.typoScriptIncluded', '.')) {
+                $hash = 'ts-conf-page-' . sha1(serialize($result));
+                $cacheInstance->set($hash, $result);
+                $this->pagesConfigurationHashes[$pageUid] = $hash;
+                $cacheInstance->set(self::PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER, $this->pagesConfigurationHashes);
+            }
         }
 
         return $result;
