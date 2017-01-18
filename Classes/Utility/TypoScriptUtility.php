@@ -18,7 +18,6 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Service\TypoScriptService;
 
 /**
@@ -27,11 +26,6 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService;
 class TypoScriptUtility implements SingletonInterface
 {
     const EXTENSION_CONFIGURATION_PATH = 'config.tx_formz';
-
-    /**
-     * @var EnvironmentService
-     */
-    protected $environmentService;
 
     /**
      * @var TypoScriptService
@@ -131,18 +125,35 @@ class TypoScriptUtility implements SingletonInterface
         $contextHash = $this->getContextHash();
 
         if (false === array_key_exists($contextHash, $this->configuration)) {
-            if ($this->environmentService->isEnvironmentInFrontendMode()) {
-                $typoScriptArray = Core::get()->getPageController()->tmpl->setup;
+            if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+                $typoScriptArray = $this->getFrontendTypoScriptConfiguration();
             } else {
-                /** @var ConfigurationManager $configurationManager */
-                $configurationManager = Core::get()->getObjectManager()->get(ConfigurationManager::class);
-                $typoScriptArray = $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
+                $typoScriptArray = $this->getBackendTypoScriptConfiguration();
             }
 
             $this->configuration[$contextHash] = $this->typoScriptService->convertTypoScriptArrayToPlainArray($typoScriptArray);
         }
 
         return $this->configuration[$contextHash];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFrontendTypoScriptConfiguration()
+    {
+        return Core::get()->getPageController()->tmpl->setup;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getBackendTypoScriptConfiguration()
+    {
+        /** @var ConfigurationManager $configurationManager */
+        $configurationManager = Core::get()->getObjectManager()->get(ConfigurationManager::class);
+
+        return $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
     }
 
     /**
@@ -153,19 +164,11 @@ class TypoScriptUtility implements SingletonInterface
      */
     protected function getContextHash()
     {
-        $hash = ($this->environmentService->isEnvironmentInFrontendMode())
+        $hash = (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode())
             ? 'fe-' . Core::get()->getCurrentPageUid()
             : 'be-' . Core::get()->sanitizeString(GeneralUtility::_GET('M'));
 
         return 'ts-conf-' . $hash;
-    }
-
-    /**
-     * @param EnvironmentService $environmentService
-     */
-    public function injectEnvironmentService(EnvironmentService $environmentService)
-    {
-        $this->environmentService = $environmentService;
     }
 
     /**
