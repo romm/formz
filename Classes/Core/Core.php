@@ -386,6 +386,23 @@ class Core implements SingletonInterface
     }
 
     /**
+     * Sanitizes a string: lower case with dash separation.
+     *
+     * @param string $string
+     * @return string
+     */
+    public function sanitizeString($string)
+    {
+        $string = str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($string));
+
+        while (strpos($string, '--')) {
+            $string = str_replace('--', '-', $string);
+        }
+
+        return $string;
+    }
+
+    /**
      * @return ObjectManagerInterface
      */
     public function getObjectManager()

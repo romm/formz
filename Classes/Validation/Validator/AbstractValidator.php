@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Validation\Message;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
@@ -176,7 +175,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
                 $this->getMessage($key, $arguments),
                 $code,
                 [],
-                DataAttributesAssetHandler::getFieldCleanName(AbstractFormValidator::getCurrentValidationName() . ':' . $key)
+                Core::get()->sanitizeString(AbstractFormValidator::getCurrentValidationName() . ':' . $key)
             );
         }
     }
