@@ -92,7 +92,7 @@ class ConfigurationFactory implements SingletonInterface
      */
     protected function buildFormzConfiguration()
     {
-        $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
+        $configuration = Core::get()->getTypoScriptService()->getFormzConfiguration();
         $instance = ConfigurationObjectFactory::getInstance()
             ->get(Configuration::class, $configuration);
 
@@ -111,7 +111,7 @@ class ConfigurationFactory implements SingletonInterface
         $pageUid = Core::get()->getCurrentPageUid();
 
         if (false === array_key_exists($pageUid, $this->cacheIdentifiers)) {
-            $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
+            $configuration = Core::get()->getTypoScriptService()->getFormzConfiguration();
 
             $this->cacheIdentifiers[$pageUid] = 'formz-configuration-' . sha1(serialize($configuration));
         }

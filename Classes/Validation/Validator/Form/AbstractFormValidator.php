@@ -21,7 +21,7 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\Utility\FormUtility;
+use Romm\Formz\Service\FormService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -238,7 +238,7 @@ abstract class AbstractFormValidator extends GenericObjectValidator
 
         if ($this->result->hasErrors()) {
             // Storing the form for possible third party further usage.
-            FormUtility::addFormWithErrors($this->form);
+            FormService::addFormWithErrors($this->form);
         }
 
         self::$formsValidationResults[$formClassName . '::' . $formName] = $this->result;

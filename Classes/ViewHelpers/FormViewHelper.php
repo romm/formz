@@ -19,7 +19,7 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Utility\TimeTracker;
+use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use Romm\Formz\ViewHelpers\Service\FormzViewHelperServiceInjectionTrait;
@@ -82,7 +82,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $assetHandlerFactory;
 
     /**
-     * @var TimeTracker
+     * @var TimeTrackerService
      */
     protected $timeTracker;
 
@@ -127,7 +127,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */
     public function render()
     {
-        $this->timeTracker = TimeTracker::getAndStart();
+        $this->timeTracker = TimeTrackerService::getAndStart();
         $result = '';
 
         if (false === Core::get()->isTypoScriptIncluded()) {

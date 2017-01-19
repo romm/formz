@@ -8,14 +8,14 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
-use Romm\Formz\Utility\TypoScriptUtility;
+use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\CacheFactory;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
-use TYPO3\CMS\Extbase\Service\TypoScriptService;
+use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 trait FormzUnitTestUtility
@@ -93,7 +93,7 @@ trait FormzUnitTestUtility
         );
 
         $this->formzCoreMock->injectObjectManager($this->getFormzObjectManagerMock());
-        $this->formzCoreMock->injectTypoScriptUtility(new TypoScriptUtility);
+        $this->formzCoreMock->injectTypoScriptService(new TypoScriptService);
         $this->formzCoreMock->injectConfigurationFactory(new ConfigurationFactory);
         $this->formzCoreMock->injectFormObjectFactory(new FormObjectFactory());
 
@@ -243,8 +243,8 @@ trait FormzUnitTestUtility
      */
     private function injectMockedTypoScriptUtilityInFormzCore()
     {
-        /** @var TypoScriptUtility|\PHPUnit_Framework_MockObject_MockObject $typoScriptUtilityMock */
-        $typoScriptUtilityMock = $this->getMock(TypoScriptUtility::class, ['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration']);
+        /** @var TypoScriptService|\PHPUnit_Framework_MockObject_MockObject $typoScriptUtilityMock */
+        $typoScriptUtilityMock = $this->getMock(TypoScriptService::class, ['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration']);
 
         $configurationCallBack = function () {
             $configuration = ArrayUtility::setValueByPath(
@@ -262,9 +262,9 @@ trait FormzUnitTestUtility
         $typoScriptUtilityMock->method('getBackendTypoScriptConfiguration')
             ->willReturnCallback($configurationCallBack);
 
-        $typoScriptUtilityMock->injectTypoScriptService(new TypoScriptService);
+        $typoScriptUtilityMock->injectTypoScriptService(new ExtbaseTypoScriptService);
 
-        $this->formzCoreMock->injectTypoScriptUtility($typoScriptUtilityMock);
+        $this->formzCoreMock->injectTypoScriptService($typoScriptUtilityMock);
     }
 
     /**

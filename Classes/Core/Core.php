@@ -16,7 +16,7 @@ namespace Romm\Formz\Core;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormObjectFactory;
-use Romm\Formz\Utility\TypoScriptUtility;
+use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -59,9 +59,9 @@ class Core implements SingletonInterface
     private $objectManager;
 
     /**
-     * @var TypoScriptUtility
+     * @var TypoScriptService
      */
-    private $typoScriptUtility;
+    private $typoScriptService;
 
     /**
      * @var ConfigurationFactory
@@ -151,7 +151,7 @@ class Core implements SingletonInterface
      */
     public function getBackendCache()
     {
-        $backendCache = $this->getTypoScriptUtility()
+        $backendCache = $this->getTypoScriptService()
             ->getExtensionConfigurationFromPath('settings.defaultBackendCache');
 
         if (false === class_exists($backendCache)
@@ -347,7 +347,7 @@ class Core implements SingletonInterface
      */
     public function isTypoScriptIncluded()
     {
-        return null !== $this->getTypoScriptUtility()->getExtensionConfigurationFromPath('settings.typoScriptIncluded');
+        return null !== $this->getTypoScriptService()->getExtensionConfigurationFromPath('settings.typoScriptIncluded');
     }
 
     /**
@@ -460,19 +460,19 @@ class Core implements SingletonInterface
     }
 
     /**
-     * @return TypoScriptUtility
+     * @return TypoScriptService
      */
-    public function getTypoScriptUtility()
+    public function getTypoScriptService()
     {
-        return $this->typoScriptUtility;
+        return $this->typoScriptService;
     }
 
     /**
-     * @param TypoScriptUtility $typoScriptUtility
+     * @param TypoScriptService $typoScriptService
      */
-    public function injectTypoScriptUtility(TypoScriptUtility $typoScriptUtility)
+    public function injectTypoScriptService(TypoScriptService $typoScriptService)
     {
-        $this->typoScriptUtility = $typoScriptUtility;
+        $this->typoScriptService = $typoScriptService;
     }
 
     /**

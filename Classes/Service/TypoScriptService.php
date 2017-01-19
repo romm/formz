@@ -11,24 +11,24 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Utility;
+namespace Romm\Formz\Service;
 
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Service\TypoScriptService;
+use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 
 /**
  * Handles the TypoScript configuration of the extension.
  */
-class TypoScriptUtility implements SingletonInterface
+class TypoScriptService implements SingletonInterface
 {
     const EXTENSION_CONFIGURATION_PATH = 'config.tx_formz';
 
     /**
-     * @var TypoScriptService
+     * @var ExtbaseTypoScriptService
      */
     protected $typoScriptService;
 
@@ -158,7 +158,7 @@ class TypoScriptUtility implements SingletonInterface
 
     /**
      * Returns a unique hash for the context of the current request, depending
-     * on wether the request comes from frontend or backend.
+     * on whether the request comes from frontend or backend.
      *
      * @return string
      */
@@ -172,9 +172,9 @@ class TypoScriptUtility implements SingletonInterface
     }
 
     /**
-     * @param TypoScriptService $typoScriptService
+     * @param ExtbaseTypoScriptService $typoScriptService
      */
-    public function injectTypoScriptService(TypoScriptService $typoScriptService)
+    public function injectTypoScriptService(ExtbaseTypoScriptService $typoScriptService)
     {
         $this->typoScriptService = $typoScriptService;
     }

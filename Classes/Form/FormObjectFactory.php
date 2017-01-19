@@ -99,7 +99,7 @@ class FormObjectFactory implements SingletonInterface
 
         $this->insertObjectProperties($instance);
 
-        $formConfiguration = Core::get()->getTypoScriptUtility()->getFormConfiguration($className);
+        $formConfiguration = Core::get()->getTypoScriptService()->getFormConfiguration($className);
         $instance->setConfigurationArray($formConfiguration);
 
         $instance->getHash();
