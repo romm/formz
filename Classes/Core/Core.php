@@ -180,17 +180,6 @@ class Core implements SingletonInterface
     }
 
     /**
-     * Allows you to set manually the current page uid. Useful when editing a
-     * record, for example.
-     *
-     * @param int $uid The uid of the page.
-     */
-    public function setCurrentPageUid($uid)
-    {
-        $this->currentPageUid = intval($uid);
-    }
-
-    /**
      * Returns the cache instance for this extension.
      *
      * @return FrontendInterface
