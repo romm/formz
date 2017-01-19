@@ -47,11 +47,6 @@ class Core implements SingletonInterface
     protected static $instance;
 
     /**
-     * @var int|null
-     */
-    private $currentPageUid = -1;
-
-    /**
      * @var ObjectManagerInterface
      */
     protected $objectManager;
@@ -151,32 +146,6 @@ class Core implements SingletonInterface
         }
 
         return $backendCache;
-    }
-
-    /**
-     * Returns the current page uid, in a frontend or backend context.
-     *
-     * Returns null if the uid can't be found (backend module, ajax call, etc.).
-     *
-     * @return int|null
-     */
-    public function getCurrentPageUid()
-    {
-        if (-1 === $this->currentPageUid) {
-            $id = ($this->environmentService->isEnvironmentInFrontendMode())
-                ? $this->getPageController()->id
-                : GeneralUtility::_GP('id');
-
-            if (false === MathUtility::canBeInterpretedAsInteger($id)
-                || intval($id) < 0
-            ) {
-                $id = null;
-            }
-
-            $this->currentPageUid = $id;
-        }
-
-        return $this->currentPageUid;
     }
 
     /**
@@ -428,7 +397,7 @@ class Core implements SingletonInterface
     public function getContextHash()
     {
         return ($this->environmentService->isEnvironmentInFrontendMode())
-            ? 'fe-' . $this->getCurrentPageUid()
+            ? 'fe-' . $this->getPageController()->id
             : 'be-' . $this->sanitizeString(GeneralUtility::_GET('M'));
     }
 
