@@ -15,6 +15,7 @@ namespace Romm\Formz\Condition\Processor;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -54,7 +55,7 @@ class ConditionProcessorFactory implements SingletonInterface
      */
     protected function getProcessorInstance($cacheIdentifier, FormObject $formObject)
     {
-        $cacheInstance = Core::get()->getCacheInstance();
+        $cacheInstance = CacheService::get()->getCacheInstance();
 
         /** @var ConditionProcessor $instance */
         if ($cacheInstance->has($cacheIdentifier)) {

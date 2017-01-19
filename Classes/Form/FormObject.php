@@ -17,7 +17,7 @@ use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Form;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -189,7 +189,7 @@ class FormObject
     public function getConfigurationObject()
     {
         if (null === $this->configurationObject) {
-            $cacheInstance = Core::get()->getCacheInstance();
+            $cacheInstance = CacheService::get()->getCacheInstance();
             $cacheIdentifier = 'configuration-' . $this->getHash();
 
             if ($cacheInstance->has($cacheIdentifier)) {

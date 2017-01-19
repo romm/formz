@@ -100,7 +100,7 @@ class TypoScriptService implements SingletonInterface
      */
     protected function getExtensionConfiguration()
     {
-        $cacheInstance = Core::get()->getCacheInstance();
+        $cacheInstance = CacheService::get()->getCacheInstance();
         $hash = $this->getContextHash();
 
         if ($cacheInstance->has($hash)) {

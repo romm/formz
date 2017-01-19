@@ -15,6 +15,7 @@ namespace Romm\Formz\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -117,7 +118,7 @@ class AssetHandlerConnectorManager
             ? $prefix . '-'
             : '';
 
-        return Core::GENERATED_FILES_PATH . Core::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
+        return Core::GENERATED_FILES_PATH . CacheService::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
     }
 
     /**

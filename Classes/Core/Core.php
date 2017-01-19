@@ -16,14 +16,10 @@ namespace Romm\Formz\Core;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
-use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
-use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -38,7 +34,6 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 class Core implements SingletonInterface
 {
     const EXTENSION_KEY = 'formz';
-    const CACHE_IDENTIFIER = 'cache_formz';
     const GENERATED_FILES_PATH = 'typo3temp/Formz/';
 
     /**
@@ -72,11 +67,6 @@ class Core implements SingletonInterface
      * @var array
      */
     private $extensionConfiguration;
-
-    /**
-     * @var FrontendInterface
-     */
-    protected $cacheInstance;
 
     /**
      * @return Core
@@ -123,78 +113,6 @@ class Core implements SingletonInterface
     public function arrayToJavaScriptJson(array $array)
     {
         return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
-    }
-
-    /**
-     * Returns the type of backend cache defined in TypoScript at the path:
-     * `settings.defaultBackendCache`.
-     *
-     * @return string
-     * @throws \Exception
-     */
-    public function getBackendCache()
-    {
-        $backendCache = $this->typoScriptService->getExtensionConfigurationFromPath('settings.defaultBackendCache');
-
-        if (false === class_exists($backendCache)
-            && false === in_array(AbstractBackend::class, class_parents($backendCache))
-        ) {
-            throw new \Exception(
-                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
-                1459251263
-            );
-        }
-
-        return $backendCache;
-    }
-
-    /**
-     * Returns the cache instance for this extension.
-     *
-     * @return FrontendInterface
-     */
-    public function getCacheInstance()
-    {
-        if (null === $this->cacheInstance) {
-            /** @var $cacheManager CacheManager */
-            $cacheManager = $this->getObjectManager()->get(CacheManager::class);
-
-            if ($cacheManager->hasCache(self::CACHE_IDENTIFIER)) {
-                $this->cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
-            }
-        }
-
-        return $this->cacheInstance;
-    }
-
-    /**
-     * @param FrontendInterface $cacheInstance
-     */
-    public function setCacheInstance(FrontendInterface $cacheInstance)
-    {
-        $this->cacheInstance = $cacheInstance;
-    }
-
-    /**
-     * Generic cache identifier creation for usages in the extension.
-     *
-     * @param string $string
-     * @param string $formClassName
-     * @param int    $maxLength
-     * @return string
-     */
-    public function getCacheIdentifier($string, $formClassName, $maxLength = 55)
-    {
-        $explodedClassName = explode('\\', $formClassName);
-
-        $identifier = strtolower(
-            $string .
-            end($explodedClassName) .
-            '-' .
-            sha1($formClassName)
-        );
-
-        return substr($identifier, 0, $maxLength);
     }
 
     /**

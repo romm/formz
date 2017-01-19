@@ -49,4 +49,18 @@ class UnitTestContainer extends Container
             ? $this->mockedInstances[$className]
             : null;
     }
+
+    /**
+     * Empty the instances array.
+     */
+    public function resetInstances()
+    {
+        $blankInstance = new static;
+        $reflectionClass = new \ReflectionClass(get_parent_class());
+
+        foreach ($reflectionClass->getProperties() as $property) {
+            $property->setAccessible(true);
+            $property->setValue($this, $property->getValue($blankInstance));
+        }
+    }
 }

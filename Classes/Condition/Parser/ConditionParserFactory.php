@@ -14,7 +14,7 @@
 namespace Romm\Formz\Condition\Parser;
 
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -61,7 +61,7 @@ class ConditionParserFactory implements SingletonInterface
      */
     protected function getConditionTree($cacheIdentifier, ActivationInterface $condition)
     {
-        $cacheInstance = Core::get()->getCacheInstance();
+        $cacheInstance = CacheService::get()->getCacheInstance();
 
         /** @var ConditionTree $instance */
         if ($cacheInstance->has($cacheIdentifier)) {

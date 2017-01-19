@@ -6,6 +6,7 @@ use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\TypoScriptService;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
@@ -90,6 +91,8 @@ trait FormzUnitTestUtility
         $objectManagerProperty->setAccessible(true);
         $objectManagerProperty->setValue($configurationFactory, []);
         $objectManagerProperty->setAccessible(false);
+
+        UnitTestContainer::get()->resetInstances();
     }
 
     /**
@@ -157,6 +160,7 @@ trait FormzUnitTestUtility
 
     protected function injectDependenciesInFormzCore()
     {
+        /** @var ObjectManager $objectManager */
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->formzCoreMock->injectObjectManager($objectManager);
         $this->formzCoreMock->injectTypoScriptService($this->getMockedTypoScriptService());
@@ -267,7 +271,7 @@ trait FormzUnitTestUtility
         $cacheFactory = new CacheFactory('foo', new CacheManager);
         $cacheInstance = $cacheFactory->create('foo', VariableFrontend::class, TransientMemoryBackend::class);
 
-        $this->formzCoreMock->setCacheInstance($cacheInstance);
+        CacheService::get()->setCacheInstance($cacheInstance);
     }
 
     /**
@@ -275,7 +279,7 @@ trait FormzUnitTestUtility
      * environment easily thanks to the functions `setFrontendEnvironment()` and
      * `setBackendEnvironment()`.
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|EnvironmentService
+     * @return EnvironmentService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getMockedEnvironmentService()
     {
@@ -298,7 +302,7 @@ trait FormzUnitTestUtility
 
     /**
      *
-     * This function will mock the `TypoScriptUtility` class to return a
+     * This function will mock the `TypoScriptService` class to return a
      * custom configuration array.
      *
      * @return TypoScriptService|\PHPUnit_Framework_MockObject_MockObject

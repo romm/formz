@@ -17,6 +17,7 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -69,10 +70,10 @@ class FormObjectFactory implements SingletonInterface
             );
         }
 
-        $cacheIdentifier = Core::get()->getCacheIdentifier('form-object-', $className . '-' . $name);
+        $cacheIdentifier = CacheService::get()->getCacheIdentifier('form-object-', $className . '-' . $name);
 
         if (false === isset($this->instances[$cacheIdentifier])) {
-            $cacheInstance = Core::get()->getCacheInstance();
+            $cacheInstance = CacheService::get()->getCacheInstance();
 
             if ($cacheInstance->has($cacheIdentifier)) {
                 $instance = $cacheInstance->get($cacheIdentifier);

@@ -16,6 +16,7 @@ namespace Romm\Formz\Configuration;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -75,7 +76,7 @@ class ConfigurationFactory implements SingletonInterface
      */
     protected function getFormzConfigurationFromCache($cacheIdentifier)
     {
-        $cacheInstance = Core::get()->getCacheInstance();
+        $cacheInstance = CacheService::get()->getCacheInstance();
 
         if ($cacheInstance->has($cacheIdentifier)) {
             $instance = $cacheInstance->get($cacheIdentifier);
