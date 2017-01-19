@@ -19,6 +19,7 @@ use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
+use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -78,8 +79,8 @@ class FormatMessageViewHelper extends AbstractViewHelper
                 $fieldName,
                 $fieldId,
                 $this->getMessageType($message),
-                Core::get()->getMessageValidationName($message),
-                Core::get()->getMessageKey($message),
+                MessageService::get()->getMessageValidationName($message),
+                MessageService::get()->getMessageKey($message),
                 $message->getMessage()
             ],
             $field->getSettings()->getMessageTemplate()
