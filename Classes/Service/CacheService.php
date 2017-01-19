@@ -19,12 +19,14 @@ use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CacheService implements SingletonInterface
 {
     use ExtendedFacadeInstanceTrait;
 
     const CACHE_IDENTIFIER = 'cache_formz';
+    const GENERATED_FILES_PATH = 'typo3temp/Formz/';
 
     /**
      * @var TypoScriptService
@@ -114,5 +116,28 @@ class CacheService implements SingletonInterface
     public function injectTypoScriptService(TypoScriptService $typoScriptService)
     {
         $this->typoScriptService = $typoScriptService;
+    }
+
+    /**
+     * Function called when clearing TYPO3 caches. It will remove the temporary
+     * asset files created by Formz.
+     *
+     * @param array $parameters
+     */
+    public function clearCacheCommand($parameters)
+    {
+        if (false === in_array($parameters['cacheCmd'], ['all', 'system'])) {
+            return;
+        }
+
+        $files = glob(GeneralUtility::getFileAbsFileName(self::GENERATED_FILES_PATH . '*'));
+
+        if (false === $files) {
+            return;
+        }
+
+        foreach ($files as $assetCacheFile) {
+            unlink($assetCacheFile);
+        }
     }
 }

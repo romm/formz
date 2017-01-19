@@ -32,7 +32,6 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 class Core implements SingletonInterface
 {
     const EXTENSION_KEY = 'formz';
-    const GENERATED_FILES_PATH = 'typo3temp/Formz/';
 
     /**
      * @var Core
@@ -147,29 +146,6 @@ class Core implements SingletonInterface
         }
 
         return $this->extensionConfiguration;
-    }
-
-    /**
-     * Function called when clearing TYPO3 caches. It will remove the temporary
-     * asset files created by Formz.
-     *
-     * @param array $parameters
-     */
-    public function clearCacheCommand($parameters)
-    {
-        if (false === in_array($parameters['cacheCmd'], ['all', 'system'])) {
-            return;
-        }
-
-        $files = glob(GeneralUtility::getFileAbsFileName(self::GENERATED_FILES_PATH . '*'));
-
-        if (false === $files) {
-            return;
-        }
-
-        foreach ($files as $assetCacheFile) {
-            unlink($assetCacheFile);
-        }
     }
 
     /**
