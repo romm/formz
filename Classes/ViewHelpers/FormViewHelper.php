@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -85,6 +85,27 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * @var TimeTracker
      */
     protected $timeTracker;
+
+    /**
+     * @inheritdoc
+     */
+    public function initialize()
+    {
+        parent::initialize();
+
+        /*
+         * Important: we need to instantiate the page renderer with this instead
+         * of Extbase object manager (or with an inject function).
+         *
+         * This is due to some TYPO3 low level behaviour which overrides the
+         * page renderer singleton instance, whenever a new request is used. The
+         * problem is that the instance is not updated on Extbase side.
+         *
+         * Using Extbase injection can lead to old page renderer instance being
+         * used, resulting in a leak of assets inclusion, and maybe more issues.
+         */
+        $this->pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+    }
 
     /**
      * @inheritdoc

@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
@@ -103,7 +102,7 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = (true === isset($templateArguments['fieldId']))
             ? $templateArguments['fieldId']
-            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $formObject->getName() . '-' . $fieldName);
+            : Core::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
         $currentView = $this->renderingContext
             ->getViewHelperVariableContainer()

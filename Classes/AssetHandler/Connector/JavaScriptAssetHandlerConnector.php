@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -80,9 +80,7 @@ class JavaScriptAssetHandlerConnector
         foreach ($this->javaScriptFiles as $file) {
             $filePath = Core::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
 
-            $this->assetHandlerConnectorManager
-                ->getPageRenderer()
-                ->addJsFile($filePath);
+            $this->includeJsFile($filePath);
         }
 
         return $this;
@@ -110,9 +108,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterFile($filePath);
+        $this->includeJsFile(Core::get()->getResourceRelativePath($filePath));
 
         return $this;
     }
@@ -136,9 +132,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterFile($fileName);
+        $this->includeJsFile(Core::get()->getResourceRelativePath($fileName));
 
         return $this;
     }
@@ -175,9 +169,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterFile($filePath);
+        $this->includeJsFile(Core::get()->getResourceRelativePath($filePath));
 
         return $this;
     }
@@ -209,9 +201,7 @@ class JavaScriptAssetHandlerConnector
         $javaScriptCode .= LF;
         $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterInlineCode('Formz - Initialization ' . $formName, $javaScriptCode);
+        $this->addInlineJs('Formz - Initialization ' . $formName, $javaScriptCode);
 
         return $this;
     }
@@ -230,12 +220,8 @@ class JavaScriptAssetHandlerConnector
 
         foreach ($javaScriptValidationFiles as $file) {
             if (false === in_array($file, $assetHandlerConnectorStates->getAlreadyIncludedValidationJavaScriptFiles())) {
-                $path = Core::get()->getResourceRelativePath($file);
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
-
-                $this->assetHandlerConnectorManager
-                    ->getPageRenderer()
-                    ->addJsFooterFile($path);
+                $this->includeJsFile(Core::get()->getResourceRelativePath($file));
             }
         }
 
@@ -262,6 +248,43 @@ class JavaScriptAssetHandlerConnector
         $javaScriptFiles = array_merge($javaScriptFiles, $conditionProcessor->getJavaScriptFiles());
 
         return $javaScriptFiles;
+    }
+
+    /**
+     * We need an abstraction function because the footer inclusion for assets
+     * does not work in backend. It means we include every JavaScript asset in
+     * the header when the request is in a backend context.
+     *
+     * @see https://forge.typo3.org/issues/60213
+     *
+     * @param string $path
+     */
+    protected function includeJsFile($path)
+    {
+        $pageRenderer = $this->assetHandlerConnectorManager->getPageRenderer();
+
+        if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+            $pageRenderer->addJsFooterFile($path);
+        } else {
+            $pageRenderer->addJsFile($path);
+        }
+    }
+
+    /**
+     * @see includeJsFile()
+     *
+     * @param string $name
+     * @param string $javaScriptCode
+     */
+    protected function addInlineJs($name, $javaScriptCode)
+    {
+        $pageRenderer = $this->assetHandlerConnectorManager->getPageRenderer();
+
+        if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+            $pageRenderer->addJsFooterInlineCode($name, $javaScriptCode);
+        } else {
+            $pageRenderer->addJsInlineCode($name, $javaScriptCode);
+        }
     }
 
     /**

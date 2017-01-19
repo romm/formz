@@ -53,6 +53,11 @@ trait FormzUnitTestUtility
     }
 
     /**
+     * @var bool
+     */
+    private $frontendEnvironment = true;
+
+    /**
      * Can be used in the `tearDown()` function of every unit test.
      */
     protected function formzTearDown()
@@ -80,7 +85,7 @@ trait FormzUnitTestUtility
      * Initializes correctly this extension `Core` class to be able to work
      * correctly in unit tests.
      */
-    private function setUpFormzCore()
+    protected function setUpFormzCore()
     {
         $this->formzCoreMock = $this->getMock(
             Core::class,
@@ -93,6 +98,7 @@ trait FormzUnitTestUtility
         $this->formzCoreMock->injectFormObjectFactory(new FormObjectFactory());
 
         $this->injectTransientMemoryCacheInFormzCore();
+        $this->injectMockedEnvironmentServiceInFormzCore();
 
         $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
         $this->injectMockedTypoScriptUtilityInFormzCore();
@@ -155,6 +161,47 @@ trait FormzUnitTestUtility
     }
 
     /**
+     * The mocked service allows unit tests to manipulate the current
+     * environment easily thanks to the functions `setFrontendEnvironment()` and
+     * `setBackendEnvironment()`.
+     */
+    private function injectMockedEnvironmentServiceInFormzCore()
+    {
+        /** @var EnvironmentService|\PHPUnit_Framework_MockObject_MockObject $environmentServiceMock */
+        $environmentServiceMock = $this->getMock(EnvironmentService::class, ['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode']);
+
+        $environmentServiceMock->method('isEnvironmentInFrontendMode')
+            ->willReturnCallback(function () {
+                return $this->frontendEnvironment;
+            });
+
+        $environmentServiceMock->method('isEnvironmentInBackendMode')
+            ->willReturnCallback(function () {
+                return !$this->frontendEnvironment;
+            });
+
+        $this->formzCoreMock->injectEnvironmentService($environmentServiceMock);
+    }
+
+    /**
+     * Makes the mocked environment service from the core class be in frontend
+     * environment.
+     */
+    protected function setFrontendEnvironment()
+    {
+        $this->frontendEnvironment = true;
+    }
+
+    /**
+     * Makes the mocked environment service from the core class be in backend
+     * environment.
+     */
+    protected function setBackendEnvironment()
+    {
+        $this->frontendEnvironment = false;
+    }
+
+    /**
      * @param array $formzConfiguration
      */
     protected function setFormzConfiguration(array $formzConfiguration)
@@ -197,24 +244,24 @@ trait FormzUnitTestUtility
     private function injectMockedTypoScriptUtilityInFormzCore()
     {
         /** @var TypoScriptUtility|\PHPUnit_Framework_MockObject_MockObject $typoScriptUtilityMock */
-        $typoScriptUtilityMock = $this->getMock(TypoScriptUtility::class, ['getConfiguration']);
-        $typoScriptUtilityMock->expects($this->any())
-            ->method('getConfiguration')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        $configuration = ArrayUtility::setValueByPath(
-                            $this->formzConfiguration,
-                            'config.tx_formz.forms',
-                            $this->formConfiguration
-                        );
+        $typoScriptUtilityMock = $this->getMock(TypoScriptUtility::class, ['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration']);
 
-                        return $configuration;
-                    }
-                )
+        $configurationCallBack = function () {
+            $configuration = ArrayUtility::setValueByPath(
+                $this->formzConfiguration,
+                'config.tx_formz.forms',
+                $this->formConfiguration
             );
 
-        $typoScriptUtilityMock->injectEnvironmentService(new EnvironmentService);
+            return $configuration;
+        };
+
+        $typoScriptUtilityMock->method('getFrontendTypoScriptConfiguration')
+            ->willReturnCallback($configurationCallBack);
+
+        $typoScriptUtilityMock->method('getBackendTypoScriptConfiguration')
+            ->willReturnCallback($configurationCallBack);
+
         $typoScriptUtilityMock->injectTypoScriptService(new TypoScriptService);
 
         $this->formzCoreMock->injectTypoScriptUtility($typoScriptUtilityMock);

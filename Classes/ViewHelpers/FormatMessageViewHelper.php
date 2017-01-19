@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormzMessageInterface;
@@ -21,6 +20,7 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
 use TYPO3\CMS\Extbase\Error\Warning;
@@ -64,7 +64,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
         $fieldId = ($templateVariableContainer->exists('fieldId'))
             ? $templateVariableContainer->get('fieldId')
-            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $formObject->getName() . '-' . $fieldName);
+            : Core::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
         $result = str_replace(
             [

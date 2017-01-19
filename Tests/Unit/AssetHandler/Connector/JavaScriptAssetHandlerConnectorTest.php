@@ -37,9 +37,9 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
 
         /** @var PageRenderer|\PHPUnit_Framework_MockObject_MockObject $pageRendererMock */
-        $pageRendererMock = $this->getMock(PageRenderer::class, ['addJsFile']);
+        $pageRendererMock = $this->getMock(PageRenderer::class, ['addJsFooterFile']);
         $pageRendererMock->expects($this->atLeastOnce())
-            ->method('addJsFile')
+            ->method('addJsFooterFile')
             ->willReturnCallback(function () use (&$filesIncluded) {
                 $filesIncluded++;
             });
@@ -60,9 +60,9 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
         $filesIncludedBis = 0;
 
         /** @var PageRenderer|\PHPUnit_Framework_MockObject_MockObject $pageRendererMockBis */
-        $pageRendererMockBis = $this->getMock(PageRenderer::class, ['addJsFile']);
+        $pageRendererMockBis = $this->getMock(PageRenderer::class, ['addJsFooterFile']);
         $pageRendererMockBis->expects($this->atLeastOnce())
-            ->method('addJsFile')
+            ->method('addJsFooterFile')
             ->willReturnCallback(function () use (&$filesIncludedBis) {
                 $filesIncludedBis++;
             });

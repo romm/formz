@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -18,6 +18,7 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -163,7 +164,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValueKey($fieldName)
     {
-        return 'formz-value-' . self::getFieldCleanName($fieldName);
+        return 'formz-value-' . Core::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -174,7 +175,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidKey($fieldName)
     {
-        return 'formz-valid-' . self::getFieldCleanName($fieldName);
+        return 'formz-valid-' . Core::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -185,7 +186,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataErrorKey($fieldName)
     {
-        return 'formz-error-' . self::getFieldCleanName($fieldName);
+        return 'formz-error-' . Core::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -199,24 +200,15 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)
     {
+        $core = Core::get();
+
         return vsprintf(
             'formz-error-%s-%s-%s',
             [
-                self::getFieldCleanName($fieldName),
-                self::getFieldCleanName($validationName),
-                self::getFieldCleanName($messageKey)
+                $core->sanitizeString($fieldName),
+                $core->sanitizeString($validationName),
+                $core->sanitizeString($messageKey)
             ]
         );
-    }
-
-    /**
-     * Replaces underscores with a dash.
-     *
-     * @param string $fieldName
-     * @return string
-     */
-    public static function getFieldCleanName($fieldName)
-    {
-        return str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($fieldName));
     }
 }
