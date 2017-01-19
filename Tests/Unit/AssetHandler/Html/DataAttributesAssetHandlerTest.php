@@ -84,7 +84,10 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
      */
     public function checkFieldsErrorsDataAttributesDataProvider()
     {
-        $this->setUpFormzCore();
+        $this->setUpFormzCoreMock();
+        $this->overrideExtbaseContainer();
+        $this->changeReflectionCache();
+        $this->injectDependenciesInFormzCore();
 
         return [
             'defaultSingleErrorCheck'  => [

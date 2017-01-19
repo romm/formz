@@ -62,9 +62,11 @@ trait FormzUnitTestUtility
     protected function formzSetUp()
     {
         $this->initializeConfigurationObjectTestServices();
-        $this->changeReflectionCache();
+
+        $this->setUpFormzCoreMock();
         $this->overrideExtbaseContainer();
-        $this->setUpFormzCore();
+        $this->changeReflectionCache();
+        $this->injectDependenciesInFormzCore();
 
         ConditionFactory::get()->registerDefaultConditions();
     }
@@ -139,19 +141,22 @@ trait FormzUnitTestUtility
      * Initializes correctly this extension `Core` class to be able to work
      * correctly in unit tests.
      */
-    protected function setUpFormzCore()
+    protected function setUpFormzCoreMock()
     {
+        // Injecting the mocked instance in the core.
         $this->formzCoreMock = $this->getMock(
             Core::class,
             ['translate', 'getFullExtensionConfiguration', 'getExtensionRelativePath']
         );
 
-        // Injecting the mocked instance in the core.
         $reflectedCore = new \ReflectionClass(Core::class);
         $objectManagerProperty = $reflectedCore->getProperty('instance');
         $objectManagerProperty->setAccessible(true);
         $objectManagerProperty->setValue($this->formzCoreMock);
+    }
 
+    protected function injectDependenciesInFormzCore()
+    {
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->formzCoreMock->injectObjectManager($objectManager);
         $this->formzCoreMock->injectTypoScriptService($this->getMockedTypoScriptService());
