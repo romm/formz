@@ -16,6 +16,7 @@ namespace Romm\Formz\Validation;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ExtensionService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -93,7 +94,7 @@ class AjaxFieldValidation implements SingletonInterface
                 }
             } catch (\Exception $e) {
                 $result['data'] = ['errorCode' => $e->getCode()];
-                if (Core::get()->isInDebugMode()) {
+                if (ExtensionService::get()->isInDebugMode()) {
                     $result['message'] = $e->getMessage();
                 }
             }
@@ -107,7 +108,7 @@ class AjaxFieldValidation implements SingletonInterface
     /**
      * Will clean the string filled with form values sent with Ajax.
      *
-     * @param string $values
+     * @param array $values
      * @return array
      */
     protected function cleanValuesFromUrl($values)

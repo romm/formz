@@ -13,10 +13,10 @@
 
 namespace Romm\Formz\Core;
 
+use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -31,8 +31,6 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  */
 class Core implements SingletonInterface
 {
-    const EXTENSION_KEY = 'formz';
-
     /**
      * @var Core
      */
@@ -61,11 +59,6 @@ class Core implements SingletonInterface
     private $languageKey;
 
     /**
-     * @var array
-     */
-    private $extensionConfiguration;
-
-    /**
      * @return Core
      */
     public static function get()
@@ -92,7 +85,7 @@ class Core implements SingletonInterface
      */
     public function translate($index, $extensionKey = null, $arguments = null)
     {
-        $extensionKey = ($extensionKey) ?: self::EXTENSION_KEY;
+        $extensionKey = ($extensionKey) ?: ExtensionService::get()->getExtensionKey();
         $result = LocalizationUtility::translate($index, $extensionKey, $arguments);
         if ($result === '' && $index !== '') {
             $result = $index;
@@ -110,42 +103,6 @@ class Core implements SingletonInterface
     public function arrayToJavaScriptJson(array $array)
     {
         return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
-    }
-
-    /**
-     * Return the wanted extension configuration.
-     *
-     * @param string $configurationName
-     * @return mixed
-     */
-    public function getExtensionConfiguration($configurationName)
-    {
-        $result = null;
-        $extensionConfiguration = $this->getFullExtensionConfiguration();
-
-        if (null === $configurationName) {
-            $result = $extensionConfiguration;
-        } elseif (ArrayUtility::isValidPath($extensionConfiguration, $configurationName, '.')) {
-            $result = ArrayUtility::getValueByPath($extensionConfiguration, $configurationName, '.');
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getFullExtensionConfiguration()
-    {
-        if (null === $this->extensionConfiguration) {
-            $this->extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][self::EXTENSION_KEY]);
-
-            if (false === $this->extensionConfiguration) {
-                $this->extensionConfiguration = [];
-            }
-        }
-
-        return $this->extensionConfiguration;
     }
 
     /**
@@ -185,14 +142,6 @@ class Core implements SingletonInterface
     public function isTypoScriptIncluded()
     {
         return null !== $this->typoScriptService->getExtensionConfigurationFromPath('settings.typoScriptIncluded');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isInDebugMode()
-    {
-        return (bool)$this->getExtensionConfiguration('debugMode');
     }
 
     /**
@@ -306,16 +255,6 @@ class Core implements SingletonInterface
     public function injectEnvironmentService(EnvironmentService $environmentService)
     {
         $this->environmentService = $environmentService;
-    }
-
-    /**
-     * Returns the extension key.
-     *
-     * @return string
-     */
-    public function getExtensionKey()
-    {
-        return self::EXTENSION_KEY;
     }
 
     /**

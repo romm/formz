@@ -118,7 +118,7 @@ class AssetHandlerConnectorManager
             ? $prefix . '-'
             : '';
 
-        return Core::GENERATED_FILES_PATH . CacheService::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
+        return CacheService::GENERATED_FILES_PATH . CacheService::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
     }
 
     /**

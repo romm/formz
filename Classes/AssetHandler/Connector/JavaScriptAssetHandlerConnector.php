@@ -25,6 +25,7 @@ use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\ExtensionService;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
@@ -78,7 +79,7 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeDefaultJavaScriptFiles()
     {
-        if (Core::get()->isInDebugMode()) {
+        if (ExtensionService::get()->isInDebugMode()) {
             $this->javaScriptFiles[] = 'Formz.Debug.js';
         }
 
@@ -197,7 +198,7 @@ class JavaScriptAssetHandlerConnector
         $javaScriptCode = $this->getFormRequestDataJavaScriptAssetHandler()
             ->getFormRequestDataJavaScriptCode();
 
-        if (Core::get()->isInDebugMode()) {
+        if (ExtensionService::get()->isInDebugMode()) {
             $javaScriptCode .= LF . $this->getDebugActivationCode();
         }
 

@@ -18,7 +18,6 @@ use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Error\Message;
 
-
 class MessageService implements SingletonInterface
 {
     use FacadeInstanceTrait;

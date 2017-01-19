@@ -14,6 +14,7 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
 
 /**
  * This asset handler generates the JavaScript code which will inject the Formz
@@ -32,7 +33,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
             ->getFormzConfiguration()
             ->getHash();
 
-        return Core::GENERATED_FILES_PATH . 'formz-config-' . $hash . '.js';
+        return CacheService::GENERATED_FILES_PATH . 'formz-config-' . $hash . '.js';
     }
 
     /**
