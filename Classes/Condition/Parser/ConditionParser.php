@@ -19,6 +19,7 @@ use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Parser\Node\NullNode;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
@@ -46,6 +47,8 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class ConditionParser implements SingletonInterface
 {
+    use FacadeInstanceTrait;
+
     const LOGICAL_AND = '&&';
     const LOGICAL_OR = '||';
 
@@ -63,14 +66,6 @@ class ConditionParser implements SingletonInterface
      * @var ConditionParserScope
      */
     private $scope;
-
-    /**
-     * @return ConditionParser
-     */
-    public static function get()
-    {
-        return GeneralUtility::makeInstance(self::class);
-    }
 
     /**
      * See class documentation.

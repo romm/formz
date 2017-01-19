@@ -15,33 +15,19 @@ namespace Romm\Formz\Condition\Processor;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class ConditionProcessorFactory implements SingletonInterface
 {
-    /**
-     * @var ConditionProcessorFactory
-     */
-    private static $instance;
+    use ExtendedFacadeInstanceTrait {
+        get as getInstance;
+    }
 
     /**
      * @var ConditionProcessor[]
      */
     private $processorInstances = [];
-
-    /**
-     * @return ConditionProcessorFactory
-     */
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::$instance = Core::get()
-                ->getObjectManager()
-                ->get(self::class);
-        }
-
-        return self::$instance;
-    }
 
     /**
      * @param FormObject $formObject
