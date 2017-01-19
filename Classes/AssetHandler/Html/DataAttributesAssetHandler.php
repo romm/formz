@@ -14,10 +14,10 @@
 namespace Romm\Formz\AssetHandler\Html;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\MessageService;
+use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -163,7 +163,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValueKey($fieldName)
     {
-        return 'formz-value-' . Core::get()->sanitizeString($fieldName);
+        return 'formz-value-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -174,7 +174,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidKey($fieldName)
     {
-        return 'formz-valid-' . Core::get()->sanitizeString($fieldName);
+        return 'formz-valid-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -185,7 +185,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataErrorKey($fieldName)
     {
-        return 'formz-error-' . Core::get()->sanitizeString($fieldName);
+        return 'formz-error-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -199,14 +199,14 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)
     {
-        $core = Core::get();
+        $stringService = StringService::get();
 
         return vsprintf(
             'formz-error-%s-%s-%s',
             [
-                $core->sanitizeString($fieldName),
-                $core->sanitizeString($validationName),
-                $core->sanitizeString($messageKey)
+                $stringService->sanitizeString($fieldName),
+                $stringService->sanitizeString($validationName),
+                $stringService->sanitizeString($messageKey)
             ]
         );
     }

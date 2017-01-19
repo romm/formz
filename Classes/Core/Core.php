@@ -17,9 +17,7 @@ use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
@@ -96,44 +94,6 @@ class Core implements SingletonInterface
     public function arrayToJavaScriptJson(array $array)
     {
         return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
-    }
-
-    /**
-     * @param string|null $path If a string is given, it will be precessed by the extension relative path and returned.
-     * @return string
-     */
-    public function getExtensionRelativePath($path = null)
-    {
-        $relativePath = ExtensionManagementUtility::siteRelPath('formz');
-
-        if ($this->environmentService->isEnvironmentInBackendMode()) {
-            $relativePath = '../' . $relativePath;
-        }
-
-        return (null !== $path)
-            ? $relativePath . $path
-            : $relativePath;
-    }
-
-    /**
-     * @param string $path
-     * @return string
-     */
-    public function getResourceRelativePath($path)
-    {
-        $relativePath = rtrim(
-            PathUtility::getRelativePath(
-                GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT'),
-                GeneralUtility::getFileAbsFileName($path)
-            ),
-            '/'
-        );
-
-        if ($this->environmentService->isEnvironmentInBackendMode()) {
-            $relativePath = '../' . $relativePath;
-        }
-
-        return $relativePath;
     }
 
     /**

@@ -43,7 +43,7 @@ class ContextService implements SingletonInterface
     {
         return ($this->environmentService->isEnvironmentInFrontendMode())
             ? 'fe-' . Core::get()->getPageController()->id
-            : 'be-' . Core::get()->sanitizeString(GeneralUtility::_GET('M'));
+            : 'be-' . StringService::get()->sanitizeString(GeneralUtility::_GET('M'));
     }
 
     /**

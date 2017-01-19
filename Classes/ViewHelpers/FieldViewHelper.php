@@ -16,6 +16,7 @@ namespace Romm\Formz\ViewHelpers;
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
@@ -102,7 +103,7 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = (true === isset($templateArguments['fieldId']))
             ? $templateArguments['fieldId']
-            : Core::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
+            : StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
         $currentView = $this->renderingContext
             ->getViewHelperVariableContainer()

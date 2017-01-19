@@ -22,6 +22,7 @@ use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
@@ -355,12 +356,12 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         /** @var $view \TYPO3\CMS\Fluid\View\StandaloneView */
         $view = $this->objectManager->get(StandaloneView::class);
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
-        $layoutRootPath = Core::get()->getExtensionRelativePath('Resources/Private/Layouts');
+        $layoutRootPath = StringService::get()->getExtensionRelativePath('Resources/Private/Layouts');
         $view->setLayoutRootPaths([$layoutRootPath]);
         $view->assign('result', $result);
 
         $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
-        $this->pageRenderer->addCssFile(Core::get()->getResourceRelativePath($templatePath));
+        $this->pageRenderer->addCssFile(StringService::get()->getResourceRelativePath($templatePath));
 
         return $view->render();
     }

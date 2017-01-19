@@ -14,12 +14,12 @@
 namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Service\MessageService;
+use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -64,7 +64,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
         $fieldId = ($templateVariableContainer->exists('fieldId'))
             ? $templateVariableContainer->get('fieldId')
-            : Core::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
+            : StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
         $result = str_replace(
             [

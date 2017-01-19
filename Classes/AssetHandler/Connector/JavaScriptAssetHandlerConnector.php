@@ -27,6 +27,7 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
@@ -85,7 +86,7 @@ class JavaScriptAssetHandlerConnector
         }
 
         foreach ($this->javaScriptFiles as $file) {
-            $filePath = Core::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
+            $filePath = StringService::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
 
             $this->includeJsFile($filePath);
         }
@@ -115,7 +116,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->includeJsFile(Core::get()->getResourceRelativePath($filePath));
+        $this->includeJsFile(StringService::get()->getResourceRelativePath($filePath));
 
         return $this;
     }
@@ -139,7 +140,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->includeJsFile(Core::get()->getResourceRelativePath($fileName));
+        $this->includeJsFile(StringService::get()->getResourceRelativePath($fileName));
 
         return $this;
     }
@@ -176,7 +177,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->includeJsFile(Core::get()->getResourceRelativePath($filePath));
+        $this->includeJsFile(StringService::get()->getResourceRelativePath($filePath));
 
         return $this;
     }
@@ -228,7 +229,7 @@ class JavaScriptAssetHandlerConnector
         foreach ($javaScriptValidationFiles as $file) {
             if (false === in_array($file, $assetHandlerConnectorStates->getAlreadyIncludedValidationJavaScriptFiles())) {
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
-                $this->includeJsFile(Core::get()->getResourceRelativePath($file));
+                $this->includeJsFile(StringService::get()->getResourceRelativePath($file));
             }
         }
 
