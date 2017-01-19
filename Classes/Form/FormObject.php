@@ -15,6 +15,7 @@ namespace Romm\Formz\Form;
 
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
+use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -25,6 +26,11 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class FormObject
 {
+
+    /**
+     * @var ConfigurationFactory
+     */
+    protected $configurationFactory;
 
     /**
      * Name of the form.
@@ -211,8 +217,7 @@ class FormObject
     public function getConfigurationValidationResult()
     {
         $result = new Result();
-        $formzConfigurationValidationResult = Core::get()
-            ->getConfigurationFactory()
+        $formzConfigurationValidationResult = $this->configurationFactory
             ->getFormzConfiguration()
             ->getValidationResult();
 
@@ -267,6 +272,14 @@ class FormObject
     protected function calculateHash()
     {
         return sha1(serialize($this));
+    }
+
+    /**
+     * @param ConfigurationFactory $configurationFactory
+     */
+    public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
+    {
+        $this->configurationFactory = $configurationFactory;
     }
 
     /**

@@ -14,8 +14,10 @@
 namespace Romm\Formz\Form;
 
 use Romm\Formz\Configuration\Configuration;
+use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -26,6 +28,16 @@ use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 class FormObjectFactory implements SingletonInterface
 {
     const IGNORE_PROPERTY = 'formz-ignore';
+
+    /**
+     * @var ConfigurationFactory
+     */
+    protected $configurationFactory;
+
+    /**
+     * @var TypoScriptService
+     */
+    protected $typoScriptService;
 
     /**
      * @var FormObject[]
@@ -70,8 +82,7 @@ class FormObjectFactory implements SingletonInterface
             }
 
             /** @var Configuration $formzConfigurationObject */
-            $formzConfigurationObject = Core::get()
-                ->getConfigurationFactory()
+            $formzConfigurationObject = $this->configurationFactory
                 ->getFormzConfiguration()
                 ->getObject(true);
 
@@ -95,11 +106,11 @@ class FormObjectFactory implements SingletonInterface
     protected function createInstance($className, $name)
     {
         /** @var FormObject $instance */
-        $instance = GeneralUtility::makeInstance(FormObject::class, $className, $name);
+        $instance = Core::instantiate(FormObject::class, $className, $name);
 
         $this->insertObjectProperties($instance);
 
-        $formConfiguration = Core::get()->getTypoScriptService()->getFormConfiguration($className);
+        $formConfiguration = $this->typoScriptService->getFormConfiguration($className);
         $instance->setConfigurationArray($formConfiguration);
 
         $instance->getHash();
@@ -135,5 +146,21 @@ class FormObjectFactory implements SingletonInterface
         }
 
         unset($publicProperties);
+    }
+
+    /**
+     * @param ConfigurationFactory $configurationFactory
+     */
+    public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
+    {
+        $this->configurationFactory = $configurationFactory;
+    }
+
+    /**
+     * @param TypoScriptService $typoScriptService
+     */
+    public function injectTypoScriptService(TypoScriptService $typoScriptService)
+    {
+        $this->typoScriptService = $typoScriptService;
     }
 }

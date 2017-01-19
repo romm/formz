@@ -46,6 +46,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
 
         $assetHandlerConnectorManager = new AssetHandlerConnectorManager($pageRendererMock, $assetHandlerFactory);
         $javaScriptAssetHandlerConnector = new JavaScriptAssetHandlerConnector($assetHandlerConnectorManager);
+        $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
         $return = $javaScriptAssetHandlerConnector->includeDefaultJavaScriptFiles();
 
         // Checking that the function returns `$this`.
@@ -69,6 +70,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
 
         $assetHandlerConnectorManagerBis = new AssetHandlerConnectorManager($pageRendererMockBis, $assetHandlerFactory);
         $javaScriptAssetHandlerConnectorBis = new JavaScriptAssetHandlerConnector($assetHandlerConnectorManagerBis);
+        $javaScriptAssetHandlerConnectorBis->injectEnvironmentService($this->getMockedEnvironmentService());
         $javaScriptAssetHandlerConnectorBis->includeDefaultJavaScriptFiles();
 
         $this->assertGreaterThan($filesIncluded, $filesIncludedBis);
@@ -100,6 +102,8 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ['getFormzConfigurationJavaScriptAssetHandler'],
             [$assetHandlerConnectorManager]
         );
+
+        $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
 
         /** @var FormzConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzConfigurationJavaScriptAssetHandlerMock */
         $formzConfigurationJavaScriptAssetHandlerMock = $this->getMock(
@@ -168,6 +172,8 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ],
             [$assetHandlerConnectorManagerMock]
         );
+
+        $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
 
         $formInitializationJavaScriptAssetHandlerMock = $this->getMock(
             FormInitializationJavaScriptAssetHandler::class,
@@ -266,6 +272,8 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             [$assetHandlerConnectorManager]
         );
 
+        $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
+
         $formRequestDataJavaScriptAssetHandlerMock = $this->getMock(
             FormRequestDataJavaScriptAssetHandler::class,
             ['getFormRequestDataJavaScriptCode'],
@@ -347,6 +355,8 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             [$assetHandlerConnectorManagerMock]
         );
 
+        $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
+
         $formzLocalizationJavaScriptAssetHandlerMock = $this->getMock(
             FormzLocalizationJavaScriptAssetHandler::class,
             ['injectTranslationsForFormFieldsValidation', 'getJavaScriptCode'],
@@ -403,6 +413,8 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             [$assetHandlerConnectorManager]
         );
 
+        $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
+
         $conditionProcessorMock = $this->getMock(
             ConditionProcessor::class,
             ['getJavaScriptFiles'],
@@ -445,6 +457,8 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
             ['getConditionProcessor', 'getFieldsValidationJavaScriptAssetHandler'],
             [$assetHandlerConnectorManager]
         );
+
+        $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
 
         $conditionProcessorMock = $this->getMock(
             ConditionProcessor::class,

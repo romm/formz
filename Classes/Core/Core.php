@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Core;
 
-use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
@@ -55,22 +54,17 @@ class Core implements SingletonInterface
     /**
      * @var ObjectManagerInterface
      */
-    private $objectManager;
+    protected $objectManager;
 
     /**
      * @var TypoScriptService
      */
-    private $typoScriptService;
-
-    /**
-     * @var ConfigurationFactory
-     */
-    private $configurationFactory;
+    protected $typoScriptService;
 
     /**
      * @var EnvironmentService
      */
-    private $environmentService;
+    protected $environmentService;
 
     /**
      * Contains the actual language key.
@@ -145,8 +139,7 @@ class Core implements SingletonInterface
      */
     public function getBackendCache()
     {
-        $backendCache = $this->getTypoScriptService()
-            ->getExtensionConfigurationFromPath('settings.defaultBackendCache');
+        $backendCache = $this->typoScriptService->getExtensionConfigurationFromPath('settings.defaultBackendCache');
 
         if (false === class_exists($backendCache)
             && false === in_array(AbstractBackend::class, class_parents($backendCache))
@@ -341,7 +334,7 @@ class Core implements SingletonInterface
      */
     public function isTypoScriptIncluded()
     {
-        return null !== $this->getTypoScriptService()->getExtensionConfigurationFromPath('settings.typoScriptIncluded');
+        return null !== $this->typoScriptService->getExtensionConfigurationFromPath('settings.typoScriptIncluded');
     }
 
     /**
@@ -438,6 +431,19 @@ class Core implements SingletonInterface
     }
 
     /**
+     * Returns a unique hash for the context of the current request, depending
+     * on whether the request comes from frontend or backend.
+     *
+     * @return string
+     */
+    public function getContextHash()
+    {
+        return ($this->environmentService->isEnvironmentInFrontendMode())
+            ? 'fe-' . $this->getCurrentPageUid()
+            : 'be-' . $this->sanitizeString(GeneralUtility::_GET('M'));
+    }
+
+    /**
      * Shortcut for object manager `get()` function.
      *
      * @param string $className
@@ -467,43 +473,11 @@ class Core implements SingletonInterface
     }
 
     /**
-     * @return TypoScriptService
-     */
-    public function getTypoScriptService()
-    {
-        return $this->typoScriptService;
-    }
-
-    /**
      * @param TypoScriptService $typoScriptService
      */
     public function injectTypoScriptService(TypoScriptService $typoScriptService)
     {
         $this->typoScriptService = $typoScriptService;
-    }
-
-    /**
-     * @return ConfigurationFactory
-     */
-    public function getConfigurationFactory()
-    {
-        return $this->configurationFactory;
-    }
-
-    /**
-     * @param ConfigurationFactory $configurationFactory
-     */
-    public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
-    {
-        $this->configurationFactory = $configurationFactory;
-    }
-
-    /**
-     * @return EnvironmentService
-     */
-    public function getEnvironmentService()
-    {
-        return $this->environmentService;
     }
 
     /**

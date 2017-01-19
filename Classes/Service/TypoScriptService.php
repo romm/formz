@@ -16,8 +16,8 @@ namespace Romm\Formz\Service;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 
 /**
@@ -26,6 +26,11 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 class TypoScriptService implements SingletonInterface
 {
     const EXTENSION_CONFIGURATION_PATH = 'config.tx_formz';
+
+    /**
+     * @var EnvironmentService
+     */
+    protected $environmentService;
 
     /**
      * @var ExtbaseTypoScriptService
@@ -125,7 +130,7 @@ class TypoScriptService implements SingletonInterface
         $contextHash = $this->getContextHash();
 
         if (false === array_key_exists($contextHash, $this->configuration)) {
-            if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+            if ($this->environmentService->isEnvironmentInFrontendMode()) {
                 $typoScriptArray = $this->getFrontendTypoScriptConfiguration();
             } else {
                 $typoScriptArray = $this->getBackendTypoScriptConfiguration();
@@ -164,11 +169,15 @@ class TypoScriptService implements SingletonInterface
      */
     protected function getContextHash()
     {
-        $hash = (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode())
-            ? 'fe-' . Core::get()->getCurrentPageUid()
-            : 'be-' . Core::get()->sanitizeString(GeneralUtility::_GET('M'));
+        return 'ts-conf-' . Core::get()->getContextHash();
+    }
 
-        return 'ts-conf-' . $hash;
+    /**
+     * @param EnvironmentService $environmentService
+     */
+    public function injectEnvironmentService(EnvironmentService $environmentService)
+    {
+        $this->environmentService = $environmentService;
     }
 
     /**

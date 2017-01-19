@@ -26,6 +26,7 @@ use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 class JavaScriptAssetHandlerConnector
 {
@@ -56,6 +57,10 @@ class JavaScriptAssetHandlerConnector
      */
     private $assetHandlerConnectorManager;
 
+    /**
+     * @var EnvironmentService
+     */
+    protected $environmentService;
     /**
      * @param AssetHandlerConnectorManager $assetHandlerConnectorManager
      */
@@ -263,7 +268,7 @@ class JavaScriptAssetHandlerConnector
     {
         $pageRenderer = $this->assetHandlerConnectorManager->getPageRenderer();
 
-        if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+        if ($this->environmentService->isEnvironmentInFrontendMode()) {
             $pageRenderer->addJsFooterFile($path);
         } else {
             $pageRenderer->addJsFile($path);
@@ -280,7 +285,7 @@ class JavaScriptAssetHandlerConnector
     {
         $pageRenderer = $this->assetHandlerConnectorManager->getPageRenderer();
 
-        if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+        if ($this->environmentService->isEnvironmentInFrontendMode()) {
             $pageRenderer->addJsFooterInlineCode($name, $javaScriptCode);
         } else {
             $pageRenderer->addJsInlineCode($name, $javaScriptCode);
@@ -389,5 +394,13 @@ class JavaScriptAssetHandlerConnector
         return $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+    }
+
+    /**
+     * @param EnvironmentService $environmentService
+     */
+    public function injectEnvironmentService(EnvironmentService $environmentService)
+    {
+        $this->environmentService = $environmentService;
     }
 }

@@ -16,6 +16,7 @@ namespace Romm\Formz\Configuration;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -26,6 +27,10 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class ConfigurationFactory implements SingletonInterface
 {
+    /**
+     * @var TypoScriptService
+     */
+    protected $typoScriptService;
 
     /**
      * @var ConfigurationObjectInstance[]
@@ -53,7 +58,7 @@ class ConfigurationFactory implements SingletonInterface
     {
         $cacheIdentifier = $this->getCacheIdentifier();
 
-        if (null === $this->instances[$cacheIdentifier]) {
+        if (false === array_key_exists($cacheIdentifier, $this->instances)) {
             $this->instances[$cacheIdentifier] = $this->getFormzConfigurationFromCache($cacheIdentifier);
         }
 
@@ -92,7 +97,7 @@ class ConfigurationFactory implements SingletonInterface
      */
     protected function buildFormzConfiguration()
     {
-        $configuration = Core::get()->getTypoScriptService()->getFormzConfiguration();
+        $configuration = $this->typoScriptService->getFormzConfiguration();
         $instance = ConfigurationObjectFactory::getInstance()
             ->get(Configuration::class, $configuration);
 
@@ -108,14 +113,22 @@ class ConfigurationFactory implements SingletonInterface
      */
     protected function getCacheIdentifier()
     {
-        $pageUid = Core::get()->getCurrentPageUid();
+        $contextHash = Core::get()->getContextHash();
 
-        if (false === array_key_exists($pageUid, $this->cacheIdentifiers)) {
-            $configuration = Core::get()->getTypoScriptService()->getFormzConfiguration();
+        if (false === array_key_exists($contextHash, $this->cacheIdentifiers)) {
+            $configuration = $this->typoScriptService->getFormzConfiguration();
 
-            $this->cacheIdentifiers[$pageUid] = 'formz-configuration-' . sha1(serialize($configuration));
+            $this->cacheIdentifiers[$contextHash] = 'formz-configuration-' . sha1(serialize($configuration));
         }
 
-        return $this->cacheIdentifiers[$pageUid];
+        return $this->cacheIdentifiers[$contextHash];
+    }
+
+    /**
+     * @param TypoScriptService $typoScriptService
+     */
+    public function injectTypoScriptService(TypoScriptService $typoScriptService)
+    {
+        $this->typoScriptService = $typoScriptService;
     }
 }

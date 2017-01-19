@@ -1,0 +1,52 @@
+<?php
+namespace Romm\Formz\Tests\Unit;
+
+use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use TYPO3\CMS\Extbase\Object\Container\ClassInfo;
+use TYPO3\CMS\Extbase\Object\Container\Container;
+
+/**
+ * Overrides Extbase default objects container, and adds the possibility to
+ * register an object instance (generally a mock) for a given class name.
+ */
+class UnitTestContainer extends Container
+{
+    use FacadeInstanceTrait;
+
+    /**
+     * @var array
+     */
+    protected $mockedInstances = [];
+
+    /**
+     * @inheritdoc
+     */
+    protected function instanciateObject(ClassInfo $classInfo, array $givenConstructorArguments)
+    {
+        if (isset($this->mockedInstances[$classInfo->getClassName()])) {
+            return $this->mockedInstances[$classInfo->getClassName()];
+        } else {
+            return parent::instanciateObject($classInfo, $givenConstructorArguments);
+        }
+    }
+
+    /**
+     * @param string $className
+     * @param object $instance
+     */
+    public function registerMockedInstance($className, $instance)
+    {
+        $this->mockedInstances[$className] = $instance;
+    }
+
+    /**
+     * @param string $className
+     * @return object|null
+     */
+    public function getMockedInstance($className)
+    {
+        return (isset($this->mockedInstances[$className]))
+            ? $this->mockedInstances[$className]
+            : null;
+    }
+}

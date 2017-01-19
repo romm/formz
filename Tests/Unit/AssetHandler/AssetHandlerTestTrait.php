@@ -2,8 +2,10 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
+use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 trait AssetHandlerTestTrait
@@ -15,8 +17,9 @@ trait AssetHandlerTestTrait
      */
     protected function getAssetHandlerFactoryInstance($formClassName)
     {
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
+        $formObjectFactory = new FormObjectFactory;
+        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
+        $formObjectFactory->injectTypoScriptService(Core::instantiate(TypoScriptService::class));
 
         $form = $formObjectFactory->getInstanceFromClassName($formClassName, 'foo');
         $controllerContext = new ControllerContext();
