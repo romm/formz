@@ -15,7 +15,6 @@ namespace Romm\Formz\Core;
 
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Error\FormzMessageInterface;
-use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
@@ -67,11 +66,6 @@ class Core implements SingletonInterface
      * @var ConfigurationFactory
      */
     private $configurationFactory;
-
-    /**
-     * @var FormObjectFactory
-     */
-    private $formObjectFactory;
 
     /**
      * @var EnvironmentService
@@ -502,22 +496,6 @@ class Core implements SingletonInterface
     public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
     {
         $this->configurationFactory = $configurationFactory;
-    }
-
-    /**
-     * @return FormObjectFactory
-     */
-    public function getFormObjectFactory()
-    {
-        return $this->formObjectFactory;
-    }
-
-    /**
-     * @param FormObjectFactory $formObjectFactory
-     */
-    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
-    {
-        $this->formObjectFactory = $formObjectFactory;
     }
 
     /**

@@ -17,10 +17,10 @@ use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\FormService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -143,6 +143,11 @@ abstract class AbstractFormValidator extends GenericObjectValidator
     protected $objectManager;
 
     /**
+     * @var FormObjectFactory
+     */
+    protected $formObjectFactory;
+
+    /**
      * @var ConditionProcessor
      */
     private $conditionProcessor;
@@ -208,8 +213,7 @@ abstract class AbstractFormValidator extends GenericObjectValidator
         $formName = $this->options['name'];
         $this->result = new FormResult();
 
-        $this->formObject = Core::get()->getFormObjectFactory()
-            ->getInstanceFromClassName($formClassName, $formName);
+        $this->formObject = $this->formObjectFactory->getInstanceFromClassName($formClassName, $formName);
 
         /** @var BehavioursManager $behavioursManager */
         $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
@@ -483,5 +487,13 @@ abstract class AbstractFormValidator extends GenericObjectValidator
         }
 
         return $this->formClone;
+    }
+
+    /**
+     * @param FormObjectFactory $formObjectFactory
+     */
+    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
+    {
+        $this->formObjectFactory = $formObjectFactory;
     }
 }

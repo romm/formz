@@ -15,6 +15,7 @@ namespace Romm\Formz\Validation;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObjectFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -54,7 +55,10 @@ class AjaxFieldValidation implements SingletonInterface
 
         if ($formClassName && $formName && $passObjectInstance && $fieldValue && $fieldName && $validatorName) {
             try {
-                $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName($formClassName, $formName);
+                /** @var FormObjectFactory $formObjectFactory */
+                $formObjectFactory = Core::instantiate(FormObjectFactory::class);
+
+                $formObject = $formObjectFactory->getInstanceFromClassName($formClassName, $formName);
                 $validationResult = $formObject->getConfigurationValidationResult();
 
                 if (false === $validationResult->hasErrors()) {

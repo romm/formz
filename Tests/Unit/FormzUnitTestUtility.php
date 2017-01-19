@@ -6,7 +6,6 @@ use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\TypoScriptService;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
@@ -95,7 +94,6 @@ trait FormzUnitTestUtility
         $this->formzCoreMock->injectObjectManager($this->getFormzObjectManagerMock());
         $this->formzCoreMock->injectTypoScriptService(new TypoScriptService);
         $this->formzCoreMock->injectConfigurationFactory(new ConfigurationFactory);
-        $this->formzCoreMock->injectFormObjectFactory(new FormObjectFactory());
 
         $this->injectTransientMemoryCacheInFormzCore();
         $this->injectMockedEnvironmentServiceInFormzCore();

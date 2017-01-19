@@ -19,6 +19,7 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
@@ -70,6 +71,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * @var PageRenderer
      */
     protected $pageRenderer;
+
+    /**
+     * @var FormObjectFactory
+     */
+    protected $formObjectFactory;
 
     /**
      * @var string
@@ -135,9 +141,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 $result = Core::get()->translate('form.typoscript_not_included.error_message');
             }
         } else {
-            $formObject = Core::get()
-                ->getFormObjectFactory()
-                ->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
+            $formObject = $this->formObjectFactory->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
 
             $this->service->setFormObject($formObject);
             $formzValidationResult = $formObject->getConfigurationValidationResult();
@@ -421,5 +425,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     public function injectPageRenderer(PageRenderer $pageRenderer)
     {
         $this->pageRenderer = $pageRenderer;
+    }
+
+    /**
+     * @param FormObjectFactory $formObjectFactory
+     */
+    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
+    {
+        $this->formObjectFactory = $formObjectFactory;
     }
 }
