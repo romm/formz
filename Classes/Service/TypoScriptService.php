@@ -169,7 +169,7 @@ class TypoScriptService implements SingletonInterface
      */
     protected function getContextHash()
     {
-        return 'ts-conf-' . Core::get()->getContextHash();
+        return 'ts-conf-' . ContextService::get()->getContextHash();
     }
 
     /**

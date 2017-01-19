@@ -25,6 +25,7 @@ use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
@@ -103,7 +104,7 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeLanguageJavaScriptFiles()
     {
-        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('local-' . Core::get()->getLanguageKey()) . '.js';
+        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('local-' . ContextService::get()->getLanguageKey()) . '.js';
 
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,

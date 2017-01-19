@@ -20,6 +20,7 @@ use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
@@ -137,7 +138,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->timeTracker = TimeTrackerService::getAndStart();
         $result = '';
 
-        if (false === Core::get()->isTypoScriptIncluded()) {
+        if (false === ContextService::get()->isTypoScriptIncluded()) {
             if (ExtensionService::get()->isInDebugMode()) {
                 $result = Core::get()->translate('form.typoscript_not_included.error_message');
             }

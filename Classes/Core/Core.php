@@ -52,13 +52,6 @@ class Core implements SingletonInterface
     protected $environmentService;
 
     /**
-     * Contains the actual language key.
-     *
-     * @var string
-     */
-    private $languageKey;
-
-    /**
      * @return Core
      */
     public static function get()
@@ -103,45 +96,6 @@ class Core implements SingletonInterface
     public function arrayToJavaScriptJson(array $array)
     {
         return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
-    }
-
-    /**
-     * Returns the current language key.
-     *
-     * @return string
-     */
-    public function getLanguageKey()
-    {
-        if (null === $this->languageKey) {
-            $this->languageKey = 'default';
-
-            if ($this->environmentService->isEnvironmentInFrontendMode()) {
-                $pageController = $this->getPageController();
-
-                if (isset($pageController->config['config']['language'])) {
-                    $this->languageKey = $pageController->config['config']['language'];
-                }
-            } else {
-                $backendUser = $this->getBackendUser();
-
-                if (strlen($backendUser->uc['lang']) > 0) {
-                    $this->languageKey = $backendUser->uc['lang'];
-                }
-            }
-        }
-
-        return $this->languageKey;
-    }
-
-    /**
-     * Will check if the TypoScript was indeed included, as it contains required
-     * configuration to make the forms work properly.
-     *
-     * @return bool
-     */
-    public function isTypoScriptIncluded()
-    {
-        return null !== $this->typoScriptService->getExtensionConfigurationFromPath('settings.typoScriptIncluded');
     }
 
     /**
@@ -197,19 +151,6 @@ class Core implements SingletonInterface
         }
 
         return $string;
-    }
-
-    /**
-     * Returns a unique hash for the context of the current request, depending
-     * on whether the request comes from frontend or backend.
-     *
-     * @return string
-     */
-    public function getContextHash()
-    {
-        return ($this->environmentService->isEnvironmentInFrontendMode())
-            ? 'fe-' . $this->getPageController()->id
-            : 'be-' . $this->sanitizeString(GeneralUtility::_GET('M'));
     }
 
     /**

@@ -13,13 +13,13 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 class ExtensionService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use FacadeInstanceTrait;
 
     const EXTENSION_KEY = 'formz';
 
