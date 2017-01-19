@@ -151,7 +151,7 @@ class TypoScriptService implements SingletonInterface
     protected function getBackendTypoScriptConfiguration()
     {
         /** @var ConfigurationManager $configurationManager */
-        $configurationManager = Core::get()->getObjectManager()->get(ConfigurationManager::class);
+        $configurationManager = Core::instantiate(ConfigurationManager::class);
 
         return $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
     }

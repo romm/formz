@@ -34,9 +34,7 @@ trait ExtendedFacadeInstanceTrait
     public static function get()
     {
         if (null === self::$facadeInstance) {
-            self::$facadeInstance = Core::get()
-                ->getObjectManager()
-                ->get(self::class);
+            self::$facadeInstance = Core::instantiate(self::class);
         }
 
         return self::$facadeInstance;

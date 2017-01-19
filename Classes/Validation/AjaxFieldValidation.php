@@ -76,8 +76,7 @@ class AjaxFieldValidation implements SingletonInterface
                             }
 
                             /** @var AbstractValidator $validatorInstance */
-                            /** @noinspection PhpMethodParametersCountMismatchInspection */
-                            $validatorInstance = Core::get()->getObjectManager()->get(
+                            $validatorInstance = Core::instantiate(
                                 $validatorClassName,
                                 $fieldValidationConfiguration->getOptions(),
                                 $form,

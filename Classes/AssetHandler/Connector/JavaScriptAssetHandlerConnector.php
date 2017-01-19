@@ -293,7 +293,7 @@ class JavaScriptAssetHandlerConnector
     protected function getAjaxUrl()
     {
         /** @var UriBuilder $uriBuilder */
-        $uriBuilder = Core::get()->getObjectManager()->get(UriBuilder::class);
+        $uriBuilder = Core::instantiate(UriBuilder::class);
 
         return $uriBuilder->reset()
             ->setTargetPageType(1473682545)

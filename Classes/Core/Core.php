@@ -444,6 +444,19 @@ class Core implements SingletonInterface
     }
 
     /**
+     * Shortcut for object manager `get()` function.
+     *
+     * @param string $className
+     * @return object
+     */
+    public static function instantiate($className)
+    {
+        $objectManager = self::get()->getObjectManager();
+
+        return call_user_func_array([$objectManager, 'get'], func_get_args());
+    }
+
+    /**
      * @return ObjectManagerInterface
      */
     public function getObjectManager()

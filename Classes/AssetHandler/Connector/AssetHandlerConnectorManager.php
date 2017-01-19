@@ -62,16 +62,8 @@ class AssetHandlerConnectorManager
     {
         $this->pageRenderer = $pageRenderer;
         $this->assetHandlerFactory = $assetHandlerFactory;
-
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $this->cssAssetHandlerConnector = Core::get()
-            ->getObjectManager()
-            ->get(CssAssetHandlerConnector::class, $this);
-
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $this->javaScriptAssetHandlerConnector = Core::get()
-            ->getObjectManager()
-            ->get(JavaScriptAssetHandlerConnector::class, $this);
+        $this->cssAssetHandlerConnector = Core::instantiate(CssAssetHandlerConnector::class, $this);
+        $this->javaScriptAssetHandlerConnector = Core::instantiate(JavaScriptAssetHandlerConnector::class, $this);
     }
 
     /**
