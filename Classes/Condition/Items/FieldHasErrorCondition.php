@@ -15,7 +15,6 @@ namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormzMessageInterface;
 
 /**

@@ -20,7 +20,6 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use TYPO3\CMS\Extbase\Error\Error;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
 use TYPO3\CMS\Extbase\Error\Warning;
