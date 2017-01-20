@@ -17,7 +17,6 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
@@ -141,7 +140,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
         if (false === ContextService::get()->isTypoScriptIncluded()) {
             if (ExtensionService::get()->isInDebugMode()) {
-                $result = Core::get()->translate('form.typoscript_not_included.error_message');
+                $result = ContextService::get()->translate('form.typoscript_not_included.error_message');
             }
         } else {
             $formObject = $this->formObjectFactory->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());

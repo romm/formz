@@ -16,6 +16,7 @@ namespace Romm\Formz\Validation;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -40,7 +41,7 @@ class AjaxFieldValidation implements SingletonInterface
         // Default technical error result if the function can not be reached.
         $result = [
             'success' => false,
-            'message' => [Core::get()->translate('default_error_message')]
+            'message' => [ContextService::get()->translate('default_error_message')]
         ];
 
         // We prevent any external message to be displayed here.

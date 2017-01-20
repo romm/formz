@@ -13,13 +13,11 @@
 
 namespace Romm\Formz\Core;
 
-use Romm\Formz\Service\ExtensionService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -50,27 +48,6 @@ class Core implements SingletonInterface
         }
 
         return self::$instance;
-    }
-
-    /**
-     * Translation handler. Does the same job as Extbase translation tools,
-     * expect that if the index to the LLL reference is not found, the index is
-     * returned (Extbase would have returned an empty string).
-     *
-     * @param    string $index        The index to the LLL reference.
-     * @param    string $extensionKey Key of the extension containing the LLL reference.
-     * @param    array  $arguments    Arguments passed over to vsprintf.
-     * @return   string               The translated string.
-     */
-    public function translate($index, $extensionKey = null, $arguments = null)
-    {
-        $extensionKey = ($extensionKey) ?: ExtensionService::get()->getExtensionKey();
-        $result = LocalizationUtility::translate($index, $extensionKey, $arguments);
-        if ($result === '' && $index !== '') {
-            $result = $index;
-        }
-
-        return $result;
     }
 
     /**
