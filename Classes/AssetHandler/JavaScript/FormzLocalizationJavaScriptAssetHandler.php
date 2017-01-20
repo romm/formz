@@ -14,7 +14,7 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
 
 /**
  * This asset handler will manage the translations which will be sent to Formz
@@ -66,8 +66,8 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHan
             $translationsBinding[$key] = $hash;
         }
 
-        $jsonRealTranslations = $this->handleRealTranslations(Core::get()->arrayToJavaScriptJson($realTranslations));
-        $jsonTranslationsBinding = $this->handleTranslationsBinding(Core::get()->arrayToJavaScriptJson($translationsBinding));
+        $jsonRealTranslations = $this->handleRealTranslations(ArrayService::get()->arrayToJavaScriptJson($realTranslations));
+        $jsonTranslationsBinding = $this->handleTranslationsBinding(ArrayService::get()->arrayToJavaScriptJson($translationsBinding));
 
         return <<<JS
 Formz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);

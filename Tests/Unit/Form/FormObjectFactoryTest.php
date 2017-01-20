@@ -1,6 +1,8 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Form;
 
+use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
@@ -18,6 +20,8 @@ class FormObjectFactoryTest extends AbstractUnitTest
     public function formObjectFromClassNameIsCreated()
     {
         $formObjectFactory = new FormObjectFactory;
+        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
+        $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
@@ -68,6 +72,9 @@ class FormObjectFactoryTest extends AbstractUnitTest
 
         /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
         $formObjectFactory = $this->getMock(FormObjectFactory::class, ['createInstance']);
+        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
+        $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());
+
         $formObjectFactory->expects($this->once())
             ->method('createInstance')
             ->willReturn($formObject);

@@ -14,7 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
 
 /**
  * This class must be extended by every registered condition item. When it is
@@ -68,7 +68,7 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     protected function getDefaultJavaScriptCall(array $data)
     {
         $conditionName = addslashes(get_class($this));
-        $data = Core::get()->arrayToJavaScriptJson($data);
+        $data = ArrayService::get()->arrayToJavaScriptJson($data);
 
         return <<<JS
 Formz.Condition.validateCondition('$conditionName', form, $data)

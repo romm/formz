@@ -6,25 +6,32 @@ use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\CacheService;
+use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\TypoScriptService;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
-use Romm\Formz\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\CacheFactory;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\Container\Container;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
-use TYPO3\CMS\Extbase\Service\TypoScriptService;
+use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 trait FormzUnitTestUtility
 {
+    /**
+     * @var EnvironmentService|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $mockedEnvironmentService;
 
     /**
-     * @var Core|\PHPUnit_Framework_MockObject_MockObject
+     * @var TypoScriptService|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $formzCoreMock;
+    private $mockedTypoScriptService;
 
     /**
      * @var array
@@ -42,20 +49,38 @@ trait FormzUnitTestUtility
     protected $extensionConfiguration = [];
 
     /**
+     * @var bool
+     */
+    private $frontendEnvironment = true;
+
+    /**
      * Can be used in the `setUp()` function of every unit test.
      */
     protected function formzSetUp()
     {
+        /*
+         * The function below is part of the Configuration Object API. It must
+         * be called in order to use the API during unit testing.
+         */
         $this->initializeConfigurationObjectTestServices();
-        $this->setUpFormzCore();
+
+        $this->injectAllDependencies();
 
         ConditionFactory::get()->registerDefaultConditions();
     }
 
     /**
-     * @var bool
+     * Function to inject every dependency needed during a unit test.
      */
-    private $frontendEnvironment = true;
+    protected function injectAllDependencies()
+    {
+        $this->setUpFormzCoreMock();
+        $this->overrideExtbaseContainer();
+        $this->changeReflectionCache();
+        $this->injectDependenciesInFormzCore();
+        $this->injectTransientMemoryCacheInFormzCore();
+        $this->setUpExtensionServiceMock();
+    }
 
     /**
      * Can be used in the `tearDown()` function of every unit test.
@@ -63,11 +88,21 @@ trait FormzUnitTestUtility
     protected function formzTearDown()
     {
         // Reset asset handler factory instances.
-        $reflectedCore = new \ReflectionClass(AssetHandlerFactory::class);
-        $objectManagerProperty = $reflectedCore->getProperty('factoryInstances');
+        $reflectedClass = new \ReflectionClass(AssetHandlerFactory::class);
+        $objectManagerProperty = $reflectedClass->getProperty('factoryInstances');
         $objectManagerProperty->setAccessible(true);
         $objectManagerProperty->setValue([]);
         $objectManagerProperty->setAccessible(false);
+
+        // Reset configuration factory instances.
+        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
+        $reflectedObject = new \ReflectionObject($configurationFactory);
+        $objectManagerProperty = $reflectedObject->getProperty('instances');
+        $objectManagerProperty->setAccessible(true);
+        $objectManagerProperty->setValue($configurationFactory, []);
+        $objectManagerProperty->setAccessible(false);
+
+        UnitTestContainer::get()->resetInstances();
     }
 
     /**
@@ -75,51 +110,87 @@ trait FormzUnitTestUtility
      */
     protected function getFormObject()
     {
-        return new FormObject(
+        $formObject = new FormObject(
             AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
             AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
         );
+
+        $formObject->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
+
+        return $formObject;
+    }
+
+    /**
+     * This function will force the type of cache of `extbase_object` to
+     * `TransientMemoryBackend` instead of something like database.
+     */
+    protected function changeReflectionCache()
+    {
+        /** @var CacheManager $cacheManager */
+        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+
+        $cacheManager->setCacheConfigurations([
+            'extbase_object' => [
+                'frontend' => VariableFrontend::class,
+                'backend'  => TransientMemoryBackend::class
+            ]
+        ]);
+    }
+
+    /**
+     * Overrides Extbase default container to be more flexible.
+     *
+     * @see UnitTestContainer
+     */
+    protected function overrideExtbaseContainer()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][Container::class]['className'] = UnitTestContainer::class;
+
+        UnitTestContainer::get()->registerMockedInstance(TypoScriptService::class, $this->getMockedTypoScriptService());
+        UnitTestContainer::get()->registerMockedInstance(EnvironmentService::class, $this->getMockedEnvironmentService());
     }
 
     /**
      * Initializes correctly this extension `Core` class to be able to work
      * correctly in unit tests.
      */
-    protected function setUpFormzCore()
+    protected function setUpFormzCoreMock()
     {
-        $this->formzCoreMock = $this->getMock(
+        // Injecting the mocked instance in the core.
+        $formzCoreMock = $this->getMock(
             Core::class,
-            ['translate', 'getFullExtensionConfiguration', 'getExtensionRelativePath']
+            ['translate']
         );
 
-        $this->formzCoreMock->injectObjectManager($this->getFormzObjectManagerMock());
-        $this->formzCoreMock->injectTypoScriptUtility(new TypoScriptUtility);
-        $this->formzCoreMock->injectConfigurationFactory(new ConfigurationFactory);
-        $this->formzCoreMock->injectFormObjectFactory(new FormObjectFactory());
+        $reflectedClass = new \ReflectionClass(Core::class);
+        $property = $reflectedClass->getProperty('instance');
+        $property->setAccessible(true);
+        $property->setValue($formzCoreMock);
+    }
 
-        $this->injectTransientMemoryCacheInFormzCore();
-        $this->injectMockedEnvironmentServiceInFormzCore();
+    /**
+     * Will inject a mocked instance a the `ExtensionService`, allowing to
+     * dynamically change the extension configuration during the tests.
+     */
+    protected function setUpExtensionServiceMock()
+    {
+        /** @var ExtensionService|\PHPUnit_Framework_MockObject_MockObject $extensionServiceMock */
+        $extensionServiceMock = $this->getMock(
+            ExtensionService::class,
+            ['getFullExtensionConfiguration', 'getExtensionRelativePath']
+        );
 
-        $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
-        $this->injectMockedTypoScriptUtilityInFormzCore();
-
-        /*
-         * Mocking the translate function, to avoid the fatal error due to TYPO3
-         * core trying to get the localization data in database cache.
-         */
-        $this->formzCoreMock->method('translate')
-            ->will(
-                $this->returnCallback(
-                    function ($key, $extension) {
-                        return 'LLL:' . $extension . ':' . $key;
-                    }
-                )
-            );
+        $reflectedClass = new \ReflectionClass(ExtensionService::class);
+        $property = $reflectedClass->getProperty('facadeInstance');
+        $property->setAccessible(true);
+        $property->setValue($extensionServiceMock);
 
         /*
          * Will return a configuration that can be manipulated during tests.
          */
-        $this->formzCoreMock->method('getFullExtensionConfiguration')
+        $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
+
+        $extensionServiceMock->method('getFullExtensionConfiguration')
             ->willReturnCallback(function () {
                 return $this->extensionConfiguration;
             });
@@ -128,7 +199,7 @@ trait FormzUnitTestUtility
          * The relative path can't be fetched during unit tests: we force a
          * static value.
          */
-        $this->formzCoreMock->method('getExtensionRelativePath')
+        $extensionServiceMock->method('getExtensionRelativePath')
             ->will(
                 $this->returnCallback(
                     function ($path = null) {
@@ -140,47 +211,29 @@ trait FormzUnitTestUtility
                     }
                 )
             );
-
-        // Injecting the mocked instance in the core.
-        $reflectedCore = new \ReflectionClass(Core::class);
-        $objectManagerProperty = $reflectedCore->getProperty('instance');
-        $objectManagerProperty->setAccessible(true);
-        $objectManagerProperty->setValue($this->formzCoreMock);
     }
 
-    /**
-     * Inject a special type of cache that will work with the unit tests suit.
-     */
-    private function injectTransientMemoryCacheInFormzCore()
+    protected function injectDependenciesInFormzCore()
     {
-        $cacheManager = new CacheManager;
-        $cacheFactory = new CacheFactory('foo', $cacheManager);
-        $cacheInstance = $cacheFactory->create('foo', VariableFrontend::class, TransientMemoryBackend::class);
+        /** @var Core|\PHPUnit_Framework_MockObject_MockObject $core */
+        $core = Core::get();
 
-        $this->formzCoreMock->setCacheInstance($cacheInstance);
-    }
+        /** @var ObjectManager $objectManager */
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $core->injectObjectManager($objectManager);
 
-    /**
-     * The mocked service allows unit tests to manipulate the current
-     * environment easily thanks to the functions `setFrontendEnvironment()` and
-     * `setBackendEnvironment()`.
-     */
-    private function injectMockedEnvironmentServiceInFormzCore()
-    {
-        /** @var EnvironmentService|\PHPUnit_Framework_MockObject_MockObject $environmentServiceMock */
-        $environmentServiceMock = $this->getMock(EnvironmentService::class, ['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode']);
-
-        $environmentServiceMock->method('isEnvironmentInFrontendMode')
-            ->willReturnCallback(function () {
-                return $this->frontendEnvironment;
-            });
-
-        $environmentServiceMock->method('isEnvironmentInBackendMode')
-            ->willReturnCallback(function () {
-                return !$this->frontendEnvironment;
-            });
-
-        $this->formzCoreMock->injectEnvironmentService($environmentServiceMock);
+        /*
+         * Mocking the translate function, to avoid the fatal error due to TYPO3
+         * core trying to get the localization data in database cache.
+         */
+        $core->method('translate')
+            ->will(
+                $this->returnCallback(
+                    function ($key, $extension) {
+                        return 'LLL:' . $extension . ':' . $key;
+                    }
+                )
+            );
     }
 
     /**
@@ -238,64 +291,74 @@ trait FormzUnitTestUtility
     }
 
     /**
-     * This function will mock the `TypoScriptUtility` class to return a
-     * custom configuration array.
+     * Inject a special type of cache that will work with the unit tests suit.
      */
-    private function injectMockedTypoScriptUtilityInFormzCore()
+    private function injectTransientMemoryCacheInFormzCore()
     {
-        /** @var TypoScriptUtility|\PHPUnit_Framework_MockObject_MockObject $typoScriptUtilityMock */
-        $typoScriptUtilityMock = $this->getMock(TypoScriptUtility::class, ['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration']);
+        $cacheFactory = new CacheFactory('foo', new CacheManager);
+        $cacheInstance = $cacheFactory->create('foo', VariableFrontend::class, TransientMemoryBackend::class);
 
-        $configurationCallBack = function () {
-            $configuration = ArrayUtility::setValueByPath(
-                $this->formzConfiguration,
-                'config.tx_formz.forms',
-                $this->formConfiguration
-            );
-
-            return $configuration;
-        };
-
-        $typoScriptUtilityMock->method('getFrontendTypoScriptConfiguration')
-            ->willReturnCallback($configurationCallBack);
-
-        $typoScriptUtilityMock->method('getBackendTypoScriptConfiguration')
-            ->willReturnCallback($configurationCallBack);
-
-        $typoScriptUtilityMock->injectTypoScriptService(new TypoScriptService);
-
-        $this->formzCoreMock->injectTypoScriptUtility($typoScriptUtilityMock);
+        CacheService::get()->setCacheInstance($cacheInstance);
     }
 
     /**
-     * Returns a mocked instance of the Extbase `ObjectManager`. Will allow the
-     * main function `get()` to work properly during the tests.
+     * The mocked service allows unit tests to manipulate the current
+     * environment easily thanks to the functions `setFrontendEnvironment()` and
+     * `setBackendEnvironment()`.
      *
-     * @return ObjectManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return EnvironmentService|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getFormzObjectManagerMock()
+    protected function getMockedEnvironmentService()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject $objectManagerMock */
-        $objectManagerMock = $this->getMock(ObjectManagerInterface::class);
-        $objectManagerMock->expects($this->any())
-            ->method('get')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        $arguments = func_get_args();
+        if (null === $this->mockedEnvironmentService) {
+            $this->mockedEnvironmentService = $this->getMock(EnvironmentService::class, ['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode']);
 
-                        $reflectionClass = new \ReflectionClass(array_shift($arguments));
-                        if (empty($arguments)) {
-                            $instance = $reflectionClass->newInstance();
-                        } else {
-                            $instance = $reflectionClass->newInstanceArgs($arguments);
-                        }
+            $this->mockedEnvironmentService->method('isEnvironmentInFrontendMode')
+                ->willReturnCallback(function () {
+                    return $this->frontendEnvironment;
+                });
 
-                        return $instance;
-                    }
-                )
-            );
+            $this->mockedEnvironmentService->method('isEnvironmentInBackendMode')
+                ->willReturnCallback(function () {
+                    return !$this->frontendEnvironment;
+                });
+        }
 
-        return $objectManagerMock;
+        return $this->mockedEnvironmentService;
+    }
+
+    /**
+     *
+     * This function will mock the `TypoScriptService` class to return a
+     * custom configuration array.
+     *
+     * @return TypoScriptService|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getMockedTypoScriptService()
+    {
+        if (null === $this->mockedTypoScriptService) {
+            $this->mockedTypoScriptService = $this->getMock(TypoScriptService::class, ['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration']);
+
+            $configurationCallBack = function () {
+                $configuration = ArrayUtility::setValueByPath(
+                    $this->formzConfiguration,
+                    'config.tx_formz.forms',
+                    $this->formConfiguration
+                );
+
+                return $configuration;
+            };
+
+            $this->mockedTypoScriptService->method('getFrontendTypoScriptConfiguration')
+                ->willReturnCallback($configurationCallBack);
+
+            $this->mockedTypoScriptService->method('getBackendTypoScriptConfiguration')
+                ->willReturnCallback($configurationCallBack);
+
+            $this->mockedTypoScriptService->injectEnvironmentService($this->getMockedEnvironmentService());
+            $this->mockedTypoScriptService->injectTypoScriptService(new ExtbaseTypoScriptService);
+        }
+
+        return $this->mockedTypoScriptService;
     }
 }

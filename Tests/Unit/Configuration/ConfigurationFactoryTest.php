@@ -20,6 +20,7 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     public function canGetFormzConfiguration()
     {
         $configurationFactory = new ConfigurationFactory;
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
         $formzConfiguration = $configurationFactory->getFormzConfiguration();
 
         $this->assertInstanceOf(ConfigurationObjectInstance::class, $formzConfiguration);
@@ -38,6 +39,7 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
         $configurationFactory = $this->getMock(ConfigurationFactory::class, ['getFormzConfigurationFromCache']);
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $configurationInstance = new Configuration;
         $configurationResult = new Result;
@@ -66,8 +68,11 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
         $configurationFactory = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
+
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory2 */
         $configurationFactory2 = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory2->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $configurationInstance = new Configuration;
         $configurationResult = new Result;
@@ -103,9 +108,11 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
         $configurationFactory = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory2 */
         $configurationFactory2 = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory2->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $configurationInstance = new Configuration;
         $configurationResult = new Result;

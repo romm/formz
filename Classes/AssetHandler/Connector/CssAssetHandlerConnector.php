@@ -15,7 +15,7 @@ namespace Romm\Formz\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\Css\ErrorContainerDisplayCssAssetHandler;
 use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\StringService;
 
 class CssAssetHandlerConnector
 {
@@ -51,7 +51,7 @@ class CssAssetHandlerConnector
     public function includeDefaultCssFiles()
     {
         foreach ($this->cssFiles as $file) {
-            $filePath = Core::get()->getExtensionRelativePath('Resources/Public/StyleSheets/' . $file);
+            $filePath = StringService::get()->getExtensionRelativePath('Resources/Public/StyleSheets/' . $file);
 
             $this->assetHandlerConnectorManager
                 ->getPageRenderer()
@@ -96,7 +96,7 @@ class CssAssetHandlerConnector
 
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
-            ->addCssFile(Core::get()->getResourceRelativePath($filePath));
+            ->addCssFile(StringService::get()->getResourceRelativePath($filePath));
 
         return $this;
     }

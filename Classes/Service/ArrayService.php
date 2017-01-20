@@ -11,37 +11,23 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Condition\Parser\Node;
+namespace Romm\Formz\Service;
 
-use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
-class NullNode extends AbstractNode implements SingletonInterface
+class ArrayService implements SingletonInterface
 {
     use FacadeInstanceTrait;
 
     /**
-     * @inheritdoc
+     * Converts an array to a clean JSON string which can be used by JavaScript.
+     *
+     * @param array $array
+     * @return string
      */
-    public function getCssResult()
+    public function arrayToJavaScriptJson(array $array)
     {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getJavaScriptResult()
-    {
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPhpResult(PhpConditionDataObject $dataObject)
-    {
-        return true;
+        return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
     }
 }

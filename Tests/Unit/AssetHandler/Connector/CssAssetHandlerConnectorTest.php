@@ -22,6 +22,7 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
 
+        /** @var PageRenderer|\PHPUnit_Framework_MockObject_MockObject $pageRendererMock */
         $pageRendererMock = $this->getMock(PageRenderer::class, ['addCssFile']);
         $pageRendererMock->expects($this->atLeastOnce())
             ->method('addCssFile');
@@ -53,6 +54,7 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
         $pageRendererMock->expects($this->atLeastOnce())
             ->method('addCssFile');
 
+        /** @var AssetHandlerConnectorManager|\PHPUnit_Framework_MockObject_MockObject $assetHandlerConnectorManager */
         $assetHandlerConnectorManager = $this->getMock(
             AssetHandlerConnectorManager::class,
             ['fileExists', 'writeTemporaryFile'],

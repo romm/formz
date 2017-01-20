@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Utility;
+namespace Romm\Formz\Service;
 
 use TYPO3\CMS\Core\TimeTracker\TimeTracker as TYPO3TimeTracker;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -19,7 +19,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Little utility to track the time used by certain functionality.
  */
-class TimeTracker extends TYPO3TimeTracker
+class TimeTrackerService extends TYPO3TimeTracker
 {
 
     /**
@@ -28,11 +28,11 @@ class TimeTracker extends TYPO3TimeTracker
     protected $logs = [];
 
     /**
-     * @return TimeTracker
+     * @return TimeTrackerService
      */
     public static function getAndStart()
     {
-        /** @var TimeTracker $timeTracker */
+        /** @var TimeTrackerService $timeTracker */
         $timeTracker = GeneralUtility::makeInstance(self::class);
         $timeTracker->start();
 

@@ -1,7 +1,9 @@
 <?php
 namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
+use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
@@ -44,6 +46,8 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
         $classViewHelper->setArguments($arguments);
 
         $formObjectFactory = new FormObjectFactory;
+        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
+        $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         /** @noinspection PhpUndefinedMethodInspection */

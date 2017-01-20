@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Utility;
+namespace Romm\Formz\Service;
 
 use Romm\Formz\Form\FormInterface;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -30,7 +30,7 @@ use TYPO3\CMS\Extbase\Mvc\Request;
  *
  * @see `onRequiredArgumentIsMissing()`
  */
-class FormUtility implements SingletonInterface
+class FormService implements SingletonInterface
 {
 
     /**

@@ -14,11 +14,11 @@
 namespace Romm\Formz\Validation\Validator;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Message as FormzMessage;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\Notice;
 use Romm\Formz\Error\Warning;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Service\ContextService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -304,7 +304,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      */
     protected function getMessageFromKey($key, $extensionKey = null, array $arguments = [])
     {
-        return Core::get()->translate($key, $extensionKey, $arguments);
+        return ContextService::get()->translate($key, $extensionKey, $arguments);
     }
 
     /**

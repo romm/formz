@@ -17,9 +17,12 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Utility\TimeTracker;
+use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\StringService;
+use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use Romm\Formz\ViewHelpers\Service\FormzViewHelperServiceInjectionTrait;
@@ -72,6 +75,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $pageRenderer;
 
     /**
+     * @var FormObjectFactory
+     */
+    protected $formObjectFactory;
+
+    /**
      * @var string
      */
     protected $formObjectClassName;
@@ -82,7 +90,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $assetHandlerFactory;
 
     /**
-     * @var TimeTracker
+     * @var TimeTrackerService
      */
     protected $timeTracker;
 
@@ -127,17 +135,15 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */
     public function render()
     {
-        $this->timeTracker = TimeTracker::getAndStart();
+        $this->timeTracker = TimeTrackerService::getAndStart();
         $result = '';
 
-        if (false === Core::get()->isTypoScriptIncluded()) {
-            if (Core::get()->isInDebugMode()) {
-                $result = Core::get()->translate('form.typoscript_not_included.error_message');
+        if (false === ContextService::get()->isTypoScriptIncluded()) {
+            if (ExtensionService::get()->isInDebugMode()) {
+                $result = ContextService::get()->translate('form.typoscript_not_included.error_message');
             }
         } else {
-            $formObject = Core::get()
-                ->getFormObjectFactory()
-                ->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
+            $formObject = $this->formObjectFactory->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
 
             $this->service->setFormObject($formObject);
             $formzValidationResult = $formObject->getConfigurationValidationResult();
@@ -348,13 +354,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     {
         /** @var $view \TYPO3\CMS\Fluid\View\StandaloneView */
         $view = $this->objectManager->get(StandaloneView::class);
-        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
-        $layoutRootPath = Core::get()->getExtensionRelativePath('Resources/Private/Layouts');
+        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
+        $layoutRootPath = StringService::get()->getExtensionRelativePath('Resources/Private/Layouts');
         $view->setLayoutRootPaths([$layoutRootPath]);
         $view->assign('result', $result);
 
-        $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
-        $this->pageRenderer->addCssFile(Core::get()->getResourceRelativePath($templatePath));
+        $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
+        $this->pageRenderer->addCssFile(StringService::get()->getResourceRelativePath($templatePath));
 
         return $view->render();
     }
@@ -421,5 +427,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     public function injectPageRenderer(PageRenderer $pageRenderer)
     {
         $this->pageRenderer = $pageRenderer;
+    }
+
+    /**
+     * @param FormObjectFactory $formObjectFactory
+     */
+    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
+    {
+        $this->formObjectFactory = $formObjectFactory;
     }
 }
