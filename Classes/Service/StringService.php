@@ -15,7 +15,6 @@ namespace Romm\Formz\Service;
 
 use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
@@ -30,12 +29,12 @@ class StringService implements SingletonInterface
     protected $environmentService;
 
     /**
-     * @param string|null $path If a string is given, it will be precessed by the extension relative path and returned.
+     * @param string $path If a string is given, it will be precessed by the extension relative path and returned.
      * @return string
      */
-    public function getExtensionRelativePath($path = null)
+    public function getExtensionRelativePath($path)
     {
-        $relativePath = ExtensionManagementUtility::siteRelPath('formz');
+        $relativePath = ExtensionService::get()->getExtensionRelativePath();
 
         if ($this->environmentService->isEnvironmentInBackendMode()) {
             $relativePath = '../' . $relativePath;

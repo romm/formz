@@ -159,7 +159,7 @@ trait FormzUnitTestUtility
         // Injecting the mocked instance in the core.
         $formzCoreMock = $this->getMock(
             Core::class,
-            ['translate', 'getExtensionRelativePath']
+            ['translate']
         );
 
         $reflectedClass = new \ReflectionClass(Core::class);
@@ -174,10 +174,11 @@ trait FormzUnitTestUtility
      */
     protected function setUpExtensionServiceMock()
     {
-        $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
-
         /** @var ExtensionService|\PHPUnit_Framework_MockObject_MockObject $extensionServiceMock */
-        $extensionServiceMock = $this->getMock(ExtensionService::class, ['getFullExtensionConfiguration']);
+        $extensionServiceMock = $this->getMock(
+            ExtensionService::class,
+            ['getFullExtensionConfiguration', 'getExtensionRelativePath']
+        );
 
         $reflectedClass = new \ReflectionClass(ExtensionService::class);
         $property = $reflectedClass->getProperty('facadeInstance');
@@ -187,10 +188,29 @@ trait FormzUnitTestUtility
         /*
          * Will return a configuration that can be manipulated during tests.
          */
+        $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
+
         $extensionServiceMock->method('getFullExtensionConfiguration')
             ->willReturnCallback(function () {
                 return $this->extensionConfiguration;
             });
+
+        /*
+         * The relative path can't be fetched during unit tests: we force a
+         * static value.
+         */
+        $extensionServiceMock->method('getExtensionRelativePath')
+            ->will(
+                $this->returnCallback(
+                    function ($path = null) {
+                        $relativePath = '/tmp/formz/';
+
+                        return (null !== $path)
+                            ? $relativePath . $path
+                            : $relativePath;
+                    }
+                )
+            );
     }
 
     protected function injectDependenciesInFormzCore()
@@ -213,23 +233,6 @@ trait FormzUnitTestUtility
                 $this->returnCallback(
                     function ($key, $extension) {
                         return 'LLL:' . $extension . ':' . $key;
-                    }
-                )
-            );
-
-        /*
-         * The relative path can't be fetched during unit tests: we force a
-         * static value.
-         */
-        $core->method('getExtensionRelativePath')
-            ->will(
-                $this->returnCallback(
-                    function ($path = null) {
-                        $relativePath = '/tmp/formz/';
-
-                        return (null !== $path)
-                            ? $relativePath . $path
-                            : $relativePath;
                     }
                 )
             );

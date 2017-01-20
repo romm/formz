@@ -16,6 +16,7 @@ namespace Romm\Formz\Service;
 use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 class ExtensionService implements SingletonInterface
 {
@@ -62,6 +63,14 @@ class ExtensionService implements SingletonInterface
         }
 
         return $this->extensionConfiguration;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtensionRelativePath()
+    {
+        return ExtensionManagementUtility::siteRelPath(self::EXTENSION_KEY);
     }
 
     /**
