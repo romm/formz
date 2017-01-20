@@ -15,7 +15,7 @@ namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -156,7 +156,7 @@ JS;
 
         $messages = $formzLocalizationJavaScriptAssetHandler->getTranslationKeysForFieldValidation($field, $validationName);
 
-        return Core::get()->arrayToJavaScriptJson([
+        return ArrayService::get()->arrayToJavaScriptJson([
             'options'            => $validatorConfiguration->getOptions(),
             'messages'           => $messages,
             'settings'           => $validatorConfiguration->toArray(),

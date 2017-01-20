@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
@@ -44,8 +44,8 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractJavaScriptAssetHandl
             : 'false';
 
         if ($formWasSubmitted) {
-            $submittedFormValues = Core::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
-            $fieldsExistingErrors = Core::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
+            $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
+            $fieldsExistingErrors = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
         }
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());

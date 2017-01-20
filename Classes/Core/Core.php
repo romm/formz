@@ -74,17 +74,6 @@ class Core implements SingletonInterface
     }
 
     /**
-     * Converts an array to a clean JSON string which can be used by JavaScript.
-     *
-     * @param array $array
-     * @return string
-     */
-    public function arrayToJavaScriptJson(array $array)
-    {
-        return json_encode($array, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_TAG);
-    }
-
-    /**
      * Shortcut for object manager `get()` function.
      *
      * @param string $className

@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\CacheService;
 
 /**
@@ -77,6 +77,6 @@ JS;
             'view' => $formzConfigurationArray['view']
         ];
 
-        return Core::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
+        return ArrayService::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
     }
 }
