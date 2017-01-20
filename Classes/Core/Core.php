@@ -14,13 +14,11 @@
 namespace Romm\Formz\Core;
 
 use Romm\Formz\Service\ExtensionService;
-use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
-use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -38,16 +36,6 @@ class Core implements SingletonInterface
      * @var ObjectManagerInterface
      */
     protected $objectManager;
-
-    /**
-     * @var TypoScriptService
-     */
-    protected $typoScriptService;
-
-    /**
-     * @var EnvironmentService
-     */
-    protected $environmentService;
 
     /**
      * @return Core
@@ -97,23 +85,6 @@ class Core implements SingletonInterface
     }
 
     /**
-     * Sanitizes a string: lower case with dash separation.
-     *
-     * @param string $string
-     * @return string
-     */
-    public function sanitizeString($string)
-    {
-        $string = str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($string));
-
-        while (strpos($string, '--')) {
-            $string = str_replace('--', '-', $string);
-        }
-
-        return $string;
-    }
-
-    /**
      * Shortcut for object manager `get()` function.
      *
      * @param string $className
@@ -140,22 +111,6 @@ class Core implements SingletonInterface
     public function injectObjectManager(ObjectManagerInterface $objectManager)
     {
         $this->objectManager = $objectManager;
-    }
-
-    /**
-     * @param TypoScriptService $typoScriptService
-     */
-    public function injectTypoScriptService(TypoScriptService $typoScriptService)
-    {
-        $this->typoScriptService = $typoScriptService;
-    }
-
-    /**
-     * @param EnvironmentService $environmentService
-     */
-    public function injectEnvironmentService(EnvironmentService $environmentService)
-    {
-        $this->environmentService = $environmentService;
     }
 
     /**

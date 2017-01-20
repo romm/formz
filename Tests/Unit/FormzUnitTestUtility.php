@@ -221,8 +221,6 @@ trait FormzUnitTestUtility
         /** @var ObjectManager $objectManager */
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $core->injectObjectManager($objectManager);
-        $core->injectTypoScriptService($this->getMockedTypoScriptService());
-        $core->injectEnvironmentService($this->getMockedEnvironmentService());
 
         /*
          * Mocking the translate function, to avoid the fatal error due to TYPO3
