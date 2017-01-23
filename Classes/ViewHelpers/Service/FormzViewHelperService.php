@@ -15,6 +15,7 @@ namespace Romm\Formz\ViewHelpers\Service;
 
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
@@ -219,7 +220,7 @@ class FormzViewHelperService implements SingletonInterface
     public function checkIsInsideFieldViewHelper()
     {
         if (false === $this->fieldContextExists()) {
-            throw new \Exception(
+            throw new ContextNotFoundException(
                 'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
                 1465243085
             );

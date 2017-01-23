@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\Core\Core;
 use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -28,20 +28,24 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  *
  * Without the Option view helper:
  *
+ * ```
  *  <formz:field layout="..."
  *               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
  *
  *      ...
  *  </formz:field>
+ * ```
  *
  * With it:
  *
+ * ```
  *  <formz:field layout="...">
  *      <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
  *      <formz:option name="foo" value="bar" />
  *
  *      ...
  *  </formz:field>
+ * ```
  */
 class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
@@ -76,7 +80,7 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
         /** @var FormzViewHelperService $service */
-        $service = GeneralUtility::makeInstance(FormzViewHelperService::class);
+        $service = Core::instantiate(FormzViewHelperService::class);
 
         $service->setFieldOption($arguments['name'], $arguments['value']);
     }
