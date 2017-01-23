@@ -14,7 +14,7 @@
 namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
+use Romm\Formz\ViewHelpers\Service\FieldService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -49,6 +49,10 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  */
 class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * @var array
@@ -69,7 +73,7 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        $this->service->checkIsInsideFieldViewHelper();
+        $this->fieldService->checkIsInsideFieldViewHelper();
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
@@ -79,9 +83,17 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        /** @var FormzViewHelperService $service */
-        $service = Core::instantiate(FormzViewHelperService::class);
+        /** @var FieldService $service */
+        $service = Core::instantiate(FieldService::class);
 
         $service->setFieldOption($arguments['name'], $arguments['value']);
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

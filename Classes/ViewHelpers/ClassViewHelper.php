@@ -17,6 +17,8 @@ use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -51,6 +53,16 @@ class ClassViewHelper extends AbstractViewHelper
      * @var array
      */
     protected static $acceptedClassesNameSpace = [self::CLASS_ERRORS, self::CLASS_VALID];
+
+    /**
+     * @var FormService
+     */
+    protected $formService;
+
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * @var string
@@ -133,9 +145,9 @@ class ClassViewHelper extends AbstractViewHelper
         $this->fieldName = $this->arguments['field'];
 
         if (empty($this->fieldName)
-            && $this->service->fieldContextExists()
+            && $this->fieldService->fieldContextExists()
         ) {
-            $this->fieldName = $this->service
+            $this->fieldName = $this->fieldService
                 ->getCurrentField()
                 ->getFieldName();
         }
@@ -156,7 +168,7 @@ class ClassViewHelper extends AbstractViewHelper
      */
     protected function initializeClassValue()
     {
-        $classesConfiguration = $this->service
+        $classesConfiguration = $this->formService
             ->getFormObject()
             ->getConfiguration()
             ->getFormzConfiguration()
@@ -184,12 +196,12 @@ class ClassViewHelper extends AbstractViewHelper
      */
     protected function getFormResultClass()
     {
-        $formResult = $this->service->getFormResult();
+        $formResult = $this->formService->getFormResult();
         $propertyResult = ($formResult)
             ? $formResult->forProperty($this->fieldName)
             : null;
 
-        return ($this->service->formWasSubmitted() && null !== $propertyResult)
+        return ($this->formService->formWasSubmitted() && null !== $propertyResult)
             ? $this->getPropertyResultClass($propertyResult)
             : '';
     }
@@ -216,5 +228,21 @@ class ClassViewHelper extends AbstractViewHelper
         }
 
         return $result;
+    }
+
+    /**
+     * @param FormService $service
+     */
+    public function injectFormService(FormService $service)
+    {
+        $this->formService = $service;
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

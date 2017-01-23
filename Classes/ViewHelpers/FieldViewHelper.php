@@ -17,6 +17,8 @@ use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Service\StringService;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
@@ -37,6 +39,16 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class FieldViewHelper extends AbstractViewHelper
 {
+    /**
+     * @var FormService
+     */
+    protected $formService;
+
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
+
     /**
      * Unique instance of view, stored to save some performance.
      *
@@ -59,9 +71,9 @@ class FieldViewHelper extends AbstractViewHelper
      */
     public function render()
     {
-        $this->service->checkIsInsideFormViewHelper();
+        $this->formService->checkIsInsideFormViewHelper();
 
-        $formObject = $this->service->getFormObject();
+        $formObject = $this->formService->getFormObject();
 
         $formConfiguration = $formObject->getConfiguration();
 
@@ -74,7 +86,7 @@ class FieldViewHelper extends AbstractViewHelper
             throw new \Exception('The form "' . $formObject->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.', 1465243619);
         }
 
-        $this->service->setCurrentField($formConfiguration->getField($fieldName));
+        $this->fieldService->setCurrentField($formConfiguration->getField($fieldName));
 
         $closure = $this->buildRenderChildrenClosure();
         $closure();
@@ -89,7 +101,7 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments = is_array($this->arguments['arguments'])
             ? $this->arguments['arguments']
             : [];
-        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, $this->service->getFieldOptions());
+        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, $this->fieldService->getFieldOptions());
 
         /*
          * Keeping a trace of potential original arguments which will be
@@ -121,7 +133,7 @@ class FieldViewHelper extends AbstractViewHelper
             ->getViewHelperVariableContainer()
             ->setView($currentView);
 
-        $this->service
+        $this->fieldService
             ->removeCurrentField()
             ->resetFieldOptions();
         SectionViewHelper::resetSectionClosures();
@@ -222,5 +234,21 @@ class FieldViewHelper extends AbstractViewHelper
                 $templateVariableContainer->add($key, $value);
             }
         }
+    }
+
+    /**
+     * @param FormService $service
+     */
+    public function injectFormService(FormService $service)
+    {
+        $this->formService = $service;
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

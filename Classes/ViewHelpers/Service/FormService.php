@@ -13,12 +13,9 @@
 
 namespace Romm\Formz\ViewHelpers\Service;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormViewHelper;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -29,7 +26,7 @@ use TYPO3\CMS\Core\SingletonInterface;
  * It is mainly configured inside the `FormViewHelper`, and used in other
  * view helpers.
  */
-class FormzViewHelperService implements SingletonInterface
+class FormService implements SingletonInterface
 {
     /**
      * @var bool
@@ -40,11 +37,6 @@ class FormzViewHelperService implements SingletonInterface
      * @var array|FormInterface
      */
     protected $formInstance;
-
-    /**
-     * @var Field
-     */
-    protected $currentField;
 
     /**
      * @var bool
@@ -62,11 +54,6 @@ class FormzViewHelperService implements SingletonInterface
     protected $formObject;
 
     /**
-     * @var array
-     */
-    protected $fieldOptions = [];
-
-    /**
      * Reset every state that can be used by this service.
      */
     public function resetState()
@@ -75,7 +62,6 @@ class FormzViewHelperService implements SingletonInterface
         $this->formInstance = null;
         $this->formResult = null;
         $this->formWasSubmitted = false;
-        $this->currentField = null;
     }
 
     /**
@@ -126,76 +112,6 @@ class FormzViewHelperService implements SingletonInterface
     }
 
     /**
-     * Checks that the `FieldViewHelper` has been called. If not, an exception
-     * is thrown.
-     *
-     * @return bool
-     */
-    public function fieldContextExists()
-    {
-        return $this->currentField instanceof Field;
-    }
-
-    /**
-     * Returns the current field which was defined by the `FieldViewHelper`.
-     *
-     * Returns null if no current field was found.
-     *
-     * @return Field|null
-     */
-    public function getCurrentField()
-    {
-        return $this->currentField;
-    }
-
-    /**
-     * @param Field $field
-     */
-    public function setCurrentField(Field $field)
-    {
-        $this->currentField = $field;
-    }
-
-    /**
-     * @param string $name
-     * @param mixed  $value
-     */
-    public function setFieldOption($name, $value)
-    {
-        $this->fieldOptions[$name] = $value;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFieldOptions()
-    {
-        return $this->fieldOptions;
-    }
-
-    /**
-     * @return $this
-     */
-    public function resetFieldOptions()
-    {
-        $this->fieldOptions = [];
-
-        return $this;
-    }
-
-    /**
-     * Unset the current field.
-     *
-     * @return $this
-     */
-    public function removeCurrentField()
-    {
-        $this->currentField = null;
-
-        return $this;
-    }
-
-    /**
      * Checks that the current `FormViewHelper` exists. If not, an exception is
      * thrown.
      *
@@ -206,22 +122,6 @@ class FormzViewHelperService implements SingletonInterface
         if (false === $this->formContextExists()) {
             throw new \Exception(
                 'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FormViewHelper::class . '".',
-                1465243085
-            );
-        }
-    }
-
-    /**
-     * Checks that the `FieldViewHelper` has been called. If not, an exception
-     * is thrown.
-     *
-     * @throws \Exception
-     */
-    public function checkIsInsideFieldViewHelper()
-    {
-        if (false === $this->fieldContextExists()) {
-            throw new ContextNotFoundException(
-                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
                 1465243085
             );
         }

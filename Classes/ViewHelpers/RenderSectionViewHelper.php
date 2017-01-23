@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\ViewHelpers\Service\FieldService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -23,6 +24,10 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  */
 class RenderSectionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * @inheritdoc
@@ -37,7 +42,7 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public function render()
     {
-        $this->service->checkIsInsideFieldViewHelper();
+        $this->fieldService->checkIsInsideFieldViewHelper();
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
@@ -55,5 +60,13 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
         return (null !== $closure)
             ? $closure()
             : '';
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\ViewHelpers\Service\FieldService;
 use TYPO3\CMS\Fluid\Core\Compiler\TemplateCompiler;
 use TYPO3\CMS\Fluid\Core\Parser\SyntaxTree\AbstractNode;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
@@ -27,6 +28,10 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  */
 class SectionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * Contains the closures which will render the registered sections. The keys
@@ -49,7 +54,7 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function render()
     {
-        $this->service->checkIsInsideFieldViewHelper();
+        $this->fieldService->checkIsInsideFieldViewHelper();
 
         self::addSectionClosure($this->arguments['name'], $this->buildRenderChildrenClosure());
     }
@@ -99,5 +104,13 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     public static function resetSectionClosures()
     {
         self::$sections = [];
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

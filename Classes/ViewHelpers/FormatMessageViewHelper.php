@@ -20,6 +20,8 @@ use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -40,6 +42,15 @@ use TYPO3\CMS\Extbase\Error\Warning;
  */
 class FormatMessageViewHelper extends AbstractViewHelper
 {
+    /**
+     * @var FormService
+     */
+    protected $formService;
+
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * @inheritdoc
@@ -58,7 +69,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $message = $this->getMessage();
         $fieldName = $this->getFieldName();
         $field = $this->getField();
-        $formObject = $this->service->getFormObject();
+        $formObject = $this->formService->getFormObject();
 
         $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
 
@@ -135,9 +146,9 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $fieldName = $this->arguments['field'];
 
         if (empty($fieldName)
-            && $this->service->fieldContextExists()
+            && $this->fieldService->fieldContextExists()
         ) {
-            $field = $this->service->getCurrentField();
+            $field = $this->fieldService->getCurrentField();
             $fieldName = $field->getFieldName();
         }
 
@@ -157,7 +168,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
      */
     protected function getField()
     {
-        $formObject = $this->service->getFormObject();
+        $formObject = $this->formService->getFormObject();
         $fieldName = $this->getFieldName();
 
         if (false === $formObject->getConfiguration()->hasField($fieldName)) {
@@ -171,5 +182,21 @@ class FormatMessageViewHelper extends AbstractViewHelper
         }
 
         return $formObject->getConfiguration()->getField($fieldName);
+    }
+
+    /**
+     * @param FormService $service
+     */
+    public function injectFormService(FormService $service)
+    {
+        $this->formService = $service;
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

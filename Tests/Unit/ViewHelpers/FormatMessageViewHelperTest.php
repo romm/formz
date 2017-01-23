@@ -13,7 +13,8 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
-use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Extbase\Error\Message;
 
 class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
@@ -45,15 +46,18 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
             ]
         );
 
-        $service = $this->getService();
-        $viewHelper->injectFormzViewHelperService($service);
+        $formService = $this->getFormService();
+        $fieldService = new FieldService;
+
+        $viewHelper->injectFormService($formService);
+        $viewHelper->injectFieldService($fieldService);
 
         if (null !== $field) {
-            $service->setCurrentField($field);
+            $fieldService->setCurrentField($field);
         }
 
         if (null !== $messageTemplate) {
-            $service->getFormObject()
+            $formService->getFormObject()
                 ->getConfiguration()
                 ->getField('foo')
                 ->getSettings()
@@ -131,11 +135,11 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
-     * @return FormzViewHelperService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getService()
+    protected function getFormService()
     {
-        $service = $this->getMock(FormzViewHelperService::class, ['getFormObject']);
+        $service = $this->getMock(FormService::class, ['getFormObject']);
         $formObjectFactory = new FormObjectFactory;
         $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
         $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());

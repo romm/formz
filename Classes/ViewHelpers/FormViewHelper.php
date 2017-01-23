@@ -25,7 +25,7 @@ use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
-use Romm\Formz\ViewHelpers\Service\FormzViewHelperServiceInjectionTrait;
+use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -67,8 +67,6 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 {
-    use FormzViewHelperServiceInjectionTrait;
-
     /**
      * @var PageRenderer
      */
@@ -78,6 +76,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * @var FormObjectFactory
      */
     protected $formObjectFactory;
+
+    /**
+     * @var FormService
+     */
+    protected $formService;
 
     /**
      * @var string
@@ -127,12 +130,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->registerArgument('formClassName', 'string', 'Class name of the form.', false);
     }
 
+    /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */
+
     /**
      * Render the form.
      *
      * @return string
      */
-    /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */
     public function render()
     {
         $this->timeTracker = TimeTrackerService::getAndStart();
@@ -145,7 +149,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         } else {
             $formObject = $this->formObjectFactory->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
 
-            $this->service->setFormObject($formObject);
+            $this->formService->setFormObject($formObject);
             $formzValidationResult = $formObject->getConfigurationValidationResult();
 
             if ($formzValidationResult->hasErrors()) {
@@ -163,11 +167,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $result = $this->timeTracker->getHTMLCommentLogs() . LF . $result;
         unset($this->timeTracker);
 
-        $this->service->resetState();
+        $this->formService->resetState();
 
         return $result;
     }
-
     /**
      * Will render the whole form and return the HTML result.
      *
@@ -178,7 +181,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     {
         $this->timeTracker->logTime('post-config');
 
-        $this->assetHandlerFactory = AssetHandlerFactory::get($this->service->getFormObject(), $this->controllerContext);
+        $this->assetHandlerFactory = AssetHandlerFactory::get($this->formService->getFormObject(), $this->controllerContext);
 
         $this->setObjectAndRequestResult()
             ->applyBehavioursOnSubmittedForm()
@@ -214,7 +217,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function setObjectAndRequestResult()
     {
-        $this->service->activateFormContext();
+        $this->formService->activateFormContext();
 
         $originalRequest = $this->controllerContext
             ->getRequest()
@@ -231,9 +234,9 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 $this->getFormObjectName()
             );
 
-            $this->service->setFormInstance($formInstance);
-            $this->service->setFormResult($formRequestResult);
-            $this->service->markFormAsSubmitted();
+            $this->formService->setFormInstance($formInstance);
+            $this->formService->setFormResult($formRequestResult);
+            $this->formService->markFormAsSubmitted();
         } elseif (null !== $this->arguments['object']) {
             $formInstance = $this->arguments['object'];
 
@@ -248,8 +251,8 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             );
             $formRequestResult = $formValidator->validate($formInstance);
 
-            $this->service->setFormInstance($formInstance);
-            $this->service->setFormResult($formRequestResult);
+            $this->formService->setFormInstance($formInstance);
+            $this->formService->setFormResult($formRequestResult);
         }
 
         return $this;
@@ -267,13 +270,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             ->getRequest()
             ->getOriginalRequest();
 
-        if ($this->service->formWasSubmitted()) {
+        if ($this->formService->formWasSubmitted()) {
             /** @var BehavioursManager $behavioursManager */
             $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
 
             $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
-                $this->service->getFormInstance(),
-                $this->service->getFormObject()->getConfiguration()
+                $this->formService->getFormInstance(),
+                $this->formService->getFormObject()->getConfiguration()
             );
 
             $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
@@ -292,7 +295,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function addDefaultClass()
     {
-        $formDefaultClass = $this->service
+        $formDefaultClass = $this->formService
             ->getFormObject()
             ->getConfiguration()
             ->getSettings()
@@ -317,8 +320,8 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function handleDataAttributes()
     {
-        $object = $this->service->getFormInstance();
-        $formResult = $this->service->getFormResult();
+        $object = $this->formService->getFormInstance();
+        $formResult = $this->formService->getFormResult();
 
         /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
         $dataAttributesAssetHandler =  $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
@@ -331,7 +334,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         if ($formResult) {
             $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($formResult);
 
-            if (true === $this->service->formWasSubmitted()) {
+            if (true === $this->formService->formWasSubmitted()) {
                 $dataAttributes += ['formz-submission-done' => '1'];
                 $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($formResult);
             }
@@ -435,5 +438,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
     {
         $this->formObjectFactory = $formObjectFactory;
+    }
+
+    /**
+     * @param FormService $service
+     */
+    public function injectFormService(FormService $service)
+    {
+        $this->formService = $service;
     }
 }

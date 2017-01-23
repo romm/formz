@@ -13,9 +13,6 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\ViewHelpers\Service\FormzViewHelperServiceInjectionTrait;
-
 abstract class AbstractViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {
-    use FormzViewHelperServiceInjectionTrait;
 }

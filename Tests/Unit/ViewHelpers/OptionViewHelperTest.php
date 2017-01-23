@@ -5,7 +5,8 @@ use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\ViewHelpers\OptionViewHelper;
-use Romm\Formz\ViewHelpers\Service\FormzViewHelperService;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\FormService;
 
 class OptionViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -14,19 +15,20 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelper()
     {
-        /** @var FormzViewHelperService|\PHPUnit_Framework_MockObject_MockObject $formzViewHelperService */
-        $formzViewHelperService = $this->getMock(FormzViewHelperService::class, ['setFieldOption']);
-        $formzViewHelperService->expects($this->once())
+        /** @var FormService|\PHPUnit_Framework_MockObject_MockObject $formService */
+        $formService = $this->getMock(FormService::class, ['setFieldOption']);
+        $formService->expects($this->once())
             ->method('setFieldOption')
             ->with('foo', 'bar');
 
-        $formzViewHelperService->setCurrentField(new Field);
+        $fieldService = new FieldService;
+        $fieldService->setCurrentField(new Field);
 
-        UnitTestContainer::get()->registerMockedInstance(FormzViewHelperService::class, $formzViewHelperService);
+        UnitTestContainer::get()->registerMockedInstance(FieldService::class, $formService);
 
         $viewHelper = new OptionViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFormzViewHelperService($formzViewHelperService);
+        $viewHelper->injectFieldService($fieldService);
         $viewHelper->initializeArguments();
         $viewHelper->setArguments([
             'name'  => 'foo',
@@ -45,7 +47,7 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
     {
         $viewHelper = new OptionViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFormzViewHelperService(new FormzViewHelperService);
+        $viewHelper->injectFieldService(new FieldService);
         $viewHelper->initializeArguments();
 
         $this->setExpectedException(ContextNotFoundException::class);
