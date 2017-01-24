@@ -130,14 +130,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->registerArgument('formClassName', 'string', 'Class name of the form.', false);
     }
 
-    /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */
-
     /**
-     * Render the form.
-     *
      * @return string
      */
-    public function render()
+    public function renderViewHelper()
     {
         $this->timeTracker = TimeTrackerService::getAndStart();
         $result = '';
