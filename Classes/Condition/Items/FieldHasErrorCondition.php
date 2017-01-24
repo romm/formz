@@ -15,6 +15,7 @@ namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Core\Core;
 use TYPO3\CMS\Extbase\Error\Error;
 
 /**
@@ -125,6 +126,6 @@ class FieldHasErrorCondition extends AbstractConditionItem
      */
     protected function getErrorTitle()
     {
-        return DataAttributesAssetHandler::getFieldCleanName($this->validationName . ':' . $this->errorName);
+        return Core::get()->sanitizeString($this->validationName . ':' . $this->errorName);
     }
 }

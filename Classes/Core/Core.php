@@ -72,6 +72,11 @@ class Core implements SingletonInterface
     private $formObjectFactory;
 
     /**
+     * @var EnvironmentService
+     */
+    private $environmentService;
+
+    /**
      * Contains the actual language key.
      *
      * @var string
@@ -169,10 +174,7 @@ class Core implements SingletonInterface
     public function getCurrentPageUid()
     {
         if (-1 === $this->currentPageUid) {
-            /** @var EnvironmentService $environmentService */
-            $environmentService = GeneralUtility::makeInstance(EnvironmentService::class);
-
-            $id = ($environmentService->isEnvironmentInFrontendMode())
+            $id = ($this->environmentService->isEnvironmentInFrontendMode())
                 ? $this->getPageController()->id
                 : GeneralUtility::_GP('id');
 
@@ -317,10 +319,7 @@ class Core implements SingletonInterface
         if (null === $this->languageKey) {
             $this->languageKey = 'default';
 
-            /** @var EnvironmentService $environmentService */
-            $environmentService = GeneralUtility::makeInstance(EnvironmentService::class);
-
-            if ($environmentService->isEnvironmentInFrontendMode()) {
+            if ($this->environmentService->isEnvironmentInFrontendMode()) {
                 $pageController = $this->getPageController();
 
                 if (isset($pageController->config['config']['language'])) {
@@ -365,6 +364,10 @@ class Core implements SingletonInterface
     {
         $relativePath = ExtensionManagementUtility::siteRelPath('formz');
 
+        if ($this->environmentService->isEnvironmentInBackendMode()) {
+            $relativePath = '../' . $relativePath;
+        }
+
         return (null !== $path)
             ? $relativePath . $path
             : $relativePath;
@@ -376,13 +379,36 @@ class Core implements SingletonInterface
      */
     public function getResourceRelativePath($path)
     {
-        return rtrim(
+        $relativePath = rtrim(
             PathUtility::getRelativePath(
                 GeneralUtility::getIndpEnv('TYPO3_DOCUMENT_ROOT'),
                 GeneralUtility::getFileAbsFileName($path)
             ),
             '/'
         );
+
+        if ($this->environmentService->isEnvironmentInBackendMode()) {
+            $relativePath = '../' . $relativePath;
+        }
+
+        return $relativePath;
+    }
+
+    /**
+     * Sanitizes a string: lower case with dash separation.
+     *
+     * @param string $string
+     * @return string
+     */
+    public function sanitizeString($string)
+    {
+        $string = str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($string));
+
+        while (strpos($string, '--')) {
+            $string = str_replace('--', '-', $string);
+        }
+
+        return $string;
     }
 
     /**
@@ -447,6 +473,22 @@ class Core implements SingletonInterface
     public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
     {
         $this->formObjectFactory = $formObjectFactory;
+    }
+
+    /**
+     * @return EnvironmentService
+     */
+    public function getEnvironmentService()
+    {
+        return $this->environmentService;
+    }
+
+    /**
+     * @param EnvironmentService $environmentService
+     */
+    public function injectEnvironmentService(EnvironmentService $environmentService)
+    {
+        $this->environmentService = $environmentService;
     }
 
     /**

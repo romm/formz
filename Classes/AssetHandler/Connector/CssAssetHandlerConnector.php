@@ -96,7 +96,7 @@ class CssAssetHandlerConnector
 
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
-            ->addCssFile($filePath);
+            ->addCssFile(Core::get()->getResourceRelativePath($filePath));
 
         return $this;
     }

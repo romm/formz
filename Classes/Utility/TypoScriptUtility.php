@@ -16,7 +16,8 @@ namespace Romm\Formz\Utility;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Extbase\Service\EnvironmentService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Extbase\Service\TypoScriptService;
 
 /**
@@ -25,13 +26,6 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService;
 class TypoScriptUtility implements SingletonInterface
 {
     const EXTENSION_CONFIGURATION_PATH = 'config.tx_formz';
-
-    const PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER = 'ts-conf-hash-pages';
-
-    /**
-     * @var EnvironmentService
-     */
-    protected $environmentService;
 
     /**
      * @var TypoScriptService
@@ -43,35 +37,22 @@ class TypoScriptUtility implements SingletonInterface
      *
      * @var array
      */
-    protected $pageConfiguration = [];
+    protected $configuration = [];
 
     /**
-     * @var array
-     */
-    protected $pagesConfigurationHashes;
-
-    /**
-     * Calls the function `getConfigurationFromPath`, but uses the extension
-     * configuration path as root path.
+     * Returns the TypoScript configuration at the given path (starting from
+     * Formz configuration root).
      *
-     * @param string        $path      The path to the configuration value. If null is given, the whole extension configuration is returned.
-     * @param int|null|bool $pageUid   The uid of the page you want the TypoScript configuration from. If `null` is given, the current page uid is used.
-     * @param string        $delimiter The delimiter for the path. Default is ".".
-     * @return mixed|null
+     * @param string $path
+     * @return mixed
      */
-    public function getExtensionConfigurationFromPath($path = null, $pageUid = null, $delimiter = '.')
+    public function getExtensionConfigurationFromPath($path)
     {
-        $extensionConfiguration = $this->getFullExtensionConfiguration($pageUid);
+        $extensionConfiguration = $this->getExtensionConfiguration();
 
-        if (null === $path) {
-            $result = $extensionConfiguration;
-        } else {
-            $result = (ArrayUtility::isValidPath($extensionConfiguration, $path, $delimiter))
-                ? ArrayUtility::getValueByPath($extensionConfiguration, $path, $delimiter)
-                : null;
-        }
-
-        return $result;
+        return (ArrayUtility::isValidPath($extensionConfiguration, $path, '.'))
+            ? ArrayUtility::getValueByPath($extensionConfiguration, $path, '.')
+            : null;
     }
 
     /**
@@ -82,7 +63,7 @@ class TypoScriptUtility implements SingletonInterface
      */
     public function getFormConfiguration($formClassName)
     {
-        $formzConfiguration = $this->getExtensionConfigurationFromPath();
+        $formzConfiguration = $this->getExtensionConfiguration();
 
         return (isset($formzConfiguration['forms'][$formClassName]))
             ? $formzConfiguration['forms'][$formClassName]
@@ -97,110 +78,97 @@ class TypoScriptUtility implements SingletonInterface
      */
     public function getFormzConfiguration()
     {
-        $configuration = $this->getExtensionConfigurationFromPath();
+        $configuration = $this->getExtensionConfiguration();
         unset($configuration['forms']);
 
         return $configuration;
     }
 
     /**
-     * This function will fetch the extension TypoScript configuration. There
-     * are two levels of cache: one cache entry is used to store identifiers for
-     * the second level of configuration caches: for every page id on which
-     * there is a need to access the Formz configuration.
+     * This function will fetch the extension TypoScript configuration, and
+     * store it in cache for further usage.
      *
-     * @param int|null $pageUid The uid of the page you want the TypoScript configuration from. If `null` is given, the current page uid is used.
+     * The configuration array is not stored in cache if the configuration
+     * property `settings.typoScriptIncluded` is not found.
+     *
      * @return array
      */
-    protected function getFullExtensionConfiguration($pageUid = null)
+    protected function getExtensionConfiguration()
     {
-        $result = null;
-        $pageUid = $this->getRealPageUid($pageUid);
         $cacheInstance = Core::get()->getCacheInstance();
+        $hash = $this->getContextHash();
 
-        if (null === $this->pagesConfigurationHashes) {
-            $this->pagesConfigurationHashes = ($cacheInstance->has(self::PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER))
-                ? $cacheInstance->get(self::PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER)
-                : [];
-        }
-
-        if (true === isset($this->pagesConfigurationHashes[$pageUid])) {
-            $hash = $this->pagesConfigurationHashes[$pageUid];
-
-            if ($cacheInstance->has($hash)) {
-                $result = $cacheInstance->get($hash);
-            }
-        }
-
-        if (null === $result) {
-            $result = $this->getConfiguration($pageUid);
-
+        if ($cacheInstance->has($hash)) {
+            $result = $cacheInstance->get($hash);
+        } else {
+            $result = $this->getFullConfiguration();
             $result = (ArrayUtility::isValidPath($result, self::EXTENSION_CONFIGURATION_PATH, '.'))
                 ? ArrayUtility::getValueByPath($result, self::EXTENSION_CONFIGURATION_PATH, '.')
                 : [];
 
-            $hash = 'ts-conf-page-' . sha1(serialize($result));
-
-            $cacheInstance->set($hash, $result);
-
-            $this->pagesConfigurationHashes[$pageUid] = $hash;
-            $cacheInstance->set(self::PAGES_CONFIGURATION_HASHES_CACHE_IDENTIFIER, $this->pagesConfigurationHashes);
+            if (ArrayUtility::isValidPath($result, 'settings.typoScriptIncluded', '.')) {
+                $cacheInstance->set($hash, $result);
+            }
         }
 
         return $result;
     }
 
     /**
-     * Returns the TypoScript configuration, including the static configuration
-     * from files (see function `getExtensionConfiguration()`).
+     * Returns the full TypoScript configuration, based on the context of the
+     * current request.
      *
-     * As this function does not save the configuration in cache, we advise not
-     * to call it, and prefer using the function `getConfigurationFromPath()`
-     * instead, which has its own caching system.
-     *
-     * It can still be useful to get the whole TypoScript configuration, so the
-     * function remains public, but use with caution!
-     *
-     * @param int|null $pageUid The uid of the page you want the TypoScript configuration from. If `null` is given, the current page uid is used.
-     * @return array The configuration.
+     * @return array
      */
-    public function getConfiguration($pageUid = null)
+    protected function getFullConfiguration()
     {
-        $pageUid = $this->getRealPageUid($pageUid);
+        $contextHash = $this->getContextHash();
 
-        if (!array_key_exists($pageUid, $this->pageConfiguration)) {
-            if ($this->environmentService->isEnvironmentInFrontendMode()) {
-                $typoScriptArray = Core::get()->getPageController()->tmpl->setup;
+        if (false === array_key_exists($contextHash, $this->configuration)) {
+            if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+                $typoScriptArray = $this->getFrontendTypoScriptConfiguration();
             } else {
-                // @todo: backend context
-                $typoScriptArray = [];
+                $typoScriptArray = $this->getBackendTypoScriptConfiguration();
             }
 
-            $this->pageConfiguration[$pageUid] = $this->typoScriptService->convertTypoScriptArrayToPlainArray($typoScriptArray);
+            $this->configuration[$contextHash] = $this->typoScriptService->convertTypoScriptArrayToPlainArray($typoScriptArray);
         }
 
-        return $this->pageConfiguration[$pageUid];
+        return $this->configuration[$contextHash];
     }
 
     /**
-     * Determines the real page uid, depending on the type of the parameter.
+     * @return array
+     */
+    protected function getFrontendTypoScriptConfiguration()
+    {
+        return Core::get()->getPageController()->tmpl->setup;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getBackendTypoScriptConfiguration()
+    {
+        /** @var ConfigurationManager $configurationManager */
+        $configurationManager = Core::get()->getObjectManager()->get(ConfigurationManager::class);
+
+        return $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
+    }
+
+    /**
+     * Returns a unique hash for the context of the current request, depending
+     * on wether the request comes from frontend or backend.
      *
-     * @param  int|null $pageUid The page uid.
-     * @return int|null The real page uid.
+     * @return string
      */
-    private function getRealPageUid($pageUid)
+    protected function getContextHash()
     {
-        return ($pageUid === null)
-            ? Core::get()->getCurrentPageUid()
-            : $pageUid;
-    }
+        $hash = (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode())
+            ? 'fe-' . Core::get()->getCurrentPageUid()
+            : 'be-' . Core::get()->sanitizeString(GeneralUtility::_GET('M'));
 
-    /**
-     * @param EnvironmentService $environmentService
-     */
-    public function injectEnvironmentService(EnvironmentService $environmentService)
-    {
-        $this->environmentService = $environmentService;
+        return 'ts-conf-' . $hash;
     }
 
     /**

@@ -14,9 +14,9 @@
 namespace Romm\Formz\AssetHandler\Html;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -164,7 +164,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValueKey($fieldName)
     {
-        return 'formz-value-' . self::getFieldCleanName($fieldName);
+        return 'formz-value-' . Core::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -175,7 +175,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidKey($fieldName)
     {
-        return 'formz-valid-' . self::getFieldCleanName($fieldName);
+        return 'formz-valid-' . Core::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -186,7 +186,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataErrorKey($fieldName)
     {
-        return 'formz-error-' . self::getFieldCleanName($fieldName);
+        return 'formz-error-' . Core::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -199,17 +199,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidationErrorKey($fieldName, $errorTitle)
     {
-        return 'formz-error-' . self::getFieldCleanName($fieldName) . '-' . self::getFieldCleanName(str_replace(':', '-', $errorTitle));
-    }
+        $core = Core::get();
 
-    /**
-     * Replaces underscores with a dash.
-     *
-     * @param string $fieldName
-     * @return string
-     */
-    public static function getFieldCleanName($fieldName)
-    {
-        return str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($fieldName));
+        return 'formz-error-' . $core->sanitizeString($fieldName) . '-' . $core->sanitizeString(str_replace(':', '-', $errorTitle));
     }
 }

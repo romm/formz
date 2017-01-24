@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
@@ -112,7 +111,7 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = (true === isset($templateArguments['fieldId']))
             ? $templateArguments['fieldId']
-            : DataAttributesAssetHandler::getFieldCleanName('formz-' . $form->getFormObject()->getName() . '-' . $fieldName);
+            : Core::get()->sanitizeString('formz-' . $form->getFormObject()->getName() . '-' . $fieldName);
 
         $currentView = $renderingContext->getViewHelperVariableContainer()->getView();
 
