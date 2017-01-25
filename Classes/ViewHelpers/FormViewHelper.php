@@ -133,7 +133,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     /**
      * @return string
      */
-    public function renderViewHelper()
+    protected function renderViewHelper()
     {
         $this->timeTracker = TimeTrackerService::getAndStart();
         $result = '';

@@ -1,0 +1,24 @@
+config.tx_formz {
+    view {
+        classes {
+            valid {
+                has-success = has-success
+            }
+            errors {
+                has-error = has-error
+            }
+        }
+
+        layouts {
+            typo3-backend {
+                templateFile = EXT:formz/Resources/Private/Templates/TYPO3/Backend/Default.html
+
+                items {
+                    default {
+                        layout = TYPO3/Backend/Default
+                    }
+                }
+            }
+        }
+    }
+}

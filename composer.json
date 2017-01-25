@@ -16,7 +16,8 @@
   ],
   "require": {
     "php": ">=5.5",
-    "romm/configuration-object": "^1.2.1"
+    "romm/configuration-object": "^1.2.1",
+    "typo3/cms": "^6.2 || ^7.6.13"
   },
   "require-dev": {
     "mikey179/vfsStream": "1.4.*@dev",
