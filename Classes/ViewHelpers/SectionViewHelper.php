@@ -13,10 +13,10 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\Core\Core;
 use Romm\Formz\ViewHelpers\Service\FieldService;
 use Romm\Formz\ViewHelpers\Service\SectionService;
-use TYPO3\CMS\Fluid\Core\Compiler\TemplateCompiler;
-use TYPO3\CMS\Fluid\Core\Parser\SyntaxTree\AbstractNode;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
@@ -35,11 +35,6 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     protected $fieldService;
 
     /**
-     * @var SectionService
-     */
-    protected $sectionService;
-
-    /**
      * @inheritdoc
      */
     public function initializeArguments()
@@ -54,20 +49,18 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     {
         $this->fieldService->checkIsInsideFieldViewHelper();
 
-        $this->sectionService->addSectionClosure($this->arguments['name'], $this->buildRenderChildrenClosure());
+        return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
     /**
-     * In the created PHP code, we add a call to the function which will
-     * register the closure to render this section.
-     *
      * @inheritdoc
      */
-    public function compile($argumentsVariableName, $renderChildrenClosureVariableName, &$initializationPhpCode, AbstractNode $syntaxTreeNode, TemplateCompiler $templateCompiler)
+    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        $initializationPhpCode .= SectionService::class . '::get()->addSectionClosure(' . $argumentsVariableName . "['name'], " . $renderChildrenClosureVariableName . ');' . LF;
+        /** @var SectionService $sectionService */
+        $sectionService = Core::instantiate(SectionService::class);
 
-        return '""';
+        $sectionService->addSectionClosure($arguments['name'], $renderChildrenClosure);
     }
 
     /**
@@ -76,13 +69,5 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     public function injectFieldService(FieldService $service)
     {
         $this->fieldService = $service;
-    }
-
-    /**
-     * @param SectionService $sectionService
-     */
-    public function injectSectionService(SectionService $sectionService)
-    {
-        $this->sectionService = $sectionService;
     }
 }

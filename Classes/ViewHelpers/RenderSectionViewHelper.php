@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\Core\Core;
 use Romm\Formz\ViewHelpers\Service\FieldService;
 use Romm\Formz\ViewHelpers\Service\SectionService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
@@ -56,7 +57,10 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        $closure = SectionService::get()->getSectionClosure($arguments['section']);
+        /** @var SectionService $sectionService */
+        $sectionService = Core::instantiate(SectionService::class);
+
+        $closure = $sectionService->getSectionClosure($arguments['section']);
 
         return (null !== $closure)
             ? $closure()

@@ -13,13 +13,10 @@
 
 namespace Romm\Formz\ViewHelpers\Service;
 
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class SectionService implements SingletonInterface
 {
-    use FacadeInstanceTrait;
-
     /**
      * Contains the closures which will render the registered sections. The keys
      * of this array are the names of the sections.
@@ -27,7 +24,7 @@ class SectionService implements SingletonInterface
      * @var callable[]
      */
     private $sections = [];
-    
+
     /**
      * Adds a closure - which will render the section with the given name - to
      * the private storage in this class.
