@@ -14,6 +14,7 @@
 namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\SectionService;
 use TYPO3\CMS\Fluid\Core\Compiler\TemplateCompiler;
 use TYPO3\CMS\Fluid\Core\Parser\SyntaxTree\AbstractNode;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
@@ -34,12 +35,9 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     protected $fieldService;
 
     /**
-     * Contains the closures which will render the registered sections. The keys
-     * of this array are the names of the sections.
-     *
-     * @var callable[]
+     * @var SectionService
      */
-    private static $sections = [];
+    protected $sectionService;
 
     /**
      * @inheritdoc
@@ -56,7 +54,7 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     {
         $this->fieldService->checkIsInsideFieldViewHelper();
 
-        self::addSectionClosure($this->arguments['name'], $this->buildRenderChildrenClosure());
+        $this->sectionService->addSectionClosure($this->arguments['name'], $this->buildRenderChildrenClosure());
     }
 
     /**
@@ -67,43 +65,9 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function compile($argumentsVariableName, $renderChildrenClosureVariableName, &$initializationPhpCode, AbstractNode $syntaxTreeNode, TemplateCompiler $templateCompiler)
     {
-        $initializationPhpCode .= self::class . '::addSectionClosure(' . $argumentsVariableName . "['name'], " . $renderChildrenClosureVariableName . ');' . LF;
+        $initializationPhpCode .= SectionService::class . '::get()->addSectionClosure(' . $argumentsVariableName . "['name'], " . $renderChildrenClosureVariableName . ');' . LF;
 
         return '""';
-    }
-
-    /**
-     * Adds a closure - which will render the section with the given name - to
-     * the private storage in this class.
-     *
-     * @param string   $name
-     * @param callable $closure
-     */
-    public static function addSectionClosure($name, $closure)
-    {
-        self::$sections[$name] = $closure;
-    }
-
-    /**
-     * Returns the closure which will render the section with the given name. If
-     * nothing is found, `null` is returned.
-     *
-     * @param string $name
-     * @return callable|null
-     */
-    public static function getSectionClosure($name)
-    {
-        return (true === isset(self::$sections[$name]))
-            ? self::$sections[$name]
-            : null;
-    }
-
-    /**
-     * Resets the list of closures.
-     */
-    public static function resetSectionClosures()
-    {
-        self::$sections = [];
     }
 
     /**
@@ -112,5 +76,13 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     public function injectFieldService(FieldService $service)
     {
         $this->fieldService = $service;
+    }
+
+    /**
+     * @param SectionService $sectionService
+     */
+    public function injectSectionService(SectionService $sectionService)
+    {
+        $this->sectionService = $sectionService;
     }
 }

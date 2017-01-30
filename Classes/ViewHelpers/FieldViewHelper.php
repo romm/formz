@@ -19,6 +19,7 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\ViewHelpers\Service\FieldService;
 use Romm\Formz\ViewHelpers\Service\FormService;
+use Romm\Formz\ViewHelpers\Service\SectionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
@@ -48,6 +49,11 @@ class FieldViewHelper extends AbstractViewHelper
      * @var FieldService
      */
     protected $fieldService;
+
+    /**
+     * @var SectionService
+     */
+    protected $sectionService;
 
     /**
      * Unique instance of view, stored to save some performance.
@@ -136,7 +142,8 @@ class FieldViewHelper extends AbstractViewHelper
         $this->fieldService
             ->removeCurrentField()
             ->resetFieldOptions();
-        SectionViewHelper::resetSectionClosures();
+
+        $this->sectionService->resetSectionClosures();
 
         self::restoreOriginalArguments($this->renderingContext, $templateArguments, $originalArguments);
 
@@ -250,5 +257,13 @@ class FieldViewHelper extends AbstractViewHelper
     public function injectFieldService(FieldService $service)
     {
         $this->fieldService = $service;
+    }
+
+    /**
+     * @param SectionService $sectionService
+     */
+    public function injectSectionService(SectionService $sectionService)
+    {
+        $this->sectionService = $sectionService;
     }
 }
