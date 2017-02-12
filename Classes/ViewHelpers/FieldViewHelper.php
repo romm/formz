@@ -17,6 +17,7 @@ use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\ViewHelpers\Service\FieldService;
 use Romm\Formz\ViewHelpers\Service\FormService;
@@ -39,6 +40,11 @@ use TYPO3\CMS\Extbase\Utility\ArrayUtility;
  */
 class FieldViewHelper extends AbstractViewHelper
 {
+    /**
+     * @var array
+     */
+    public static $reservedVariablesNames = ['layout', 'formName', 'fieldName', 'fieldId'];
+
     /**
      * @var FormService
      */
@@ -106,7 +112,7 @@ class FieldViewHelper extends AbstractViewHelper
          * We merge the arguments with the ones registered with the
          * `OptionViewHelper`.
          */
-        $templateArguments = $this->arguments['arguments'];
+        $templateArguments = $this->arguments['arguments'] ?: [];
         $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, $this->fieldService->getFieldOptions());
 
         $currentView = $viewHelperVariableContainer->getView();
@@ -191,30 +197,43 @@ class FieldViewHelper extends AbstractViewHelper
      * @param View $viewConfiguration
      * @return Layout
      * @throws EntryNotFoundException
+     * @throws InvalidArgumentTypeException
+     * @throws InvalidArgumentValueException
      */
     protected function getLayout(View $viewConfiguration)
     {
-        $layoutFound = true;
         $layout = $this->arguments['layout'];
 
-        list($layoutName, $templateName) = GeneralUtility::trimExplode('.', $layout);
+        if (false === is_string($layout)) {
+            throw new InvalidArgumentTypeException(
+                'The argument "layout" must be a string (' . gettype($layout) . ' given).',
+                1485786193
+            );
+        }
 
+        list($layoutName, $templateName) = GeneralUtility::trimExplode('.', $layout);
         if (false === is_string($templateName)) {
             $templateName = 'default';
         }
 
-        if (false === is_string($layoutName)) {
-            $layoutFound = false;
-        } elseif (false === $viewConfiguration->hasLayout($layoutName)) {
-            $layoutFound = false;
-        } elseif (false === $viewConfiguration->getLayout($layoutName)->hasItem($templateName)) {
-            $layoutFound = false;
+        if (empty($layoutName)) {
+            throw new InvalidArgumentValueException(
+                'The layout name cannot be empty, please fill with a value.',
+                1485786285
+            );
         }
 
-        if (false === $layoutFound) {
+        if (false === $viewConfiguration->hasLayout($layoutName)) {
             throw new EntryNotFoundException(
                 'The layout "' . $layout . '" could not be found. Please check your TypoScript configuration.',
                 1465243586
+            );
+        }
+
+        if (false === $viewConfiguration->getLayout($layoutName)->hasItem($templateName)) {
+            throw new EntryNotFoundException(
+                'The layout "' . $layout . '" does not have an item "' . $templateName . '".',
+                1485867803
             );
         }
 
@@ -222,32 +241,19 @@ class FieldViewHelper extends AbstractViewHelper
     }
 
     /**
-     * Returns the value of the current variable in the variable container at
-     * the index `$key`, or null if it is not found.
-     *
-     * @param string $key
-     * @return mixed|null
-     */
-    protected function getTemplateVariableContainerValue($key)
-    {
-        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
-
-        return ($templateVariableContainer->exists($key))
-            ? $templateVariableContainer->get($key)
-            : null;
-    }
-
-    /**
-     * Stores some arguments which may already have been initialized.
+     * Stores some arguments which may already have been initialized, and could
+     * be overridden in the local scope.
      */
     protected function storeOriginalArguments()
     {
-        $this->originalArguments = [
-            'layout'    => $this->getTemplateVariableContainerValue('layout'),
-            'formName'  => $this->getTemplateVariableContainerValue('formName'),
-            'fieldName' => $this->getTemplateVariableContainerValue('fieldName'),
-            'fieldId'   => $this->getTemplateVariableContainerValue('fieldId')
-        ];
+        $this->originalArguments = [];
+        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+
+        foreach (self::$reservedVariablesNames as $key) {
+            if ($templateVariableContainer->exists($key)) {
+                $this->originalArguments[$key] = $templateVariableContainer->get($key);
+            }
+        }
     }
 
     /**
@@ -259,21 +265,18 @@ class FieldViewHelper extends AbstractViewHelper
     {
         $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
 
-        $identifiers = $templateVariableContainer->getAllIdentifiers();
-        foreach ($identifiers as $identifier) {
+        foreach ($templateVariableContainer->getAllIdentifiers() as $identifier) {
             if (array_key_exists($identifier, $templateArguments)) {
                 $templateVariableContainer->remove($identifier);
             }
         }
 
         foreach ($this->originalArguments as $key => $value) {
-            if (null !== $value) {
-                if ($templateVariableContainer->exists($key)) {
-                    $templateVariableContainer->remove($key);
-                }
-
-                $templateVariableContainer->add($key, $value);
+            if ($templateVariableContainer->exists($key)) {
+                $templateVariableContainer->remove($key);
             }
+
+            $templateVariableContainer->add($key, $value);
         }
     }
 

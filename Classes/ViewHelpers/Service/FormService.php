@@ -14,6 +14,7 @@
 namespace Romm\Formz\ViewHelpers\Service;
 
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\ViewHelpers\FormViewHelper;
@@ -31,7 +32,7 @@ class FormService implements SingletonInterface
     /**
      * @var bool
      */
-    protected $formContext;
+    protected $formContext = false;
 
     /**
      * @var array|FormInterface
@@ -41,7 +42,7 @@ class FormService implements SingletonInterface
     /**
      * @var bool
      */
-    protected $formWasSubmitted;
+    protected $formWasSubmitted = false;
 
     /**
      * @var FormResult
@@ -66,7 +67,7 @@ class FormService implements SingletonInterface
 
     /**
      * Will activate the form context, changing the result returned by the
-     * function `formContextExists`.
+     * function `formContextExists()`.
      *
      * @throws \Exception
      */
@@ -120,7 +121,7 @@ class FormService implements SingletonInterface
     public function checkIsInsideFormViewHelper()
     {
         if (false === $this->formContextExists()) {
-            throw new \Exception(
+            throw new ContextNotFoundException(
                 'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FormViewHelper::class . '".',
                 1465243085
             );

@@ -19,8 +19,11 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function formObjectFromClassNameIsCreated()
     {
+        /** @var ConfigurationFactory $configurationFactory */
+        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
+
         $formObjectFactory = new FormObjectFactory;
-        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
+        $formObjectFactory->injectConfigurationFactory($configurationFactory);
         $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
@@ -70,10 +73,12 @@ class FormObjectFactoryTest extends AbstractUnitTest
     {
         $formObject = new FormObject(DefaultForm::class, 'foo');
 
+        /** @var ConfigurationFactory $configurationFactory */
+        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
+
         /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
         $formObjectFactory = $this->getMock(FormObjectFactory::class, ['createInstance']);
-        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
-        $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());
+        $formObjectFactory->injectConfigurationFactory($configurationFactory);
 
         $formObjectFactory->expects($this->once())
             ->method('createInstance')

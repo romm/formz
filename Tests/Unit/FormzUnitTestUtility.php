@@ -1,6 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit;
 
+use Prophecy\Prophet;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\ConfigurationFactory;
@@ -15,6 +16,9 @@ use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\CacheFactory;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
+use TYPO3\CMS\Core\Package\Package;
+use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\Container\Container;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
@@ -23,6 +27,11 @@ use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 trait FormzUnitTestUtility
 {
+    /**
+     * @var Prophet
+     */
+    protected $prophet;
+
     /**
      * @var EnvironmentService|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -54,16 +63,15 @@ trait FormzUnitTestUtility
     private $frontendEnvironment = true;
 
     /**
+     * @var PackageManager
+     */
+    private $packageManagerBackUp;
+
+    /**
      * Can be used in the `setUp()` function of every unit test.
      */
     protected function formzSetUp()
     {
-        /*
-         * The function below is part of the Configuration Object API. It must
-         * be called in order to use the API during unit testing.
-         */
-        $this->initializeConfigurationObjectTestServices();
-
         $this->injectAllDependencies();
 
         ConditionFactory::get()->registerDefaultConditions();
@@ -74,10 +82,19 @@ trait FormzUnitTestUtility
      */
     protected function injectAllDependencies()
     {
+        /*
+        * The function below is part of the Configuration Object API. It must
+        * be called in order to use the API during unit testing.
+        */
+        $this->initializeConfigurationObjectTestServices();
+
+        $this->backUpPackageManager();
         $this->overrideExtbaseContainer();
         $this->changeReflectionCache();
         $this->injectTransientMemoryCacheInFormzCore();
         $this->setUpExtensionServiceMock();
+
+        $this->prophet = new Prophet;
     }
 
     /**
@@ -85,6 +102,12 @@ trait FormzUnitTestUtility
      */
     protected function formzTearDown()
     {
+        if ($this->prophet) {
+            $this->prophet->checkPredictions();
+        }
+
+        $this->restorePackageManager();
+
         // Reset asset handler factory instances.
         $reflectedClass = new \ReflectionClass(AssetHandlerFactory::class);
         $objectManagerProperty = $reflectedClass->getProperty('factoryInstances');
@@ -113,7 +136,10 @@ trait FormzUnitTestUtility
             AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
         );
 
-        $formObject->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
+        /** @var ConfigurationFactory $configurationFactory */
+        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
+
+        $formObject->injectConfigurationFactory($configurationFactory);
 
         return $formObject;
     }
@@ -146,6 +172,50 @@ trait FormzUnitTestUtility
 
         UnitTestContainer::get()->registerMockedInstance(TypoScriptService::class, $this->getMockedTypoScriptService());
         UnitTestContainer::get()->registerMockedInstance(EnvironmentService::class, $this->getMockedEnvironmentService());
+    }
+
+    /**
+     * Overrides the default package manager.
+     */
+    protected function setUpPackageManagerMock()
+    {
+        /** @var Package|\PHPUnit_Framework_MockObject_MockObject $package */
+        $package = $this->getMock(Package::class, ['getPackagePath'], [], '', false);
+
+        /** @var PackageManager|\PHPUnit_Framework_MockObject_MockObject $packageManager */
+        $packageManager = $this->getMock(PackageManager::class, ['isPackageActive', 'getPackage']);
+
+        $package->method('getPackagePath')
+            ->willReturn(realpath(__DIR__ . '/../../') . '/');
+
+        $packageManager->method('isPackageActive')
+            ->with($this->equalTo('formz'))
+            ->will($this->returnValue(true));
+
+        $packageManager->method('getPackage')
+            ->with('formz')
+            ->will($this->returnValue($package));
+
+        ExtensionManagementUtility::setPackageManager($packageManager);
+    }
+
+    /**
+     * Stores the initial instance of the package manager.
+     */
+    protected function backUpPackageManager()
+    {
+        $reflection = new \ReflectionClass(ExtensionManagementUtility::class);
+        $property = $reflection->getProperty('packageManager');
+        $property->setAccessible(true);
+        $this->packageManagerBackUp = $property->getValue();
+    }
+
+    /**
+     * Restores the initial instance of the package manager.
+     */
+    protected function restorePackageManager()
+    {
+        ExtensionManagementUtility::setPackageManager($this->packageManagerBackUp);
     }
 
     /**
@@ -242,6 +312,21 @@ trait FormzUnitTestUtility
     protected function setFormzConfiguration(array $formzConfiguration)
     {
         $this->formzConfiguration = $formzConfiguration;
+    }
+
+    /**
+     * @param array $configuration
+     */
+    protected function addFormzConfiguration(array $configuration)
+    {
+        $this->setFormzConfiguration(array_merge_recursive(
+            $this->formzConfiguration,
+            [
+                'config' => [
+                    'tx_formz' => $configuration
+                ]
+            ]
+        ));
     }
 
     /**
