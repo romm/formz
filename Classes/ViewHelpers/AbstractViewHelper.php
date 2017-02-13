@@ -13,6 +13,20 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
+use TYPO3Fluid\Fluid\Core\Variables\VariableProviderInterface;
+
 abstract class AbstractViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
 {
+    /**
+     * @return VariableProviderInterface|RenderingContext
+     */
+    protected function getVariableProvider()
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        return (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '>='))
+            ? $this->renderingContext->getVariableProvider()
+            : $this->renderingContext->getTemplateVariableContainer();
+    }
 }

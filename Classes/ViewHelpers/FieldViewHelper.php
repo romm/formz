@@ -41,6 +41,11 @@ use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 class FieldViewHelper extends AbstractViewHelper
 {
     /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
+    /**
      * @var array
      */
     public static $reservedVariablesNames = ['layout', 'formName', 'fieldName', 'fieldId'];
@@ -64,11 +69,6 @@ class FieldViewHelper extends AbstractViewHelper
      * @var array
      */
     protected $originalArguments = [];
-
-    /**
-     * @var bool
-     */
-    protected $escapeOutput = false;
 
     /**
      * @inheritdoc
@@ -252,11 +252,11 @@ class FieldViewHelper extends AbstractViewHelper
     protected function storeOriginalArguments()
     {
         $this->originalArguments = [];
-        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+        $variableProvider = $this->getVariableProvider();
 
         foreach (self::$reservedVariablesNames as $key) {
-            if ($templateVariableContainer->exists($key)) {
-                $this->originalArguments[$key] = $templateVariableContainer->get($key);
+            if ($variableProvider->exists($key)) {
+                $this->originalArguments[$key] = $variableProvider->get($key);
             }
         }
     }
@@ -268,20 +268,20 @@ class FieldViewHelper extends AbstractViewHelper
      */
     protected function restoreOriginalArguments(array $templateArguments)
     {
-        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+        $variableProvider = $this->getVariableProvider();
 
-        foreach ($templateVariableContainer->getAllIdentifiers() as $identifier) {
+        foreach ($variableProvider->getAllIdentifiers() as $identifier) {
             if (array_key_exists($identifier, $templateArguments)) {
-                $templateVariableContainer->remove($identifier);
+                $variableProvider->remove($identifier);
             }
         }
 
         foreach ($this->originalArguments as $key => $value) {
-            if ($templateVariableContainer->exists($key)) {
-                $templateVariableContainer->remove($key);
+            if ($variableProvider->exists($key)) {
+                $variableProvider->remove($key);
             }
 
-            $templateVariableContainer->add($key, $value);
+            $variableProvider->add($key, $value);
         }
     }
 

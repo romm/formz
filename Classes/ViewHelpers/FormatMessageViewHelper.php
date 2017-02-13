@@ -76,10 +76,10 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $field = $this->getField();
         $formObject = $this->formService->getFormObject();
 
-        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+        $variableProvider = $this->getVariableProvider();
 
-        $fieldId = ($templateVariableContainer->exists('fieldId'))
-            ? $templateVariableContainer->get('fieldId')
+        $fieldId = ($variableProvider->exists('fieldId'))
+            ? $variableProvider->get('fieldId')
             : StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
         $result = str_replace(
