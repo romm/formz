@@ -40,7 +40,7 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public function initializeArguments()
     {
-        $this->registerArgument('section', 'object', 'Instance of the section which will be rendered.', true);
+        $this->registerArgument('section', 'string', 'Instance of the section which will be rendered.', true);
     }
 
     /**
