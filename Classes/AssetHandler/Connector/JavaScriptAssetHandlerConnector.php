@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -25,7 +25,11 @@ use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 class JavaScriptAssetHandlerConnector
 {
@@ -57,6 +61,10 @@ class JavaScriptAssetHandlerConnector
     private $assetHandlerConnectorManager;
 
     /**
+     * @var EnvironmentService
+     */
+    protected $environmentService;
+    /**
      * @param AssetHandlerConnectorManager $assetHandlerConnectorManager
      */
     public function __construct(AssetHandlerConnectorManager $assetHandlerConnectorManager)
@@ -73,16 +81,14 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeDefaultJavaScriptFiles()
     {
-        if (Core::get()->isInDebugMode()) {
+        if (ExtensionService::get()->isInDebugMode()) {
             $this->javaScriptFiles[] = 'Formz.Debug.js';
         }
 
         foreach ($this->javaScriptFiles as $file) {
-            $filePath = Core::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
+            $filePath = StringService::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
 
-            $this->assetHandlerConnectorManager
-                ->getPageRenderer()
-                ->addJsFile($filePath);
+            $this->includeJsFile($filePath);
         }
 
         return $this;
@@ -99,7 +105,7 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeLanguageJavaScriptFiles()
     {
-        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('local-' . Core::get()->getLanguageKey()) . '.js';
+        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('local-' . ContextService::get()->getLanguageKey()) . '.js';
 
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
@@ -110,9 +116,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterFile($filePath);
+        $this->includeJsFile(StringService::get()->getResourceRelativePath($filePath));
 
         return $this;
     }
@@ -136,9 +140,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterFile($fileName);
+        $this->includeJsFile(StringService::get()->getResourceRelativePath($fileName));
 
         return $this;
     }
@@ -175,9 +177,7 @@ class JavaScriptAssetHandlerConnector
             }
         );
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterFile($filePath);
+        $this->includeJsFile(StringService::get()->getResourceRelativePath($filePath));
 
         return $this;
     }
@@ -200,7 +200,7 @@ class JavaScriptAssetHandlerConnector
         $javaScriptCode = $this->getFormRequestDataJavaScriptAssetHandler()
             ->getFormRequestDataJavaScriptCode();
 
-        if (Core::get()->isInDebugMode()) {
+        if (ExtensionService::get()->isInDebugMode()) {
             $javaScriptCode .= LF . $this->getDebugActivationCode();
         }
 
@@ -209,9 +209,7 @@ class JavaScriptAssetHandlerConnector
         $javaScriptCode .= LF;
         $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
 
-        $this->assetHandlerConnectorManager
-            ->getPageRenderer()
-            ->addJsFooterInlineCode('Formz - Initialization ' . $formName, $javaScriptCode);
+        $this->addInlineJs('Formz - Initialization ' . $formName, $javaScriptCode);
 
         return $this;
     }
@@ -230,12 +228,8 @@ class JavaScriptAssetHandlerConnector
 
         foreach ($javaScriptValidationFiles as $file) {
             if (false === in_array($file, $assetHandlerConnectorStates->getAlreadyIncludedValidationJavaScriptFiles())) {
-                $path = Core::get()->getResourceRelativePath($file);
                 $assetHandlerConnectorStates->registerIncludedValidationJavaScriptFiles($file);
-
-                $this->assetHandlerConnectorManager
-                    ->getPageRenderer()
-                    ->addJsFooterFile($path);
+                $this->includeJsFile(StringService::get()->getResourceRelativePath($file));
             }
         }
 
@@ -265,12 +259,49 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
+     * We need an abstraction function because the footer inclusion for assets
+     * does not work in backend. It means we include every JavaScript asset in
+     * the header when the request is in a backend context.
+     *
+     * @see https://forge.typo3.org/issues/60213
+     *
+     * @param string $path
+     */
+    protected function includeJsFile($path)
+    {
+        $pageRenderer = $this->assetHandlerConnectorManager->getPageRenderer();
+
+        if ($this->environmentService->isEnvironmentInFrontendMode()) {
+            $pageRenderer->addJsFooterFile($path);
+        } else {
+            $pageRenderer->addJsFile($path);
+        }
+    }
+
+    /**
+     * @see includeJsFile()
+     *
+     * @param string $name
+     * @param string $javaScriptCode
+     */
+    protected function addInlineJs($name, $javaScriptCode)
+    {
+        $pageRenderer = $this->assetHandlerConnectorManager->getPageRenderer();
+
+        if ($this->environmentService->isEnvironmentInFrontendMode()) {
+            $pageRenderer->addJsFooterInlineCode($name, $javaScriptCode);
+        } else {
+            $pageRenderer->addJsInlineCode($name, $javaScriptCode);
+        }
+    }
+
+    /**
      * @return string
      */
     protected function getAjaxUrl()
     {
         /** @var UriBuilder $uriBuilder */
-        $uriBuilder = Core::get()->getObjectManager()->get(UriBuilder::class);
+        $uriBuilder = Core::instantiate(UriBuilder::class);
 
         return $uriBuilder->reset()
             ->setTargetPageType(1473682545)
@@ -366,5 +397,13 @@ class JavaScriptAssetHandlerConnector
         return $this->assetHandlerConnectorManager
             ->getAssetHandlerFactory()
             ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+    }
+
+    /**
+     * @param EnvironmentService $environmentService
+     */
+    public function injectEnvironmentService(EnvironmentService $environmentService)
+    {
+        $this->environmentService = $environmentService;
     }
 }

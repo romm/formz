@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -16,8 +16,8 @@ namespace Romm\Formz\AssetHandler\Html;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Error;
+use Romm\Formz\Service\MessageService;
+use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -117,11 +117,10 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
                 $result[self::getFieldDataErrorKey($fieldName)] = '1';
 
                 foreach ($fieldResult->getErrors() as $error) {
-                    /** @var Error $error */
-                    $errorTitle = ($error->getTitle())
-                        ? $error->getTitle()
-                        : 'default';
-                    $result[self::getFieldDataValidationErrorKey($fieldName, $errorTitle)] = '1';
+                    $validationName = MessageService::get()->getMessageValidationName($error);
+                    $messageKey = MessageService::get()->getMessageKey($error);
+
+                    $result[self::getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)] = '1';
                 }
             }
         }
@@ -164,7 +163,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValueKey($fieldName)
     {
-        return 'formz-value-' . self::getFieldCleanName($fieldName);
+        return 'formz-value-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -175,7 +174,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidKey($fieldName)
     {
-        return 'formz-valid-' . self::getFieldCleanName($fieldName);
+        return 'formz-valid-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -186,30 +185,29 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataErrorKey($fieldName)
     {
-        return 'formz-error-' . self::getFieldCleanName($fieldName);
+        return 'formz-error-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
      * Formats the data error attribute key for a given failed validation for
      * the given field name.
      *
-     * @param string $fieldName  Name of the field.
-     * @param string $errorTitle Title of the error.
-     * @return string
-     */
-    public static function getFieldDataValidationErrorKey($fieldName, $errorTitle)
-    {
-        return 'formz-error-' . self::getFieldCleanName($fieldName) . '-' . self::getFieldCleanName(str_replace(':', '-', $errorTitle));
-    }
-
-    /**
-     * Replaces underscores with a dash.
-     *
      * @param string $fieldName
+     * @param string $validationName
+     * @param string $messageKey
      * @return string
      */
-    public static function getFieldCleanName($fieldName)
+    public static function getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)
     {
-        return str_replace('_', '-', GeneralUtility::camelCaseToLowerCaseUnderscored($fieldName));
+        $stringService = StringService::get();
+
+        return vsprintf(
+            'formz-error-%s-%s-%s',
+            [
+                $stringService->sanitizeString($fieldName),
+                $stringService->sanitizeString($validationName),
+                $stringService->sanitizeString($messageKey)
+            ]
+        );
     }
 }

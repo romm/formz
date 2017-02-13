@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,6 +13,9 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\Core\Core;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\SectionService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -27,6 +30,10 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      * @var bool
      */
     protected $escapeOutput = false;
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * @inheritdoc
@@ -41,6 +48,8 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public function render()
     {
+        $this->fieldService->checkIsInsideFieldViewHelper();
+
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -52,12 +61,21 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        self::checkIsInsideFieldViewHelper($renderingContext);
+        /** @var SectionService $sectionService */
+        $sectionService = Core::instantiate(SectionService::class);
 
-        $closure = SectionViewHelper::getSectionClosure($arguments['section']);
+        $closure = $sectionService->getSectionClosure($arguments['section']);
 
         return (null !== $closure)
             ? $closure()
             : '';
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

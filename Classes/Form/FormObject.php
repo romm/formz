@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -15,8 +15,10 @@ namespace Romm\Formz\Form;
 
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
+use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -25,6 +27,11 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class FormObject
 {
+
+    /**
+     * @var ConfigurationFactory
+     */
+    protected $configurationFactory;
 
     /**
      * Name of the form.
@@ -183,7 +190,7 @@ class FormObject
     public function getConfigurationObject()
     {
         if (null === $this->configurationObject) {
-            $cacheInstance = Core::get()->getCacheInstance();
+            $cacheInstance = CacheService::get()->getCacheInstance();
             $cacheIdentifier = 'configuration-' . $this->getHash();
 
             if ($cacheInstance->has($cacheIdentifier)) {
@@ -211,8 +218,7 @@ class FormObject
     public function getConfigurationValidationResult()
     {
         $result = new Result();
-        $formzConfigurationValidationResult = Core::get()
-            ->getConfigurationFactory()
+        $formzConfigurationValidationResult = $this->configurationFactory
             ->getFormzConfiguration()
             ->getValidationResult();
 
@@ -270,6 +276,14 @@ class FormObject
     }
 
     /**
+     * @param ConfigurationFactory $configurationFactory
+     */
+    public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
+    {
+        $this->configurationFactory = $configurationFactory;
+    }
+
+    /**
      * When this instance is saved in TYPO3 cache, we need not to store all the
      * properties to increase performance.
      *
@@ -288,5 +302,9 @@ class FormObject
     public function __wakeup()
     {
         $this->hashShouldBeCalculated = (null === $this->hash);
+
+        /** @var ConfigurationFactory $configurationFactory */
+        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
+        $this->injectConfigurationFactory($configurationFactory);
     }
 }

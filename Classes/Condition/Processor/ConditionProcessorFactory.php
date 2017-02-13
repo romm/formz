@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -15,33 +15,20 @@ namespace Romm\Formz\Condition\Processor;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\CacheService;
+use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class ConditionProcessorFactory implements SingletonInterface
 {
-    /**
-     * @var ConditionProcessorFactory
-     */
-    private static $instance;
+    use ExtendedFacadeInstanceTrait {
+        get as getInstance;
+    }
 
     /**
      * @var ConditionProcessor[]
      */
     private $processorInstances = [];
-
-    /**
-     * @return ConditionProcessorFactory
-     */
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::$instance = Core::get()
-                ->getObjectManager()
-                ->get(self::class);
-        }
-
-        return self::$instance;
-    }
 
     /**
      * @param FormObject $formObject
@@ -68,17 +55,13 @@ class ConditionProcessorFactory implements SingletonInterface
      */
     protected function getProcessorInstance($cacheIdentifier, FormObject $formObject)
     {
-        $cacheInstance = Core::get()->getCacheInstance();
+        $cacheInstance = CacheService::get()->getCacheInstance();
 
         /** @var ConditionProcessor $instance */
         if ($cacheInstance->has($cacheIdentifier)) {
             $instance = $cacheInstance->get($cacheIdentifier);
         } else {
-            /** @noinspection PhpMethodParametersCountMismatchInspection */
-            $instance = Core::get()
-                ->getObjectManager()
-                ->get(ConditionProcessor::class, $formObject);
-
+            $instance = Core::instantiate(ConditionProcessor::class, $formObject);
             $instance->calculateAllTrees();
             $instance->attachFormObject($formObject);
 

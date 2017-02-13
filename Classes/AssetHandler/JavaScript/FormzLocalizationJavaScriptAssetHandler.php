@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -14,7 +14,7 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
 
 /**
  * This asset handler will manage the translations which will be sent to Formz
@@ -66,8 +66,8 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHan
             $translationsBinding[$key] = $hash;
         }
 
-        $jsonRealTranslations = $this->handleRealTranslations(Core::get()->arrayToJavaScriptJson($realTranslations));
-        $jsonTranslationsBinding = $this->handleTranslationsBinding(Core::get()->arrayToJavaScriptJson($translationsBinding));
+        $jsonRealTranslations = $this->handleRealTranslations(ArrayService::get()->arrayToJavaScriptJson($realTranslations));
+        $jsonTranslationsBinding = $this->handleTranslationsBinding(ArrayService::get()->arrayToJavaScriptJson($translationsBinding));
 
         return <<<JS
 Formz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);

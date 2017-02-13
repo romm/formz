@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -15,7 +15,9 @@ namespace Romm\Formz\Configuration;
 
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
+use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -26,6 +28,10 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class ConfigurationFactory implements SingletonInterface
 {
+    /**
+     * @var TypoScriptService
+     */
+    protected $typoScriptService;
 
     /**
      * @var ConfigurationObjectInstance[]
@@ -53,7 +59,7 @@ class ConfigurationFactory implements SingletonInterface
     {
         $cacheIdentifier = $this->getCacheIdentifier();
 
-        if (null === $this->instances[$cacheIdentifier]) {
+        if (false === array_key_exists($cacheIdentifier, $this->instances)) {
             $this->instances[$cacheIdentifier] = $this->getFormzConfigurationFromCache($cacheIdentifier);
         }
 
@@ -70,7 +76,7 @@ class ConfigurationFactory implements SingletonInterface
      */
     protected function getFormzConfigurationFromCache($cacheIdentifier)
     {
-        $cacheInstance = Core::get()->getCacheInstance();
+        $cacheInstance = CacheService::get()->getCacheInstance();
 
         if ($cacheInstance->has($cacheIdentifier)) {
             $instance = $cacheInstance->get($cacheIdentifier);
@@ -92,7 +98,7 @@ class ConfigurationFactory implements SingletonInterface
      */
     protected function buildFormzConfiguration()
     {
-        $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
+        $configuration = $this->typoScriptService->getFormzConfiguration();
         $instance = ConfigurationObjectFactory::getInstance()
             ->get(Configuration::class, $configuration);
 
@@ -108,14 +114,22 @@ class ConfigurationFactory implements SingletonInterface
      */
     protected function getCacheIdentifier()
     {
-        $pageUid = Core::get()->getCurrentPageUid();
+        $contextHash = ContextService::get()->getContextHash();
 
-        if (false === array_key_exists($pageUid, $this->cacheIdentifiers)) {
-            $configuration = Core::get()->getTypoScriptUtility()->getFormzConfiguration();
+        if (false === array_key_exists($contextHash, $this->cacheIdentifiers)) {
+            $configuration = $this->typoScriptService->getFormzConfiguration();
 
-            $this->cacheIdentifiers[$pageUid] = 'formz-configuration-' . sha1(serialize($configuration));
+            $this->cacheIdentifiers[$contextHash] = 'formz-configuration-' . sha1(serialize($configuration));
         }
 
-        return $this->cacheIdentifiers[$pageUid];
+        return $this->cacheIdentifiers[$contextHash];
+    }
+
+    /**
+     * @param TypoScriptService $typoScriptService
+     */
+    public function injectTypoScriptService(TypoScriptService $typoScriptService)
+    {
+        $this->typoScriptService = $typoScriptService;
     }
 }

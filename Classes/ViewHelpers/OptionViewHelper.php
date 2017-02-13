@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\Core\Core;
+use Romm\Formz\ViewHelpers\Service\FieldService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -26,23 +28,31 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  *
  * Without the Option view helper:
  *
+ * ```
  *  <formz:field layout="..."
  *               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
  *
  *      ...
  *  </formz:field>
+ * ```
  *
  * With it:
  *
+ * ```
  *  <formz:field layout="...">
  *      <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
  *      <formz:option name="foo" value="bar" />
  *
  *      ...
  *  </formz:field>
+ * ```
  */
 class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * @var array
@@ -63,6 +73,8 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
+        $this->fieldService->checkIsInsideFieldViewHelper();
+
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -71,36 +83,17 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        self::checkIsInsideFieldViewHelper($renderingContext);
+        /** @var FieldService $service */
+        $service = Core::instantiate(FieldService::class);
 
-        self::$options[$arguments['name']] = $arguments['value'];
+        $service->setFieldOption($arguments['name'], $arguments['value']);
     }
 
     /**
-     * Returns a given option if `$name` is specified, otherwise it returns the
-     * full options array.
-     *
-     * @param string $name
-     * @return mixed|null
+     * @param FieldService $service
      */
-    public static function getOption($name = null)
+    public function injectFieldService(FieldService $service)
     {
-        if (null === $name) {
-            $result = self::$options;
-        } else {
-            $result = (isset(self::$options[$name]))
-                ? self::$options[$name]
-                : null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Resets the options array.
-     */
-    public static function resetOptions()
-    {
-        self::$options = [];
+        $this->fieldService = $service;
     }
 }

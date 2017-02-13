@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -17,7 +17,7 @@ use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\Form\Form;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ContextService;
 
 class FormSettings extends AbstractFormzConfiguration
 {
@@ -54,7 +54,7 @@ class FormSettings extends AbstractFormzConfiguration
      */
     public function getDefaultErrorMessage()
     {
-        return Core::get()->translate($this->getSettingsProperty('defaultErrorMessage'));
+        return ContextService::get()->translate($this->getSettingsProperty('defaultErrorMessage'));
     }
 
     /**

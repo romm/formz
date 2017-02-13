@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -15,7 +15,7 @@ namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use TYPO3\CMS\Extbase\Error\Error;
+use Romm\Formz\Error\FormzMessageInterface;
 
 /**
  * This condition will match when a field is does have a specific error.
@@ -58,7 +58,10 @@ class FieldHasErrorCondition extends AbstractConditionItem
      */
     public function getCssResult()
     {
-        return '[' . DataAttributesAssetHandler::getFieldDataValidationErrorKey($this->fieldName, $this->getErrorTitle()) . '="1"]';
+        return sprintf(
+            '[%s="1"]',
+            DataAttributesAssetHandler::getFieldDataValidationErrorKey($this->fieldName, $this->validationName, $this->errorName)
+        );
     }
 
     /**
@@ -86,8 +89,10 @@ class FieldHasErrorCondition extends AbstractConditionItem
             ->forProperty($this->fieldName);
 
         foreach ($result->getErrors() as $error) {
-            /** @var Error $error */
-            if ($this->getErrorTitle() === $error->getTitle()) {
+            if ($error instanceof FormzMessageInterface
+                && $this->validationName === $error->getValidationName()
+                && $this->errorName === $error->getMessageKey()
+            ) {
                 $flag = true;
                 break;
             }
@@ -118,13 +123,5 @@ class FieldHasErrorCondition extends AbstractConditionItem
     public function getErrorName()
     {
         return $this->errorName;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getErrorTitle()
-    {
-        return DataAttributesAssetHandler::getFieldCleanName($this->validationName . ':' . $this->errorName);
     }
 }

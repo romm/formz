@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,7 +13,8 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\CacheService;
 
 /**
  * This asset handler generates the JavaScript code which will inject the Formz
@@ -32,7 +33,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
             ->getFormzConfiguration()
             ->getHash();
 
-        return Core::GENERATED_FILES_PATH . 'formz-config-' . $hash . '.js';
+        return CacheService::GENERATED_FILES_PATH . 'formz-config-' . $hash . '.js';
     }
 
     /**
@@ -76,6 +77,6 @@ JS;
             'view' => $formzConfigurationArray['view']
         ];
 
-        return Core::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
+        return ArrayService::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
     }
 }

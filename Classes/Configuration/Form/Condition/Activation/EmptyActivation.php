@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -13,22 +13,9 @@
 
 namespace Romm\Formz\Configuration\Form\Condition\Activation;
 
+use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+
 class EmptyActivation extends AbstractActivation
 {
-    /**
-     * @var EmptyActivation
-     */
-    private static $instance;
-
-    /**
-     * @return EmptyActivation
-     */
-    public static function get()
-    {
-        if (null === self::$instance) {
-            self::$instance = new self;
-        }
-
-        return self::$instance;
-    }
+    use FacadeInstanceTrait;
 }

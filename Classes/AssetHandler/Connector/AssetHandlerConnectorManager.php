@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -15,6 +15,7 @@ namespace Romm\Formz\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -62,16 +63,8 @@ class AssetHandlerConnectorManager
     {
         $this->pageRenderer = $pageRenderer;
         $this->assetHandlerFactory = $assetHandlerFactory;
-
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $this->cssAssetHandlerConnector = Core::get()
-            ->getObjectManager()
-            ->get(CssAssetHandlerConnector::class, $this);
-
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
-        $this->javaScriptAssetHandlerConnector = Core::get()
-            ->getObjectManager()
-            ->get(JavaScriptAssetHandlerConnector::class, $this);
+        $this->cssAssetHandlerConnector = Core::instantiate(CssAssetHandlerConnector::class, $this);
+        $this->javaScriptAssetHandlerConnector = Core::instantiate(JavaScriptAssetHandlerConnector::class, $this);
     }
 
     /**
@@ -125,7 +118,7 @@ class AssetHandlerConnectorManager
             ? $prefix . '-'
             : '';
 
-        return Core::GENERATED_FILES_PATH . Core::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
+        return CacheService::GENERATED_FILES_PATH . CacheService::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
     }
 
     /**

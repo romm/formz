@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -14,27 +14,12 @@
 namespace Romm\Formz\Condition\Parser\Node;
 
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class NullNode extends AbstractNode implements SingletonInterface
 {
-    /**
-     * @var NullNode
-     */
-    private static $instance;
-
-    /**
-     * @return NullNode
-     */
-    public static function get()
-    {
-        if (null === self::$instance) {
-            self::$instance = GeneralUtility::makeInstance(self::class);
-        }
-
-        return self::$instance;
-    }
+    use FacadeInstanceTrait;
 
     /**
      * @inheritdoc

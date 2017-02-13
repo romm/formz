@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -29,12 +29,12 @@ class BooleanNode extends AbstractNode
     /**
      * @var NodeInterface
      */
-    protected $leftSide;
+    protected $leftNode;
 
     /**
      * @var NodeInterface
      */
-    protected $rightSide;
+    protected $rightNode;
 
     /**
      * Constructor.
@@ -45,12 +45,12 @@ class BooleanNode extends AbstractNode
      */
     public function __construct(NodeInterface $leftSide, NodeInterface $rightSide, $operator)
     {
-        $this->leftSide = $leftSide;
-        $this->rightSide = $rightSide;
+        $this->leftNode = $leftSide;
+        $this->rightNode = $rightSide;
         $this->operator = $operator;
 
-        $this->leftSide->setParent($this);
-        $this->rightSide->setParent($this);
+        $this->leftNode->setParent($this);
+        $this->rightNode->setParent($this);
     }
 
     /**
@@ -58,8 +58,8 @@ class BooleanNode extends AbstractNode
      */
     public function along(callable $callback)
     {
-        $this->leftSide->along($callback);
-        $this->rightSide->along($callback);
+        $this->leftNode->along($callback);
+        $this->rightNode->along($callback);
     }
 
     /**
@@ -69,10 +69,10 @@ class BooleanNode extends AbstractNode
     {
         return $this->getLogicalResult(
             function () {
-                return $this->processLogicalAndCss($this->leftSide, $this->rightSide);
+                return $this->processLogicalAndCss();
             },
             function () {
-                return $this->processLogicalOrCss($this->leftSide, $this->rightSide);
+                return $this->processLogicalOrCss();
             }
         );
     }
@@ -84,10 +84,10 @@ class BooleanNode extends AbstractNode
     {
         return $this->getLogicalResult(
             function () {
-                return $this->processLogicalAndJavaScript($this->leftSide, $this->rightSide);
+                return $this->processLogicalAndJavaScript();
             },
             function () {
-                return $this->processLogicalOrJavaScript($this->leftSide, $this->rightSide);
+                return $this->processLogicalOrJavaScript();
             }
         );
     }
@@ -99,10 +99,10 @@ class BooleanNode extends AbstractNode
     {
         return $this->getLogicalResult(
             function () use ($dataObject) {
-                return $this->processLogicalAndPhp($this->leftSide, $this->rightSide, $dataObject);
+                return $this->processLogicalAndPhp($dataObject);
             },
             function () use ($dataObject) {
-                return $this->processLogicalOrPhp($this->leftSide, $this->rightSide, $dataObject);
+                return $this->processLogicalOrPhp($dataObject);
             }
         );
     }
@@ -143,14 +143,12 @@ class BooleanNode extends AbstractNode
      * Right  = [pet="dog"]
      * Result = [foo="bar"][pet="dog"]
      *
-     * @param NodeInterface $left  Left node instance.
-     * @param NodeInterface $right Right node instance.
      * @return array
      */
-    protected function processLogicalAndCss(NodeInterface $left, NodeInterface $right)
+    protected function processLogicalAndCss()
     {
-        $leftResults = $this->toArray($left->getCssResult());
-        $rightResults = $this->toArray($right->getCssResult());
+        $leftResults = $this->toArray($this->leftNode->getCssResult());
+        $rightResults = $this->toArray($this->rightNode->getCssResult());
 
         $result = [];
         foreach ($leftResults as $leftResult) {
@@ -167,15 +165,13 @@ class BooleanNode extends AbstractNode
      * will be an array containing all the result of the "or" operation on
      * every existing results of the two nodes.
      *
-     * @param NodeInterface $left  Left node instance.
-     * @param NodeInterface $right Right node instance.
      * @return array
      */
-    protected function processLogicalOrCss(NodeInterface $left, NodeInterface $right)
+    protected function processLogicalOrCss()
     {
         return array_merge(
-            $this->toArray($left->getCssResult()),
-            $this->toArray($right->getCssResult())
+            $this->toArray($this->leftNode->getCssResult()),
+            $this->toArray($this->rightNode->getCssResult())
         );
     }
 
@@ -187,14 +183,12 @@ class BooleanNode extends AbstractNode
      * With JavaScript, it means adding the operator `&&` between the two
      * expressions.
      *
-     * @param NodeInterface $left  Left node instance.
-     * @param NodeInterface $right Right node instance.
      * @return array
      */
-    protected function processLogicalAndJavaScript(NodeInterface $left, NodeInterface $right)
+    protected function processLogicalAndJavaScript()
     {
-        $leftResults = $this->toArray($left->getJavaScriptResult());
-        $rightResults = $this->toArray($right->getJavaScriptResult());
+        $leftResults = $this->toArray($this->leftNode->getJavaScriptResult());
+        $rightResults = $this->toArray($this->rightNode->getJavaScriptResult());
 
         $result = [];
         foreach ($leftResults as $leftResult) {
@@ -211,15 +205,13 @@ class BooleanNode extends AbstractNode
      * will be an array containing all the result of the "or" operation on
      * every existing results of the two nodes.
      *
-     * @param NodeInterface $left  Left node instance.
-     * @param NodeInterface $right Right node instance.
      * @return array
      */
-    protected function processLogicalOrJavaScript(NodeInterface $left, NodeInterface $right)
+    protected function processLogicalOrJavaScript()
     {
         return array_merge(
-            $this->toArray($left->getJavaScriptResult()),
-            $this->toArray($right->getJavaScriptResult())
+            $this->toArray($this->leftNode->getJavaScriptResult()),
+            $this->toArray($this->rightNode->getJavaScriptResult())
         );
     }
 
@@ -231,26 +223,22 @@ class BooleanNode extends AbstractNode
      * With JavaScript, it means that the left and the right nodes are both
      * true.
      *
-     * @param NodeInterface          $left  Left node instance.
-     * @param NodeInterface          $right Right node instance.
      * @param PhpConditionDataObject $dataObject
      * @return bool
      */
-    protected function processLogicalAndPhp(NodeInterface $left, NodeInterface $right, PhpConditionDataObject $dataObject)
+    protected function processLogicalAndPhp(PhpConditionDataObject $dataObject)
     {
-        return $left->getPhpResult($dataObject) && $right->getPhpResult($dataObject);
+        return $this->leftNode->getPhpResult($dataObject) && $this->rightNode->getPhpResult($dataObject);
     }
 
     /**
      * Will process a logical "or" operation on the two given nodes.
      *
-     * @param NodeInterface          $left  Left node instance.
-     * @param NodeInterface          $right Right node instance.
      * @param PhpConditionDataObject $dataObject
      * @return bool
      */
-    protected function processLogicalOrPhp(NodeInterface $left, NodeInterface $right, PhpConditionDataObject $dataObject)
+    protected function processLogicalOrPhp(PhpConditionDataObject $dataObject)
     {
-        return $left->getPhpResult($dataObject) || $right->getPhpResult($dataObject);
+        return $this->leftNode->getPhpResult($dataObject) || $this->rightNode->getPhpResult($dataObject);
     }
 }

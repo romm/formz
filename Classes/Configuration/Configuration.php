@@ -1,6 +1,6 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 Formz project.
  * It is free software; you can redistribute it and/or modify it
@@ -22,7 +22,6 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\DefaultConfigurationObje
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -72,7 +71,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
         return ServiceFactory::getInstance()
             ->attach(ServiceInterface::SERVICE_CACHE)
             ->with(ServiceInterface::SERVICE_CACHE)
-            ->setOption(CacheService::OPTION_CACHE_BACKEND, Core::get()->getBackendCache())
+            ->setOption(CacheService::OPTION_CACHE_BACKEND, \Romm\Formz\Service\CacheService::get()->getBackendCache())
             ->attach(ServiceInterface::SERVICE_PARENTS)
             ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
             ->attach(ServiceInterface::SERVICE_MIXED_TYPES);

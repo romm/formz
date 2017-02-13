@@ -2,11 +2,11 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Error\Error;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
-use TYPO3\CMS\Extbase\Error\Error;
 
 class DataAttributesAssetHandlerTest extends AbstractUnitTest
 {
@@ -57,7 +57,14 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
 
         foreach ($fieldErrors as $fieldName => $errors) {
             foreach ($errors as $errorData) {
-                $error = new Error($errorData['message'], 42, [], $errorData['title']);
+                $error = new Error(
+                    $errorData['message'],
+                    42,
+                    $errorData['validationName'],
+                    $errorData['messageKey'],
+                    [],
+                    ''
+                );
                 $requestResult->forProperty($fieldName)->addError($error);
             }
         }
@@ -77,11 +84,13 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
      */
     public function checkFieldsErrorsDataAttributesDataProvider()
     {
+        $this->injectAllDependencies();
+
         return [
             'defaultSingleErrorCheck'  => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                      => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'default') => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                                 => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'unknown', 'unknown') => '1'
                 ],
                 [
                     'foo' => [
@@ -93,23 +102,24 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             ],
             'customSingleErrorCheck'   => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                          => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello-world') => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                             => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello', 'world') => '1'
                 ],
                 [
                     'foo' => [
                         [
-                            'message' => 'foo',
-                            'title'   => 'hello-world'
+                            'message'        => 'foo',
+                            'validationName' => 'hello',
+                            'messageKey'     => 'world'
                         ]
                     ]
                 ]
             ],
             'multipleErrorCheck'       => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                          => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'default')     => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello-world') => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                                 => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'unknown', 'unknown') => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello', 'world')     => '1'
                 ],
                 [
                     'foo' => [
@@ -117,19 +127,20 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                             'message' => 'foo'
                         ],
                         [
-                            'message' => 'foo',
-                            'title'   => 'hello-world'
+                            'message'        => 'foo',
+                            'validationName' => 'hello',
+                            'messageKey'     => 'world'
                         ]
                     ]
                 ]
             ],
             'multipleFieldsErrorCheck' => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                          => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'default')     => '1',
-                    DataAttributesAssetHandler::getFieldDataErrorKey('bar')                          => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'default')     => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'hello-world') => '1'
+                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                                 => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'unknown', 'unknown') => '1',
+                    DataAttributesAssetHandler::getFieldDataErrorKey('bar')                                 => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'unknown', 'unknown') => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'hello', 'world')     => '1'
                 ],
                 [
                     'foo' => [
@@ -142,8 +153,9 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                             'message' => 'bar'
                         ],
                         [
-                            'message' => 'bar',
-                            'title'   => 'hello-world'
+                            'message'        => 'bar',
+                            'validationName' => 'hello',
+                            'messageKey'     => 'world'
                         ]
                     ]
                 ]
