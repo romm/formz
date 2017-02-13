@@ -46,6 +46,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
      * @var bool
      */
     protected $escapeOutput = false;
+
     /**
      * @var FormService
      */

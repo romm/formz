@@ -69,6 +69,11 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 {
     /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
+    /**
      * @var PageRenderer
      */
     protected $pageRenderer;

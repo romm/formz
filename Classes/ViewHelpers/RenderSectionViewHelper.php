@@ -30,6 +30,7 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      * @var bool
      */
     protected $escapeOutput = false;
+
     /**
      * @var FieldService
      */
