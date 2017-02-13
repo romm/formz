@@ -17,6 +17,7 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
@@ -241,7 +242,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
              * + ça prend quand même un peu de temps cette manière. Peut-on faire autrement ?
              */
             /** @var DefaultFormValidator $formValidator */
-            $formValidator = GeneralUtility::makeInstance(
+            $formValidator = Core::instantiate(
                 DefaultFormValidator::class,
                 ['name' => $this->getFormObjectName()]
             );
