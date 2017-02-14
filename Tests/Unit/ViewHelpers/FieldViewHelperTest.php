@@ -20,6 +20,7 @@ use TYPO3\CMS\Core\Cache\CacheFactory;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
@@ -323,7 +324,12 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         /** @var TemplateVariableContainer $templateVariableContainer */
         $templateVariableContainer = $templateVariableContainerProphecy->reveal();
 
-        $renderingContextMock->injectTemplateVariableContainer($templateVariableContainer);
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $renderingContextMock->injectTemplateVariableContainer($templateVariableContainer);
+        } else {
+            $renderingContextMock->setVariableProvider($templateVariableContainer);
+        }
+
         $viewHelper->setRenderingContext($renderingContextMock);
 
         $arguments = [];
@@ -462,7 +468,13 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         $renderingContext = new RenderingContext;
         $this->inject($renderingContext, 'viewHelperVariableContainer', $viewHelperVariableContainer);
-        $renderingContext->injectTemplateVariableContainer($templateVariableContainer);
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $renderingContext->injectTemplateVariableContainer($templateVariableContainer);
+        } else {
+            $renderingContext->setVariableProvider($templateVariableContainer);
+        }
+
         $renderingContext->setControllerContext($controllerContextMock);
 
         return $renderingContext;
@@ -474,13 +486,15 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function registerFluidTemplateCache()
     {
-        /** @var CacheManager $cacheManager */
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $cacheFactory = new CacheFactory('foo', $cacheManager);
-        $cacheInstance = $cacheFactory->create('fluid_template', PhpFrontend::class, NullBackend::class);
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '7.6.0', '<')) {
+            /** @var CacheManager $cacheManager */
+            $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+            $cacheFactory = new CacheFactory('foo', $cacheManager);
+            $cacheInstance = $cacheFactory->create('fluid_template', PhpFrontend::class, NullBackend::class);
 
-        if (false === $cacheManager->hasCache('fluid_template')) {
-            $cacheManager->registerCache($cacheInstance);
+            if (false === $cacheManager->hasCache('fluid_template')) {
+                $cacheManager->registerCache($cacheInstance);
+            }
         }
     }
 
