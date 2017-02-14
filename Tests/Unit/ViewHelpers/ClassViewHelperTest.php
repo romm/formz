@@ -212,7 +212,9 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getDefaultFormService()
     {
-        return $this->getMock(FormService::class, ['getFormObject']);
+        return $this->getMockBuilder(FormService::class)
+            ->setMethods(['getFormObject'])
+            ->getMock();
     }
 
     /**

@@ -77,7 +77,9 @@ class FormObjectFactoryTest extends AbstractUnitTest
         $configurationFactory = Core::instantiate(ConfigurationFactory::class);
 
         /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
-        $formObjectFactory = $this->getMock(FormObjectFactory::class, ['createInstance']);
+        $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
+            ->setMethods(['createInstance'])
+            ->getMock();
         $formObjectFactory->injectConfigurationFactory($configurationFactory);
 
         $formObjectFactory->expects($this->once())

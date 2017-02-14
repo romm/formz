@@ -10,6 +10,7 @@ use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\FacadeService;
 use Romm\Formz\Service\TypoScriptService;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
@@ -88,11 +89,13 @@ trait FormzUnitTestUtility
         */
         $this->initializeConfigurationObjectTestServices();
 
+        FacadeService::get()->reset();
         $this->backUpPackageManager();
         $this->overrideExtbaseContainer();
         $this->changeReflectionCache();
         $this->injectTransientMemoryCacheInFormzCore();
         $this->setUpExtensionServiceMock();
+        $this->setUpPackageManagerMock();
 
         $this->prophet = new Prophet;
     }
@@ -180,10 +183,15 @@ trait FormzUnitTestUtility
     protected function setUpPackageManagerMock()
     {
         /** @var Package|\PHPUnit_Framework_MockObject_MockObject $package */
-        $package = $this->getMock(Package::class, ['getPackagePath'], [], '', false);
+        $package = $this->getMockBuilder(Package::class)
+            ->setMethods(['getPackagePath'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         /** @var PackageManager|\PHPUnit_Framework_MockObject_MockObject $packageManager */
-        $packageManager = $this->getMock(PackageManager::class, ['isPackageActive', 'getPackage']);
+        $packageManager = $this->getMockBuilder(PackageManager::class)
+            ->setMethods(['isPackageActive', 'getPackage'])
+            ->getMock();
 
         $package->method('getPackagePath')
             ->willReturn(realpath(__DIR__ . '/../../') . '/');
@@ -225,15 +233,11 @@ trait FormzUnitTestUtility
     protected function setUpExtensionServiceMock()
     {
         /** @var ExtensionService|\PHPUnit_Framework_MockObject_MockObject $extensionServiceMock */
-        $extensionServiceMock = $this->getMock(
-            ExtensionService::class,
-            ['getFullExtensionConfiguration', 'getExtensionRelativePath']
-        );
+        $extensionServiceMock = $this->getMockBuilder(ExtensionService::class)
+            ->setMethods(['getFullExtensionConfiguration', 'getExtensionRelativePath'])
+            ->getMock();
 
-        $reflectedClass = new \ReflectionClass(ExtensionService::class);
-        $property = $reflectedClass->getProperty('facadeInstance');
-        $property->setAccessible(true);
-        $property->setValue($extensionServiceMock);
+        FacadeService::get()->forceInstance(ExtensionService::class, $extensionServiceMock);
 
         /*
          * Will return a configuration that can be manipulated during tests.
@@ -269,10 +273,9 @@ trait FormzUnitTestUtility
     protected function setUpContextService()
     {
         /** @var ContextService|\PHPUnit_Framework_MockObject_MockObject $contextServiceMock */
-        $contextServiceMock = $this->getMock(
-            ContextService::class,
-            ['translate']
-        );
+        $contextServiceMock = $this->getMockBuilder(ContextService::class)
+            ->setMethods(['translate'])
+            ->getMock();
 
         /*
          * Mocking the translate function, to avoid the fatal error due to TYPO3
@@ -378,7 +381,9 @@ trait FormzUnitTestUtility
     protected function getMockedEnvironmentService()
     {
         if (null === $this->mockedEnvironmentService) {
-            $this->mockedEnvironmentService = $this->getMock(EnvironmentService::class, ['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode']);
+            $this->mockedEnvironmentService = $this->getMockBuilder(EnvironmentService::class)
+                ->setMethods(['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode'])
+                ->getMock();
 
             $this->mockedEnvironmentService->method('isEnvironmentInFrontendMode')
                 ->willReturnCallback(function () {
@@ -403,7 +408,9 @@ trait FormzUnitTestUtility
     protected function getMockedTypoScriptService()
     {
         if (null === $this->mockedTypoScriptService) {
-            $this->mockedTypoScriptService = $this->getMock(TypoScriptService::class, ['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration']);
+            $this->mockedTypoScriptService = $this->getMockBuilder(TypoScriptService::class)
+                ->setMethods(['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration'])
+                ->getMock();
 
             $configurationCallBack = function () {
                 $configuration = ArrayUtility::setValueByPath(

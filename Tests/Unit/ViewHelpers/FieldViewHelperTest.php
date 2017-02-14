@@ -147,7 +147,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMock(FieldViewHelper::class, ['renderChildren']);
+        $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
+            ->setMethods(['renderChildren'])
+            ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
@@ -173,7 +175,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMock(FieldViewHelper::class, ['renderChildren']);
+        $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
+            ->setMethods(['renderChildren'])
+            ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSectionService(new SectionService);
@@ -202,7 +206,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMock(FieldViewHelper::class, ['renderChildren']);
+        $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
+            ->setMethods(['renderChildren'])
+            ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSectionService(new SectionService);
@@ -233,7 +239,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMock(FieldViewHelper::class, ['renderChildren']);
+        $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
+            ->setMethods(['renderChildren'])
+            ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSectionService(new SectionService);
@@ -264,7 +272,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMock(FieldViewHelper::class, ['renderChildren']);
+        $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
+            ->setMethods(['renderChildren'])
+            ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSectionService(new SectionService);
@@ -298,7 +308,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMock(FieldViewHelper::class, ['renderChildren']);
+        $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
+            ->setMethods(['renderChildren'])
+            ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSectionService(new SectionService);
@@ -387,7 +399,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     protected function getMockedFieldViewHelper()
     {
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMock(FieldViewHelper::class, ['renderChildren']);
+        $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
+            ->setMethods(['renderChildren'])
+            ->getMock();
         $this->injectDependenciesIntoViewHelper($viewHelper);
 
         return $viewHelper;
@@ -400,7 +414,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     protected function getMockedFormService(FormObject $formObject)
     {
         /** @var FormService|\PHPUnit_Framework_MockObject_MockObject $formService */
-        $formService = $this->getMock(FormService::class, ['checkIsInsideFormViewHelper']);
+        $formService = $this->getMockBuilder(FormService::class)
+            ->setMethods(['checkIsInsideFormViewHelper'])
+            ->getMock();
         $formService->setFormObject($formObject);
 
         return $formService;
@@ -411,7 +427,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getMockedFieldService()
     {
-        $fieldService = $this->getMock(FieldService::class, ['setCurrentField']);
+        $fieldService = $this->getMockBuilder(FieldService::class)
+            ->setMethods(['setCurrentField'])
+            ->getMock();
 
         return $fieldService;
     }
@@ -421,10 +439,12 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getMockedRenderingContext()
     {
-        $mockRequest = $this->getMock(Request::class);
+        $mockRequest = $this->getMockClass(Request::class);
 
         /** @var ControllerContext|\PHPUnit_Framework_MockObject_MockObject $controllerContextMock */
-        $controllerContextMock = $this->getMock(ControllerContext::class, ['getRequest']);
+        $controllerContextMock = $this->getMockBuilder(ControllerContext::class)
+            ->setMethods(['getRequest'])
+            ->getMock();
         $controllerContextMock->method('getRequest')->will($this->returnValue($mockRequest));
 
         $view = new StandaloneView;
@@ -434,7 +454,9 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelperVariableContainer->setView($view);
 
         /** @var TemplateVariableContainer|\PHPUnit_Framework_MockObject_MockObject $templateVariableContainer */
-        $templateVariableContainer = $this->getMock(TemplateVariableContainer::class, ['add', 'exists', 'remove']);
+        $templateVariableContainer = $this->getMockBuilder(TemplateVariableContainer::class)
+            ->setMethods(['add', 'exists', 'remove'])
+            ->getMock();
 
         $renderingContext = new RenderingContext;
         $this->inject($renderingContext, 'viewHelperVariableContainer', $viewHelperVariableContainer);

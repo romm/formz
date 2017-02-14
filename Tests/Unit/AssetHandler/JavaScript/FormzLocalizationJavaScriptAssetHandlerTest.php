@@ -38,11 +38,10 @@ TXT;
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
         /** @var FormzLocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzLocalizationJavaScriptAssetHandler */
-        $formzLocalizationJavaScriptAssetHandler = $this->getMock(
-            FormzLocalizationJavaScriptAssetHandler::class,
-            ['handleRealTranslations', 'handleTranslationsBinding'],
-            [$assetHandlerFactory]
-        );
+        $formzLocalizationJavaScriptAssetHandler = $this->getMockBuilder(FormzLocalizationJavaScriptAssetHandler::class)
+            ->setMethods(['handleRealTranslations', 'handleTranslationsBinding'])
+            ->setConstructorArgs([$assetHandlerFactory])
+            ->getMock();
 
         $jsonRealTranslations = '';
         $jsonTranslationsBinding = '';

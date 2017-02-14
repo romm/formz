@@ -6,7 +6,6 @@ use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\ViewHelpers\OptionViewHelper;
 use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
 
 class OptionViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -15,8 +14,10 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelper()
     {
-        /** @var FormService|\PHPUnit_Framework_MockObject_MockObject $formService */
-        $formService = $this->getMock(FormService::class, ['setFieldOption']);
+        /** @var FieldService|\PHPUnit_Framework_MockObject_MockObject $formService */
+        $formService = $this->getMockBuilder(FieldService::class)
+            ->setMethods(['setFieldOption'])
+            ->getMock();
         $formService->expects($this->once())
             ->method('setFieldOption')
             ->with('foo', 'bar');

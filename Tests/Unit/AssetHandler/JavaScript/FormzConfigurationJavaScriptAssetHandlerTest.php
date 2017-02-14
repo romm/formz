@@ -24,7 +24,10 @@ TXT;
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
         /** @var FormzConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzConfigurationJavaScriptAssetHandler */
-        $formzConfigurationJavaScriptAssetHandler = $this->getMock(FormzConfigurationJavaScriptAssetHandler::class, ['handleFormzConfiguration'], [$assetHandlerFactory]);
+        $formzConfigurationJavaScriptAssetHandler = $this->getMockBuilder(FormzConfigurationJavaScriptAssetHandler::class)
+            ->setMethods(['handleFormzConfiguration'])
+            ->setConstructorArgs([$assetHandlerFactory])
+            ->getMock();
 
         $jsonFormzConfiguration = '';
         $formzConfigurationJavaScriptAssetHandler->method('handleFormzConfiguration')

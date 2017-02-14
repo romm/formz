@@ -139,7 +139,9 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getFormService()
     {
-        $service = $this->getMock(FormService::class, ['getFormObject']);
+        $service = $this->getMockBuilder(FormService::class)
+            ->setMethods(['getFormObject'])
+            ->getMock();
         $formObjectFactory = new FormObjectFactory;
         $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
         $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());

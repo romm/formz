@@ -60,22 +60,20 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
         $pageRenderer = new PageRenderer;
 
         /** @var AssetHandlerConnectorManager|\PHPUnit_Framework_MockObject_MockObject $assetHandlerConnectorManagerMock */
-        $assetHandlerConnectorManagerMock = $this->getMock(
-            AssetHandlerConnectorManager::class,
-            ['getJavaScriptAssetHandlerConnector', 'getCssAssetHandlerConnector'],
-            [$pageRenderer, $assetHandlerFactory]
-        );
+        $assetHandlerConnectorManagerMock = $this->getMockBuilder(AssetHandlerConnectorManager::class)
+            ->setMethods(['getJavaScriptAssetHandlerConnector', 'getCssAssetHandlerConnector'])
+            ->setConstructorArgs([$pageRenderer, $assetHandlerFactory])
+            ->getMock();
 
         $assetHandlerConnectorStates = new AssetHandlerConnectorStates;
         $assetHandlerConnectorManagerMock->injectAssetHandlerConnectorStates($assetHandlerConnectorStates);
         $this->assertSame($assetHandlerConnectorStates, $assetHandlerConnectorManagerMock->getAssetHandlerConnectorStates());
 
         /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnectorMock */
-        $javaScriptAssetHandlerConnectorMock = $this->getMock(
-            JavaScriptAssetHandlerConnector::class,
-            ['includeDefaultJavaScriptFiles'],
-            [$assetHandlerConnectorManagerMock]
-        );
+        $javaScriptAssetHandlerConnectorMock = $this->getMockBuilder(JavaScriptAssetHandlerConnector::class)
+            ->setMethods(['includeDefaultJavaScriptFiles'])
+            ->setConstructorArgs([$assetHandlerConnectorManagerMock])
+            ->getMock();
         $javaScriptAssetHandlerConnectorMock->expects($this->once())
             ->method('includeDefaultJavaScriptFiles');
 
@@ -83,11 +81,10 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
             ->willReturn($javaScriptAssetHandlerConnectorMock);
 
         /** @var CssAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $cssAssetHandlerConnectorMock */
-        $cssAssetHandlerConnectorMock = $this->getMock(
-            CssAssetHandlerConnector::class,
-            ['includeDefaultCssFiles'],
-            [$assetHandlerConnectorManagerMock]
-        );
+        $cssAssetHandlerConnectorMock = $this->getMockBuilder(CssAssetHandlerConnector::class)
+            ->setMethods(['includeDefaultCssFiles'])
+            ->setConstructorArgs([$assetHandlerConnectorManagerMock])
+            ->getMock();
         $cssAssetHandlerConnectorMock->expects($this->once())
             ->method('includeDefaultCssFiles');
 
