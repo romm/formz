@@ -439,13 +439,15 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getMockedRenderingContext()
     {
-        $mockRequest = $this->getMockClass(Request::class);
+        $mockRequest = $this->getMockBuilder(Request::class)
+            ->getMock();
 
         /** @var ControllerContext|\PHPUnit_Framework_MockObject_MockObject $controllerContextMock */
         $controllerContextMock = $this->getMockBuilder(ControllerContext::class)
             ->setMethods(['getRequest'])
             ->getMock();
-        $controllerContextMock->method('getRequest')->will($this->returnValue($mockRequest));
+        $controllerContextMock->method('getRequest')
+            ->willReturn($mockRequest);
 
         $view = new StandaloneView;
         $view->setControllerContext($controllerContextMock);

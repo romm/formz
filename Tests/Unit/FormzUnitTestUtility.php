@@ -95,7 +95,6 @@ trait FormzUnitTestUtility
         $this->changeReflectionCache();
         $this->injectTransientMemoryCacheInFormzCore();
         $this->setUpExtensionServiceMock();
-        $this->setUpPackageManagerMock();
 
         $this->prophet = new Prophet;
     }
