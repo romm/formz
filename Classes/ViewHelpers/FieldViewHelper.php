@@ -23,6 +23,7 @@ use Romm\Formz\ViewHelpers\Service\FieldService;
 use Romm\Formz\ViewHelpers\Service\FormService;
 use Romm\Formz\ViewHelpers\Service\SectionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 /**
@@ -161,8 +162,11 @@ class FieldViewHelper extends AbstractViewHelper
         $view->setTemplatePathAndFilename($layout->getTemplateFile());
         $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
         $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
-        $view->setRenderingContext($this->renderingContext);
         $view->assignMultiple($templateArguments);
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $view->setRenderingContext($this->renderingContext);
+        }
 
         return $view->render();
     }
