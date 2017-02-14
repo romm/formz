@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Service\Traits;
 
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\FacadeService;
 
 /**
  * Same as `FacadeInstanceTrait`, but the instance is created with Extbase
@@ -24,19 +24,10 @@ use Romm\Formz\Core\Core;
 trait ExtendedFacadeInstanceTrait
 {
     /**
-     * @var ExtendedFacadeInstanceTrait
-     */
-    private static $facadeInstance;
-
-    /**
      * @return self
      */
     public static function get()
     {
-        if (null === self::$facadeInstance) {
-            self::$facadeInstance = Core::instantiate(self::class);
-        }
-
-        return self::$facadeInstance;
+        return FacadeService::get()->getInstance(self::class, true);
     }
 }

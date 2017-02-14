@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Service\Traits;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Romm\Formz\Service\FacadeService;
 
 /**
  * This trait provides a static function to help getting a singleton instance of
@@ -24,19 +24,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 trait FacadeInstanceTrait
 {
     /**
-     * @var FacadeInstanceTrait
-     */
-    private static $facadeInstance;
-
-    /**
      * @return self
      */
     public static function get()
     {
-        if (null === self::$facadeInstance) {
-            self::$facadeInstance = GeneralUtility::makeInstance(self::class);
-        }
-
-        return self::$facadeInstance;
+        return FacadeService::get()->getInstance(self::class);
     }
 }
