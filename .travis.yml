@@ -13,6 +13,9 @@ matrix:
   include:
   - env: TYPO3_VERSION=^7.6 COVERAGE=1
     php: 7.0
+    # TYPO3 v8 requires PHP v7+
+  - env: TYPO3_VERSION=^8.5 COVERAGE=0
+    php: 7.0
   exclude:
     # We must exclude TYPO3 6.2 with PHP 7, because the build just doesn't work (have no clue why).
   - env: TYPO3_VERSION=^6.2 COVERAGE=0
