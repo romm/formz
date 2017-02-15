@@ -1,5 +1,5 @@
 <phpunit
-        bootstrap=".Build/vendor/typo3/cms/components/testing_framework/Resources/Core/Build/UnitTestsBootstrap.php"
+        bootstrap=".Build/Web/typo3/sysext/core/Build/UnitTestsBootstrap.php"
         backupGlobals="false"
         backupStaticAttributes="false"
         colors="true"
