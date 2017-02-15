@@ -14,11 +14,9 @@
 namespace Romm\Formz\ViewHelpers\Service;
 
 use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Contains methods to help view helpers to manipulate data concerning the
@@ -35,13 +33,6 @@ class FieldService implements SingletonInterface
      * @var array
      */
     protected $fieldOptions = [];
-
-    /**
-     * Unique instance of view, stored to save some performance.
-     *
-     * @var StandaloneView
-     */
-    protected $view;
 
     /**
      * Reset every state that can be used by this service.
@@ -135,17 +126,5 @@ class FieldService implements SingletonInterface
                 1465243085
             );
         }
-    }
-
-    /**
-     * @return StandaloneView
-     */
-    public function getView()
-    {
-        if (null === $this->view) {
-            $this->view = Core::instantiate(StandaloneView::class);
-        }
-
-        return $this->view;
     }
 }
