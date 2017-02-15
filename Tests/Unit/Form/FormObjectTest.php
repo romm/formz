@@ -110,7 +110,10 @@ class FormObjectTest extends AbstractUnitTest
     public function hashCanBeRetrieved()
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMock(FormObject::class, ['calculateHash'], [self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME]);
+        $formObject = $this->getMockBuilder(FormObject::class)
+            ->setMethods(['calculateHash'])
+            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME])
+            ->getMock();
         $hash = 'foo';
 
         $formObject->expects($this->any())
@@ -131,7 +134,10 @@ class FormObjectTest extends AbstractUnitTest
     public function hashIsCalculatedOnlyOnce()
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMock(FormObject::class, ['calculateHash'], [self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME]);
+        $formObject = $this->getMockBuilder(FormObject::class)
+            ->setMethods(['calculateHash'])
+            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME])
+            ->getMock();
 
         $formObject->expects($this->once())
             ->method('calculateHash')
@@ -181,7 +187,10 @@ class FormObjectTest extends AbstractUnitTest
     public function configurationObjectIsStoredInCache()
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMock(FormObject::class, ['buildConfigurationObject'], [\stdClass::class, 'foo']);
+        $formObject = $this->getMockBuilder(FormObject::class)
+            ->setMethods(['buildConfigurationObject'])
+            ->setConstructorArgs([\stdClass::class, 'foo'])
+            ->getMock();
 
         $formzConfiguration = new Configuration();
         $result = new Result();
@@ -196,7 +205,10 @@ class FormObjectTest extends AbstractUnitTest
         }
 
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject2 */
-        $formObject2 = $this->getMock(FormObject::class, ['buildConfigurationObject'], [\stdClass::class, 'foo']);
+        $formObject2 = $this->getMockBuilder(FormObject::class)
+            ->setMethods(['buildConfigurationObject'])
+            ->setConstructorArgs([\stdClass::class, 'foo'])
+            ->getMock();
 
         $formObject2->expects($this->never())
             ->method('buildConfigurationObject');

@@ -88,6 +88,14 @@ class FieldSettings extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string $messageTemplate
+     */
+    public function setMessageTemplate($messageTemplate)
+    {
+        $this->messageTemplate = $messageTemplate;
+    }
+
+    /**
      * @param string $selector
      * @param string $fieldName
      * @return string

@@ -13,6 +13,9 @@ matrix:
   include:
   - env: TYPO3_VERSION=^7.6 COVERAGE=1
     php: 7.0
+    # TYPO3 v8 requires PHP v7+
+  - env: TYPO3_VERSION=^8.6 COVERAGE=0
+    php: 7.0
   exclude:
     # We must exclude TYPO3 6.2 with PHP 7, because the build just doesn't work (have no clue why).
   - env: TYPO3_VERSION=^6.2 COVERAGE=0
@@ -45,16 +48,21 @@ before_script:
 
 script:
   - >
+    PHPUNIT_CONFIG_FILE="phpunit.xml.dist";
+    if [[ "$TYPO3_VERSION" != "^8.6" ]]; then
+      PHPUNIT_CONFIG_FILE="phpunit-legacy.xml.dist"
+    fi
+  - >
     if [[ "$COVERAGE" == "0" ]]; then
       echo;
       echo "Running unit tests";
-      .Build/bin/phpunit --colors Tests/Unit/
+      .Build/bin/phpunit --configuration $PHPUNIT_CONFIG_FILE --colors Tests/Unit/
     fi
   - >
     if [[ "$COVERAGE" == "1" ]]; then
       echo;
       echo "Running unit tests with coverage";
-      .Build/bin/phpunit --colors --coverage-text --coverage-clover build/logs/clover.xml Tests/Unit/
+      .Build/bin/phpunit --configuration $PHPUNIT_CONFIG_FILE --colors --coverage-text --coverage-clover build/logs/clover.xml Tests/Unit/
     fi
 
 after_script:

@@ -13,6 +13,9 @@
 
 namespace Romm\Formz\ViewHelpers;
 
+use Romm\Formz\Core\Core;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\SectionService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -23,13 +26,22 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  */
 class RenderSectionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
+    /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
 
     /**
      * @inheritdoc
      */
     public function initializeArguments()
     {
-        $this->registerArgument('section', 'object', 'Instance of the section which will be rendered.', true);
+        $this->registerArgument('section', 'string', 'Instance of the section which will be rendered.', true);
     }
 
     /**
@@ -37,6 +49,8 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public function render()
     {
+        $this->fieldService->checkIsInsideFieldViewHelper();
+
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -48,12 +62,21 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        self::checkIsInsideFieldViewHelper($renderingContext);
+        /** @var SectionService $sectionService */
+        $sectionService = Core::instantiate(SectionService::class);
 
-        $closure = SectionViewHelper::getSectionClosure($arguments['section']);
+        $closure = $sectionService->getSectionClosure($arguments['section']);
 
         return (null !== $closure)
             ? $closure()
             : '';
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
     }
 }

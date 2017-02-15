@@ -18,8 +18,8 @@ use Romm\Formz\Condition\Items\FieldHasErrorCondition;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
 use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
+use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Factory class for working with conditions.
@@ -36,10 +36,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ConditionFactory implements SingletonInterface
 {
-    /**
-     * @var ConditionFactory
-     */
-    private static $instance;
+    use FacadeInstanceTrait;
 
     /**
      * @var array
@@ -50,20 +47,6 @@ class ConditionFactory implements SingletonInterface
      * @var bool
      */
     private $defaultConditionsWereRegistered = false;
-
-    /**
-     * Returns an instance of this class.
-     *
-     * @return ConditionFactory
-     */
-    public static function get()
-    {
-        if (null === self::$instance) {
-            self::$instance = GeneralUtility::makeInstance(self::class);
-        }
-
-        return self::$instance;
-    }
 
     /**
      * Use this function to register a new condition type which can then be used

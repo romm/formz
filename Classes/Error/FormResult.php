@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Error;
 
-use Romm\Formz\Utility\Traits\StoreDataTrait;
+use Romm\Formz\Service\Traits\StoreDataTrait;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**

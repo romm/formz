@@ -15,6 +15,9 @@ namespace Romm\Formz\Validation;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\ExtensionService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -38,7 +41,7 @@ class AjaxFieldValidation implements SingletonInterface
         // Default technical error result if the function can not be reached.
         $result = [
             'success' => false,
-            'message' => [Core::get()->translate('default_error_message')]
+            'message' => [ContextService::get()->translate('default_error_message')]
         ];
 
         // We prevent any external message to be displayed here.
@@ -54,7 +57,10 @@ class AjaxFieldValidation implements SingletonInterface
 
         if ($formClassName && $formName && $passObjectInstance && $fieldValue && $fieldName && $validatorName) {
             try {
-                $formObject = Core::get()->getFormObjectFactory()->getInstanceFromClassName($formClassName, $formName);
+                /** @var FormObjectFactory $formObjectFactory */
+                $formObjectFactory = Core::instantiate(FormObjectFactory::class);
+
+                $formObject = $formObjectFactory->getInstanceFromClassName($formClassName, $formName);
                 $validationResult = $formObject->getConfigurationValidationResult();
 
                 if (false === $validationResult->hasErrors()) {
@@ -76,8 +82,7 @@ class AjaxFieldValidation implements SingletonInterface
                             }
 
                             /** @var AbstractValidator $validatorInstance */
-                            /** @noinspection PhpMethodParametersCountMismatchInspection */
-                            $validatorInstance = Core::get()->getObjectManager()->get(
+                            $validatorInstance = Core::instantiate(
                                 $validatorClassName,
                                 $fieldValidationConfiguration->getOptions(),
                                 $form,
@@ -90,7 +95,7 @@ class AjaxFieldValidation implements SingletonInterface
                 }
             } catch (\Exception $e) {
                 $result['data'] = ['errorCode' => $e->getCode()];
-                if (Core::get()->isInDebugMode()) {
+                if (ExtensionService::get()->isInDebugMode()) {
                     $result['message'] = $e->getMessage();
                 }
             }
@@ -104,7 +109,7 @@ class AjaxFieldValidation implements SingletonInterface
     /**
      * Will clean the string filled with form values sent with Ajax.
      *
-     * @param string $values
+     * @param array $values
      * @return array
      */
     protected function cleanValuesFromUrl($values)

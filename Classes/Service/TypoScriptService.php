@@ -11,24 +11,29 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Utility;
+namespace Romm\Formz\Service;
 
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
-use TYPO3\CMS\Extbase\Service\TypoScriptService;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
+use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 
 /**
  * Handles the TypoScript configuration of the extension.
  */
-class TypoScriptUtility implements SingletonInterface
+class TypoScriptService implements SingletonInterface
 {
     const EXTENSION_CONFIGURATION_PATH = 'config.tx_formz';
 
     /**
-     * @var TypoScriptService
+     * @var EnvironmentService
+     */
+    protected $environmentService;
+
+    /**
+     * @var ExtbaseTypoScriptService
      */
     protected $typoScriptService;
 
@@ -95,7 +100,7 @@ class TypoScriptUtility implements SingletonInterface
      */
     protected function getExtensionConfiguration()
     {
-        $cacheInstance = Core::get()->getCacheInstance();
+        $cacheInstance = CacheService::get()->getCacheInstance();
         $hash = $this->getContextHash();
 
         if ($cacheInstance->has($hash)) {
@@ -125,7 +130,7 @@ class TypoScriptUtility implements SingletonInterface
         $contextHash = $this->getContextHash();
 
         if (false === array_key_exists($contextHash, $this->configuration)) {
-            if (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode()) {
+            if ($this->environmentService->isEnvironmentInFrontendMode()) {
                 $typoScriptArray = $this->getFrontendTypoScriptConfiguration();
             } else {
                 $typoScriptArray = $this->getBackendTypoScriptConfiguration();
@@ -151,30 +156,34 @@ class TypoScriptUtility implements SingletonInterface
     protected function getBackendTypoScriptConfiguration()
     {
         /** @var ConfigurationManager $configurationManager */
-        $configurationManager = Core::get()->getObjectManager()->get(ConfigurationManager::class);
+        $configurationManager = Core::instantiate(ConfigurationManager::class);
 
         return $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
     }
 
     /**
      * Returns a unique hash for the context of the current request, depending
-     * on wether the request comes from frontend or backend.
+     * on whether the request comes from frontend or backend.
      *
      * @return string
      */
     protected function getContextHash()
     {
-        $hash = (Core::get()->getEnvironmentService()->isEnvironmentInFrontendMode())
-            ? 'fe-' . Core::get()->getCurrentPageUid()
-            : 'be-' . Core::get()->sanitizeString(GeneralUtility::_GET('M'));
-
-        return 'ts-conf-' . $hash;
+        return 'ts-conf-' . ContextService::get()->getContextHash();
     }
 
     /**
-     * @param TypoScriptService $typoScriptService
+     * @param EnvironmentService $environmentService
      */
-    public function injectTypoScriptService(TypoScriptService $typoScriptService)
+    public function injectEnvironmentService(EnvironmentService $environmentService)
+    {
+        $this->environmentService = $environmentService;
+    }
+
+    /**
+     * @param ExtbaseTypoScriptService $typoScriptService
+     */
+    public function injectTypoScriptService(ExtbaseTypoScriptService $typoScriptService)
     {
         $this->typoScriptService = $typoScriptService;
     }

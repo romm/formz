@@ -20,6 +20,7 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     public function canGetFormzConfiguration()
     {
         $configurationFactory = new ConfigurationFactory;
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
         $formzConfiguration = $configurationFactory->getFormzConfiguration();
 
         $this->assertInstanceOf(ConfigurationObjectInstance::class, $formzConfiguration);
@@ -37,7 +38,10 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     public function localCacheIsUsedForFormzConfiguration()
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
-        $configurationFactory = $this->getMock(ConfigurationFactory::class, ['getFormzConfigurationFromCache']);
+        $configurationFactory = $this->getMockBuilder(ConfigurationFactory::class)
+            ->setMethods(['getFormzConfigurationFromCache'])
+            ->getMock();
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $configurationInstance = new Configuration;
         $configurationResult = new Result;
@@ -65,9 +69,16 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     public function builtFormzConfigurationIsNotStoredInSystemCacheWhenItDoesHaveErrors()
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
-        $configurationFactory = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory = $this->getMockBuilder(ConfigurationFactory::class)
+            ->setMethods(['buildFormzConfiguration'])
+            ->getMock();
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
+
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory2 */
-        $configurationFactory2 = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory2 = $this->getMockBuilder(ConfigurationFactory::class)
+            ->setMethods(['buildFormzConfiguration'])
+            ->getMock();
+        $configurationFactory2->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $configurationInstance = new Configuration;
         $configurationResult = new Result;
@@ -102,10 +113,16 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     public function builtFormzConfigurationIsStoredInSystemCacheWhenItDoesNotHaveErrors()
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
-        $configurationFactory = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory = $this->getMockBuilder(ConfigurationFactory::class)
+            ->setMethods(['buildFormzConfiguration'])
+            ->getMock();
+        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory2 */
-        $configurationFactory2 = $this->getMock(ConfigurationFactory::class, ['buildFormzConfiguration']);
+        $configurationFactory2 = $this->getMockBuilder(ConfigurationFactory::class)
+            ->setMethods(['buildFormzConfiguration'])
+            ->getMock();
+        $configurationFactory2->injectTypoScriptService($this->getMockedTypoScriptService());
 
         $configurationInstance = new Configuration;
         $configurationResult = new Result;

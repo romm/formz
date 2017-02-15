@@ -16,10 +16,16 @@ namespace Romm\Formz\ViewHelpers;
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Exceptions\InvalidArgumentValueException;
+use Romm\Formz\Service\StringService;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\FormService;
+use Romm\Formz\ViewHelpers\Service\SectionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -35,16 +41,37 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  * `bootstrap`, the layout `default` will be used, only if it does exist of
  * course).
  */
-class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
+class FieldViewHelper extends AbstractViewHelper
 {
-    const FIELD_INSTANCE = 'FieldInstance';
+    /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
 
     /**
-     * Unique instance of view, stored to save some performance.
-     *
-     * @var StandaloneView
+     * @var array
      */
-    protected static $view;
+    public static $reservedVariablesNames = ['layout', 'formName', 'fieldName', 'fieldId'];
+
+    /**
+     * @var FormService
+     */
+    protected $formService;
+
+    /**
+     * @var FieldService
+     */
+    protected $fieldService;
+
+    /**
+     * @var SectionService
+     */
+    protected $sectionService;
+
+    /**
+     * @var array
+     */
+    protected $originalArguments = [];
 
     /**
      * @inheritdoc
@@ -53,7 +80,7 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
     {
         $this->registerArgument('name', 'string', 'Name of the field which should be rendered.', true);
         $this->registerArgument('layout', 'string', 'Path of the TypoScript layout which will be used.', true);
-        $this->registerArgument('arguments', 'array', 'Arbitrary arguments which will be sent to the field template.', false);
+        $this->registerArgument('arguments', 'array', 'Arbitrary arguments which will be sent to the field template.', false, []);
     }
 
     /**
@@ -61,169 +88,241 @@ class FieldViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
-    {
-        self::checkIsInsideFormViewHelper();
-
-        /** @var FormViewHelper $form */
-        $form = FormViewHelper::getVariable(FormViewHelper::FORM_VIEW_HELPER);
-        $viewConfiguration = $form->getFormzConfiguration()->getView();
-        $formConfiguration = $form->getFormObject()->getConfiguration();
-        $fieldName = $arguments['name'];
-
-        if (false === is_string($arguments['name'])) {
-            throw new \Exception('The argument "name" of the view helper "' . __CLASS__ . '" must be a string.', 1465243479);
-        } elseif (false === $formConfiguration->hasField($fieldName)) {
-            throw new \Exception('The form "' . $form->getFormObject()->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.', 1465243619);
-        }
-
-        $renderingContext->getViewHelperVariableContainer()->addOrUpdate(__CLASS__, self::FIELD_INSTANCE, $formConfiguration->getField($fieldName));
-
-        $renderChildrenClosure();
-
-        $layout = self::getLayout($arguments, $viewConfiguration);
-
-        /** @var StandaloneView $view */
-        $view = self::$view = (null === self::$view)
-            ? Core::get()->getObjectManager()->get(StandaloneView::class)
-            : self::$view;
-
-        $templateArguments = is_array($arguments['arguments'])
-            ? $arguments['arguments']
-            : [];
-        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, OptionViewHelper::getOption());
+        $viewHelperVariableContainer = $this->renderingContext->getViewHelperVariableContainer();
 
         /*
-         * Keeping a trace of potential original arguments which will be
-         * replaced in the section, to restore them at the end of the view
-         * helper.
+         * First, we check if this view helper is called from within the
+         * `FormViewHelper`, because it would not make sense anywhere else.
          */
-        $originalArguments = self::getOriginalArguments($renderingContext);
+        $this->formService->checkIsInsideFormViewHelper();
 
-        $templateArguments['layout'] = $layout->getLayout();
-        $templateArguments['formName'] = $form->getFormObject()->getName();
-        $templateArguments['fieldName'] = $fieldName;
-        $templateArguments['fieldId'] = (true === isset($templateArguments['fieldId']))
-            ? $templateArguments['fieldId']
-            : Core::get()->sanitizeString('formz-' . $form->getFormObject()->getName() . '-' . $fieldName);
+        /*
+         * Then, we inject the wanted field in the `FieldService` so we can know
+         * later which field we're working with.
+         */
+        $this->injectFieldInService($this->arguments['name']);
 
-        $currentView = $renderingContext->getViewHelperVariableContainer()->getView();
+        /*
+         * Calling this here will process every view helper beneath this one,
+         * allowing options and sections to be used correctly in the field
+         * layout.
+         */
+        $this->renderChildren();
 
-        $view->setTemplatePathAndFilename($layout->getTemplateFile());
-        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
-        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
-        $view->setRenderingContext($renderingContext);
-        $view->assignMultiple($templateArguments);
+        /*
+         * We need to store original arguments declared for the current view
+         * context, because we may override them during the rendering of this
+         * view helper.
+         */
+        $this->storeOriginalArguments();
 
-        $result = $view->render();
+        /*
+         * We merge the arguments with the ones registered with the
+         * `OptionViewHelper`.
+         */
+        $templateArguments = $this->arguments['arguments'] ?: [];
+        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, $this->fieldService->getFieldOptions());
 
-        $renderingContext->getViewHelperVariableContainer()->setView($currentView);
+        $currentView = $viewHelperVariableContainer->getView();
 
-        $renderingContext->getViewHelperVariableContainer()->remove(__CLASS__, self::FIELD_INSTANCE);
-        SectionViewHelper::resetSectionClosures();
-        OptionViewHelper::resetOptions();
+        $result = $this->renderLayoutView($templateArguments);
 
-        self::restoreOriginalArguments($renderingContext, $templateArguments, $originalArguments);
+        /*
+         * Resetting all services data.
+         */
+        $this->fieldService->removeCurrentField();
+        $this->fieldService->resetFieldOptions();
+        $this->sectionService->resetSectionClosures();
+
+        $viewHelperVariableContainer->setView($currentView);
+        $this->restoreOriginalArguments($templateArguments);
 
         return $result;
     }
 
     /**
+     * Will render the associated Fluid view for this field (configured with the
+     * `layout` argument).
+     *
+     * @param array $templateArguments
+     * @return string
+     */
+    protected function renderLayoutView(array $templateArguments)
+    {
+        $fieldName = $this->arguments['name'];
+        $formObject = $this->formService->getFormObject();
+        $formConfiguration = $formObject->getConfiguration();
+        $viewConfiguration = $formConfiguration->getFormzConfiguration()->getView();
+        $layout = $this->getLayout($viewConfiguration);
+
+        $templateArguments['layout'] = $layout->getLayout();
+        $templateArguments['formName'] = $formObject->getName();
+        $templateArguments['fieldName'] = $fieldName;
+        $templateArguments['fieldId'] = ($templateArguments['fieldId']) ?: StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
+
+        /** @var StandaloneView $view */
+        $view = Core::instantiate(StandaloneView::class);
+        $view->setTemplatePathAndFilename($layout->getTemplateFile());
+        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
+        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $view->setRenderingContext($this->renderingContext);
+        } else {
+            $variableProvider = $this->getVariableProvider();
+            foreach ($templateArguments as $key => $value) {
+                if ($variableProvider->exists($key)) {
+                    $variableProvider->remove($key);
+                }
+
+                $variableProvider->add($key, $value);
+            }
+        }
+
+        $view->assignMultiple($templateArguments);
+
+        return $view->render();
+    }
+
+    /**
+     * Will check that the given field exists in the current form definition and
+     * inject it in the `FieldService` as `currentField`.
+     *
+     * Throws an error if the field is not found or incorrect.
+     *
+     * @param string $fieldName
+     * @throws EntryNotFoundException
+     * @throws InvalidArgumentTypeException
+     */
+    protected function injectFieldInService($fieldName)
+    {
+        $formObject = $this->formService->getFormObject();
+        $formConfiguration = $formObject->getConfiguration();
+
+        if (false === is_string($fieldName)) {
+            throw new InvalidArgumentTypeException(
+                'The argument "name" of the view helper "' . __CLASS__ . '" must be a string.',
+                1465243479
+            );
+        } elseif (false === $formConfiguration->hasField($fieldName)) {
+            throw new EntryNotFoundException(
+                'The form "' . $formObject->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.',
+                1465243619);
+        }
+
+        $this->fieldService->setCurrentField($formConfiguration->getField($fieldName));
+    }
+
+    /**
      * Returns the layout instance used by this field.
      *
-     * @param array $arguments
-     * @param View  $viewConfiguration
+     * @param View $viewConfiguration
      * @return Layout
-     * @throws \Exception
+     * @throws EntryNotFoundException
+     * @throws InvalidArgumentTypeException
+     * @throws InvalidArgumentValueException
      */
-    protected static function getLayout(array $arguments, View $viewConfiguration)
+    protected function getLayout(View $viewConfiguration)
     {
-        $layoutFound = true;
-        list($layoutName, $templateName) = GeneralUtility::trimExplode('.', $arguments['layout']);
+        $layout = $this->arguments['layout'];
+
+        if (false === is_string($layout)) {
+            throw new InvalidArgumentTypeException(
+                'The argument "layout" must be a string (' . gettype($layout) . ' given).',
+                1485786193
+            );
+        }
+
+        list($layoutName, $templateName) = GeneralUtility::trimExplode('.', $layout);
         if (false === is_string($templateName)) {
             $templateName = 'default';
         }
 
-        if (false === is_string($layoutName)) {
-            $layoutFound = false;
-        } elseif (false === $viewConfiguration->hasLayout($layoutName)) {
-            $layoutFound = false;
-        } elseif (false === $viewConfiguration->getLayout($layoutName)->hasItem($templateName)) {
-            $layoutFound = false;
+        if (empty($layoutName)) {
+            throw new InvalidArgumentValueException(
+                'The layout name cannot be empty, please fill with a value.',
+                1485786285
+            );
         }
 
-        if (false === $layoutFound) {
-            throw new \Exception('The layout "' . $arguments['layout'] . '" could not be found. Please check your TypoScript configuration.', 1465243586);
+        if (false === $viewConfiguration->hasLayout($layoutName)) {
+            throw new EntryNotFoundException(
+                'The layout "' . $layout . '" could not be found. Please check your TypoScript configuration.',
+                1465243586
+            );
+        }
+
+        if (false === $viewConfiguration->getLayout($layoutName)->hasItem($templateName)) {
+            throw new EntryNotFoundException(
+                'The layout "' . $layout . '" does not have an item "' . $templateName . '".',
+                1485867803
+            );
         }
 
         return $viewConfiguration->getLayout($layoutName)->getItem($templateName);
     }
 
     /**
-     * Returns the value of the current variable in the variable container at
-     * the index `$key`, or null if it is not found.
-     *
-     * @param RenderingContextInterface $renderingContext
-     * @param string                    $key
-     * @return mixed|null
+     * Stores some arguments which may already have been initialized, and could
+     * be overridden in the local scope.
      */
-    protected static function getTemplateVariableContainerValue(RenderingContextInterface $renderingContext, $key)
+    protected function storeOriginalArguments()
     {
-        $templateVariableContainer = $renderingContext->getTemplateVariableContainer();
+        $this->originalArguments = [];
+        $variableProvider = $this->getVariableProvider();
 
-        return ($templateVariableContainer->exists($key))
-            ? $templateVariableContainer->get($key)
-            : null;
-    }
-
-    /**
-     * Returns some arguments which may already have been initialized.
-     *
-     * @param RenderingContextInterface $renderingContext
-     * @return array
-     */
-    protected static function getOriginalArguments(RenderingContextInterface $renderingContext)
-    {
-        return [
-            'layout'    => self::getTemplateVariableContainerValue($renderingContext, 'layout'),
-            'formName'  => self::getTemplateVariableContainerValue($renderingContext, 'formName'),
-            'fieldName' => self::getTemplateVariableContainerValue($renderingContext, 'fieldName'),
-            'fieldId'   => self::getTemplateVariableContainerValue($renderingContext, 'fieldId')
-        ];
+        foreach (self::$reservedVariablesNames as $key) {
+            if ($variableProvider->exists($key)) {
+                $this->originalArguments[$key] = $variableProvider->get($key);
+            }
+        }
     }
 
     /**
      * Will restore original arguments in the template variable container.
      *
-     * @param RenderingContextInterface $renderingContext
-     * @param array                     $templateArguments
-     * @param array                     $originalArguments
+     * @param array $templateArguments
      */
-    protected static function restoreOriginalArguments(RenderingContextInterface $renderingContext, array $templateArguments, array $originalArguments)
+    protected function restoreOriginalArguments(array $templateArguments)
     {
-        $templateVariableContainer = $renderingContext->getTemplateVariableContainer();
+        $variableProvider = $this->getVariableProvider();
 
-        $identifiers = $templateVariableContainer->getAllIdentifiers();
-        foreach ($identifiers as $identifier) {
+        foreach ($variableProvider->getAllIdentifiers() as $identifier) {
             if (array_key_exists($identifier, $templateArguments)) {
-                $templateVariableContainer->remove($identifier);
+                $variableProvider->remove($identifier);
             }
         }
 
-        foreach ($originalArguments as $key => $value) {
-            if (null !== $value) {
-                if ($templateVariableContainer->exists($key)) {
-                    $templateVariableContainer->remove($key);
-                }
-
-                $templateVariableContainer->add($key, $value);
+        foreach ($this->originalArguments as $key => $value) {
+            if ($variableProvider->exists($key)) {
+                $variableProvider->remove($key);
             }
+
+            $variableProvider->add($key, $value);
         }
+    }
+
+    /**
+     * @param FormService $service
+     */
+    public function injectFormService(FormService $service)
+    {
+        $this->formService = $service;
+    }
+
+    /**
+     * @param FieldService $service
+     */
+    public function injectFieldService(FieldService $service)
+    {
+        $this->fieldService = $service;
+    }
+
+    /**
+     * @param SectionService $sectionService
+     */
+    public function injectSectionService(SectionService $sectionService)
+    {
+        $this->sectionService = $sectionService;
     }
 }

@@ -3,10 +3,8 @@ if (!defined('TYPO3_MODE')) {
     throw new \Exception('Access denied.');
 }
 
-/** @noinspection PhpUndefinedVariableInspection */
 call_user_func(
     function ($extensionKey) {
-        // Including TypoScript.
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
             $extensionKey,
             'Configuration/TypoScript',
@@ -25,5 +23,5 @@ call_user_func(
             '[Formz] View configuration for Foundation 5'
         );
     },
-    $_EXTKEY
+    'formz'
 );

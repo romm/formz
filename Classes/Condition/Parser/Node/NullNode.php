@@ -14,27 +14,12 @@
 namespace Romm\Formz\Condition\Parser\Node;
 
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class NullNode extends AbstractNode implements SingletonInterface
 {
-    /**
-     * @var NullNode
-     */
-    private static $instance;
-
-    /**
-     * @return NullNode
-     */
-    public static function get()
-    {
-        if (null === self::$instance) {
-            self::$instance = GeneralUtility::makeInstance(self::class);
-        }
-
-        return self::$instance;
-    }
+    use FacadeInstanceTrait;
 
     /**
      * @inheritdoc

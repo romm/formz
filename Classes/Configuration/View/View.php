@@ -62,7 +62,7 @@ class View extends AbstractFormzConfiguration
     }
 
     /**
-     * @return Classes[]
+     * @return Classes
      */
     public function getClasses()
     {

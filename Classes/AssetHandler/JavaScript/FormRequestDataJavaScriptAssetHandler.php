@@ -13,10 +13,11 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Validation\Error;
 
 /**
  * Will handle the "one time run" data needed by JavaScript: the submitted
@@ -43,8 +44,8 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractJavaScriptAssetHandl
             : 'false';
 
         if ($formWasSubmitted) {
-            $submittedFormValues = Core::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
-            $fieldsExistingErrors = Core::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
+            $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
+            $fieldsExistingErrors = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
         }
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
@@ -108,8 +109,10 @@ JS;
 
                     foreach ($formFieldsResult[$fieldName]->getErrors() as $error) {
                         /** @var Error $error */
-                        list($validationName, $errorName) = explode(':', $error->getTitle());
-                        $fieldsErrors[$fieldName][$validationName] = [$errorName => $error->getMessage()];
+                        $validationName = MessageService::get()->getMessageValidationName($error);
+                        $messageKey = MessageService::get()->getMessageKey($error);
+
+                        $fieldsErrors[$fieldName][$validationName] = [$messageKey => $error->render()];
                     }
                 }
             }

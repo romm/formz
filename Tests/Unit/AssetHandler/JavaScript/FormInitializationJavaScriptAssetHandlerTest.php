@@ -24,7 +24,10 @@ TXT;
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
         /** @var FormInitializationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formInitializationJavaScriptAssetHandler */
-        $formInitializationJavaScriptAssetHandler = $this->getMock(FormInitializationJavaScriptAssetHandler::class, ['handleFormConfiguration'], [$assetHandlerFactory]);
+        $formInitializationJavaScriptAssetHandler = $this->getMockBuilder(FormInitializationJavaScriptAssetHandler::class)
+            ->setMethods(['handleFormConfiguration'])
+            ->setConstructorArgs([$assetHandlerFactory])
+            ->getMock();
 
         $jsonFormConfiguration = '';
         $formInitializationJavaScriptAssetHandler->method('handleFormConfiguration')

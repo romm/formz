@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Utility\Traits;
+namespace Romm\Formz\Service\Traits;
 
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 
