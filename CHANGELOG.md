@@ -1,6 +1,15 @@
 # ![Formz](Documentation/Images/formz-icon@medium.png) Formz - Changelog
 
-0.3.3 - 2016-01-25
+0.4.0 - 2017-02-15
+------------------
+
+Support for TYPO3 8.6 has been added. It means you should now be able to use Formz with TYPO3 6.2/7.6/8.6! 
+
+----
+
+- **[[#44](https://github.com/romm/configuration_object/pull/44)] [FEATURE] Introduce TYPO3 8.6 support (#44)**
+
+0.3.3 - 2017-01-25
 ------------------
 
 This release fixes a PHP warning (which could be thrown as an exception) when working on TYPO3 >= 7.6.13. 
@@ -9,7 +18,7 @@ This release fixes a PHP warning (which could be thrown as an exception) when wo
 
 - **[[5f119e1](https://github.com/romm/formz/commit/5f119e1be9b7510bd79378539ad02d7831cb0b15)] [TASK] Introduce legacy version of `FormViewHelper`**
 
-0.3.2 - 2016-01-24
+0.3.2 - 2017-01-24
 ------------------
 
 This release introduces partial backend support for Formz, meaning you can use Formz in any backend module.
@@ -24,7 +33,7 @@ The last remaining known issue is ajax calls, which wont work for now.
 
   **[[3cc9886](https://github.com/romm/formz/commit/3cc9886b05a26d524704f91b4f97d45d3501e01a)] [TASK] Add backend support for `TypoScriptUtility` (#36)**
 
-0.3.1 - 2016-01-05
+0.3.1 - 2017-01-05
 ------------------
 
 This release fixes two issues, updating is recommended.
