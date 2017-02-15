@@ -1,5 +1,10 @@
 # ![Formz](Documentation/Images/formz-icon@medium.png) Formz - Changelog
 
+0.4.1 - 2017-02-15
+------------------
+
+TYPO3 version requirement changed from 8.5 to 8.6 (mistake from last version).
+
 0.4.0 - 2017-02-15
 ------------------
 
