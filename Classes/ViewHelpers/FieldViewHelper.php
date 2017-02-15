@@ -165,7 +165,6 @@ class FieldViewHelper extends AbstractViewHelper
         $view->setTemplatePathAndFilename($layout->getTemplateFile());
         $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
         $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
-        $view->assignMultiple($templateArguments);
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
@@ -179,6 +178,8 @@ class FieldViewHelper extends AbstractViewHelper
                 $variableProvider->add($key, $value);
             }
         }
+
+        $view->assignMultiple($templateArguments);
 
         return $view->render();
     }
