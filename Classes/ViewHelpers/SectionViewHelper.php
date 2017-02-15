@@ -13,8 +13,10 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use TYPO3\CMS\Fluid\Core\Compiler\TemplateCompiler;
-use TYPO3\CMS\Fluid\Core\Parser\SyntaxTree\AbstractNode;
+use Romm\Formz\Core\Core;
+use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\ViewHelpers\Service\SectionService;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
@@ -27,14 +29,10 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  */
 class SectionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
-
     /**
-     * Contains the closures which will render the registered sections. The keys
-     * of this array are the names of the sections.
-     *
-     * @var callable[]
+     * @var FieldService
      */
-    private static $sections = [];
+    protected $fieldService;
 
     /**
      * @inheritdoc
@@ -49,56 +47,27 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function render()
     {
-        self::checkIsInsideFieldViewHelper($this->renderingContext);
+        $this->fieldService->checkIsInsideFieldViewHelper();
 
-        self::addSectionClosure($this->arguments['name'], $this->buildRenderChildrenClosure());
+        return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
     /**
-     * In the created PHP code, we add a call to the function which will
-     * register the closure to render this section.
-     *
      * @inheritdoc
      */
-    public function compile($argumentsVariableName, $renderChildrenClosureVariableName, &$initializationPhpCode, AbstractNode $syntaxTreeNode, TemplateCompiler $templateCompiler)
+    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        $initializationPhpCode .= self::class . '::checkIsInsideFieldViewHelper($renderingContext);' . LF;
-        $initializationPhpCode .= self::class . '::addSectionClosure(' . $argumentsVariableName . "['name'], " . $renderChildrenClosureVariableName . ');' . LF;
+        /** @var SectionService $sectionService */
+        $sectionService = Core::instantiate(SectionService::class);
 
-        return '""';
+        $sectionService->addSectionClosure($arguments['name'], $renderChildrenClosure);
     }
 
     /**
-     * Adds a closure - which will render the section with the given name - to
-     * the private storage in this class.
-     *
-     * @param string   $name
-     * @param callable $closure
+     * @param FieldService $service
      */
-    public static function addSectionClosure($name, $closure)
+    public function injectFieldService(FieldService $service)
     {
-        self::$sections[$name] = $closure;
-    }
-
-    /**
-     * Returns the closure which will render the section with the given name. If
-     * nothing is found, `null` is returned.
-     *
-     * @param string $name
-     * @return callable|null
-     */
-    public static function getSectionClosure($name)
-    {
-        return (true === isset(self::$sections[$name]))
-            ? self::$sections[$name]
-            : null;
-    }
-
-    /**
-     * Resets the list of closures.
-     */
-    public static function resetSectionClosures()
-    {
-        self::$sections = [];
+        $this->fieldService = $service;
     }
 }

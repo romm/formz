@@ -22,7 +22,10 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
 
-        $pageRendererMock = $this->getMock(PageRenderer::class, ['addCssFile']);
+        /** @var PageRenderer|\PHPUnit_Framework_MockObject_MockObject $pageRendererMock */
+        $pageRendererMock = $this->getMockBuilder(PageRenderer::class)
+            ->setMethods(['addCssFile'])
+            ->getMock();
         $pageRendererMock->expects($this->atLeastOnce())
             ->method('addCssFile');
 
@@ -49,15 +52,17 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
 
-        $pageRendererMock = $this->getMock(PageRenderer::class, ['addCssFile']);
+        $pageRendererMock = $this->getMockBuilder(PageRenderer::class)
+            ->setMethods(['addCssFile'])
+            ->getMock();
         $pageRendererMock->expects($this->atLeastOnce())
             ->method('addCssFile');
 
-        $assetHandlerConnectorManager = $this->getMock(
-            AssetHandlerConnectorManager::class,
-            ['fileExists', 'writeTemporaryFile'],
-            [$pageRendererMock, $assetHandlerFactory]
-        );
+        /** @var AssetHandlerConnectorManager|\PHPUnit_Framework_MockObject_MockObject $assetHandlerConnectorManager */
+        $assetHandlerConnectorManager = $this->getMockBuilder(AssetHandlerConnectorManager::class)
+            ->setMethods(['fileExists', 'writeTemporaryFile'])
+            ->setConstructorArgs([$pageRendererMock, $assetHandlerFactory])
+            ->getMock();
 
         $fileExists = false;
         $assetHandlerConnectorManager->method('fileExists')

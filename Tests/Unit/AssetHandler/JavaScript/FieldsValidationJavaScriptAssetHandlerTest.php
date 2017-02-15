@@ -46,7 +46,10 @@ TXT;
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
         /** @var FieldsValidationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $fieldsValidationJavaScriptAssetHandler */
-        $fieldsValidationJavaScriptAssetHandler = $this->getMock(FieldsValidationJavaScriptAssetHandler::class, ['handleValidationConfiguration'], [$assetHandlerFactory]);
+        $fieldsValidationJavaScriptAssetHandler = $this->getMockBuilder(FieldsValidationJavaScriptAssetHandler::class)
+            ->setMethods(['handleValidationConfiguration'])
+            ->setConstructorArgs([$assetHandlerFactory])
+            ->getMock();
 
         $jsonValidationConfiguration = '';
         $fieldsValidationJavaScriptAssetHandler->method('handleValidationConfiguration')

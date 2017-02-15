@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ArrayService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -64,7 +64,7 @@ JS;
         $this->removeFieldsValidationConfiguration($formConfigurationArray)
             ->addClassNameProperty($formConfigurationArray);
 
-        return Core::get()->arrayToJavaScriptJson($formConfigurationArray);
+        return ArrayService::get()->arrayToJavaScriptJson($formConfigurationArray);
     }
 
     /**

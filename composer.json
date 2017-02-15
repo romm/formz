@@ -16,12 +16,12 @@
   ],
   "require": {
     "php": ">=5.5",
-    "romm/configuration-object": "^1.2.1",
-    "typo3/cms": "^6.2 || ^7.6.13"
+    "romm/configuration-object": "^1.2.3",
+    "typo3/cms": "^6.2 || ^7.6.13 || ^8.5.0"
   },
   "require-dev": {
     "mikey179/vfsStream": "1.4.*@dev",
-    "phpunit/phpunit": "~4.8.0",
+    "phpunit/phpunit": "^4.7 || ^5.6",
     "satooshi/php-coveralls": "dev-master"
   },
   "autoload": {
@@ -33,6 +33,7 @@
     "psr-4": {
       "Romm\\Formz\\Tests\\": "Tests",
       "Romm\\ConfigurationObject\\Tests\\": ".Build/Web/typo3conf/ext/configuration_object/Tests",
+      "TYPO3\\Components\\TestingFramework\\": ".Build/vendor/typo3/cms/components/testing_framework/Classes/",
       "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/",
       "TYPO3\\CMS\\Fluid\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/fluid/Tests/"
     }
@@ -43,7 +44,10 @@
   },
   "config": {
     "vendor-dir": ".Build/vendor",
-    "bin-dir": ".Build/bin"
+    "bin-dir": ".Build/bin",
+    "preferred-install": {
+      "typo3/cms": "prefer-source"
+    }
   },
   "scripts": {
     "post-autoload-dump": [

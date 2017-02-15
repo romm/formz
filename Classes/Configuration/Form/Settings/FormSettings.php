@@ -17,7 +17,7 @@ use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\Form\Form;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Service\ContextService;
 
 class FormSettings extends AbstractFormzConfiguration
 {
@@ -54,7 +54,7 @@ class FormSettings extends AbstractFormzConfiguration
      */
     public function getDefaultErrorMessage()
     {
-        return Core::get()->translate($this->getSettingsProperty('defaultErrorMessage'));
+        return ContextService::get()->translate($this->getSettingsProperty('defaultErrorMessage'));
     }
 
     /**

@@ -17,13 +17,16 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
-use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
-use Romm\Formz\Utility\TimeTracker;
+use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\StringService;
+use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
+use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -65,10 +68,10 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 {
-    const FORM_VIEW_HELPER = 'FormViewHelper';
-    const FORM_INSTANCE = 'FormInstance';
-    const FORM_RESULT = 'FormResult';
-    const FORM_WAS_SUBMITTED = 'FormWasSubmitted';
+    /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
 
     /**
      * @var PageRenderer
@@ -76,19 +79,19 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $pageRenderer;
 
     /**
+     * @var FormObjectFactory
+     */
+    protected $formObjectFactory;
+
+    /**
+     * @var FormService
+     */
+    protected $formService;
+
+    /**
      * @var string
      */
     protected $formObjectClassName;
-
-    /**
-     * @var Configuration
-     */
-    protected $formzConfiguration;
-
-    /**
-     * @var FormObject
-     */
-    protected $formObject;
 
     /**
      * @var AssetHandlerFactory
@@ -96,14 +99,9 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $assetHandlerFactory;
 
     /**
-     * @var TimeTracker
+     * @var TimeTrackerService
      */
     protected $timeTracker;
-
-    /**
-     * @var array
-     */
-    protected static $staticVariables = [];
 
     /**
      * @inheritdoc
@@ -143,25 +141,25 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function renderViewHelper()
     {
-        $this->timeTracker = TimeTracker::getAndStart();
+        $this->timeTracker = TimeTrackerService::getAndStart();
         $result = '';
 
-        if (false === Core::get()->isTypoScriptIncluded()) {
-            if (Core::get()->isInDebugMode()) {
-                $result = Core::get()->translate('form.typoscript_not_included.error_message');
+        if (false === ContextService::get()->isTypoScriptIncluded()) {
+            if (ExtensionService::get()->isInDebugMode()) {
+                $result = ContextService::get()->translate('form.typoscript_not_included.error_message');
             }
         } else {
-            $this->formObject = Core::get()->getFormObjectFactory()
-                ->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
+            $formObject = $this->formObjectFactory->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
 
-            $formzValidationResult = $this->formObject->getConfigurationValidationResult();
+            $this->formService->setFormObject($formObject);
+            $formzValidationResult = $formObject->getConfigurationValidationResult();
 
             if ($formzValidationResult->hasErrors()) {
                 // If the form configuration is not valid, we display the errors list.
                 $result = $this->getErrorText($formzValidationResult);
             } else {
                 // Everything is ok, we render the form.
-                $result = $this->renderForm();
+                $result = $this->renderForm(func_get_args());
             }
 
             unset($formzValidationResult);
@@ -171,26 +169,23 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $result = $this->timeTracker->getHTMLCommentLogs() . LF . $result;
         unset($this->timeTracker);
 
+        $this->formService->resetState();
+
         return $result;
     }
-
     /**
      * Will render the whole form and return the HTML result.
      *
+     * @param array $arguments
      * @return string
      */
-    protected function renderForm()
+    final protected function renderForm(array $arguments)
     {
-        $this->formzConfiguration = Core::get()->getConfigurationFactory()
-            ->getFormzConfiguration()
-            ->getObject();
-
         $this->timeTracker->logTime('post-config');
 
-        $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
+        $this->assetHandlerFactory = AssetHandlerFactory::get($this->formService->getFormObject(), $this->controllerContext);
 
-        $this->injectFormInstance()
-            ->injectObjectAndRequestResult()
+        $this->setObjectAndRequestResult()
             ->applyBehavioursOnSubmittedForm()
             ->addDefaultClass()
             ->handleDataAttributes();
@@ -207,30 +202,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->timeTracker->logTime('pre-render');
 
         // Renders the whole Fluid template.
-        $result = call_user_func_array([$this, 'parent::render'], func_get_args());
+        $result = call_user_func_array([get_parent_class(), 'render'], $arguments);
 
         $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->includeLanguageJavaScriptFiles();
 
-        $this->resetVariables();
-
         return $result;
-    }
-
-    /**
-     * Stores this class instance in the variable container for further usage.
-     *
-     * @throws \Exception
-     * @return $this
-     */
-    protected function injectFormInstance()
-    {
-        if (true === isset(self::$staticVariables[self::FORM_VIEW_HELPER])) {
-            throw new \Exception('You can not use a form view helper inside another one.', 1465242575);
-        }
-
-        self::$staticVariables[self::FORM_VIEW_HELPER] = $this;
-
-        return $this;
     }
 
     /**
@@ -241,71 +217,45 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      *
      * @return $this
      */
-    protected function injectObjectAndRequestResult()
+    protected function setObjectAndRequestResult()
     {
-        if (false === isset(self::$staticVariables[self::FORM_INSTANCE])
-            || false === isset(self::$staticVariables[self::FORM_RESULT])
+        $this->formService->activateFormContext();
+
+        $originalRequest = $this->controllerContext
+            ->getRequest()
+            ->getOriginalRequest();
+
+        if (null !== $originalRequest
+            && $originalRequest->hasArgument($this->getFormObjectName())
         ) {
-            $formInstance = false;
-            $formRequestResult = false;
+            /** @var array $formInstance */
+            $formInstance = $originalRequest->getArgument($this->getFormObjectName());
 
-            $originalRequest = $this->controllerContext
-                ->getRequest()
-                ->getOriginalRequest();
+            $formRequestResult = AbstractFormValidator::getFormValidationResult(
+                $this->getFormObjectClassName(),
+                $this->getFormObjectName()
+            );
 
-            if (null !== $originalRequest
-                && $originalRequest->hasArgument($this->getFormObjectName())
-            ) {
-                $formInstance = $originalRequest->getArgument($this->getFormObjectName());
-                $formRequestResult = AbstractFormValidator::getFormValidationResult(
-                    $this->getFormObjectClassName(),
-                    $this->getFormObjectName()
-                );
+            $this->formService->setFormInstance($formInstance);
+            $this->formService->setFormResult($formRequestResult);
+            $this->formService->markFormAsSubmitted();
+        } elseif (null !== $this->arguments['object']) {
+            $formInstance = $this->arguments['object'];
 
-                self::$staticVariables[self::FORM_WAS_SUBMITTED] = true;
-            } elseif (null !== $this->arguments['object']) {
-                $formInstance = $this->arguments['object'];
-                /*
-                 * @todo: pas forcément un DefaultFormValidator: comment je gère ça?
-                 * + ça prend quand même un peu de temps cette manière. Peut-on faire autrement ?
-                 */
-                /** @var DefaultFormValidator $formValidator */
-                $formValidator = GeneralUtility::makeInstance(
-                    DefaultFormValidator::class,
-                    ['name' => $this->getFormObjectName()]
-                );
-                $formRequestResult = $formValidator->validate($formInstance);
-            }
+            /*
+             * @todo: pas forcément un DefaultFormValidator: comment je gère ça?
+             * + ça prend quand même un peu de temps cette manière. Peut-on faire autrement ?
+             */
+            /** @var DefaultFormValidator $formValidator */
+            $formValidator = Core::instantiate(
+                DefaultFormValidator::class,
+                ['name' => $this->getFormObjectName()]
+            );
+            $formRequestResult = $formValidator->validate($formInstance);
 
-            self::$staticVariables[self::FORM_INSTANCE] = $formInstance;
-            self::$staticVariables[self::FORM_RESULT] = $formRequestResult;
+            $this->formService->setFormInstance($formInstance);
+            $this->formService->setFormResult($formRequestResult);
         }
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     * @return mixed|null
-     */
-    public static function getVariable($name)
-    {
-        return (isset(self::$staticVariables[$name]))
-            ? self::$staticVariables[$name]
-            : null;
-    }
-
-    /**
-     * Deletes the values stored in the variable container.
-     *
-     * @return $this
-     */
-    protected function resetVariables()
-    {
-        unset(self::$staticVariables[self::FORM_VIEW_HELPER]);
-        unset(self::$staticVariables[self::FORM_INSTANCE]);
-        unset(self::$staticVariables[self::FORM_RESULT]);
-        self::$staticVariables[self::FORM_WAS_SUBMITTED] = false;
 
         return $this;
     }
@@ -318,17 +268,20 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function applyBehavioursOnSubmittedForm()
     {
-        $originalRequest = $this->controllerContext->getRequest()->getOriginalRequest();
-        if (null !== $originalRequest) {
-            if ($originalRequest->hasArgument($this->getFormObjectName())) {
-                /** @var BehavioursManager $behavioursManager */
-                $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
+        $originalRequest = $this->controllerContext
+            ->getRequest()
+            ->getOriginalRequest();
 
-                /** @var array $formProperties */
-                $formProperties = $originalRequest->getArgument($this->getFormObjectName());
-                $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray($formProperties, $this->formObject->getConfiguration());
-                $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
-            }
+        if ($this->formService->formWasSubmitted()) {
+            /** @var BehavioursManager $behavioursManager */
+            $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
+
+            $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
+                $this->formService->getFormInstance(),
+                $this->formService->getFormObject()->getConfiguration()
+            );
+
+            $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
         }
 
         return $this;
@@ -344,9 +297,18 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function addDefaultClass()
     {
+        $formDefaultClass = $this->formService
+            ->getFormObject()
+            ->getConfiguration()
+            ->getSettings()
+            ->getDefaultClass();
+
         $class = $this->tag->getAttribute('class');
-        $formDefaultClass = $this->formObject->getConfiguration()->getSettings()->getDefaultClass();
-        $class = $class . ((!empty($class)) ? ' ' : '') . $formDefaultClass;
+
+        if (false === empty($formDefaultClass)) {
+            $class = ((!empty($class)) ? $class . ' ' : '') . $formDefaultClass;
+        }
+
         $this->tag->addAttribute('class', $class);
 
         return $this;
@@ -360,23 +322,23 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function handleDataAttributes()
     {
-        $object = self::$staticVariables[self::FORM_INSTANCE];
-        $requestResult = self::$staticVariables[self::FORM_RESULT];
+        $object = $this->formService->getFormInstance();
+        $formResult = $this->formService->getFormResult();
 
         /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
         $dataAttributesAssetHandler =  $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
 
         $dataAttributes = [];
-        if (false !== $object) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($object, $requestResult);
+        if ($object) {
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($object, $formResult);
         }
 
-        if (false !== $requestResult) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($requestResult);
+        if ($formResult) {
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($formResult);
 
-            if (true === self::$staticVariables[self::FORM_WAS_SUBMITTED]) {
+            if (true === $this->formService->formWasSubmitted()) {
                 $dataAttributes += ['formz-submission-done' => '1'];
-                $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($requestResult);
+                $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($formResult);
             }
         }
 
@@ -397,13 +359,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     {
         /** @var $view \TYPO3\CMS\Fluid\View\StandaloneView */
         $view = $this->objectManager->get(StandaloneView::class);
-        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
-        $layoutRootPath = Core::get()->getExtensionRelativePath('Resources/Private/Layouts');
+        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
+        $layoutRootPath = StringService::get()->getExtensionRelativePath('Resources/Private/Layouts');
         $view->setLayoutRootPaths([$layoutRootPath]);
         $view->assign('result', $result);
 
-        $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . Core::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
-        $this->pageRenderer->addCssFile(Core::get()->getResourceRelativePath($templatePath));
+        $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
+        $this->pageRenderer->addCssFile(StringService::get()->getResourceRelativePath($templatePath));
 
         return $view->render();
     }
@@ -465,18 +427,26 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     }
 
     /**
-     * @return Configuration
+     * @param PageRenderer $pageRenderer
      */
-    public function getFormzConfiguration()
+    public function injectPageRenderer(PageRenderer $pageRenderer)
     {
-        return $this->formzConfiguration;
+        $this->pageRenderer = $pageRenderer;
     }
 
     /**
-     * @return FormObject
+     * @param FormObjectFactory $formObjectFactory
      */
-    public function getFormObject()
+    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
     {
-        return $this->formObject;
+        $this->formObjectFactory = $formObjectFactory;
+    }
+
+    /**
+     * @param FormService $service
+     */
+    public function injectFormService(FormService $service)
+    {
+        $this->formService = $service;
     }
 }
