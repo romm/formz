@@ -149,14 +149,6 @@ class ConditionProcessor
     }
 
     /**
-     * @return FormObject
-     */
-    public function getFormObject()
-    {
-        return $this->formObject;
-    }
-
-    /**
      * @return array
      */
     public function getJavaScriptFiles()
