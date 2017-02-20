@@ -15,8 +15,7 @@ class ConditionFactoryTest extends AbstractUnitTest
      */
     public function registerConditionMustBeAString()
     {
-        $this->expectException(InvalidArgumentTypeException::class);
-        $this->expectExceptionCode(1466588489);
+        $this->setExpectedException(InvalidArgumentTypeException::class, '', 1466588489);
 
         $conditionFactory = new ConditionFactory;
         $conditionFactory->registerCondition(true, 'foo');
@@ -27,8 +26,7 @@ class ConditionFactoryTest extends AbstractUnitTest
      */
     public function registerConditionWithInvalidClassNameThrowsException()
     {
-        $this->expectException(InvalidArgumentTypeException::class);
-        $this->expectExceptionCode(1466588495);
+        $this->setExpectedException(InvalidArgumentTypeException::class, '', 1466588495);
 
         $conditionFactory = new ConditionFactory;
         $conditionFactory->registerCondition('foo', \stdClass::class);
@@ -58,7 +56,7 @@ class ConditionFactoryTest extends AbstractUnitTest
      */
     public function getUnregisteredConditionThrowsException()
     {
-        $this->expectException(EntryNotFoundException::class);
+        $this->setExpectedException(EntryNotFoundException::class);
 
         $conditionFactory = new ConditionFactory;
         $conditionFactory->getCondition('bar');
@@ -80,7 +78,7 @@ class ConditionFactoryTest extends AbstractUnitTest
 
         $conditionFactoryMock->expects($this->atLeastOnce())
             ->method('registerCondition')
-            ->willReturnCallback(function() use (&$defaultConditionsWereRegistered, &$conditionFactoryMock) {
+            ->willReturnCallback(function () use (&$defaultConditionsWereRegistered, &$conditionFactoryMock) {
                 $this->assertFalse($defaultConditionsWereRegistered);
 
                 return $conditionFactoryMock;

@@ -98,6 +98,7 @@ class ConditionProcessor
     public function calculateAllTrees()
     {
         $fields = $this->formObject->getConfiguration()->getFields();
+
         foreach ($fields as $field) {
             $this->getActivationConditionTreeForField($field)
                 ->alongNodes(function (NodeInterface $node) {

@@ -318,7 +318,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         $renderingContextMock = $this->getMockedRenderingContext();
 
-        /** @var  TemplateVariableContainer|ObjectProphecy $templateVariableContainerProphecy */
+        /** @var TemplateVariableContainer|ObjectProphecy $templateVariableContainerProphecy */
         $templateVariableContainerProphecy = $this->prophet->prophesize(TemplateVariableContainer::class);
 
         /** @var TemplateVariableContainer $templateVariableContainer */
