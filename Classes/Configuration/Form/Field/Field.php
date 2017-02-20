@@ -92,6 +92,7 @@ class Field extends AbstractFormzConfiguration
     public function getValidation($validationName = null)
     {
         $result = $this->validation;
+
         if (null !== $validationName) {
             $result = (true === isset($this->validation[$validationName]))
                 ? $this->validation[$validationName]
@@ -99,6 +100,15 @@ class Field extends AbstractFormzConfiguration
         }
 
         return $result;
+    }
+
+    /**
+     * @param string     $validationName
+     * @param Validation $validation
+     */
+    public function addValidation($validationName, Validation $validation)
+    {
+        $this->validation[$validationName] = $validation;
     }
 
     /**

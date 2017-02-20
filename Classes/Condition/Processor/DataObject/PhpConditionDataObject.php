@@ -39,7 +39,7 @@ class PhpConditionDataObject
     /**
      * @param FormInterface $form
      */
-    public function setForm($form)
+    public function setForm(FormInterface $form)
     {
         $this->form = $form;
     }
@@ -55,7 +55,7 @@ class PhpConditionDataObject
     /**
      * @param AbstractFormValidator $formValidator
      */
-    public function setFormValidator($formValidator)
+    public function setFormValidator(AbstractFormValidator $formValidator)
     {
         $this->formValidator = $formValidator;
     }

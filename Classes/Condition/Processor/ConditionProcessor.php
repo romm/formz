@@ -89,17 +89,6 @@ class ConditionProcessor
     }
 
     /**
-     * @param ActivationInterface $activation
-     * @return ConditionTree
-     */
-    protected function getConditionTree(ActivationInterface $activation)
-    {
-        return ConditionParserFactory::get()
-            ->parse($activation)
-            ->attachConditionProcessor($this);
-    }
-
-    /**
      * Function that will calculate all trees from fields and their validation
      * rules.
      *
@@ -110,18 +99,37 @@ class ConditionProcessor
         $fields = $this->formObject->getConfiguration()->getFields();
 
         foreach ($fields as $field) {
-            $this->getActivationConditionTreeForField($field)
-                ->alongNodes(function (NodeInterface $node) {
-                    $this->attachNodeJavaScriptFiles($node);
-                });
+            $this->getActivationConditionTreeForField($field);
 
             foreach ($field->getValidation() as $validation) {
-                $this->getActivationConditionTreeForValidation($validation)
-                    ->alongNodes(function (NodeInterface $node) {
-                        $this->attachNodeJavaScriptFiles($node);
-                    });
+                $this->getActivationConditionTreeForValidation($validation);
             }
         }
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     * @return ConditionTree
+     */
+    protected function getConditionTree(ActivationInterface $activation)
+    {
+        $tree = $this->getNewConditionTreeFromActivation($activation);
+        $tree->alongNodes(function (NodeInterface $node) {
+            $this->attachNodeJavaScriptFiles($node);
+        });
+
+        return $tree;
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     * @return ConditionTree
+     */
+    protected function getNewConditionTreeFromActivation(ActivationInterface $activation)
+    {
+        return ConditionParserFactory::get()
+            ->parse($activation)
+            ->attachConditionProcessor($this);
     }
 
     /**
