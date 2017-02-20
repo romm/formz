@@ -62,6 +62,14 @@ class Validation extends AbstractFormzConfiguration
     protected $useAjax = false;
 
     /**
+     * Name of the validation. By default, it is the key of this instance in the
+     * array containing all the validation for the parent field.
+     *
+     * @var string
+     */
+    private $validationName;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -133,7 +141,19 @@ class Validation extends AbstractFormzConfiguration
      */
     public function getValidationName()
     {
-        return $this->getArrayIndex();
+        if (null === $this->validationName) {
+            $this->validationName = $this->getArrayIndex();
+        }
+
+        return $this->validationName;
+    }
+
+    /**
+     * @param string $validationName
+     */
+    public function setValidationName($validationName)
+    {
+        $this->validationName = $validationName;
     }
 
     /**

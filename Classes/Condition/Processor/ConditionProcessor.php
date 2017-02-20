@@ -17,6 +17,7 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject;
@@ -60,13 +61,13 @@ class ConditionProcessor
      */
     public function getActivationConditionTreeForField(Field $field)
     {
-        if (false === array_key_exists($field->getFieldName(), $this->fieldsTrees)) {
-            $this->fieldsTrees[$field->getFieldName()] = ConditionParserFactory::get()
-                ->parse($field->getActivation())
-                ->attachConditionProcessor($this);
+        $key = $field->getFieldName();
+
+        if (false === array_key_exists($key, $this->fieldsTrees)) {
+            $this->fieldsTrees[$key] = $this->getConditionTree($field->getActivation());
         }
 
-        return $this->fieldsTrees[$field->getFieldName()];
+        return $this->fieldsTrees[$key];
     }
 
     /**
@@ -81,12 +82,21 @@ class ConditionProcessor
         $key = $validation->getParentField()->getFieldName() . '->' . $validation->getValidationName();
 
         if (false === array_key_exists($key, $this->validationsTrees)) {
-            $this->validationsTrees[$key] = ConditionParserFactory::get()
-                ->parse($validation->getActivation())
-                ->attachConditionProcessor($this);
+            $this->validationsTrees[$key] = $this->getConditionTree($validation->getActivation());
         }
 
         return $this->validationsTrees[$key];
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     * @return ConditionTree
+     */
+    protected function getConditionTree(ActivationInterface $activation)
+    {
+        return ConditionParserFactory::get()
+            ->parse($activation)
+            ->attachConditionProcessor($this);
     }
 
     /**

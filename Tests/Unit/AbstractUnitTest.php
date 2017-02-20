@@ -25,8 +25,8 @@ abstract class AbstractUnitTest extends UnitTestCase
      */
     protected function tearDown()
     {
-        parent::tearDown();
-
         $this->formzTearDown();
+
+        parent::tearDown();
     }
 }
