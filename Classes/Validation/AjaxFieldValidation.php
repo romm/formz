@@ -14,6 +14,9 @@
 namespace Romm\Formz\Validation;
 
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentValueException;
+use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
@@ -21,17 +24,45 @@ use Romm\Formz\Service\ExtensionService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
-use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 /**
  * This class is used for automatic Ajax calls for fields which have the setting
- * `useAjax` set to `true`.
+ * `useAjax` enabled.
  */
 class AjaxFieldValidation implements SingletonInterface
 {
+    /**
+     * @var string
+     */
+    protected $formClassName;
+
+    /**
+     * @var string
+     */
+    protected $formName;
+
+    /**
+     * @var string
+     */
+    protected $passObjectInstance;
+
+    /**
+     * @var string
+     */
+    protected $fieldValue;
+
+    /**
+     * @var string
+     */
+    protected $fieldName;
+
+    /**
+     * @var string
+     */
+    protected $validatorName;
 
     /**
      * Main function called.
@@ -47,63 +78,132 @@ class AjaxFieldValidation implements SingletonInterface
         // We prevent any external message to be displayed here.
         ob_start();
 
-        // Getting the sent arguments.
-        $formClassName = GeneralUtility::_GP('formClassName');
-        $formName = GeneralUtility::_GP('formName');
-        $passObjectInstance = GeneralUtility::_GP('passObjectInstance');
-        $fieldValue = GeneralUtility::_GP('fieldValue');
-        $fieldName = GeneralUtility::_GP('fieldName');
-        $validatorName = GeneralUtility::_GP('validatorName');
+        try {
+            $result = $this->getRequestResult();
+        } catch (\Exception $e) {
+            $result['data'] = ['errorCode' => $e->getCode()];
 
-        if ($formClassName && $formName && $passObjectInstance && $fieldValue && $fieldName && $validatorName) {
-            try {
-                /** @var FormObjectFactory $formObjectFactory */
-                $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-
-                $formObject = $formObjectFactory->getInstanceFromClassName($formClassName, $formName);
-                $validationResult = $formObject->getConfigurationValidationResult();
-
-                if (false === $validationResult->hasErrors()) {
-                    $formConfiguration = $formObject->getConfiguration();
-
-                    if (true === $formConfiguration->hasField($fieldName)) {
-                        $fieldValidationConfiguration = $formConfiguration->getField($fieldName)->getValidation($validatorName);
-                        $validatorClassName = $fieldValidationConfiguration->getClassName();
-
-                        if (null !== $fieldValidationConfiguration
-                            && true === $fieldValidationConfiguration->doesUseAjax()
-                            && class_exists($validatorClassName)
-                            && in_array(AbstractValidator::class, class_parents($validatorClassName))
-                        ) {
-                            $form = null;
-                            if ('true' === $passObjectInstance) {
-                                $form = $this->buildObject($formClassName, $this->cleanValuesFromUrl($fieldValue));
-                                $fieldValue = ObjectAccess::getProperty($form, $fieldName);
-                            }
-
-                            /** @var AbstractValidator $validatorInstance */
-                            $validatorInstance = Core::instantiate(
-                                $validatorClassName,
-                                $fieldValidationConfiguration->getOptions(),
-                                $form,
-                                $fieldName,
-                                $fieldValidationConfiguration->getMessages()
-                            );
-                            $result = $this->convertResultToJson($validatorInstance->validate($fieldValue));
-                        }
-                    }
-                }
-            } catch (\Exception $e) {
-                $result['data'] = ['errorCode' => $e->getCode()];
-                if (ExtensionService::get()->isInDebugMode()) {
-                    $result['message'] = $e->getMessage();
-                }
+            if (ExtensionService::get()->isInDebugMode()) {
+                $result['message'] = 'Debug mode – ' . $e->getMessage();
             }
         }
 
         ob_end_clean();
 
         return json_encode($result);
+    }
+
+    /**
+     * Will get the result of the validation for this Ajax request.
+     *
+     * If any error is found, an exception is thrown.
+     *
+     * @return array
+     * @throws EntryNotFoundException
+     * @throws InvalidArgumentValueException
+     * @throws InvalidConfigurationException
+     */
+    protected function getRequestResult()
+    {
+        $argumentsMissing = $this->initializeArguments();
+
+        if (false === empty($argumentsMissing)) {
+            throw new InvalidArgumentValueException(
+                'One or more arguments are missing in the request: "' . implode('", "', $argumentsMissing) . '".',
+                1487673983
+            );
+        }
+
+        /** @var FormObjectFactory $formObjectFactory */
+        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
+
+        $formObject = $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
+        $validationResult = $formObject->getConfigurationValidationResult();
+
+        if (true === $validationResult->hasErrors()) {
+            throw new InvalidConfigurationException(
+                'The form configuration contains errors.',
+                1487671395
+            );
+        }
+
+        $formConfiguration = $formObject->getConfiguration();
+
+        if (false === $formConfiguration->hasField($this->fieldName)) {
+            throw new EntryNotFoundException(
+                'The field "' . $this->fieldName . '" was not found in the form "' . $this->formName . '" with class "' . $this->formClassName . '".',
+                1487671603
+            );
+        }
+
+        $field = $formConfiguration->getField($this->fieldName);
+
+        if (false === $field->hasValidation($this->validatorName)) {
+            throw new EntryNotFoundException(
+                'The field "' . $this->fieldName . '" does not have a rule "' . $this->validatorName . '".',
+                1487672956
+            );
+        }
+
+        $fieldValidationConfiguration = $field->getValidationByName($this->validatorName);
+
+        if (false === $fieldValidationConfiguration->doesUseAjax()) {
+            throw new InvalidConfigurationException(
+                'The validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" is not configured to work with Ajax. Please add the option "useAjax".',
+                1487673434
+            );
+        }
+
+        $validatorClassName = $fieldValidationConfiguration->getClassName();
+
+        if (false === in_array(ValidatorInterface::class, class_implements($validatorClassName))) {
+            throw new InvalidConfigurationException(
+                'The class name "' . $validatorClassName . '" of the validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" must implement the interface "' . ValidatorInterface::class . '".',
+                1487673690
+            );
+        }
+
+        $form = null;
+
+        if ('true' === $this->passObjectInstance) {
+            $form = $this->buildObject();
+            $this->fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
+        }
+
+        /** @var ValidatorInterface $validatorInstance */
+        $validatorInstance = Core::instantiate(
+            $validatorClassName,
+            $fieldValidationConfiguration->getOptions(),
+            $form,
+            $this->fieldName,
+            $fieldValidationConfiguration->getMessages()
+        );
+
+        return $this->convertResultToJson($validatorInstance->validate($this->fieldValue));
+    }
+
+    /**
+     * Initializes all arguments for the request, and returns an array
+     * containing the missing arguments.
+     *
+     * @return array
+     */
+    protected function initializeArguments()
+    {
+        $arguments = ['formClassName', 'formName', 'passObjectInstance', 'fieldValue', 'fieldName', 'validatorName'];
+        $argumentsMissing = [];
+
+        foreach ($arguments as $argument) {
+            $argumentValue = GeneralUtility::_GP($argument);
+
+            if ($argumentValue) {
+                $this->$argument = $argumentValue;
+            } else {
+                $argumentsMissing[] = $argument;
+            }
+        }
+
+        return $argumentsMissing;
     }
 
     /**
@@ -144,22 +244,16 @@ class AjaxFieldValidation implements SingletonInterface
     /**
      * Will build and fill an object with a form sent value.
      *
-     * @param string $className Class name of the model object.
-     * @param array  $values    Values for properties.
      * @return FormInterface
      */
-    protected function buildObject($className, array $values)
+    protected function buildObject()
     {
-        /** @var ObjectManager $objectManager */
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-
+        $values = $this->cleanValuesFromUrl($this->fieldValue);
         /** @var ReflectionService $reflectionService */
-        $reflectionService = $objectManager->get(ReflectionService::class);
-
+        $reflectionService = Core::instantiate(ReflectionService::class);
         /** @var FormInterface $object */
-        $object = $objectManager->get($className);
-
-        $properties = $reflectionService->getClassPropertyNames($className);
+        $object = Core::instantiate($this->formClassName);
+        $properties = $reflectionService->getClassPropertyNames($this->formClassName);
 
         foreach ($properties as $propertyName) {
             if (ObjectAccess::isPropertySettable($object, $propertyName)
