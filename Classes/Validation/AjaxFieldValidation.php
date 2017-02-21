@@ -13,11 +13,14 @@
 
 namespace Romm\Formz\Validation;
 
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
@@ -94,6 +97,22 @@ class AjaxFieldValidation implements SingletonInterface
     }
 
     /**
+     * @param FormObject $formObject
+     * @throws InvalidConfigurationException
+     */
+    protected function checkConfigurationValidationResult(FormObject $formObject)
+    {
+        $validationResult = $formObject->getConfigurationValidationResult();
+
+        if (true === $validationResult->hasErrors()) {
+            throw new InvalidConfigurationException(
+                'The form configuration contains errors.',
+                1487671395
+            );
+        }
+    }
+
+    /**
      * Will get the result of the validation for this Ajax request.
      *
      * If any error is found, an exception is thrown.
@@ -105,65 +124,17 @@ class AjaxFieldValidation implements SingletonInterface
      */
     protected function getRequestResult()
     {
-        $argumentsMissing = $this->initializeArguments();
+        $form = null;
 
-        if (false === empty($argumentsMissing)) {
-            throw new InvalidArgumentValueException(
-                'One or more arguments are missing in the request: "' . implode('", "', $argumentsMissing) . '".',
-                1487673983
-            );
-        }
+        $this->initializeArguments();
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-
         $formObject = $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
-        $validationResult = $formObject->getConfigurationValidationResult();
 
-        if (true === $validationResult->hasErrors()) {
-            throw new InvalidConfigurationException(
-                'The form configuration contains errors.',
-                1487671395
-            );
-        }
-
-        $formConfiguration = $formObject->getConfiguration();
-
-        if (false === $formConfiguration->hasField($this->fieldName)) {
-            throw new EntryNotFoundException(
-                'The field "' . $this->fieldName . '" was not found in the form "' . $this->formName . '" with class "' . $this->formClassName . '".',
-                1487671603
-            );
-        }
-
-        $field = $formConfiguration->getField($this->fieldName);
-
-        if (false === $field->hasValidation($this->validatorName)) {
-            throw new EntryNotFoundException(
-                'The field "' . $this->fieldName . '" does not have a rule "' . $this->validatorName . '".',
-                1487672956
-            );
-        }
-
-        $fieldValidationConfiguration = $field->getValidationByName($this->validatorName);
-
-        if (false === $fieldValidationConfiguration->doesUseAjax()) {
-            throw new InvalidConfigurationException(
-                'The validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" is not configured to work with Ajax. Please add the option "useAjax".',
-                1487673434
-            );
-        }
-
-        $validatorClassName = $fieldValidationConfiguration->getClassName();
-
-        if (false === in_array(ValidatorInterface::class, class_implements($validatorClassName))) {
-            throw new InvalidConfigurationException(
-                'The class name "' . $validatorClassName . '" of the validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" must implement the interface "' . ValidatorInterface::class . '".',
-                1487673690
-            );
-        }
-
-        $form = null;
+        $this->checkConfigurationValidationResult($formObject);
+        $fieldValidationConfiguration = $this->getFieldValidationConfiguration($formObject);
+        $validatorClassName = $this->getValidatorClassName($fieldValidationConfiguration);
 
         if ('true' === $this->passObjectInstance) {
             $form = $this->buildObject();
@@ -185,8 +156,6 @@ class AjaxFieldValidation implements SingletonInterface
     /**
      * Initializes all arguments for the request, and returns an array
      * containing the missing arguments.
-     *
-     * @return array
      */
     protected function initializeArguments()
     {
@@ -203,7 +172,80 @@ class AjaxFieldValidation implements SingletonInterface
             }
         }
 
-        return $argumentsMissing;
+        if (false === empty($argumentsMissing)) {
+            throw new InvalidArgumentValueException(
+                'One or more arguments are missing in the request: "' . implode('", "', $argumentsMissing) . '".',
+                1487673983
+            );
+        }
+    }
+
+    /**
+     * @param FormObject $formObject
+     * @return Form
+     * @throws EntryNotFoundException
+     */
+    protected function getFormConfiguration(FormObject $formObject)
+    {
+        $formConfiguration = $formObject->getConfiguration();
+
+        if (false === $formConfiguration->hasField($this->fieldName)) {
+            throw new EntryNotFoundException(
+                'The field "' . $this->fieldName . '" was not found in the form "' . $this->formName . '" with class "' . $this->formClassName . '".',
+                1487671603
+            );
+        }
+
+        return $formConfiguration;
+    }
+
+    /**
+     * @param FormObject $formObject
+     * @return Validation
+     * @throws EntryNotFoundException
+     * @throws InvalidConfigurationException
+     */
+    protected function getFieldValidationConfiguration(FormObject $formObject)
+    {
+        $formConfiguration = $this->getFormConfiguration($formObject);
+        $field = $formConfiguration->getField($this->fieldName);
+
+        if (false === $field->hasValidation($this->validatorName)) {
+            throw new EntryNotFoundException(
+                'The field "' . $this->fieldName . '" does not have a rule "' . $this->validatorName . '".',
+                1487672956
+            );
+        }
+
+        $fieldValidationConfiguration = $field->getValidationByName($this->validatorName);
+
+        if (false === $fieldValidationConfiguration->doesUseAjax()) {
+            throw new InvalidConfigurationException(
+                'The validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" is not configured to work with Ajax. Please add the option "useAjax".',
+                1487673434
+            );
+        }
+
+        return $fieldValidationConfiguration;
+    }
+
+    /**
+     * @param Validation $fieldValidationConfiguration
+     * @return string
+     * @throws InvalidConfigurationException
+     */
+    protected function getValidatorClassName(Validation $fieldValidationConfiguration)
+    {
+        $validatorClassName = $fieldValidationConfiguration->getClassName();
+
+        if (false === in_array(ValidatorInterface::class, class_implements($validatorClassName))) {
+            throw new InvalidConfigurationException(
+                'The class name "' . $validatorClassName . '" of the validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" must implement the interface "' . ValidatorInterface::class . '".',
+                1487673690
+            );
+        }
+
+        return $validatorClassName;
     }
 
     /**
