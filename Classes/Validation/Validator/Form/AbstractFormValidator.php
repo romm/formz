@@ -87,7 +87,7 @@ use TYPO3\CMS\Extbase\Validation\Validator\GenericObjectValidator;
  *   are still able to add an error to `$this->result` (in a controller you do
  *   not have access to it anymore).
  */
-abstract class AbstractFormValidator extends GenericObjectValidator
+abstract class AbstractFormValidator extends GenericObjectValidator implements FormValidatorInterface
 {
 
     /**
@@ -345,9 +345,7 @@ abstract class AbstractFormValidator extends GenericObjectValidator
             if (false === in_array($fieldName, $this->fieldsActivationChecked)
                 && false === in_array($fieldName, $this->deactivatedFields)
             ) {
-                $phpConditionDataObject = new PhpConditionDataObject;
-                $phpConditionDataObject->setForm($this->form);
-                $phpConditionDataObject->setFormValidator($this);
+                $phpConditionDataObject = new PhpConditionDataObject($this->form, $this);
 
                 if ($field->hasActivation()
                     && false === isset($this->fieldsActivationChecking[$fieldName])
