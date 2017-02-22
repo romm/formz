@@ -275,15 +275,6 @@ abstract class AbstractFormValidator extends GenericObjectValidator
     }
 
     /**
-     * Use this function to (de)activate the validation for some given fields.
-     *
-     * @deprecated use `beforeValidationProcess()` instead
-     */
-    protected function processForm()
-    {
-    }
-
-    /**
      * Use this function to run your own processes after the validation ran.
      */
     protected function afterValidationProcess()
