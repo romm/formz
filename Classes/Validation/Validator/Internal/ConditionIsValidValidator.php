@@ -15,21 +15,10 @@ namespace Romm\Formz\Validation\Validator\Internal;
 
 use Romm\Formz\Condition\Parser\ConditionParser;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class ConditionIsValidValidator extends AbstractValidator
 {
-
-    /**
-     * @inheritdoc
-     */
-    protected $supportedMessages = [
-        'default' => [
-            'key'       => 'validator.form.condition_is_valid.error',
-            'extension' => null
-        ]
-    ];
-
     /**
      * Checks if the value is a valid condition string.
      *
@@ -41,14 +30,16 @@ class ConditionIsValidValidator extends AbstractValidator
             ->parse($condition);
 
         if (true === $conditionTree->getValidationResult()->hasErrors()) {
-            $this->addError(
-                'default',
-                1457621104,
+            $errorMessage = $this->translateErrorMessage(
+                'validator.form.condition_is_valid.error',
+                'formz',
                 [
                     $condition->getCondition(),
                     $conditionTree->getValidationResult()->getFirstError()->getMessage()
                 ]
             );
+
+            $this->addError($errorMessage, 1457621104);
         }
     }
 }
