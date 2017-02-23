@@ -13,15 +13,15 @@
 
 namespace Romm\Formz\Validation\Validator\Form;
 
+use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\FormService;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 
 /**
- * @todo
- *
  * This is the abstract form validator, which must be inherited by any custom
  * form validator in order to work properly.
  *
@@ -44,19 +44,6 @@ use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractV
  *
  * You may use you own custom form validator in order to be able to use the
  * following features:
- *
- * - Fields validation (de)activation:
- *   You are able to handle manually which validation rule for each field of the
- *   form may be activated or not. These functions can be used during the custom
- *   process functions described below.
- *   See the functions:
- *    - `activateField()`
- *    - `deactivateField()`
- *    - `activateFieldValidator()`
- *    - `deactivateFieldValidator()`
- *   And the properties:
- *    - `$deactivatedFields`
- *    - `$deactivatedFieldsValidators`
  *
  * - Pre-validation custom process:
  *   By extending the method `beforeValidationProcess()`, you are able to handle
@@ -82,7 +69,6 @@ use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractV
  */
 abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements FormValidatorInterface
 {
-
     /**
      * @inheritdoc
      */
@@ -109,11 +95,35 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     private static $formsValidationResults = [];
 
     /**
-     * @todo
+     * Checks the given form instance, and launches the validation if it is a
+     * correct form.
+     *
+     * @param FormInterface $form The form instance to be validated.
+     * @return FormResult
+     * @throws InvalidArgumentTypeException
+     */
+    final public function validate($form)
+    {
+        if (false === $form instanceof FormInterface) {
+            throw new InvalidArgumentTypeException(
+                'Trying to validate a form that does not implement the interface "' . FormInterface::class . '". Given class: "' . get_class($form) . '"',
+                1487865158
+            );
+        }
+
+        $this->result = new FormResult;
+
+        $this->isValid($form);
+
+        return $this->result;
+    }
+
+    /**
+     * Runs the whole validation workflow.
      *
      * @param mixed $form
      */
-    public function isValid($form)
+    final public function isValid($form)
     {
         /** @var FormValidatorExecutor $formValidatorExecutor */
         $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $form, $this->options['name'], $this->result);
@@ -123,7 +133,15 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
 
         $this->beforeValidationProcess();
 
-        $formValidatorExecutor->validateFields();
+        $formValidatorExecutor->validateFields(function (Field $field) {
+            // A callback after each field validation: `{lowerCamelCaseFieldName}Validated()`
+            // Example for field "firstName": `firstNameValidated()`
+            $functionName = lcfirst($field->getFieldName() . 'Validated');
+
+            if (method_exists($this, $functionName)) {
+                $this->$functionName();
+            }
+        });
 
         $this->afterValidationProcess();
 
@@ -133,22 +151,6 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         }
 
         self::$formsValidationResults[get_class($form) . '::' . $this->options['name']] = $this->result;
-    }
-
-    /**
-     * Validates the given Form instance. See class description for more
-     * information.
-     *
-     * @param FormInterface $form The form instance to be validated.
-     * @return FormResult
-     */
-    public function validate($form)
-    {
-        $this->result = new FormResult;
-
-        $this->isValid($form);
-
-        return $this->result;
     }
 
     /**

@@ -59,18 +59,11 @@
                     }
                 };
 
-                var passObjectInstance = (true == states['configuration']['options']['passObjectInstance']);
-                // @todo
-                passObjectInstance = true;
-
                 var data = 'formClassName=' + encodeURIComponent(field.getForm().getConfiguration()['className']);
                 data += '&formName=' + encodeURIComponent(field.getForm().getName());
-                data += '&passObjectInstance=' + encodeURIComponent(passObjectInstance.toString());
                 data += '&validatorName=' + encodeURIComponent(states['validatorName']);
                 data += '&fieldName=' + encodeURIComponent(field.getName());
-                data += (true === passObjectInstance)
-                    ? '&' + Formz.buildQueryForm(field.getForm().getElement(), 'fieldValue')
-                    : '&fieldValue=' + encodeURIComponent(value);
+                data += '&' + Formz.buildQueryForm(field.getForm().getElement(), 'fieldValue');
 
                 request.send(data);
             } else {

@@ -180,22 +180,15 @@ class FormValidatorExecutor
     }
 
     /**
+     * @param callable $callback
      * @return FormValidatorExecutor
      */
-    public function validateFields()
+    public function validateFields(callable $callback)
     {
-        foreach ($this->formObject->getConfiguration()->getFields() as $fieldName => $field) {
+        foreach ($this->formObject->getConfiguration()->getFields() as $field) {
             $this->validateField($field);
 
-            $this->form->setValidationData($this->validationData);
-
-            // A callback after each field validation: `{lowerCamelCaseFieldName}Validated()`
-            // Example for field "firstName": `firstNameValidated()`
-            // @todo
-            $functionName = lcfirst($fieldName . 'Validated');
-            if (method_exists($this, $functionName)) {
-                $this->$functionName();
-            }
+            $callback($field);
         }
 
         return $this;
@@ -246,6 +239,8 @@ class FormValidatorExecutor
                             $this->validationData[$fieldName],
                             $validationData
                         );
+
+                        $this->form->setValidationData($this->validationData);
                     }
                 }
 

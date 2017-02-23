@@ -49,13 +49,6 @@ class AjaxFieldValidation implements SingletonInterface
     protected $formName;
 
     /**
-     * @todo remove
-     *
-     * @var string
-     */
-    protected $passObjectInstance;
-
-    /**
      * @var string
      */
     protected $fieldValue;
@@ -158,7 +151,7 @@ class AjaxFieldValidation implements SingletonInterface
      */
     protected function initializeArguments()
     {
-        $arguments = ['formClassName', 'formName', 'passObjectInstance', 'fieldValue', 'fieldName', 'validatorName'];
+        $arguments = ['formClassName', 'formName', 'fieldValue', 'fieldName', 'validatorName'];
         $argumentsMissing = [];
 
         foreach ($arguments as $argument) {
