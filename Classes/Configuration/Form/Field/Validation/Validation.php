@@ -30,7 +30,7 @@ class Validation extends AbstractFormzConfiguration
     /**
      * @var string
      * @validate NotEmpty
-     * @validate Romm.Formz:Internal\ClassExists
+     * @validate Romm.ConfigurationObject:ClassExists
      */
     protected $className;
 
