@@ -11,12 +11,13 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Condition\Processor\DataObject;
+namespace Romm\Formz\Validation\DataObject;
 
+use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
 
-class PhpConditionDataObject
+class ValidatorDataObject
 {
     /**
      * @var FormInterface
@@ -24,18 +25,18 @@ class PhpConditionDataObject
     protected $form;
 
     /**
-     * @var FormValidatorExecutor
+     * @var Validation
      */
-    protected $formValidator;
+    protected $validation;
 
     /**
-     * @param FormInterface         $form
-     * @param FormValidatorExecutor $formValidator
+     * @param FormInterface $form
+     * @param Validation    $validation
      */
-    public function __construct(FormInterface $form, FormValidatorExecutor $formValidator)
+    public function __construct(FormInterface $form, Validation $validation)
     {
         $this->form = $form;
-        $this->formValidator = $formValidator;
+        $this->validation = $validation;
     }
 
     /**
@@ -47,10 +48,18 @@ class PhpConditionDataObject
     }
 
     /**
-     * @return FormValidatorExecutor
+     * @return Field
      */
-    public function getFormValidator()
+    public function getField()
     {
-        return $this->formValidator;
+        return $this->validation->getParentField();
+    }
+
+    /**
+     * @return Validation
+     */
+    public function getValidation()
+    {
+        return $this->validation;
     }
 }

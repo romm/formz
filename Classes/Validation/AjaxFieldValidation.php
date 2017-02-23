@@ -24,6 +24,7 @@ use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -48,6 +49,8 @@ class AjaxFieldValidation implements SingletonInterface
     protected $formName;
 
     /**
+     * @todo remove
+     *
      * @var string
      */
     protected $passObjectInstance;
@@ -124,8 +127,6 @@ class AjaxFieldValidation implements SingletonInterface
      */
     protected function getRequestResult()
     {
-        $form = null;
-
         $this->initializeArguments();
 
         /** @var FormObjectFactory $formObjectFactory */
@@ -133,24 +134,22 @@ class AjaxFieldValidation implements SingletonInterface
         $formObject = $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
 
         $this->checkConfigurationValidationResult($formObject);
-        $fieldValidationConfiguration = $this->getFieldValidationConfiguration($formObject);
-        $validatorClassName = $this->getValidatorClassName($fieldValidationConfiguration);
+        $validation = $this->getFieldValidation($formObject);
+        $validatorClassName = $this->getValidatorClassName($validation);
 
-        if ('true' === $this->passObjectInstance) {
-            $form = $this->buildObject();
-            $this->fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
-        }
+        $form = $this->buildObject();
+        $this->fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
 
-        /** @var ValidatorInterface $validatorInstance */
-        $validatorInstance = Core::instantiate(
+        $validatorDataObject = new ValidatorDataObject($form, $validation);
+
+        /** @var ValidatorInterface $validator */
+        $validator = GeneralUtility::makeInstance(
             $validatorClassName,
-            $fieldValidationConfiguration->getOptions(),
-            $form,
-            $this->fieldName,
-            $fieldValidationConfiguration->getMessages()
+            $validation->getOptions(),
+            $validatorDataObject
         );
 
-        return $this->convertResultToJson($validatorInstance->validate($this->fieldValue));
+        return $this->convertResultToJson($validator->validate($this->fieldValue));
     }
 
     /**
@@ -205,7 +204,7 @@ class AjaxFieldValidation implements SingletonInterface
      * @throws EntryNotFoundException
      * @throws InvalidConfigurationException
      */
-    protected function getFieldValidationConfiguration(FormObject $formObject)
+    protected function getFieldValidation(FormObject $formObject)
     {
         $formConfiguration = $this->getFormConfiguration($formObject);
         $field = $formConfiguration->getField($this->fieldName);
@@ -246,22 +245,6 @@ class AjaxFieldValidation implements SingletonInterface
         }
 
         return $validatorClassName;
-    }
-
-    /**
-     * Will clean the string filled with form values sent with Ajax.
-     *
-     * @param array $values
-     * @return array
-     */
-    protected function cleanValuesFromUrl($values)
-    {
-        // Cleaning the given form values.
-        $values = reset($values);
-        unset($values['__referrer']);
-        unset($values['__trustedProperties']);
-
-        return reset($values);
     }
 
     /**
@@ -306,5 +289,21 @@ class AjaxFieldValidation implements SingletonInterface
         }
 
         return $object;
+    }
+
+    /**
+     * Will clean the string filled with form values sent with Ajax.
+     *
+     * @param array $values
+     * @return array
+     */
+    protected function cleanValuesFromUrl($values)
+    {
+        // Cleaning the given form values.
+        $values = reset($values);
+        unset($values['__referrer']);
+        unset($values['__trustedProperties']);
+
+        return reset($values);
     }
 }

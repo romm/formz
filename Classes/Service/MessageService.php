@@ -13,14 +13,22 @@
 
 namespace Romm\Formz\Service;
 
+use Romm\Formz\Configuration\Form\Field\Validation\Message as FormzMessage;
 use Romm\Formz\Error\FormzMessageInterface;
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Error\Message;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class MessageService implements SingletonInterface
 {
-    use FacadeInstanceTrait;
+    use ExtendedFacadeInstanceTrait;
+
+    /**
+     * @var Dispatcher
+     */
+    protected $signalSlotDispatcher;
 
     /**
      * Returns the validation name of a message: if it is an instance of
@@ -50,5 +58,81 @@ class MessageService implements SingletonInterface
         return ($message instanceof FormzMessageInterface)
             ? $message->getMessageKey()
             : 'unknown';
+    }
+
+    /**
+     * @param array $message
+     * @param array $arguments
+     * @return string
+     */
+    public function parseMessageArray(array $message, array $arguments)
+    {
+        $result = (isset($message['value']) && $message['value'] !== '')
+            ? vsprintf($message['value'], $arguments)
+            : ContextService::get()->translate($message['key'], $message['extension'], $arguments);
+
+        list($result) = $this->signalSlotDispatcher->dispatch(
+            __CLASS__,
+            'getMessage',
+            [$result, $message, $arguments]
+        );
+
+        return (string)$result;
+    }
+
+    /**
+     * Will return an array by considering the supported messages, and filling
+     * the supported ones with the given values.
+     *
+     * @param FormzMessage[] $messages
+     * @param array          $supportedMessages
+     * @param bool           $canCreateNewMessages
+     * @return array
+     */
+    public function filterMessages(array $messages, array $supportedMessages, $canCreateNewMessages = false)
+    {
+        // Adding the keys `value` and `extension` to the messages, only if it is missing.
+        $addValueToArray = function (array &$a) {
+            foreach ($a as $k => $v) {
+                if (false === isset($v['value'])) {
+                    $a[$k]['value'] = '';
+                }
+                if (false === isset($v['extension'])) {
+                    $a[$k]['extension'] = '';
+                }
+            }
+
+            return $a;
+        };
+
+        $messagesArray = [];
+        foreach ($messages as $key => $message) {
+            if ($message instanceof FormzMessage) {
+                $message = $message->toArray();
+            }
+
+            $messagesArray[$key] = $message;
+        }
+
+        $addValueToArray($messagesArray);
+        $addValueToArray($supportedMessages);
+
+        $messagesResult = $supportedMessages;
+
+        ArrayUtility::mergeRecursiveWithOverrule(
+            $messagesResult,
+            $messagesArray,
+            (bool)$canCreateNewMessages
+        );
+
+        return $messagesResult;
+    }
+
+    /**
+     * @param Dispatcher $signalSlotDispatcher
+     */
+    public function injectSignalSlotDispatcher(Dispatcher $signalSlotDispatcher)
+    {
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
     }
 }

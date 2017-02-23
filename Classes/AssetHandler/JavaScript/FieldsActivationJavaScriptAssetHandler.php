@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -20,7 +21,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * validation rules of a field. Indeed, when a field is hidden, it is probably
  * not useful to let JavaScript run the validation rules.
  */
-class FieldsActivationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FieldsActivationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**
