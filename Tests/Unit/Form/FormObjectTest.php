@@ -47,6 +47,23 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
+     * @test
+     */
+    public function formObjectWithAddedPropertyHasProperty()
+    {
+        $formObject = $this->getDefaultFormObject();
+
+        $this->assertFalse($formObject->hasProperty('foo'));
+        $this->assertFalse($formObject->hasProperty('bar'));
+        $formObject->addProperty('foo');
+        $this->assertTrue($formObject->hasProperty('foo'));
+        $this->assertFalse($formObject->hasProperty('bar'));
+        $formObject->addProperty('bar');
+        $this->assertTrue($formObject->hasProperty('foo'));
+        $this->assertTrue($formObject->hasProperty('bar'));
+    }
+
+    /**
      * Setting a basic configuration array should be saved properly.
      *
      * @test

@@ -91,22 +91,6 @@ class FormObject
     }
 
     /**
-     * Registers a new property for this form.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function addProperty($name)
-    {
-        if (false === in_array($name, $this->properties)) {
-            $this->properties[] = $name;
-            $this->hashShouldBeCalculated = true;
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Form
      */
     public function getConfiguration()
@@ -131,6 +115,31 @@ class FormObject
     public function getClassName()
     {
         return $this->className;
+    }
+
+    /**
+     * Registers a new property for this form.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function addProperty($name)
+    {
+        if (false === $this->hasProperty($name)) {
+            $this->properties[] = $name;
+            $this->hashShouldBeCalculated = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasProperty($name)
+    {
+        return in_array($name, $this->properties);
     }
 
     /**
