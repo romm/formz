@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-use Romm\Formz\Exceptions\InvalidArgumentValueException;
+use Romm\Formz\Exceptions\InvalidOptionValueException;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 class EqualsToFieldValidator extends AbstractValidator
@@ -53,7 +53,7 @@ class EqualsToFieldValidator extends AbstractValidator
         $formObject = $this->dataObject->getFormObject();
 
         if (false === $formObject->hasProperty($fieldName)) {
-            throw new InvalidArgumentValueException(
+            throw new InvalidOptionValueException(
                 'The field "' . $fieldName . '" does not exist in the form "' . $formObject->getName() . '" with class "' . $formObject->getClassName() . '".',
                 1487947224
             );
