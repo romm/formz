@@ -15,9 +15,15 @@ namespace Romm\Formz\Validation\DataObject;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject;
 
 class ValidatorDataObject
 {
+    /**
+     * @var FormObject
+     */
+    protected $formObject;
+
     /**
      * @var FormInterface
      */
@@ -29,13 +35,23 @@ class ValidatorDataObject
     protected $validation;
 
     /**
+     * @param FormObject    $formObject
      * @param FormInterface $form
      * @param Validation    $validation
      */
-    public function __construct(FormInterface $form, Validation $validation)
+    public function __construct(FormObject $formObject, FormInterface $form, Validation $validation)
     {
+        $this->formObject = $formObject;
         $this->form = $form;
         $this->validation = $validation;
+    }
+
+    /**
+     * @return FormObject
+     */
+    public function getFormObject()
+    {
+        return $this->formObject;
     }
 
     /**

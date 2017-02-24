@@ -3,6 +3,7 @@ namespace Romm\Formz\Tests\Unit\Validation\Validator;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -13,30 +14,6 @@ abstract class AbstractValidatorUnitTest extends AbstractUnitTest
      * @var string
      */
     protected $validatorClassName;
-
-    /**
-     * @param string $className
-     * @param array  $options
-     * @param array  $methods
-     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractValidator
-     */
-    protected function getValidatorInstance($className, array $options = [], array $methods = [])
-    {
-        $formMock = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
-
-        $validation = new Validation;
-        $validation->setArrayIndex('foo');
-
-        $validatorDataObject = new ValidatorDataObject($formMock, $validation);
-
-        return (empty($methods))
-            ? new $className($options, $validatorDataObject)
-            : $this->getMockBuilder($className)
-                ->setConstructorArgs([$options, $validatorDataObject])
-                ->setMethods($methods)
-                ->getMock();
-    }
 
     /**
      * @param string $value
@@ -78,5 +55,45 @@ abstract class AbstractValidatorUnitTest extends AbstractUnitTest
         }
 
         return $validator->validate($value);
+    }
+
+    /**
+     * @param string $className
+     * @param array  $options
+     * @param array  $methods
+     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractValidator
+     */
+    protected function getValidatorInstance($className, array $options = [], array $methods = [])
+    {
+        $validation = new Validation;
+        $validation->setArrayIndex('foo');
+
+        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $this->getForm(), $validation);
+
+        return (empty($methods))
+            ? new $className($options, $validatorDataObject)
+            : $this->getMockBuilder($className)
+                ->setConstructorArgs([$options, $validatorDataObject])
+                ->setMethods($methods)
+                ->getMock();
+    }
+
+    /**
+     * @return FormObject|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getFormObject()
+    {
+        return $this->getMockBuilder(FormObject::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * @return FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getForm()
+    {
+        return $this->getMockBuilder(FormInterface::class)
+            ->getMock();
     }
 }

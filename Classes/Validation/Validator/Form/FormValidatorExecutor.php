@@ -221,7 +221,7 @@ class FormValidatorExecutor
                     continue;
                 }
 
-                $validatorDataObject = new ValidatorDataObject($formClone, $validation);
+                $validatorDataObject = new ValidatorDataObject($this->formObject, $formClone, $validation);
 
                 /** @var ValidatorInterface $validator */
                 $validator = GeneralUtility::makeInstance(

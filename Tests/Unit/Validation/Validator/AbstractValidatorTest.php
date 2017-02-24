@@ -4,6 +4,7 @@ namespace Romm\Formz\Tests\Unit\Validation\Validator;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
@@ -26,6 +27,9 @@ class AbstractValidatorTest extends AbstractUnitTest
             $this->setExpectedException($expectedException);
         }
 
+        $formObjectMock = $this->getMockBuilder(FormObject::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $formMock = $this->getMockBuilder(FormInterface::class)
             ->getMock();
 
@@ -33,7 +37,7 @@ class AbstractValidatorTest extends AbstractUnitTest
         $validation->setArrayIndex('foo');
         $validation->setMessages($messages);
 
-        $validatorDataObject = new ValidatorDataObject($formMock, $validation);
+        $validatorDataObject = new ValidatorDataObject($formObjectMock, $formMock, $validation);
 
         $validator = new DummyValidator([], $validatorDataObject);
         if (is_callable($callback)) {
