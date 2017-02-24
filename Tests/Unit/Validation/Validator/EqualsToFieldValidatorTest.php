@@ -24,7 +24,7 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
      * @param array  $errors
      * @param string $expectedException
      */
-    public function validatorWorks($value, array $options, array $errors = [], $expectedException = null)
+    public function validatorWorks($value, array $options = [], array $errors = [], $expectedException = null)
     {
         if (null !== $expectedException) {
             $this->setExpectedException($expectedException);

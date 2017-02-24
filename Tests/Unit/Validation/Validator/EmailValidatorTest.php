@@ -19,7 +19,7 @@ class EmailValidatorTest extends AbstractValidatorUnitTest
      * @param array $options
      * @param array $errors
      */
-    public function validatorWorks($value, array $options, array $errors = [])
+    public function validatorWorks($value, array $options = [], array $errors = [])
     {
         $this->validateValidator($value, $options, $errors);
     }
