@@ -105,11 +105,19 @@ class Validation extends AbstractFormzConfiguration
     }
 
     /**
-     * @return \Romm\Formz\Configuration\Form\Field\Validation\Message[]
+     * @return Message[]
      */
     public function getMessages()
     {
         return $this->messages;
+    }
+
+    /**
+     * @param Message[] $messages
+     */
+    public function setMessages(array $messages)
+    {
+        $this->messages = $messages;
     }
 
     /**

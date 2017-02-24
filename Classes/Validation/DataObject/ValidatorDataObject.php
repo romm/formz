@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Validation\DataObject;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
 
@@ -45,14 +44,6 @@ class ValidatorDataObject
     public function getForm()
     {
         return $this->form;
-    }
-
-    /**
-     * @return Field
-     */
-    public function getField()
-    {
-        return $this->validation->getParentField();
     }
 
     /**

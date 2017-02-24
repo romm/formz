@@ -16,6 +16,7 @@ namespace Romm\Formz\Validation\Validator;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\Notice;
 use Romm\Formz\Error\Warning;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
@@ -89,14 +90,14 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      * @param array               $options Options for the validator.
      * @param ValidatorDataObject $dataObject
      */
-    public function __construct(array $options = [], ValidatorDataObject $dataObject)
+    final public function __construct(array $options = [], ValidatorDataObject $dataObject)
     {
         parent::__construct($options);
 
         $this->dataObject = $dataObject;
         $this->form = $dataObject->getForm();
         $this->messages = MessageService::get()->filterMessages(
-            $dataObject->getValidation()->getMessages(),
+            $this->dataObject->getValidation()->getMessages(),
             $this->supportedMessages,
             (bool)$this->supportsAllMessages
         );
@@ -145,31 +146,6 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     }
 
     /**
-     * @param string $type
-     * @param string $key
-     * @param string $code
-     * @param array  $arguments
-     * @param string $title
-     * @return mixed
-     * @throws \Exception
-     */
-    private function addMessage($type, $key, $code, array $arguments, $title)
-    {
-        if (!isset($this->messages[$key])) {
-            throw new \Exception('The error key "' . $key . '" does not exist for the validator "' . get_class($this) . '".', 1455272659);
-        }
-
-        return new $type(
-            $this->getMessage($key, $arguments),
-            $code,
-            $this->dataObject->getValidation()->getValidationName(),
-            $key,
-            [],
-            $title
-        );
-    }
-
-    /**
      * Get the full validation data.
      *
      * @return array
@@ -202,6 +178,34 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     }
 
     /**
+     * @param string $type
+     * @param string $key
+     * @param string $code
+     * @param array  $arguments
+     * @param string $title
+     * @return mixed
+     * @throws \Exception
+     */
+    private function addMessage($type, $key, $code, array $arguments, $title)
+    {
+        if (!isset($this->messages[$key])) {
+            throw new EntryNotFoundException(
+                'The error key "' . $key . '" does not exist for the validator "' . get_class($this) . '".',
+                1455272659
+            );
+        }
+
+        return new $type(
+            $this->getMessage($key, $arguments),
+            $code,
+            $this->dataObject->getValidation()->getValidationName(),
+            $key,
+            [],
+            $title
+        );
+    }
+
+    /**
      * This function should *always* be used when a message should be translated
      * when an error occurs in the validation process.
      *
@@ -209,7 +213,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      * @param  array  $arguments Arguments given to the message.
      * @return string
      */
-    public function getMessage($key, array $arguments = [])
+    private function getMessage($key, array $arguments = [])
     {
         return MessageService::get()->parseMessageArray($this->messages[$key], $arguments);
     }
