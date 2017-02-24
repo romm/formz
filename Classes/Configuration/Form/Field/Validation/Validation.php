@@ -30,7 +30,7 @@ class Validation extends AbstractFormzConfiguration
     /**
      * @var string
      * @validate NotEmpty
-     * @validate Romm.ConfigurationObject:ClassExists
+     * @validate Romm.ConfigurationObject:ClassImplements(interface=TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface)
      */
     protected $className;
 
