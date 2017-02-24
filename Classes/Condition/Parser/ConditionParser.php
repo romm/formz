@@ -202,10 +202,7 @@ class ConditionParser implements SingletonInterface
                      * If a `or` node was already registered, we create a new
                      * boolean node to join the two nodes.
                      */
-                    $node = $this->getNode(
-                        BooleanNode::class,
-                        [$this->scope->getLastOrNode(), $this->scope->getNode(), $operator]
-                    );
+                    $node = new BooleanNode($this->scope->getLastOrNode(), $this->scope->getNode(), $operator);
                     $this->scope->setNode($node);
                 }
 
@@ -234,13 +231,7 @@ class ConditionParser implements SingletonInterface
         if (false === $this->condition->hasItem($condition)) {
             $this->addError('The condition "' . $condition . '" does not exist.', 1457628378);
         } else {
-            $node = $this->getNode(
-                ConditionNode::class,
-                [
-                    $condition,
-                    $this->condition->getItem($condition)
-                ]
-            );
+            $node = new ConditionNode($condition, $this->condition->getItem($condition));
             $this->scope
                 ->setNode($node)
                 ->shiftExpression();
@@ -259,10 +250,7 @@ class ConditionParser implements SingletonInterface
             && null !== $this->scope->getNode()
             && null !== $this->scope->getCurrentOperator()
         ) {
-            $node = $this->getNode(
-                BooleanNode::class,
-                [$this->scope->getCurrentLeftNode(), $this->scope->getNode(), $this->scope->getCurrentOperator()]
-            );
+            $node = new BooleanNode($this->scope->getCurrentLeftNode(), $this->scope->getNode(), $this->scope->getCurrentOperator());
             $this->scope
                 ->setNode($node)
                 ->deleteCurrentLeftNode()
@@ -282,27 +270,11 @@ class ConditionParser implements SingletonInterface
         if (null !== $this->scope->getCurrentLeftNode()) {
             $this->addError('Logical operator must be followed by a valid operation.', 1457545071);
         } elseif (null !== $this->scope->getLastOrNode()) {
-            $node = $this->getNode(
-                BooleanNode::class,
-                [$this->scope->getLastOrNode(), $this->scope->getNode(), self::LOGICAL_OR]
-            );
+            $node = new BooleanNode($this->scope->getLastOrNode(), $this->scope->getNode(), self::LOGICAL_OR);
             $this->scope->setNode($node);
         }
 
         return $this;
-    }
-
-    /**
-     * @param string $nodeClassName
-     * @param array  $arguments
-     * @return NodeInterface
-     */
-    private function getNode($nodeClassName, array $arguments)
-    {
-        return call_user_func_array(
-            [GeneralUtility::class, 'makeInstance'],
-            array_merge([$nodeClassName], $arguments)
-        );
     }
 
     /**
