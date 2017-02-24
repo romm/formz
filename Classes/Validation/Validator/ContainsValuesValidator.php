@@ -46,33 +46,41 @@ class ContainsValuesValidator extends AbstractValidator
     /**
      * @inheritdoc
      */
-    public function isValid($valuesArray)
+    public function isValid($values)
     {
-        if (false === is_array($valuesArray)) {
-            $valuesArray = [$valuesArray];
+        if (false === is_array($values)) {
+            $values = [$values];
         }
 
-        if (empty($valuesArray)) {
+        if (empty($values)) {
             $this->addError(self::MESSAGE_EMPTY, 1487943450);
         } else {
-            $flag = true;
-            $values = $this->options[self::OPTION_VALUES];
+            $this->valuesAreInArray($values);
+        }
+    }
 
-            if (false === is_array($values)) {
-                $values = GeneralUtility::trimExplode('|', $values);
-            }
+    /**
+     * @param array $values
+     */
+    protected function valuesAreInArray(array $values)
+    {
+        $flag = true;
+        $acceptedValues = $this->options[self::OPTION_VALUES];
 
-            foreach ($valuesArray as $value) {
-                $flag = $flag && in_array($value, $values);
-            }
+        if (false === is_array($acceptedValues)) {
+            $acceptedValues = GeneralUtility::trimExplode('|', $acceptedValues);
+        }
 
-            if (false === $flag) {
-                $this->addError(
-                    self::MESSAGE_DEFAULT,
-                    1445952458,
-                    [implode(', ', $values)]
-                );
-            }
+        foreach ($values as $value) {
+            $flag = $flag && in_array($value, $acceptedValues);
+        }
+
+        if (false === $flag) {
+            $this->addError(
+                self::MESSAGE_DEFAULT,
+                1445952458,
+                [implode(', ', $acceptedValues)]
+            );
         }
     }
 }
