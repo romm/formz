@@ -31,7 +31,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
 
         $filesIncluded = 0;
 
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -88,7 +88,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
      */
     public function formzConfigurationIsGeneratedAndIncluded()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -140,7 +140,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
      */
     public function generalJavaScriptIsGeneratedAndIncluded()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -249,7 +249,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
      */
     public function inlineJavaScriptIsGeneratedAndIncluded($activateDebugMode, \PHPUnit_Framework_MockObject_Matcher_Invocation $debugExpect)
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -323,7 +323,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
      */
     public function languageJavaScriptFilesAreIncluded()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -386,7 +386,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
      */
     public function javaScriptValidationAndConditionFilesAreIncludedOnce()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);

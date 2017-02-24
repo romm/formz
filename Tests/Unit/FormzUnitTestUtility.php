@@ -132,7 +132,7 @@ trait FormzUnitTestUtility
     /**
      * @return FormObject
      */
-    protected function getFormObject()
+    protected function getDefaultFormObject()
     {
         $formObject = new FormObject(
             AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,

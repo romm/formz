@@ -18,7 +18,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function constructorPropertiesAreSet()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
 
         $this->assertEquals(self::FORM_OBJECT_DEFAULT_CLASS_NAME, $formObject->getClassName());
         $this->assertEquals(self::FORM_OBJECT_DEFAULT_NAME, $formObject->getName());
@@ -31,7 +31,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function addedPropertyIsGettable()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
 
         $formObject->addProperty('foo');
         $this->assertEquals(['foo'], $formObject->getProperties());
@@ -53,7 +53,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function configurationArrayCanBeSet()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => 'foo'
@@ -81,7 +81,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function configurationArrayDeletesAdditionalFields()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => 'foo'
@@ -158,7 +158,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function configurationObjectIsCorrectlyBuilt()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => []
@@ -229,7 +229,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function configurationValidationResultCanBeGet()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => []
