@@ -19,6 +19,8 @@ use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class ConditionIsValidValidator extends AbstractValidator
 {
+    const ERROR_CODE = 1457621104;
+
     /**
      * Checks if the value is a valid condition string.
      *
@@ -39,7 +41,7 @@ class ConditionIsValidValidator extends AbstractValidator
                 ]
             );
 
-            $this->addError($errorMessage, 1457621104);
+            $this->addError($errorMessage, self::ERROR_CODE);
         }
     }
 }
