@@ -95,6 +95,7 @@ trait FormzUnitTestUtility
         $this->changeReflectionCache();
         $this->injectTransientMemoryCacheInFormzCore();
         $this->setUpExtensionServiceMock();
+        $this->setUpContextService();
 
         $this->prophet = new Prophet;
     }
@@ -275,6 +276,11 @@ trait FormzUnitTestUtility
         $contextServiceMock = $this->getMockBuilder(ContextService::class)
             ->setMethods(['translate'])
             ->getMock();
+
+        FacadeService::get()->forceInstance(ContextService::class, $contextServiceMock);
+
+        $contextServiceMock->injectEnvironmentService($this->getMockedEnvironmentService());
+        $contextServiceMock->injectTypoScriptService($this->getMockedTypoScriptService());
 
         /*
          * Mocking the translate function, to avoid the fatal error due to TYPO3
