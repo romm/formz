@@ -34,8 +34,16 @@ class BetweenNumbersValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedOptions = [
-        self::OPTION_MINIMUM => [0, 'The minimum number value to accept', 'float'],
-        self::OPTION_MAXIMUM => [PHP_INT_MAX, 'The maximum number value to accept', 'float'],
+        self::OPTION_MINIMUM => [
+            0,
+            'The minimum length to accept',
+            'integer'
+        ],
+        self::OPTION_MAXIMUM => [
+            PHP_INT_MAX,
+            'The maximum length to accept',
+            'integer'
+        ]
     ];
 
     /**

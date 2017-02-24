@@ -15,6 +15,10 @@ namespace Romm\Formz\Validation\Validator;
 
 class StringLengthValidator extends AbstractValidator
 {
+    const OPTION_MINIMUM = 'minimum';
+    const OPTION_MAXIMUM = 'maximum';
+
+    const MESSAGE_DEFAULT = 'default';
 
     /**
      * @inheritdoc
@@ -27,15 +31,23 @@ class StringLengthValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedOptions = [
-        'minimum' => [0, 'The minimum length to accept', 'integer'],
-        'maximum' => [PHP_INT_MAX, 'The maximum length to accept', 'integer'],
+        self::OPTION_MINIMUM => [
+            0,
+            'The minimum length to accept',
+            'integer'
+        ],
+        self::OPTION_MAXIMUM => [
+            PHP_INT_MAX,
+            'The maximum length to accept',
+            'integer'
+        ]
     ];
 
     /**
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.string_length.error',
             'extension' => null
         ]
@@ -46,9 +58,14 @@ class StringLengthValidator extends AbstractValidator
      */
     public function isValid($value)
     {
-        if (strlen($value) < $this->options['minimum'] || strlen($value) > $this->options['maximum']) {
+        $minimum = abs($this->options[self::OPTION_MINIMUM]);
+        $maximum = abs($this->options[self::OPTION_MAXIMUM]);
+
+        if (strlen($value) < $minimum
+            || strlen($value) > $maximum
+        ) {
             $this->addError(
-                'default',
+                self::MESSAGE_DEFAULT,
                 1445862696,
                 [$this->options['minimum'], $this->options['maximum']]
             );

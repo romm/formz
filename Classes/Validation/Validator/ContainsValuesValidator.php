@@ -26,7 +26,12 @@ class ContainsValuesValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedOptions = [
-        self::OPTION_VALUES => [[], 'The values that are accepted, can be a string of valued delimited by a pipe.', 'array', true]
+        self::OPTION_VALUES => [
+            [],
+            'The values that are accepted, can be a string of valued delimited by a pipe.',
+            'array',
+            true
+        ]
     ];
 
     /**
