@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Controller;
 
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
@@ -28,6 +27,7 @@ use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -115,6 +115,11 @@ class AjaxValidationController extends ActionController
         }
     }
 
+    public function getView()
+    {
+        return $this->view;
+    }
+
     /**
      * Main action that will render the validation result.
      */
@@ -159,7 +164,7 @@ class AjaxValidationController extends ActionController
             $result['data'] = ['errorCode' => $exception->getCode()];
 
             if (ExtensionService::get()->isInDebugMode()) {
-                $result['message'] = 'Debug mode – ' . $exception->getMessage();
+                $result['message'] = $this->getDebugMessageForException($exception);
             }
         }
 
@@ -338,6 +343,15 @@ class AjaxValidationController extends ActionController
             'success' => !$result->hasErrors(),
             'message' => $error
         ];
+    }
+
+    /**
+     * @param \Exception $exception
+     * @return string
+     */
+    protected function getDebugMessageForException(\Exception $exception)
+    {
+        return 'Debug mode – ' . $exception->getMessage();
     }
 
     /**

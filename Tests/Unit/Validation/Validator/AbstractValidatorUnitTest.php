@@ -7,6 +7,7 @@ use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
+use TYPO3\CMS\Extbase\Error\Result;
 
 abstract class AbstractValidatorUnitTest extends AbstractUnitTest
 {
@@ -21,7 +22,7 @@ abstract class AbstractValidatorUnitTest extends AbstractUnitTest
      * @param array  $errors
      * @param array  $warnings
      * @param array  $notices
-     * @return \TYPO3\CMS\Extbase\Error\Result
+     * @return Result
      */
     protected function validateValidator($value, array $options, array $errors = [], array $warnings = [], array $notices = [])
     {
