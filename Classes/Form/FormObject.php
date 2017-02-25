@@ -194,9 +194,8 @@ class FormObject
      * stored in cache, otherwise it is created from scratch.
      *
      * @return ConfigurationObjectInstance
-     * @internal
      */
-    public function getConfigurationObject()
+    protected function getConfigurationObject()
     {
         if (null === $this->configurationObject) {
             $cacheInstance = CacheService::get()->getCacheInstance();

@@ -2,9 +2,12 @@
 namespace Romm\Formz\Tests\Unit;
 
 use Prophecy\Prophet;
+use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
+use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService;
@@ -21,6 +24,7 @@ use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Object\Container\Container;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
@@ -134,15 +138,32 @@ trait FormzUnitTestUtility
      */
     protected function getDefaultFormObject()
     {
-        $formObject = new FormObject(
-            AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
-            AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
-        );
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject$formObject */
+        $formObject = $this->getMockBuilderWrap(FormObject::class)
+            ->setMethods(['getConfigurationObject'])
+            ->setConstructorArgs([
+                AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
+                AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
+            ])
+            ->getMock();
 
-        /** @var ConfigurationFactory $configurationFactory */
-        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
+        $formConfiguration = new Form;
+        $configurationObjectInstance = new ConfigurationObjectInstance($formConfiguration, new Result);
+        $configurationObjectInstance->setValidationResult(new Result);
 
-        $formObject->injectConfigurationFactory($configurationFactory);
+        $formObject->method('getConfigurationObject')
+            ->willReturn($configurationObjectInstance);
+
+        /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactoryMock */
+        $configurationFactoryMock = $this->getMockBuilderWrap(ConfigurationFactory::class)
+            ->setMethods(['getFormzConfiguration'])
+            ->getMock();
+
+        $formzConfiguration = new ConfigurationObjectInstance(new Configuration, new Result);
+        $configurationFactoryMock->method('getFormzConfiguration')
+            ->willReturn($formzConfiguration);
+
+        $formObject->injectConfigurationFactory($configurationFactoryMock);
 
         return $formObject;
     }
@@ -183,13 +204,13 @@ trait FormzUnitTestUtility
     protected function setUpPackageManagerMock()
     {
         /** @var Package|\PHPUnit_Framework_MockObject_MockObject $package */
-        $package = $this->getMockBuilder(Package::class)
+        $package = $this->getMockBuilderWrap(Package::class)
             ->setMethods(['getPackagePath'])
             ->disableOriginalConstructor()
             ->getMock();
 
         /** @var PackageManager|\PHPUnit_Framework_MockObject_MockObject $packageManager */
-        $packageManager = $this->getMockBuilder(PackageManager::class)
+        $packageManager = $this->getMockBuilderWrap(PackageManager::class)
             ->setMethods(['isPackageActive', 'getPackage'])
             ->getMock();
 
@@ -204,6 +225,7 @@ trait FormzUnitTestUtility
             ->with('formz')
             ->will($this->returnValue($package));
 
+        /** @noinspection PhpInternalEntityUsedInspection */
         ExtensionManagementUtility::setPackageManager($packageManager);
     }
 
@@ -223,6 +245,7 @@ trait FormzUnitTestUtility
      */
     protected function restorePackageManager()
     {
+        /** @noinspection PhpInternalEntityUsedInspection */
         ExtensionManagementUtility::setPackageManager($this->packageManagerBackUp);
     }
 
@@ -233,7 +256,7 @@ trait FormzUnitTestUtility
     protected function setUpExtensionServiceMock()
     {
         /** @var ExtensionService|\PHPUnit_Framework_MockObject_MockObject $extensionServiceMock */
-        $extensionServiceMock = $this->getMockBuilder(ExtensionService::class)
+        $extensionServiceMock = $this->getMockBuilderWrap(ExtensionService::class)
             ->setMethods(['getFullExtensionConfiguration', 'getExtensionRelativePath'])
             ->getMock();
 
@@ -273,7 +296,7 @@ trait FormzUnitTestUtility
     protected function setUpContextService()
     {
         /** @var ContextService|\PHPUnit_Framework_MockObject_MockObject $contextServiceMock */
-        $contextServiceMock = $this->getMockBuilder(ContextService::class)
+        $contextServiceMock = $this->getMockBuilderWrap(ContextService::class)
             ->setMethods(['translate'])
             ->getMock();
 
@@ -386,7 +409,7 @@ trait FormzUnitTestUtility
     protected function getMockedEnvironmentService()
     {
         if (null === $this->mockedEnvironmentService) {
-            $this->mockedEnvironmentService = $this->getMockBuilder(EnvironmentService::class)
+            $this->mockedEnvironmentService = $this->getMockBuilderWrap(EnvironmentService::class)
                 ->setMethods(['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode'])
                 ->getMock();
 
@@ -413,7 +436,7 @@ trait FormzUnitTestUtility
     protected function getMockedTypoScriptService()
     {
         if (null === $this->mockedTypoScriptService) {
-            $this->mockedTypoScriptService = $this->getMockBuilder(TypoScriptService::class)
+            $this->mockedTypoScriptService = $this->getMockBuilderWrap(TypoScriptService::class)
                 ->setMethods(['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration'])
                 ->getMock();
 
@@ -438,5 +461,16 @@ trait FormzUnitTestUtility
         }
 
         return $this->mockedTypoScriptService;
+    }
+
+    /**
+     * Just a wrapper to have auto-completion.
+     *
+     * @param string $className
+     * @return \PHPUnit_Framework_MockObject_MockBuilder
+     */
+    private function getMockBuilderWrap($className)
+    {
+        return $this->getMockBuilder($className);
     }
 }
