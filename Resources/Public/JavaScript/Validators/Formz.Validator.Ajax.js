@@ -63,7 +63,7 @@
                 data += '&formName=' + encodeURIComponent(field.getForm().getName());
                 data += '&validatorName=' + encodeURIComponent(states['validatorName']);
                 data += '&fieldName=' + encodeURIComponent(field.getName());
-                data += '&' + Formz.buildQueryForm(field.getForm().getElement(), 'fieldValue');
+                data += '&' + Formz.buildQueryForm(field.getForm().getElement(), 'form');
 
                 request.send(data);
             } else {

@@ -49,9 +49,9 @@ class AjaxFieldValidation implements SingletonInterface
     protected $formName;
 
     /**
-     * @var string
+     * @var array
      */
-    protected $fieldValue;
+    protected $form;
 
     /**
      * @var string
@@ -131,9 +131,9 @@ class AjaxFieldValidation implements SingletonInterface
         $validatorClassName = $this->getValidatorClassName($validation);
 
         $form = $this->buildObject();
-        $this->fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
+        $this->form = ObjectAccess::getProperty($form, $this->fieldName);
 
-        $validatorDataObject = new ValidatorDataObject($form, $validation);
+        $validatorDataObject = new ValidatorDataObject($formObject, $form, $validation);
 
         /** @var ValidatorInterface $validator */
         $validator = GeneralUtility::makeInstance(
@@ -142,7 +142,7 @@ class AjaxFieldValidation implements SingletonInterface
             $validatorDataObject
         );
 
-        return $this->convertResultToJson($validator->validate($this->fieldValue));
+        return $this->convertResultToJson($validator->validate($this->form));
     }
 
     /**
@@ -151,7 +151,7 @@ class AjaxFieldValidation implements SingletonInterface
      */
     protected function initializeArguments()
     {
-        $arguments = ['formClassName', 'formName', 'fieldValue', 'fieldName', 'validatorName'];
+        $arguments = ['formClassName', 'formName', 'form', 'fieldName', 'validatorName'];
         $argumentsMissing = [];
 
         foreach ($arguments as $argument) {
@@ -266,7 +266,7 @@ class AjaxFieldValidation implements SingletonInterface
      */
     protected function buildObject()
     {
-        $values = $this->cleanValuesFromUrl($this->fieldValue);
+        $values = $this->cleanValuesFromUrl($this->form);
         /** @var ReflectionService $reflectionService */
         $reflectionService = Core::instantiate(ReflectionService::class);
         /** @var FormInterface $object */
