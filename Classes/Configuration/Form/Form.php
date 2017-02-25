@@ -110,6 +110,14 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     }
 
     /**
+     * @param Field $field
+     */
+    public function addField(Field $field)
+    {
+        $this->fields[$field->getFieldName()] = $field;
+    }
+
+    /**
      * @return ConditionItemResolver[]
      */
     public function getActivationCondition()

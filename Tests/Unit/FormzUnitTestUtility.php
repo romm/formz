@@ -7,6 +7,7 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
@@ -140,7 +141,7 @@ trait FormzUnitTestUtility
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject$formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
-            ->setMethods(['getConfigurationObject'])
+            ->setMethods(['buildConfigurationObject'])
             ->setConstructorArgs([
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
@@ -148,10 +149,15 @@ trait FormzUnitTestUtility
             ->getMock();
 
         $formConfiguration = new Form;
+
+        $field = new Field();
+        $field->setFieldName('foo');
+        $formConfiguration->addField($field);
+
         $configurationObjectInstance = new ConfigurationObjectInstance($formConfiguration, new Result);
         $configurationObjectInstance->setValidationResult(new Result);
 
-        $formObject->method('getConfigurationObject')
+        $formObject->method('buildConfigurationObject')
             ->willReturn($configurationObjectInstance);
 
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactoryMock */

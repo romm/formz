@@ -95,6 +95,14 @@ class Field extends AbstractFormzConfiguration
     }
 
     /**
+     * @param Validation $validation
+     */
+    public function addValidation(Validation $validation)
+    {
+        $this->validation[$validation->getValidationName()] = $validation;
+    }
+
+    /**
      * @param $validationName
      * @return Validation
      * @throws EntryNotFoundException

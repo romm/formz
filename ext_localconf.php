@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 
 /** @noinspection PhpUndefinedVariableInspection */
 call_user_func(
-    function () {
+    function ($extensionKey) {
         // Registering the default Formz conditions.
         \Romm\Formz\Condition\ConditionFactory::get()->registerDefaultConditions();
 
@@ -17,6 +17,17 @@ call_user_func(
                 'groups'   => ['all', 'system', 'pages'],
             ];
         }
+
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+            'Romm.' . $extensionKey,
+            'AjaxValidation',
+            [
+                'AjaxValidation' => 'run'
+            ],
+            [
+                'AjaxValidation' => 'run'
+            ]
+        );
 
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearCachePostProc'][] = \Romm\Formz\Service\CacheService::class . '->clearCacheCommand';
 
@@ -35,5 +46,6 @@ call_user_func(
                 'className' => \Romm\Formz\ViewHelpers\Legacy\FormViewHelper::class
             ];
         }
-    }
+    },
+    $_EXTKEY
 );

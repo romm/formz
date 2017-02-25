@@ -68,9 +68,19 @@ class FormObject
     protected $configurationObject;
 
     /**
+     * @var Result
+     */
+    protected $configurationValidationResult;
+
+    /**
      * @var string
      */
     protected $hash;
+
+    /**
+     * @var string
+     */
+    protected $lastConfigurationHash;
 
     /**
      * @var bool
@@ -197,9 +207,12 @@ class FormObject
      */
     protected function getConfigurationObject()
     {
-        if (null === $this->configurationObject) {
+        if (null === $this->configurationObject
+            || $this->lastConfigurationHash !== $this->getHash()
+        ) {
             $cacheInstance = CacheService::get()->getCacheInstance();
             $cacheIdentifier = 'configuration-' . $this->getHash();
+            $this->lastConfigurationHash = $this->getHash();
 
             if ($cacheInstance->has($cacheIdentifier)) {
                 $configurationObject = $cacheInstance->get($cacheIdentifier);
@@ -225,17 +238,21 @@ class FormObject
      */
     public function getConfigurationValidationResult()
     {
-        $result = new Result();
-        $formzConfigurationValidationResult = $this->configurationFactory
-            ->getFormzConfiguration()
-            ->getValidationResult();
+        if (null === $this->configurationValidationResult
+            || $this->lastConfigurationHash !== $this->getHash()
+        ) {
+            $this->configurationValidationResult = new Result;
+            $formzConfigurationValidationResult = $this->configurationFactory
+                ->getFormzConfiguration()
+                ->getValidationResult();
 
-        $result->merge($formzConfigurationValidationResult);
+            $this->configurationValidationResult->merge($formzConfigurationValidationResult);
 
-        $result->forProperty('forms.' . $this->getClassName())
-            ->merge($this->getConfigurationObject()->getValidationResult());
+            $this->configurationValidationResult->forProperty('forms.' . $this->getClassName())
+                ->merge($this->getConfigurationObject()->getValidationResult());
+        }
 
-        return $result;
+        return $this->configurationValidationResult;
     }
 
     /**
