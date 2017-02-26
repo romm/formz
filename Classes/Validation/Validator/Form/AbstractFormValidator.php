@@ -121,26 +121,18 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     /**
      * Runs the whole validation workflow.
      *
-     * @param mixed $form
+     * @param FormInterface $form
      */
     final public function isValid($form)
     {
-        /** @var FormValidatorExecutor $formValidatorExecutor */
-        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $form, $this->options['name'], $this->result);
-
+        $formValidatorExecutor = $this->getFormValidatorExecutor($form);
         $formValidatorExecutor->applyBehaviours();
         $formValidatorExecutor->checkFieldsActivation();
 
         $this->beforeValidationProcess();
 
         $formValidatorExecutor->validateFields(function (Field $field) {
-            // A callback after each field validation: `{lowerCamelCaseFieldName}Validated()`
-            // Example for field "firstName": `firstNameValidated()`
-            $functionName = lcfirst($field->getFieldName() . 'Validated');
-
-            if (method_exists($this, $functionName)) {
-                $this->$functionName();
-            }
+            $this->callAfterFieldValidationMethod($field);
         });
 
         $this->afterValidationProcess();
@@ -151,6 +143,39 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         }
 
         self::$formsValidationResults[get_class($form) . '::' . $this->options['name']] = $this->result;
+    }
+
+    /**
+     * Use this function to (de)activate the validation for some given fields.
+     */
+    protected function beforeValidationProcess()
+    {
+    }
+
+    /**
+     * Use this function to run your own processes after the validation ran.
+     */
+    protected function afterValidationProcess()
+    {
+    }
+
+    /**
+     * After each field has been validated, a matching method can be called if
+     * it exists in the child class.
+     *
+     * The syntax is `{lowerCamelCaseFieldName}Validated()`.
+     *
+     * Example: for field `firstName` - `firstNameValidated()`.
+     *
+     * @param Field $field
+     */
+    private function callAfterFieldValidationMethod(Field $field)
+    {
+        $functionName = lcfirst($field->getFieldName() . 'Validated');
+
+        if (method_exists($this, $functionName)) {
+            call_user_func([$this, $functionName]);
+        }
     }
 
     /**
@@ -171,16 +196,14 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     }
 
     /**
-     * Use this function to (de)activate the validation for some given fields.
+     * @param FormInterface $form
+     * @return FormValidatorExecutor
      */
-    protected function beforeValidationProcess()
+    protected function getFormValidatorExecutor(FormInterface $form)
     {
-    }
+        /** @var FormValidatorExecutor $formValidatorExecutor */
+        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $form, $this->options['name'], $this->result);
 
-    /**
-     * Use this function to run your own processes after the validation ran.
-     */
-    protected function afterValidationProcess()
-    {
+        return $formValidatorExecutor;
     }
 }
