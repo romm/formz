@@ -18,6 +18,7 @@ use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
@@ -25,6 +26,7 @@ use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
@@ -51,30 +53,6 @@ class FormValidatorExecutor
     protected $fieldsActivationChecked = [];
 
     /**
-     * Contains the fields which will not be checked.
-     * You can override this property in your children class to set the fields
-     * which will not be checked by default.
-     *
-     * @var array
-     */
-    protected $deactivatedFields = [];
-
-    /**
-     * Contains the validators which will not be checked for certain fields.
-     * You can override this property in your children class to set the
-     * validators of fields which will not be checked by default.
-     *
-     * Example:
-     * protected $deactivatedFieldsValidators = [
-     *      'name'  => ['required'],
-     *      'email' => ['mustBeEmail', 'required']
-     * ];
-     *
-     * @var array
-     */
-    protected $deactivatedFieldsValidators = [];
-
-    /**
      * Current queue, used to prevent infinite loop.
      *
      * @var array
@@ -92,6 +70,11 @@ class FormValidatorExecutor
      * @var array
      */
     protected $validationData = [];
+
+    /**
+     * @var PhpConditionDataObject
+     */
+    protected $phpConditionDataObject;
 
     /**
      * @param FormInterface $form
@@ -129,54 +112,64 @@ class FormValidatorExecutor
      */
     public function checkFieldsActivation()
     {
-        foreach ($this->formObject->getConfiguration()->getFields() as $fieldName => $field) {
+        foreach ($this->formObject->getConfiguration()->getFields() as $field) {
+            $fieldName = $field->getFieldName();
+
             if (false === in_array($fieldName, $this->fieldsActivationChecked)
-                && false === in_array($fieldName, $this->deactivatedFields)
+                && false === $this->result->fieldIsDeactivated($field)
             ) {
-                $phpConditionDataObject = new PhpConditionDataObject($this->form, $this);
+                $this->checkFieldActivation($field);
 
-                if ($field->hasActivation()
-                    && false === isset($this->fieldsActivationChecking[$fieldName])
-                ) {
-                    $this->fieldsActivationChecking[$fieldName] = true;
-
-                    $activation = $this->conditionProcessor
-                        ->getActivationConditionTreeForField($field)
-                        ->getPhpResult($phpConditionDataObject);
-
-                    if (false === $activation) {
-                        $this->deactivatedFields[] = $fieldName;
-                    }
-                }
-
-                foreach ($field->getValidation() as $validationName => $validation) {
-                    if ($validation->hasActivation()) {
-                        $activation = $this->conditionProcessor
-                            ->getActivationConditionTreeForValidation($validation)
-                            ->getPhpResult($phpConditionDataObject);
-
-                        if (false === $activation) {
-                            if (false === isset($this->deactivatedFieldsValidators[$fieldName])) {
-                                $this->deactivatedFieldsValidators[$fieldName] = [];
-                            }
-
-                            $this->deactivatedFieldsValidators[$fieldName][] = $validationName;
-                        }
-                    }
-                }
-
-                unset($this->fieldsActivationChecking[$fieldName]);
                 $this->fieldsActivationChecked[] = $fieldName;
-            }
-
-            if (true === in_array($fieldName, $this->deactivatedFields)
-                && null === $this->result->fieldIsDeactivated($fieldName)
-            ) {
-                $this->result->deactivateField($fieldName);
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @param Field $field
+     */
+    protected function checkFieldActivation(Field $field)
+    {
+        $fieldName = $field->getFieldName();
+
+        if (isset($this->fieldsActivationChecking[$fieldName])) {
+            return;
+        }
+
+        $this->fieldsActivationChecking[$fieldName] = true;
+
+        if ($field->hasActivation()) {
+            $activation = $this->conditionProcessor
+                ->getActivationConditionTreeForField($field)
+                ->getPhpResult($this->getPhpConditionDataObject());
+
+            if (false === $activation) {
+                $this->result->deactivateField($field);
+            }
+        }
+
+        $this->checkFieldValidationActivation($field);
+        unset($this->fieldsActivationChecking[$fieldName]);
+    }
+
+    /**
+     * @param Field $field
+     */
+    protected function checkFieldValidationActivation(Field $field)
+    {
+        foreach ($field->getValidation() as $validation) {
+            if ($validation->hasActivation()) {
+                $activation = $this->conditionProcessor
+                    ->getActivationConditionTreeForValidation($validation)
+                    ->getPhpResult($this->getPhpConditionDataObject());
+
+                if (false === $activation) {
+                    $this->result->deactivateValidation($validation);
+                }
+            }
+        }
     }
 
     /**
@@ -207,44 +200,17 @@ class FormValidatorExecutor
         $fieldName = $field->getFieldName();
 
         if (false === in_array($fieldName, $this->fieldsValidated)
-            && false === in_array($fieldName, $this->deactivatedFields)
+            && false === $this->result->fieldIsDeactivated($field)
         ) {
             $this->fieldsValidated[] = $fieldName;
-            $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);
-            $formClone = clone $this->form;
 
             // Looping on the field's validation settings...
-            foreach ($field->getValidation() as $validationName => $validation) {
-                if (isset($this->deactivatedFieldsValidators[$fieldName])
-                    && in_array($validationName, $this->deactivatedFieldsValidators[$fieldName])
-                ) {
+            foreach ($field->getValidation() as $validation) {
+                if ($this->result->validationIsDeactivated($validation)) {
                     continue;
                 }
 
-                $validatorDataObject = new ValidatorDataObject($this->formObject, $formClone, $validation);
-
-                /** @var ValidatorInterface $validator */
-                $validator = GeneralUtility::makeInstance(
-                    $validation->getClassName(),
-                    $validation->getOptions(),
-                    $validatorDataObject
-                );
-
-                $validatorResult = $validator->validate($fieldValue);
-
-                if ($validator instanceof AbstractValidator) {
-                    if (!empty($validationData = $validator->getValidationData())) {
-                        $this->validationData[$fieldName] = ($this->validationData[$fieldName]) ?: [];
-                        $this->validationData[$fieldName] = array_merge(
-                            $this->validationData[$fieldName],
-                            $validationData
-                        );
-
-                        $this->form->setValidationData($this->validationData);
-                    }
-                }
-
-                $this->result->forProperty($fieldName)->merge($validatorResult);
+                $validatorResult = $this->processFieldValidation($field, $validation);
 
                 // Breaking the loop if an error occurred: we stop the validation process for the current field.
                 if ($validatorResult->hasErrors()) {
@@ -257,10 +223,60 @@ class FormValidatorExecutor
     }
 
     /**
+     * @param Field      $field
+     * @param Validation $validation
+     * @return Result
+     */
+    protected function processFieldValidation(Field $field, Validation $validation)
+    {
+        $fieldName = $field->getFieldName();
+        $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);
+        $validatorDataObject = new ValidatorDataObject($this->formObject, $this->form, $validation);
+
+        /** @var ValidatorInterface $validator */
+        $validator = GeneralUtility::makeInstance(
+            $validation->getClassName(),
+            $validation->getOptions(),
+            $validatorDataObject
+        );
+
+        $validatorResult = $validator->validate($fieldValue);
+
+        if ($validator instanceof AbstractValidator) {
+            if (!empty($validationData = $validator->getValidationData())) {
+                $this->validationData[$fieldName] = ($this->validationData[$fieldName]) ?: [];
+                $this->validationData[$fieldName] = array_merge(
+                    $this->validationData[$fieldName],
+                    $validationData
+                );
+
+                $this->form->setValidationData($this->validationData);
+            }
+        }
+
+        $this->result->forProperty($fieldName)->merge($validatorResult);
+        unset($validatorDataObject);
+
+        return $validatorResult;
+    }
+
+    /**
      * @return FormResult
      */
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * @return PhpConditionDataObject
+     */
+    protected function getPhpConditionDataObject()
+    {
+        if (null === $this->phpConditionDataObject) {
+            $this->phpConditionDataObject = new PhpConditionDataObject($this->form, $this);
+        }
+
+        return $this->phpConditionDataObject;
     }
 }
