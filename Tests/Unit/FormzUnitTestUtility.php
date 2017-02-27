@@ -139,6 +139,23 @@ trait FormzUnitTestUtility
      */
     protected function getDefaultFormObject()
     {
+        return $this->createFormObject(['foo']);
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getExtendedFormObject()
+    {
+        return $this->createFormObject(['foo', 'bar']);
+    }
+
+    /**
+     * @param array $fields
+     * @return FormObject
+     */
+    private function createFormObject(array $fields)
+    {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject$formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
             ->setMethods(['buildConfigurationObject'])
@@ -150,9 +167,11 @@ trait FormzUnitTestUtility
 
         $formConfiguration = new Form;
 
-        $field = new Field();
-        $field->setFieldName('foo');
-        $formConfiguration->addField($field);
+        foreach ($fields as $fieldName) {
+            $field = new Field();
+            $field->setFieldName($fieldName);
+            $formConfiguration->addField($field);
+        }
 
         $configurationObjectInstance = new ConfigurationObjectInstance($formConfiguration, new Result);
         $configurationObjectInstance->setValidationResult(new Result);
