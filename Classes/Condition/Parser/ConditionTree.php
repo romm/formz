@@ -14,8 +14,10 @@
 namespace Romm\Formz\Condition\Parser;
 
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
+use Romm\Formz\Condition\Parser\Node\ProcessorDependencyAwareInterface;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -42,6 +44,11 @@ class ConditionTree
     private $conditionProcessor;
 
     /**
+     * @var bool
+     */
+    private $dependenciesWereInjected = false;
+
+    /**
      * @param NodeInterface $rootNode
      * @param Result        $validationResult
      */
@@ -54,12 +61,24 @@ class ConditionTree
     }
 
     /**
-     * @param ConditionProcessor $conditionProcessor
+     * @param ConditionProcessor  $conditionProcessor
+     * @param ActivationInterface $activation
      * @return $this
      */
-    public function attachConditionProcessor(ConditionProcessor $conditionProcessor)
+    public function injectDependencies(ConditionProcessor $conditionProcessor, ActivationInterface $activation)
     {
-        $this->conditionProcessor = $conditionProcessor;
+        if (false === $this->dependenciesWereInjected) {
+            $this->dependenciesWereInjected = true;
+
+            $this->conditionProcessor = $conditionProcessor;
+
+            // Looping on node to detect which ones have a dependency to the processor.
+            $this->alongNodes(function (NodeInterface $node) use ($activation) {
+                if ($node instanceof ProcessorDependencyAwareInterface) {
+                    $node->injectProcessorDependencies($this->conditionProcessor, $activation);
+                }
+            });
+        }
 
         return $this;
     }
@@ -115,5 +134,13 @@ class ConditionTree
     public function getConditionProcessor()
     {
         return $this->conditionProcessor;
+    }
+
+    /**
+     * Resetting the dependencies injection.
+     */
+    public function __wakeup()
+    {
+        $this->dependenciesWereInjected = false;
     }
 }

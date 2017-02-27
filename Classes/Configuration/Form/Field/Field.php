@@ -17,6 +17,7 @@ use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
 use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour;
 use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
@@ -24,7 +25,7 @@ use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 
-class Field extends AbstractFormzConfiguration
+class Field extends AbstractFormzConfiguration implements ActivationUsageInterface
 {
     use StoreArrayIndexTrait;
     use ParentsTrait;
@@ -141,6 +142,16 @@ class Field extends AbstractFormzConfiguration
     public function hasActivation()
     {
         return !($this->activation instanceof EmptyActivation);
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     */
+    public function setActivation(ActivationInterface $activation)
+    {
+        $activation->setRootObject($this);
+
+        $this->activation = $activation;
     }
 
     /**

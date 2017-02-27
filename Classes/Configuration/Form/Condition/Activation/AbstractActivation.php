@@ -34,6 +34,11 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     protected $items = [];
 
     /**
+     * @var ActivationUsageInterface
+     */
+    private $rootObject;
+
+    /**
      * @inheritdoc
      */
     public function getCondition()
@@ -82,5 +87,21 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
         }
 
         return null;
+    }
+
+    /**
+     * @return ActivationUsageInterface
+     */
+    public function getRootObject()
+    {
+        return $this->rootObject;
+    }
+
+    /**
+     * @param ActivationUsageInterface $rootObject
+     */
+    public function setRootObject(ActivationUsageInterface $rootObject)
+    {
+        $this->rootObject = $rootObject;
     }
 }

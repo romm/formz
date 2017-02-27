@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\FormzMessageInterface;
 
@@ -84,8 +85,11 @@ class FieldHasErrorCondition extends AbstractConditionItem
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
         $flag = false;
+        $field = $this->formObject
+            ->getConfiguration()
+            ->getField($this->fieldName);
         $result = $dataObject->getFormValidator()
-            ->validateField($this->fieldName)
+            ->validateField($field)
             ->forProperty($this->fieldName);
 
         foreach ($result->getErrors() as $error) {
@@ -123,5 +127,31 @@ class FieldHasErrorCondition extends AbstractConditionItem
     public function getErrorName()
     {
         return $this->errorName;
+    }
+
+    /**
+     * @see validateConditionConfiguration()
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    protected function checkConditionConfiguration()
+    {
+        $configuration = $this->formObject->getConfiguration();
+
+        if (false === $configuration->hasField($this->fieldName)) {
+            throw new InvalidConditionException(
+                'The field "' . $this->fieldName . '" does not exist.',
+                1488192037
+            );
+        }
+
+        if (false === $configuration->getField($this->fieldName)->hasValidation($this->validationName)) {
+            throw new InvalidConditionException(
+                'The validation "' . $this->validationName . '" does not exist for the field "' . $this->fieldName . '".',
+                1488192055
+            );
+        }
+
+        return true;
     }
 }

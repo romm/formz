@@ -62,9 +62,10 @@ class ConditionProcessor
     {
         if (false === array_key_exists($field->getFieldName(), $this->fieldsTrees)) {
             $this->fieldsTrees[$field->getFieldName()] = ConditionParserFactory::get()
-                ->parse($field->getActivation())
-                ->attachConditionProcessor($this);
+                ->parse($field->getActivation());
         }
+
+        $this->fieldsTrees[$field->getFieldName()]->injectDependencies($this, $field->getActivation());
 
         return $this->fieldsTrees[$field->getFieldName()];
     }
@@ -82,9 +83,10 @@ class ConditionProcessor
 
         if (false === array_key_exists($key, $this->validationsTrees)) {
             $this->validationsTrees[$key] = ConditionParserFactory::get()
-                ->parse($validation->getActivation())
-                ->attachConditionProcessor($this);
+                ->parse($validation->getActivation());
         }
+
+        $this->validationsTrees[$key]->injectDependencies($this, $validation->getActivation());
 
         return $this->validationsTrees[$key];
     }
@@ -98,6 +100,7 @@ class ConditionProcessor
     public function calculateAllTrees()
     {
         $fields = $this->formObject->getConfiguration()->getFields();
+
         foreach ($fields as $field) {
             $this->getActivationConditionTreeForField($field)
                 ->alongNodes(function (NodeInterface $node) {

@@ -18,10 +18,11 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
 use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Field;
 
-class Validation extends AbstractFormzConfiguration
+class Validation extends AbstractFormzConfiguration implements ActivationUsageInterface
 {
     use StoreArrayIndexTrait;
     use ArrayConversionTrait;
@@ -150,6 +151,16 @@ class Validation extends AbstractFormzConfiguration
     public function hasActivation()
     {
         return !($this->activation instanceof EmptyActivation);
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     */
+    public function setActivation(ActivationInterface $activation)
+    {
+        $activation->setRootObject($this);
+
+        $this->activation = $activation;
     }
 
     /**
