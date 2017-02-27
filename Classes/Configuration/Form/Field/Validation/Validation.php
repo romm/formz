@@ -18,10 +18,11 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
 use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Field;
 
-class Validation extends AbstractFormzConfiguration
+class Validation extends AbstractFormzConfiguration implements ActivationUsageInterface
 {
     use StoreArrayIndexTrait;
     use ArrayConversionTrait;
@@ -30,7 +31,7 @@ class Validation extends AbstractFormzConfiguration
     /**
      * @var string
      * @validate NotEmpty
-     * @validate Romm.Formz:Internal\ClassExists
+     * @validate Romm.ConfigurationObject:ClassImplements(interface=TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface)
      */
     protected $className;
 
@@ -86,6 +87,14 @@ class Validation extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string $className
+     */
+    public function setClassName($className)
+    {
+        $this->className = $className;
+    }
+
+    /**
      * @return int
      */
     public function getPriority()
@@ -113,11 +122,19 @@ class Validation extends AbstractFormzConfiguration
     }
 
     /**
-     * @return \Romm\Formz\Configuration\Form\Field\Validation\Message[]
+     * @return Message[]
      */
     public function getMessages()
     {
         return $this->messages;
+    }
+
+    /**
+     * @param Message[] $messages
+     */
+    public function setMessages(array $messages)
+    {
+        $this->messages = $messages;
     }
 
     /**
@@ -134,6 +151,16 @@ class Validation extends AbstractFormzConfiguration
     public function hasActivation()
     {
         return !($this->activation instanceof EmptyActivation);
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     */
+    public function setActivation(ActivationInterface $activation)
+    {
+        $activation->setRootObject($this);
+
+        $this->activation = $activation;
     }
 
     /**
@@ -161,7 +188,23 @@ class Validation extends AbstractFormzConfiguration
      */
     public function doesUseAjax()
     {
-        return (bool) $this->useAjax;
+        return (bool)$this->useAjax;
+    }
+
+    /**
+     * @param bool $flag
+     */
+    public function activateAjaxUsage($flag = true)
+    {
+        $this->useAjax = (bool)$flag;
+    }
+
+    /**
+     * @param string $validationName
+     */
+    public function setValidationName($validationName)
+    {
+        $this->validationName = $validationName;
     }
 
     /**

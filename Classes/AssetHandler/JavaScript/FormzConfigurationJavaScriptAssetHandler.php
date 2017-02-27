@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\CacheService;
 
@@ -20,7 +21,7 @@ use Romm\Formz\Service\CacheService;
  * This asset handler generates the JavaScript code which will inject the Formz
  * TypoScript configuration.
  */
-class FormzConfigurationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**

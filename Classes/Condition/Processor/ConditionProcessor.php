@@ -67,6 +67,8 @@ class ConditionProcessor
             $this->fieldsTrees[$key] = $this->getConditionTree($field->getActivation());
         }
 
+        $this->fieldsTrees[$key]->injectDependencies($this, $field->getActivation());
+
         return $this->fieldsTrees[$key];
     }
 
@@ -84,6 +86,8 @@ class ConditionProcessor
         if (false === array_key_exists($key, $this->validationsTrees)) {
             $this->validationsTrees[$key] = $this->getConditionTree($validation->getActivation());
         }
+
+        $this->validationsTrees[$key]->injectDependencies($this, $validation->getActivation());
 
         return $this->validationsTrees[$key];
     }

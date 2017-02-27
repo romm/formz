@@ -29,7 +29,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         $this->assertInstanceOf(FormObject::class, $formObject);
-        $this->assertFalse($formObject->getConfigurationObject()->getValidationResult()->hasErrors());
+        $this->assertFalse($formObject->getConfigurationValidationResult()->hasErrors());
         $this->assertTrue($formObject->getConfiguration()->hasField('foo'));
 
         unset($formObject);

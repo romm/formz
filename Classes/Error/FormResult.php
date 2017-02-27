@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\Error;
 
+use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Service\Traits\StoreDataTrait;
 use TYPO3\CMS\Extbase\Error\Result;
 
@@ -30,23 +32,54 @@ class FormResult extends Result
     protected $deactivatedFields = [];
 
     /**
+     * @var array
+     */
+    protected $deactivatedFieldsValidation = [];
+
+    /**
      * Flags the given field as deactivated.
      *
-     * @param string $fieldName
+     * @param Field $field
      */
-    public function deactivateField($fieldName)
+    public function deactivateField(Field $field)
     {
-        $this->deactivatedFields[$fieldName] = $fieldName;
+        $this->deactivatedFields[$field->getFieldName()] = true;
     }
 
     /**
      * Returns true if the given field is flagged as deactivated.
      *
-     * @param string $fieldName
+     * @param Field $field
      * @return bool
      */
-    public function fieldIsDeactivated($fieldName)
+    public function fieldIsDeactivated(Field $field)
     {
-        return in_array($fieldName, $this->deactivatedFields);
+        return array_key_exists($field->getFieldName(), $this->deactivatedFields);
+    }
+
+    /**
+     * @param Validation $validation
+     */
+    public function deactivateValidation(Validation $validation)
+    {
+        $fieldName = $validation->getParentField()->getFieldName();
+
+        if (false === isset($this->deactivatedFieldsValidation[$fieldName])) {
+            $this->deactivatedFieldsValidation[$fieldName] = [];
+        }
+
+        $this->deactivatedFieldsValidation[$fieldName][$validation->getValidationName()] = true;
+    }
+
+    /**
+     * @param Validation $validation
+     * @return bool
+     */
+    public function validationIsDeactivated(Validation $validation)
+    {
+        $fieldName = $validation->getParentField()->getFieldName();
+
+        return array_key_exists($fieldName, $this->deactivatedFieldsValidation)
+            && array_key_exists($validation->getValidationName(), $this->deactivatedFieldsValidation[$fieldName]);
     }
 }

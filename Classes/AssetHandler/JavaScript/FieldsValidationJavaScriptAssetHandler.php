@@ -13,9 +13,11 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\ValidatorService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -27,7 +29,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * It can also return the list of files which must be included in order to make
  * the form run correctly. Call the function `getJavaScriptValidationFiles()`.
  */
-class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FieldsValidationJavaScriptAssetHandler extends AbstractAssetHandler
 {
     /**
      * @var array
@@ -146,10 +148,7 @@ JS;
      */
     protected function getValidationConfiguration(Field $field, $validationName, Validation $validatorConfiguration)
     {
-        $acceptsEmptyValues = $this
-            ->getDummyValidator()
-            ->cloneValidator($validatorConfiguration->getClassName())
-            ->acceptsEmptyValues();
+        $acceptsEmptyValues = ValidatorService::get()->validatorAcceptsEmptyValues($validatorConfiguration->getClassName());
 
         /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
         $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);

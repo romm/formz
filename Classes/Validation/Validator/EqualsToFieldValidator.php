@@ -13,16 +13,20 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Romm\Formz\Exceptions\InvalidOptionValueException;
+use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 class EqualsToFieldValidator extends AbstractValidator
 {
+    const OPTION_FIELD = 'field';
+
+    const MESSAGE_DEFAULT = 'default';
 
     /**
      * @inheritdoc
      */
     protected $supportedOptions = [
-        'field' => [
+        self::OPTION_FIELD => [
             '',
             'The field which should be equal to the current field.',
             'string',
@@ -34,7 +38,7 @@ class EqualsToFieldValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.equals_to_field.error',
             'extension' => null
         ]
@@ -45,13 +49,23 @@ class EqualsToFieldValidator extends AbstractValidator
      */
     public function isValid($value)
     {
-        $fieldGetter = 'get' . GeneralUtility::underscoredToUpperCamelCase($this->options['field']);
-        $fieldValue = $this->form->$fieldGetter();
+        $fieldName = $this->options[self::OPTION_FIELD];
+        $formObject = $this->dataObject->getFormObject();
+
+        if (false === $formObject->hasProperty($fieldName)) {
+            throw new InvalidOptionValueException(
+                'The field "' . $fieldName . '" does not exist in the form "' . $formObject->getName() . '" with class "' . $formObject->getClassName() . '".',
+                1487947224
+            );
+        }
+
+        $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);
+
         if ($value !== $fieldValue) {
             $this->addError(
-                'default',
+                self::MESSAGE_DEFAULT,
                 1446026489,
-                [$this->options['field']]
+                [$fieldName]
             );
         }
     }

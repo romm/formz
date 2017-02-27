@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Parser;
 
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
+use Romm\Formz\Condition\Parser\Node\NullNode;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -80,7 +81,7 @@ class ConditionParserScope implements SingletonInterface
      */
     public function getNode()
     {
-        return $this->node;
+        return ($this->node) ?: NullNode::get();
     }
 
     /**

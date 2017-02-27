@@ -17,20 +17,33 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ContainsValuesValidator extends AbstractValidator
 {
+    const OPTION_VALUES = 'values';
+
+    const MESSAGE_DEFAULT = 'default';
+    const MESSAGE_EMPTY = 'empty';
 
     /**
      * @inheritdoc
      */
     protected $supportedOptions = [
-        'values' => [[], 'The values that are accepted, can be a string of valued delimited by a pipe.', 'array', true]
+        self::OPTION_VALUES => [
+            [],
+            'The values that are accepted, can be a string of valued delimited by a pipe.',
+            'array',
+            true
+        ]
     ];
 
     /**
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.contains_values.error',
+            'extension' => null
+        ],
+        self::MESSAGE_EMPTY   => [
+            'key'       => 'validator.form.required.error',
             'extension' => null
         ]
     ];
@@ -38,28 +51,40 @@ class ContainsValuesValidator extends AbstractValidator
     /**
      * @inheritdoc
      */
-    public function isValid($valuesArray)
+    public function isValid($values)
     {
-        $flag = false;
-        if (false === is_array($this->options['values'])) {
-            $this->options['values'] = GeneralUtility::trimExplode('|', $this->options['values']);
-        }
-        if (false === is_array($valuesArray)) {
-            $valuesArray = [$valuesArray];
+        if (false === is_array($values)) {
+            $values = [$values];
         }
 
-        foreach ($valuesArray as $value) {
-            if (in_array($value, $this->options['values'])) {
-                $flag = true;
-                break;
-            }
+        if (empty($values)) {
+            $this->addError(self::MESSAGE_EMPTY, 1487943450);
+        } else {
+            $this->valuesAreInArray($values);
+        }
+    }
+
+    /**
+     * @param array $values
+     */
+    protected function valuesAreInArray(array $values)
+    {
+        $flag = true;
+        $acceptedValues = $this->options[self::OPTION_VALUES];
+
+        if (false === is_array($acceptedValues)) {
+            $acceptedValues = GeneralUtility::trimExplode('|', $acceptedValues);
+        }
+
+        foreach ($values as $value) {
+            $flag = $flag && in_array($value, $acceptedValues);
         }
 
         if (false === $flag) {
             $this->addError(
-                'default',
+                self::MESSAGE_DEFAULT,
                 1445952458,
-                [implode(', ', $this->options['values'])]
+                [implode(', ', $acceptedValues)]
             );
         }
     }

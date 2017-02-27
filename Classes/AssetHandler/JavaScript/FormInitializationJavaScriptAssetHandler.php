@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Service\ArrayService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -20,7 +21,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * This asset handler generates the JavaScript code which will initialize the
  * form and its whole configuration.
  */
-class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FormInitializationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**

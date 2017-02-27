@@ -21,7 +21,7 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
      */
     public function instanceGetterMethodWorksWell()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -53,7 +53,7 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
      */
     public function includingDefaultAssetsIncludesThemOnce()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -103,7 +103,7 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
      */
     public function GeneratedFilePathDependsOnPrefix()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);

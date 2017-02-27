@@ -17,6 +17,11 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 
 class BetweenNumbersValidator extends AbstractValidator
 {
+    const OPTION_MINIMUM = 'minimum';
+    const OPTION_MAXIMUM = 'maximum';
+
+    const MESSAGE_DEFAULT = 'default';
+    const MESSAGE_NOT_NUMBER = 'notNumber';
 
     /**
      * @inheritdoc
@@ -29,19 +34,27 @@ class BetweenNumbersValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedOptions = [
-        'minimum' => [0, 'The minimum number value to accept', 'float'],
-        'maximum' => [PHP_INT_MAX, 'The maximum number value to accept', 'float'],
+        self::OPTION_MINIMUM => [
+            0,
+            'The minimum length to accept',
+            'integer'
+        ],
+        self::OPTION_MAXIMUM => [
+            PHP_INT_MAX,
+            'The maximum length to accept',
+            'integer'
+        ]
     ];
 
     /**
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default'   => [
+        self::MESSAGE_DEFAULT    => [
             'key'       => 'validator.form.between_numbers.error',
             'extension' => null
         ],
-        'notNumber' => [
+        self::MESSAGE_NOT_NUMBER => [
             'key'       => 'validator.form.number.error',
             'extension' => null
         ]
@@ -53,15 +66,12 @@ class BetweenNumbersValidator extends AbstractValidator
     public function isValid($value)
     {
         if (false === MathUtility::canBeInterpretedAsFloat($value)) {
-            $this->addError(
-                'notNumber',
-                1462883487
-            );
-        } elseif (!($value >= $this->options['minimum']
-            && $value <= $this->options['maximum'])
+            $this->addError(self::MESSAGE_NOT_NUMBER, 1462883487);
+        } elseif ($value < $this->options['minimum']
+            || $value > $this->options['maximum']
         ) {
             $this->addError(
-                'default',
+                self::MESSAGE_DEFAULT,
                 1462884916,
                 [$this->options['minimum'], $this->options['maximum']]
             );

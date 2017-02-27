@@ -13,10 +13,38 @@
 
 namespace Romm\Formz\Condition\Items;
 
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
+use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Form\FormObject;
 
 interface ConditionItemInterface
 {
+    /**
+     * @param FormObject $formObject
+     * @return void
+     */
+    public function attachFormObject(FormObject $formObject);
+
+    /**
+     * @param ActivationInterface $activation
+     * @return void
+     */
+    public function attachActivation(ActivationInterface $activation);
+
+    /**
+     * @param ConditionNode $conditionNode
+     * @return void
+     */
+    public function attachConditionNode(ConditionNode $conditionNode);
+
+    /**
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    public function validateConditionConfiguration();
+
     /**
      * @return string
      */

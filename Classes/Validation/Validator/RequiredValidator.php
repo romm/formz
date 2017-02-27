@@ -15,6 +15,7 @@ namespace Romm\Formz\Validation\Validator;
 
 class RequiredValidator extends AbstractValidator
 {
+    const MESSAGE_DEFAULT = 'default';
 
     /**
      * @inheritdoc
@@ -32,7 +33,7 @@ class RequiredValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.required.error',
             'extension' => null
         ]
@@ -43,15 +44,12 @@ class RequiredValidator extends AbstractValidator
      */
     public function isValid($value)
     {
-        if ($value === null
-            || $value === ''
+        if (null === $value
+            || '' === $value
             || (is_array($value) && empty($value))
             || (is_object($value) && $value instanceof \Countable && $value->count() === 0)
         ) {
-            $this->addError(
-                'default',
-                1446026582
-            );
+            $this->addError(self::MESSAGE_DEFAULT, 1446026582);
         }
     }
 }

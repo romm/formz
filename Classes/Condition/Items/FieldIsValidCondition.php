@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 
 /**
@@ -59,13 +60,34 @@ class FieldIsValidCondition extends AbstractConditionItem
      */
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
-        $result = $dataObject->getFormValidator()
-            ->validateField($this->fieldName);
+        $formValidator = $dataObject->getFormValidator();
+        $field = $this->formObject
+            ->getConfiguration()
+            ->getField($this->fieldName);
+        $formValidator->validateField($field);
+        $result = $formValidator->getResult();
 
-        return
-            false === $result->forProperty($this->fieldName)->hasErrors()
-            && false === $result->fieldIsDeactivated($this->fieldName)
-        ;
+        return false === $result->forProperty($this->fieldName)->hasErrors()
+            && false === $result->fieldIsDeactivated($field);
+    }
+
+    /**
+     * @see validateConditionConfiguration()
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    protected function checkConditionConfiguration()
+    {
+        $configuration = $this->formObject->getConfiguration();
+
+        if (false === $configuration->hasField($this->fieldName)) {
+            throw new InvalidConditionException(
+                'The field "' . $this->fieldName . '" does not exist.',
+                1488183577
+            );
+        }
+
+        return true;
     }
 
     /**

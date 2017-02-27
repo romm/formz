@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -23,7 +24,7 @@ use TYPO3\CMS\Extbase\Error\Result;
  * Will handle the "one time run" data needed by JavaScript: the submitted
  * values, and others.
  */
-class FormRequestDataJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**

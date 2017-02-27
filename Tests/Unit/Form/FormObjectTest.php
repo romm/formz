@@ -3,7 +3,6 @@ namespace Romm\Formz\Tests\Unit\Form;
 
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\Configuration;
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -18,7 +17,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function constructorPropertiesAreSet()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
 
         $this->assertEquals(self::FORM_OBJECT_DEFAULT_CLASS_NAME, $formObject->getClassName());
         $this->assertEquals(self::FORM_OBJECT_DEFAULT_NAME, $formObject->getName());
@@ -31,7 +30,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function addedPropertyIsGettable()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
 
         $formObject->addProperty('foo');
         $this->assertEquals(['foo'], $formObject->getProperties());
@@ -47,13 +46,30 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
+     * @test
+     */
+    public function formObjectWithAddedPropertyHasProperty()
+    {
+        $formObject = $this->getDefaultFormObject();
+
+        $this->assertFalse($formObject->hasProperty('foo'));
+        $this->assertFalse($formObject->hasProperty('bar'));
+        $formObject->addProperty('foo');
+        $this->assertTrue($formObject->hasProperty('foo'));
+        $this->assertFalse($formObject->hasProperty('bar'));
+        $formObject->addProperty('bar');
+        $this->assertTrue($formObject->hasProperty('foo'));
+        $this->assertTrue($formObject->hasProperty('bar'));
+    }
+
+    /**
      * Setting a basic configuration array should be saved properly.
      *
      * @test
      */
     public function configurationArrayCanBeSet()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => 'foo'
@@ -81,7 +97,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function configurationArrayDeletesAdditionalFields()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => 'foo'
@@ -151,34 +167,6 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
-     * Will inject a basic configuration array, and check that the configuration
-     * object created by the form object is valid and without errors.
-     *
-     * @test
-     */
-    public function configurationObjectIsCorrectlyBuilt()
-    {
-        $formObject = $this->getFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => []
-            ]
-        ];
-
-        $formObject->addProperty('foo');
-        $formObject->setConfigurationArray($arrayConfiguration);
-
-        $configurationObject = $formObject->getConfigurationObject();
-
-        $this->assertEquals(ConfigurationObjectInstance::class, get_class($configurationObject));
-        $this->assertEquals(Form::class, get_class($configurationObject->getObject(true)));
-        $this->assertFalse($configurationObject->getValidationResult()->hasErrors());
-        $this->assertSame($configurationObject->getObject(true), $formObject->getConfiguration());
-
-        unset($formObject);
-    }
-
-    /**
      * Checks that the configuration object is stored in cache, so it is not
      * built every time it is fetched.
      *
@@ -201,7 +189,7 @@ class FormObjectTest extends AbstractUnitTest
             ->willReturn($configurationObjectInstance);
 
         for ($i = 0; $i < 3; $i++) {
-            $formObject->getConfigurationObject();
+            $formObject->getConfiguration();
         }
 
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject2 */
@@ -214,7 +202,7 @@ class FormObjectTest extends AbstractUnitTest
             ->method('buildConfigurationObject');
 
         for ($i = 0; $i < 3; $i++) {
-            $formObject2->getConfigurationObject();
+            $formObject2->getConfiguration();
         }
 
         unset($formObject);
@@ -229,7 +217,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function configurationValidationResultCanBeGet()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $arrayConfiguration = [
             'fields' => [
                 'foo' => []

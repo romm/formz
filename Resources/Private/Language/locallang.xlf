@@ -56,9 +56,6 @@
 			<trans-unit id="validator.form.equals_to_field.error">
 				<source>This field must have the same value as %s.</source>
 			</trans-unit>
-			<trans-unit id="validator.form.class_exists.error">
-				<source>The value « %s » is not referring to an existing class.</source>
-			</trans-unit>
 			<trans-unit id="validator.form.condition_is_valid.error">
 				<source>The condition « %s » has at least one error: « %s ».</source>
 			</trans-unit>
