@@ -60,11 +60,12 @@ class FieldIsValidCondition extends AbstractConditionItem
      */
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
+        $formValidator = $dataObject->getFormValidator();
         $field = $this->formObject
             ->getConfiguration()
             ->getField($this->fieldName);
-        $result = $dataObject->getFormValidator()
-            ->validateField($field);
+        $formValidator->validateField($field);
+        $result = $formValidator->getResult();
 
         return false === $result->forProperty($this->fieldName)->hasErrors()
             && false === $result->fieldIsDeactivated($field);

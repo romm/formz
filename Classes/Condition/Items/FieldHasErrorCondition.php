@@ -85,12 +85,12 @@ class FieldHasErrorCondition extends AbstractConditionItem
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
         $flag = false;
+        $formValidator = $dataObject->getFormValidator();
         $field = $this->formObject
             ->getConfiguration()
             ->getField($this->fieldName);
-        $result = $dataObject->getFormValidator()
-            ->validateField($field)
-            ->forProperty($this->fieldName);
+        $formValidator->validateField($field);
+        $result = $formValidator->getResult()->forProperty($this->fieldName);
 
         foreach ($result->getErrors() as $error) {
             if ($error instanceof FormzMessageInterface
