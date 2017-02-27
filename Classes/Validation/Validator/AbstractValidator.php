@@ -13,16 +13,13 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-use Romm\Formz\Configuration\Form\Field\Validation\Message as FormzMessage;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\Notice;
 use Romm\Formz\Error\Warning;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Service\ContextService;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
-use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
+use Romm\Formz\Service\MessageService;
+use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 
 abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
 {
@@ -67,14 +64,6 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     protected $form;
 
     /**
-     * Contains the name of the field which is being validated by this
-     * validator.
-     *
-     * @var string
-     */
-    protected $fieldName;
-
-    /**
      * Contains the merge of the supported messages and the TypoScript defined
      * messages.
      *
@@ -91,74 +80,27 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     protected $validationData = [];
 
     /**
-     * @var Dispatcher
+     * @var ValidatorDataObject
      */
-    protected $signalSlotDispatcher;
+    protected $dataObject;
 
     /**
      * Constructs the validator, sets validation options and messages.
      *
-     * @param array          $options  Options for the validator.
-     * @param FormInterface  $form     The original form.
-     * @param string         $field    Name of the field being validated.
-     * @param FormzMessage[] $messages Messages for the validator.
-     * @throws \TYPO3\CMS\Extbase\Validation\Exception\InvalidValidationOptionsException
+     * @param array               $options Options for the validator.
+     * @param ValidatorDataObject $dataObject
      */
-    public function __construct(array $options = [], $form = null, $field = '', array $messages = [])
+    final public function __construct(array $options = [], ValidatorDataObject $dataObject)
     {
         parent::__construct($options);
 
-        $this->signalSlotDispatcher = GeneralUtility::makeInstance(Dispatcher::class);
-        $this->form = $form;
-        $this->fieldName = $field;
-
-        $this->messages = $this->injectMessages($messages);
-    }
-
-    /**
-     * Will manage the messages of the current validator: only the supported
-     * messages will be handled.
-     *
-     * @param FormzMessage[] $messages
-     * @return array
-     */
-    protected function injectMessages(array $messages)
-    {
-        // Adding the keys `value` and `extension` to the messages, only if it is missing.
-        $addValueToArray = function (array &$a) {
-            foreach ($a as $k => $v) {
-                if (false === isset($v['value'])) {
-                    $a[$k]['value'] = '';
-                }
-                if (false === isset($v['extension'])) {
-                    $a[$k]['extension'] = '';
-                }
-            }
-
-            return $a;
-        };
-
-        $messagesArray = [];
-        foreach ($messages as $key => $message) {
-            if (false === is_array($message)) {
-                $message = $message->toArray();
-            }
-
-            $messagesArray[$key] = $message;
-        }
-
-        $addValueToArray($messagesArray);
-        $addValueToArray($this->supportedMessages);
-
-        $messagesResult = $this->supportedMessages;
-
-        ArrayUtility::mergeRecursiveWithOverrule(
-            $messagesResult,
-            $messagesArray,
-            (true === $this->supportsAllMessages)
+        $this->dataObject = $dataObject;
+        $this->form = $dataObject->getForm();
+        $this->messages = MessageService::get()->filterMessages(
+            $this->dataObject->getValidation()->getMessages(),
+            $this->supportedMessages,
+            (bool)$this->supportsAllMessages
         );
-
-        return $messagesResult;
     }
 
     /**
@@ -204,31 +146,6 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     }
 
     /**
-     * @param string $type
-     * @param string $key
-     * @param string $code
-     * @param array  $arguments
-     * @param string $title
-     * @return mixed
-     * @throws \Exception
-     */
-    private function addMessage($type, $key, $code, array $arguments, $title)
-    {
-        if (!isset($this->messages[$key])) {
-            throw new \Exception('The error key "' . $key . '" does not exist for the validator "' . get_class($this) . '".', 1455272659);
-        }
-
-        return new $type(
-            $this->getMessage($key, $arguments),
-            $code,
-            AbstractFormValidator::getCurrentValidationName(),
-            $key,
-            [],
-            $title
-        );
-    }
-
-    /**
      * Get the full validation data.
      *
      * @return array
@@ -261,50 +178,44 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     }
 
     /**
-     * @return array
+     * @param string $type
+     * @param string $key
+     * @param string $code
+     * @param array  $arguments
+     * @param string $title
+     * @return mixed
+     * @throws \Exception
      */
-    public function getMessages()
+    private function addMessage($type, $key, $code, array $arguments, $title)
     {
-        return $this->messages;
+        if (!isset($this->messages[$key])) {
+            throw new EntryNotFoundException(
+                'The error key "' . $key . '" does not exist for the validator "' . get_class($this) . '".',
+                1455272659
+            );
+        }
+
+        return new $type(
+            $this->getMessage($key, $arguments),
+            $code,
+            $this->dataObject->getValidation()->getValidationName(),
+            $key,
+            [],
+            $title
+        );
     }
 
     /**
      * This function should *always* be used when a message should be translated
      * when an error occurs in the validation process.
      *
-     * You can also use `$this->getMessageFromKey()` if you want more
-     * flexibility.
-     *
      * @param  string $key       The key of the message, usually "default".
      * @param  array  $arguments Arguments given to the message.
      * @return string
      */
-    public function getMessage($key, array $arguments = [])
+    private function getMessage($key, array $arguments = [])
     {
-        $result = (isset($this->messages[$key]['value']) && $this->messages[$key]['value'] !== '')
-            ? vsprintf($this->messages[$key]['value'], $arguments)
-            : $this->getMessageFromKey($this->messages[$key]['key'], $this->messages[$key]['extension'], $arguments);
-
-        list($result) = $this->signalSlotDispatcher->dispatch(
-            __CLASS__,
-            'getMessage',
-            [$result, $this->messages[$key], $arguments]
-        );
-
-        return $result;
-    }
-
-    /**
-     * @see getMessage()
-     *
-     * @param    string $key          Path to the message.
-     * @param    string $extensionKey Extension containing the locallang reference to the message.
-     * @param    array  $arguments    Arguments given to the message.
-     * @return    string
-     */
-    protected function getMessageFromKey($key, $extensionKey = null, array $arguments = [])
-    {
-        return ContextService::get()->translate($key, $extensionKey, $arguments);
+        return MessageService::get()->parseMessageArray($this->messages[$key], $arguments);
     }
 
     /**

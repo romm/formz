@@ -60,10 +60,10 @@ class ConditionProcessorFactory implements SingletonInterface
         /** @var ConditionProcessor $instance */
         if ($cacheInstance->has($cacheIdentifier)) {
             $instance = $cacheInstance->get($cacheIdentifier);
+            $instance->attachFormObject($formObject);
         } else {
             $instance = Core::instantiate(ConditionProcessor::class, $formObject);
             $instance->calculateAllTrees();
-            $instance->attachFormObject($formObject);
 
             $cacheInstance->set($cacheIdentifier, $instance);
         }

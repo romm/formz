@@ -16,7 +16,7 @@ class AbstractAssetHandlerTest extends AbstractUnitTest
      */
     public function assetHandlerIsBuiltCorrectly()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);

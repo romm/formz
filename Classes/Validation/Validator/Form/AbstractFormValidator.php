@@ -13,20 +13,13 @@
 
 namespace Romm\Formz\Validation\Validator\Form;
 
-use Romm\Formz\Behaviours\BehavioursManager;
-use Romm\Formz\Condition\Processor\ConditionProcessor;
-use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
-use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
-use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\FormService;
-use Romm\Formz\Validation\Validator\AbstractValidator;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
-use TYPO3\CMS\Extbase\Validation\Validator\GenericObjectValidator;
 
 /**
  * This is the abstract form validator, which must be inherited by any custom
@@ -52,19 +45,6 @@ use TYPO3\CMS\Extbase\Validation\Validator\GenericObjectValidator;
  * You may use you own custom form validator in order to be able to use the
  * following features:
  *
- * - Fields validation (de)activation:
- *   You are able to handle manually which validation rule for each field of the
- *   form may be activated or not. These functions can be used during the custom
- *   process functions described below.
- *   See the functions:
- *    - `activateField()`
- *    - `deactivateField()`
- *    - `activateFieldValidator()`
- *    - `deactivateFieldValidator()`
- *   And the properties:
- *    - `$deactivatedFields`
- *    - `$deactivatedFieldsValidators`
- *
  * - Pre-validation custom process:
  *   By extending the method `beforeValidationProcess()`, you are able to handle
  *   anything you want just before the form validation begins to loop on every
@@ -87,9 +67,8 @@ use TYPO3\CMS\Extbase\Validation\Validator\GenericObjectValidator;
  *   are still able to add an error to `$this->result` (in a controller you do
  *   not have access to it anymore).
  */
-abstract class AbstractFormValidator extends GenericObjectValidator
+abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements FormValidatorInterface
 {
-
     /**
      * @inheritdoc
      */
@@ -101,90 +80,6 @@ abstract class AbstractFormValidator extends GenericObjectValidator
      * @var FormResult
      */
     protected $result;
-
-    /**
-     * @var FormInterface
-     */
-    protected $form;
-
-    /**
-     * @var FormObject
-     */
-    protected $formObject;
-
-    /**
-     * Contains the fields which will not be checked.
-     * You can override this property in your children class to set the fields
-     * which will not be checked by default.
-     *
-     * @var array
-     */
-    protected $deactivatedFields = [];
-
-    /**
-     * Contains the validators which will not be checked for certain fields.
-     * You can override this property in your children class to set the
-     * validators of fields which will not be checked by default.
-     *
-     * Example:
-     * protected $deactivatedFieldsValidators = [
-     *      'name'  => ['required'],
-     *      'email' => ['mustBeEmail', 'required']
-     * ];
-     *
-     * @var array
-     */
-    protected $deactivatedFieldsValidators = [];
-
-    /**
-     * @var \TYPO3\CMS\Extbase\Object\ObjectManager
-     * @inject
-     */
-    protected $objectManager;
-
-    /**
-     * @var FormObjectFactory
-     */
-    protected $formObjectFactory;
-
-    /**
-     * @var ConditionProcessor
-     */
-    private $conditionProcessor;
-
-    /**
-     * Array of arbitral data which are handled by validators.
-     *
-     * @var array
-     */
-    private $validationData = [];
-
-    /**
-     * @var string
-     */
-    private static $currentValidationName;
-
-    /**
-     * @var FormInterface
-     */
-    private $formClone;
-
-    /**
-     * @var array
-     */
-    private $fieldsValidated = [];
-
-    /**
-     * @var array
-     */
-    private $fieldsActivationChecked = [];
-
-    /**
-     * Current queue, used to prevent infinite loop.
-     *
-     * @var array
-     */
-    private $fieldsActivationChecking = [];
 
     /**
      * Contains the validation results of all forms which were validated. The
@@ -200,54 +95,87 @@ abstract class AbstractFormValidator extends GenericObjectValidator
     private static $formsValidationResults = [];
 
     /**
-     * Validates the given Form instance. See class description for more
-     * information.
+     * Checks the given form instance, and launches the validation if it is a
+     * correct form.
      *
      * @param FormInterface $form The form instance to be validated.
      * @return FormResult
+     * @throws InvalidArgumentTypeException
      */
     final public function validate($form)
     {
-        $this->form = $form;
-        $formClassName = get_class($form);
-        $formName = $this->options['name'];
-        $this->result = new FormResult();
+        if (false === $form instanceof FormInterface) {
+            throw new InvalidArgumentTypeException(
+                'Trying to validate a form that does not implement the interface "' . FormInterface::class . '". Given class: "' . get_class($form) . '"',
+                1487865158
+            );
+        }
 
-        $this->formObject = $this->formObjectFactory->getInstanceFromClassName($formClassName, $formName);
+        $this->result = new FormResult;
 
-        /** @var BehavioursManager $behavioursManager */
-        $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
-        $behavioursManager->applyBehaviourOnFormInstance($this->form, $this->formObject);
+        $this->isValid($form);
 
-        $this->conditionProcessor = ConditionProcessorFactory::getInstance()
-            ->get($this->formObject);
+        return $this->result;
+    }
 
-        $this->checkFieldsActivation();
+    /**
+     * Runs the whole validation workflow.
+     *
+     * @param FormInterface $form
+     */
+    final public function isValid($form)
+    {
+        $formValidatorExecutor = $this->getFormValidatorExecutor($form);
+        $formValidatorExecutor->applyBehaviours();
+        $formValidatorExecutor->checkFieldsActivation();
+
         $this->beforeValidationProcess();
 
-        foreach ($this->formObject->getConfiguration()->getFields() as $fieldName => $field) {
-            $this->validateField($fieldName);
-
-            $this->form->setValidationData($this->validationData);
-
-            // A callback after each field validation: `{lowerCamelCaseFieldName}Validated()`
-            // Example for field "firstName": `firstNameValidated()`
-            $functionName = lcfirst($fieldName . 'Validated');
-            if (method_exists($this, $functionName)) {
-                $this->$functionName();
-            }
-        }
+        $formValidatorExecutor->validateFields(function (Field $field) {
+            $this->callAfterFieldValidationMethod($field);
+        });
 
         $this->afterValidationProcess();
 
         if ($this->result->hasErrors()) {
             // Storing the form for possible third party further usage.
-            FormService::addFormWithErrors($this->form);
+            FormService::addFormWithErrors($form);
         }
 
-        self::$formsValidationResults[$formClassName . '::' . $formName] = $this->result;
+        self::$formsValidationResults[get_class($form) . '::' . $this->options['name']] = $this->result;
+    }
 
-        return $this->result;
+    /**
+     * Use this function to (de)activate the validation for some given fields.
+     */
+    protected function beforeValidationProcess()
+    {
+    }
+
+    /**
+     * Use this function to run your own processes after the validation ran.
+     */
+    protected function afterValidationProcess()
+    {
+    }
+
+    /**
+     * After each field has been validated, a matching method can be called if
+     * it exists in the child class.
+     *
+     * The syntax is `{lowerCamelCaseFieldName}Validated()`.
+     *
+     * Example: for field `firstName` - `firstNameValidated()`.
+     *
+     * @param Field $field
+     */
+    private function callAfterFieldValidationMethod(Field $field)
+    {
+        $functionName = lcfirst($field->getFieldName() . 'Validated');
+
+        if (method_exists($this, $functionName)) {
+            call_user_func([$this, $functionName]);
+        }
     }
 
     /**
@@ -268,232 +196,14 @@ abstract class AbstractFormValidator extends GenericObjectValidator
     }
 
     /**
-     * Use this function to (de)activate the validation for some given fields.
+     * @param FormInterface $form
+     * @return FormValidatorExecutor
      */
-    protected function beforeValidationProcess()
+    protected function getFormValidatorExecutor(FormInterface $form)
     {
-    }
+        /** @var FormValidatorExecutor $formValidatorExecutor */
+        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $form, $this->options['name'], $this->result);
 
-    /**
-     * Use this function to (de)activate the validation for some given fields.
-     *
-     * @deprecated use `beforeValidationProcess()` instead
-     */
-    protected function processForm()
-    {
-    }
-
-    /**
-     * Use this function to run your own processes after the validation ran.
-     */
-    protected function afterValidationProcess()
-    {
-    }
-
-    /**
-     * Activates the full validation for the given field.
-     *
-     * @param string $fieldName Name of the field.
-     */
-    protected function activateField($fieldName)
-    {
-        if (false !== ($key = array_search($fieldName, $this->deactivatedFields))) {
-            unset($this->deactivatedFields[$key]);
-        }
-    }
-
-    /**
-     * Deactivates the full validation for the given field.
-     *
-     * @param string $fieldName Name of the field.
-     */
-    protected function deactivateField($fieldName)
-    {
-        if (false === in_array($fieldName, $this->deactivatedFields)) {
-            $this->deactivatedFields[] = $fieldName;
-        }
-    }
-
-    /**
-     * Activates the given validator for the given field.
-     *
-     * @param    string $fieldName     The name of the field.
-     * @param    string $validatorName The name given to the validator.
-     */
-    protected function activateFieldValidator($fieldName, $validatorName)
-    {
-        if (isset($this->deactivatedFieldsValidators[$fieldName])) {
-            if (false !== ($key = array_search($validatorName, $this->deactivatedFieldsValidators[$fieldName]))) {
-                unset($this->deactivatedFieldsValidators[$fieldName][$key]);
-            }
-        }
-    }
-
-    /**
-     * Deactivates the given validator for the given field.
-     *
-     * @param    string $fieldName     The name of the field.
-     * @param    string $validatorName The name given to the validator.
-     */
-    protected function deactivateFieldValidator($fieldName, $validatorName)
-    {
-        if (false === in_array($fieldName, $this->deactivatedFieldsValidators)) {
-            $this->deactivatedFieldsValidators[$fieldName] = [];
-        }
-
-        $this->deactivatedFieldsValidators[$fieldName][] = $validatorName;
-    }
-
-    /**
-     * This function will take care of deactivating the validation for fields
-     * that do not match their activation condition.
-     */
-    private function checkFieldsActivation()
-    {
-        foreach ($this->formObject->getConfiguration()->getFields() as $fieldName => $field) {
-            if (false === in_array($fieldName, $this->fieldsActivationChecked)
-                && false === in_array($fieldName, $this->deactivatedFields)
-            ) {
-                $phpConditionDataObject = new PhpConditionDataObject;
-                $phpConditionDataObject->setForm($this->form);
-                $phpConditionDataObject->setFormValidator($this);
-
-                if ($field->hasActivation()
-                    && false === isset($this->fieldsActivationChecking[$fieldName])
-                ) {
-                    $this->fieldsActivationChecking[$fieldName] = true;
-
-                    $activation = $this->conditionProcessor
-                        ->getActivationConditionTreeForField($field)
-                        ->getPhpResult($phpConditionDataObject);
-
-                    if (false === $activation) {
-                        $this->deactivatedFields[] = $fieldName;
-                    }
-                }
-
-                foreach ($field->getValidation() as $validationName => $validation) {
-                    if ($validation->hasActivation()) {
-                        $activation = $this->conditionProcessor
-                            ->getActivationConditionTreeForValidation($validation)
-                            ->getPhpResult($phpConditionDataObject);
-
-                        if (false === $activation) {
-                            if (false === isset($this->deactivatedFieldsValidators[$fieldName])) {
-                                $this->deactivatedFieldsValidators[$fieldName] = [];
-                            }
-
-                            $this->deactivatedFieldsValidators[$fieldName][] = $validationName;
-                        }
-                    }
-                }
-
-                unset($this->fieldsActivationChecking[$fieldName]);
-                $this->fieldsActivationChecked[] = $fieldName;
-            }
-
-            if (true === in_array($fieldName, $this->deactivatedFields)
-                && null === $this->result->fieldIsDeactivated($fieldName)
-            ) {
-                $this->result->deactivateField($fieldName);
-            }
-        }
-    }
-
-    /**
-     * Will loop on each validation rule and apply it of the field.
-     * Errors are stored in `$this->result`.
-     *
-     * @param string $fieldName The name of the field.
-     * @return FormResult
-     * @internal
-     */
-    final public function validateField($fieldName)
-    {
-        if (false === in_array($fieldName, $this->fieldsValidated)
-            && false === in_array($fieldName, $this->deactivatedFields)
-            && true === $this->formObject->getConfiguration()->hasField($fieldName)
-        ) {
-            $this->fieldsValidated[] = $fieldName;
-            $field = $this->formObject->getConfiguration()->getField($fieldName);
-            $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);
-
-            // Looping on the field's validation settings...
-            foreach ($field->getValidation() as $validationName => $validation) {
-                if (isset($this->deactivatedFieldsValidators[$fieldName])
-                    && in_array($validationName, $this->deactivatedFieldsValidators[$fieldName])
-                ) {
-                    continue;
-                }
-
-                self::$currentValidationName = (string)$validationName;
-
-                $formClone = $this->getFormClone();
-
-                /** @var ExtbaseAbstractValidator $validator */
-                $validator = GeneralUtility::makeInstance(
-                    $validation->getClassName(),
-                    $validation->getOptions(),
-                    $formClone,
-                    $fieldName,
-                    $validation->getMessages()
-                );
-                $validatorResult = $validator->validate($fieldValue);
-                unset($formClone);
-
-                if ($validator instanceof AbstractValidator) {
-                    /** @var AbstractValidator $validator */
-                    if (!empty($validationData = $validator->getValidationData())) {
-                        $this->validationData[$fieldName] = ($this->validationData[$fieldName]) ?: [];
-                        $this->validationData[$fieldName] = array_merge(
-                            $this->validationData[$fieldName],
-                            $validationData
-                        );
-                    }
-                }
-
-                $this->result->forProperty($fieldName)->merge($validatorResult);
-
-                // Breaking the loop if an error occurred: we stop the validation process for the current field.
-                if ($validatorResult->hasErrors()) {
-                    break;
-                }
-            }
-        }
-
-        return $this->result;
-    }
-
-    /**
-     * @return string
-     * @internal
-     */
-    final public static function getCurrentValidationName()
-    {
-        return self::$currentValidationName;
-    }
-
-    /**
-     * Returns a clone of the Form, used to give a "read-only" instance of the
-     * form to the validators.
-     *
-     * @return FormInterface
-     * @internal
-     */
-    private function getFormClone()
-    {
-        if (!$this->formClone) {
-            $this->formClone = clone $this->form;
-        }
-
-        return $this->formClone;
-    }
-
-    /**
-     * @param FormObjectFactory $formObjectFactory
-     */
-    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
-    {
-        $this->formObjectFactory = $formObjectFactory;
+        return $formValidatorExecutor;
     }
 }

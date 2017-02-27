@@ -68,9 +68,19 @@ class FormObject
     protected $configurationObject;
 
     /**
+     * @var Result
+     */
+    protected $configurationValidationResult;
+
+    /**
      * @var string
      */
     protected $hash;
+
+    /**
+     * @var string
+     */
+    protected $lastConfigurationHash;
 
     /**
      * @var bool
@@ -88,22 +98,6 @@ class FormObject
     {
         $this->className = $className;
         $this->name = $name;
-    }
-
-    /**
-     * Registers a new property for this form.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function addProperty($name)
-    {
-        if (false === in_array($name, $this->properties)) {
-            $this->properties[] = $name;
-            $this->hashShouldBeCalculated = true;
-        }
-
-        return $this;
     }
 
     /**
@@ -131,6 +125,31 @@ class FormObject
     public function getClassName()
     {
         return $this->className;
+    }
+
+    /**
+     * Registers a new property for this form.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function addProperty($name)
+    {
+        if (false === $this->hasProperty($name)) {
+            $this->properties[] = $name;
+            $this->hashShouldBeCalculated = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasProperty($name)
+    {
+        return in_array($name, $this->properties);
     }
 
     /**
@@ -185,13 +204,15 @@ class FormObject
      * stored in cache, otherwise it is created from scratch.
      *
      * @return ConfigurationObjectInstance
-     * @internal
      */
-    public function getConfigurationObject()
+    protected function getConfigurationObject()
     {
-        if (null === $this->configurationObject) {
+        if (null === $this->configurationObject
+            || $this->lastConfigurationHash !== $this->getHash()
+        ) {
             $cacheInstance = CacheService::get()->getCacheInstance();
             $cacheIdentifier = 'configuration-' . $this->getHash();
+            $this->lastConfigurationHash = $this->getHash();
 
             if ($cacheInstance->has($cacheIdentifier)) {
                 $configurationObject = $cacheInstance->get($cacheIdentifier);
@@ -217,17 +238,21 @@ class FormObject
      */
     public function getConfigurationValidationResult()
     {
-        $result = new Result();
-        $formzConfigurationValidationResult = $this->configurationFactory
-            ->getFormzConfiguration()
-            ->getValidationResult();
+        if (null === $this->configurationValidationResult
+            || $this->lastConfigurationHash !== $this->getHash()
+        ) {
+            $this->configurationValidationResult = new Result;
+            $formzConfigurationValidationResult = $this->configurationFactory
+                ->getFormzConfiguration()
+                ->getValidationResult();
 
-        $result->merge($formzConfigurationValidationResult);
+            $this->configurationValidationResult->merge($formzConfigurationValidationResult);
 
-        $result->forProperty('forms.' . $this->getClassName())
-            ->merge($this->getConfigurationObject()->getValidationResult());
+            $this->configurationValidationResult->forProperty('forms.' . $this->getClassName())
+                ->merge($this->getConfigurationObject()->getValidationResult());
+        }
 
-        return $result;
+        return $this->configurationValidationResult;
     }
 
     /**

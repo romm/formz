@@ -17,6 +17,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class EmailValidator extends AbstractValidator
 {
+    const MESSAGE_DEFAULT = 'default';
 
     /**
      * @inheritdoc
@@ -29,7 +30,7 @@ class EmailValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.email.error',
             'extension' => null
         ]
@@ -41,10 +42,7 @@ class EmailValidator extends AbstractValidator
     public function isValid($value)
     {
         if (false === GeneralUtility::validEmail((string)$value)) {
-            $this->addError(
-                'default',
-                1447333632
-            );
+            $this->addError(self::MESSAGE_DEFAULT, 1447333632);
         }
     }
 }

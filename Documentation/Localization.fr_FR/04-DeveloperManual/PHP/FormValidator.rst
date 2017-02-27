@@ -25,15 +25,9 @@ Un validateur de formulaire vous donne accès aux variables/fonctions suivantes 
 
 - :ref:`$form <formValidator-form>`
 - :ref:`$result <formValidator-result>`
-- :ref:`$deactivatedFields <formValidator-deactivatedFields>`
-- :ref:`$deactivatedFieldsValidators <formValidator-deactivatedFieldsValidators>`
 - :ref:`beforeValidationProcess() <formValidator-beforeValidationProcess>`
 - :ref:`*field*Validated() <formValidator-interValidationProcess>`
 - :ref:`afterValidationProcess() <formValidator-afterValidationProcess>`
-- :ref:`deactivateField($fieldName) <formValidator-deactivateField>`
-- :ref:`activateField($fieldName) <formValidator-activateField>`
-- :ref:`deactivateFieldValidator($fieldName, $validatorName) <formValidator-deactivateFieldValidator>`
-- :ref:`activateFieldValidator($fieldName, $validatorName) <formValidator-activateFieldValidator>`
 
 -----
 
@@ -70,46 +64,6 @@ Résultat de validation
         Dans cette variable est stocké le **résultat de validation**. Vous pouvez interagir avec selon vos besoins, notamment pour rajouter/supprimer des erreurs.
 
         Cette variable est renvoyée au contrôleur en fin de validation, ce qui signifie que si le résultat contient **au moins une erreur**, le formulaire sera **considéré comme invalide**.
-
-.. _formValidator-deactivatedFields:
-
-Liste des champs désactivés par défaut
---------------------------------------
-
-.. container:: table-row
-
-    Propriété
-        .. code-block:: php
-
-            protected $deactivatedFields = ['myProperty'];
-    Type
-        :php:`array`
-    Description
-        Surchargez et remplissez le tableau avec le nom des **champs désactivés par défaut**. Cela signifie que vous devrez réactiver ces champs vous-même via la fonction ``activateField()`` selon vos besoins.
-
-        Notez que ce tableau est automatiquement rempli en fonction de la configuration des conditions d'activation de champs : les champs désactivés seront rajoutés automatiquement par Formz.
-
-.. _formValidator-deactivatedFieldsValidators:
-
-Liste des règles devalidation de champs désactivées par défaut
---------------------------------------------------------------
-
-.. container:: table-row
-
-    Propriété
-        .. code-block:: php
-
-            protected $deactivatedFieldsValidators = [
-                'myProperty' => ['required']
-            ];
-    Type
-        :php:`array`
-    Description
-        Surchargez et remplissez le tableau avec le nom des **règles de validation de champs désactivées par défaut**. Le premier niveau du tableau correspond au nom du champ, et contient un second tableau constitué de toutes les règles de validation désactivées.
-
-        Pour réactiver ces validations, vous devrez utiliser la fonction ``activateFieldValidator()``.
-
-        Notez que ce tableau est automatiquement rempli en fonction de la configuration des conditions d'activation des règles de validation des champs : les règles de validation désactivées seront rajoutées automatiquement par Formz.
 
 .. _formValidator-beforeValidationProcess:
 
@@ -171,96 +125,6 @@ Processus post-validation
         Cette fonction sera appelée **juste après la validation des champs**. Surchargez-la pour gérer des comportement spécifiques.
 
         Notez que vous pouvez encore utiliser :php:`$this->result`.
-
-.. _formValidator-deactivateField:
-
-Désactivation d'un champ
-------------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->deactivateField($fieldName);
-    Retour
-        /
-    Paramètres
-        - ``$fieldName`` : le nom du champ à désactiver.
-    Description
-        Permet de désactiver un champ (ses règles de validation ne s'appliqueront plus).
-
-        .. note::
-
-            Appeler cette fonction dans ``afterValidationProcess()`` n'aura aucun effet.
-
-.. _formValidator-activateField:
-
-Activation d'un champ
----------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->activateField($fieldName);
-    Retour
-        /
-    Paramètres
-        - ``$fieldName`` : le nom du champ à activer.
-    Description
-        Permet de réactiver un champ.
-
-        .. note::
-
-            Appeler cette fonction dans ``afterValidationProcess()`` n'aura aucun effet.
-
-.. _formValidator-deactivateFieldValidator:
-
-Désactivation d'une règle de validation d'un champ
---------------------------------------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->deactivateFieldValidator($fieldName, $validatorName);
-    Retour
-        /
-    Paramètres
-        - ``$fieldName`` : le nom du champ contenant la règle à désactiver.
-        - ``$validatorName`` : le nom de la règle à désactiver.
-    Description
-        Permet de désactiver une certaine règle de validation pour le champ donné.
-
-        .. note::
-
-            Appeler cette fonction dans ``afterValidationProcess()`` n'aura aucun effet.
-
-.. _formValidator-activateFieldValidator:
-
-Activation d'une règle de validation d'un champ
------------------------------------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->activateFieldValidator($fieldName, $validatorName);
-    Retour
-        /
-    Paramètres
-        - ``$fieldName`` : le nom du champ contenant la règle à activer.
-        - ``$validatorName`` : le nom de la règle à activer.
-    Description
-        Permet de réactiver une certaine règle de validation pour le champ donné.
-
-        .. note::
-
-            Appeler cette fonction dans ``afterValidationProcess()`` n'aura aucun effet.
 
 -----
 

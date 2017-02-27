@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -94,5 +95,24 @@ class FieldHasValueCondition extends AbstractConditionItem
         return (is_array($value))
             ? (true === in_array($this->fieldValue, $value))
             : ($value == $this->fieldValue);
+    }
+
+    /**
+     * @see validateConditionConfiguration()
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    protected function checkConditionConfiguration()
+    {
+        $configuration = $this->formObject->getConfiguration();
+
+        if (false === $configuration->hasField($this->fieldName)) {
+            throw new InvalidConditionException(
+                'The field "' . $this->fieldName . '" does not exist.',
+                1488192031
+            );
+        }
+
+        return true;
     }
 }

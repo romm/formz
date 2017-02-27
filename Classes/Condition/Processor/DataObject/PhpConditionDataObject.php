@@ -14,7 +14,7 @@
 namespace Romm\Formz\Condition\Processor\DataObject;
 
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
 
 class PhpConditionDataObject
 {
@@ -24,9 +24,19 @@ class PhpConditionDataObject
     protected $form;
 
     /**
-     * @var AbstractFormValidator
+     * @var FormValidatorExecutor
      */
     protected $formValidator;
+
+    /**
+     * @param FormInterface         $form
+     * @param FormValidatorExecutor $formValidator
+     */
+    public function __construct(FormInterface $form, FormValidatorExecutor $formValidator)
+    {
+        $this->form = $form;
+        $this->formValidator = $formValidator;
+    }
 
     /**
      * @return FormInterface
@@ -37,26 +47,10 @@ class PhpConditionDataObject
     }
 
     /**
-     * @param FormInterface $form
-     */
-    public function setForm($form)
-    {
-        $this->form = $form;
-    }
-
-    /**
-     * @return AbstractFormValidator
+     * @return FormValidatorExecutor
      */
     public function getFormValidator()
     {
         return $this->formValidator;
-    }
-
-    /**
-     * @param AbstractFormValidator $formValidator
-     */
-    public function setFormValidator($formValidator)
-    {
-        $this->formValidator = $formValidator;
     }
 }

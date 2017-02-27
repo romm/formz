@@ -14,12 +14,14 @@
 namespace Romm\Formz\Condition\Parser\Node;
 
 use Romm\Formz\Condition\Items\ConditionItemInterface;
+use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 
 /**
  * A condition node, which contains an instance of `ConditionItemInterface`.
  */
-class ConditionNode extends AbstractNode
+class ConditionNode extends AbstractNode implements ProcessorDependencyAwareInterface
 {
     /**
      * @var string
@@ -45,6 +47,17 @@ class ConditionNode extends AbstractNode
     }
 
     /**
+     * @param ConditionProcessor  $processor
+     * @param ActivationInterface $activation
+     */
+    public function injectProcessorDependencies(ConditionProcessor $processor, ActivationInterface $activation)
+    {
+        $this->condition->attachFormObject($processor->getFormObject());
+        $this->condition->attachActivation($activation);
+        $this->condition->attachConditionNode($this);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getCssResult()
@@ -65,7 +78,17 @@ class ConditionNode extends AbstractNode
      */
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
+        $this->condition->validateConditionConfiguration();
+
         return $this->condition->getPhpResult($dataObject);
+    }
+
+    /**
+     * @return string
+     */
+    public function getConditionName()
+    {
+        return $this->conditionName;
     }
 
     /**

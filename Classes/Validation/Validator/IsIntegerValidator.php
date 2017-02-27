@@ -13,8 +13,11 @@
 
 namespace Romm\Formz\Validation\Validator;
 
+use TYPO3\CMS\Core\Utility\MathUtility;
+
 class IsIntegerValidator extends AbstractValidator
 {
+    const MESSAGE_DEFAULT = 'default';
 
     /**
      * @inheritdoc
@@ -27,7 +30,7 @@ class IsIntegerValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.is_integer.error',
             'extension' => null
         ]
@@ -38,11 +41,8 @@ class IsIntegerValidator extends AbstractValidator
      */
     public function isValid($value)
     {
-        if (0 === preg_match('/[0-9]+/', $value)) {
-            $this->addError(
-                'default',
-                1464599766
-            );
+        if (false === MathUtility::canBeInterpretedAsInteger($value)) {
+            $this->addError(self::MESSAGE_DEFAULT, 1464599766);
         }
     }
 }

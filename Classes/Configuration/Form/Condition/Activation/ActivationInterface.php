@@ -51,4 +51,14 @@ interface ActivationInterface
      * @return AbstractConditionItem
      */
     public function getItem($itemName);
+
+    /**
+     * @return ActivationUsageInterface
+     */
+    public function getRootObject();
+
+    /**
+     * @param ActivationUsageInterface $rootObject
+     */
+    public function setRootObject(ActivationUsageInterface $rootObject);
 }

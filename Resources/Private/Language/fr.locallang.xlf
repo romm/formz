@@ -53,9 +53,6 @@
 			<trans-unit id="validator.form.equals_to_field.error">
 				<target>Ce champ doit avoir une valeur identique à %s.</target>
 			</trans-unit>
-			<trans-unit id="validator.form.class_exists.error">
-				<target>La valeur « %s » ne correspond pas à une classe existante.</target>
-			</trans-unit>
 			<trans-unit id="validator.form.condition_is_valid.error">
 				<target>La condition « %s » comporte au moins une erreur : « %s ».</target>
 			</trans-unit>

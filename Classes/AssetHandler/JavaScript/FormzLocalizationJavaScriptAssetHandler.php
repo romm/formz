@@ -13,8 +13,11 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\MessageService;
+use Romm\Formz\Service\ValidatorService;
 
 /**
  * This asset handler will manage the translations which will be sent to Formz
@@ -22,7 +25,7 @@ use Romm\Formz\Service\ArrayService;
  *
  * The validation messages of the fields are handled in this class.
  */
-class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FormzLocalizationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**
@@ -126,17 +129,11 @@ JS;
         if (false === $this->translationsForFieldValidationWereInjected($field)) {
             $fieldName = $field->getFieldName();
 
-            foreach ($field->getValidation() as $validationName => $validationConfiguration) {
-                $dummyValidator = $this->getDummyValidator()
-                    ->cloneValidator($validationConfiguration->getClassName());
-
-                $messages = $dummyValidator->setExternalMessages($validationConfiguration->getMessages())
-                    ->getMessages();
+            foreach ($field->getValidation() as $validationName => $validation) {
+                $messages = ValidatorService::get()->getValidatorMessages($validation->getClassName(), $validation->getMessages());
 
                 foreach ($messages as $key => $message) {
-                    $message = $dummyValidator->getMessage($key, ['{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}']);
-
-                    $message = (is_string($message)) ? $message : '';
+                    $message = MessageService::get()->parseMessageArray($message, ['{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}']);
 
                     $localizationKey = $this->getIdentifierForFieldValidationName($field, $validationName, $key);
                     $this->addTranslation($localizationKey, $message);

@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -20,7 +21,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * validation rules for a given field. For example, you may want to enable the
  * rule "required" of a given field only under certain circumstances.
  */
-class FieldsValidationActivationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FieldsValidationActivationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**

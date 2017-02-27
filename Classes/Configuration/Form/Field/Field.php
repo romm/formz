@@ -17,13 +17,15 @@ use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
 use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour;
 use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 
-class Field extends AbstractFormzConfiguration
+class Field extends AbstractFormzConfiguration implements ActivationUsageInterface
 {
     use StoreArrayIndexTrait;
     use ParentsTrait;
@@ -86,19 +88,36 @@ class Field extends AbstractFormzConfiguration
     }
 
     /**
-     * @param string|null $validationName If given, will try to fetch the validation with the given name.
-     * @return Validation|Validation[]
+     * @return Validation[]
      */
-    public function getValidation($validationName = null)
+    public function getValidation()
     {
-        $result = $this->validation;
-        if (null !== $validationName) {
-            $result = (true === isset($this->validation[$validationName]))
-                ? $this->validation[$validationName]
-                : null;
+        return $this->validation;
+    }
+
+    /**
+     * @param Validation $validation
+     */
+    public function addValidation(Validation $validation)
+    {
+        $this->validation[$validation->getValidationName()] = $validation;
+    }
+
+    /**
+     * @param $validationName
+     * @return Validation
+     * @throws EntryNotFoundException
+     */
+    public function getValidationByName($validationName)
+    {
+        if (false === $this->hasValidation($validationName)) {
+            throw new EntryNotFoundException(
+                'The validation "' . $validationName . '" was not found. Please use the function "hasValidation()" befo',
+                1487672276
+            );
         }
 
-        return $result;
+        return $this->validation[$validationName];
     }
 
     /**
@@ -123,6 +142,16 @@ class Field extends AbstractFormzConfiguration
     public function hasActivation()
     {
         return !($this->activation instanceof EmptyActivation);
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     */
+    public function setActivation(ActivationInterface $activation)
+    {
+        $activation->setRootObject($this);
+
+        $this->activation = $activation;
     }
 
     /**

@@ -49,9 +49,11 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public function getFieldsValuesDataAttributes($formInstance, FormResult $requestResult)
     {
         $result = [];
+        $formConfiguration = $this->getFormObject()->getConfiguration();
 
         foreach ($this->getFormObject()->getProperties() as $fieldName) {
-            if (false === $requestResult->fieldIsDeactivated($fieldName)
+            if (true === $formConfiguration->hasField($fieldName)
+                && false === $requestResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
                 && $this->isPropertyGettable($formInstance, $fieldName)
             ) {
                 $value = ObjectAccess::getProperty($formInstance, $fieldName);
@@ -109,10 +111,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
 
         /** @var Result $fieldResult */
         foreach ($requestResult->getSubResults() as $fieldName => $fieldResult) {
-            if (false === $requestResult->fieldIsDeactivated($fieldName)
+            if (true === $fieldResult->hasErrors()
                 && true === $formConfiguration->hasField($fieldName)
-                && true === $fieldResult->hasErrors()
-                && false === $requestResult->fieldIsDeactivated($fieldName)
+                && false === $requestResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
             ) {
                 $result[self::getFieldDataErrorKey($fieldName)] = '1';
 
@@ -144,9 +145,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         foreach ($formConfiguration->getFields() as $field) {
             $fieldName = $field->getFieldName();
 
-            if (false === $requestResult->fieldIsDeactivated($fieldName)
+            if (false === $requestResult->fieldIsDeactivated($field)
                 && false === $requestResult->forProperty($fieldName)->hasErrors()
-                && false === $requestResult->fieldIsDeactivated($fieldName)
             ) {
                 $result[self::getFieldDataValidKey($fieldName)] = '1';
             }
