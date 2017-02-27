@@ -200,14 +200,6 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
-     * @param string $validationName
-     */
-    public function setValidationName($validationName)
-    {
-        $this->validationName = $validationName;
-    }
-
-    /**
      * @return Field
      */
     public function getParentField()

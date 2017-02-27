@@ -132,8 +132,7 @@ class ConditionProcessor
     protected function getNewConditionTreeFromActivation(ActivationInterface $activation)
     {
         return ConditionParserFactory::get()
-            ->parse($activation)
-            ->attachConditionProcessor($this);
+            ->parse($activation);
     }
 
     /**
@@ -158,6 +157,14 @@ class ConditionProcessor
     public function attachFormObject(FormObject $formObject)
     {
         $this->formObject = $formObject;
+    }
+
+    /**
+     * @return FormObject
+     */
+    public function getFormObject()
+    {
+        return $this->formObject;
     }
 
     /**

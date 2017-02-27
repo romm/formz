@@ -121,15 +121,6 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
-     * @param string     $validationName
-     * @param Validation $validation
-     */
-    public function addValidation($validationName, Validation $validation)
-    {
-        $this->validation[$validationName] = $validation;
-    }
-
-    /**
      * @return Behaviour[]
      */
     public function getBehaviours()

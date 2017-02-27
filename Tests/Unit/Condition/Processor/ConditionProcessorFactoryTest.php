@@ -10,7 +10,6 @@ use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Cache\Frontend\AbstractFrontend;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class ConditionProcessorFactoryTest extends AbstractUnitTest
 {
@@ -33,7 +32,7 @@ class ConditionProcessorFactoryTest extends AbstractUnitTest
             ->method('fetchProcessorInstanceFromCache')
             ->willReturn($dummyClass);
 
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $conditionProcessor1 = $conditionProcessorFactoryMock->get($formObject);
         $conditionProcessor2 = $conditionProcessorFactoryMock->get($formObject);
 
@@ -68,15 +67,7 @@ class ConditionProcessorFactoryTest extends AbstractUnitTest
             ->shouldBeCalled()
             ->willReturn(false);
 
-        /*
-         * In TYPO3 6.2, the `VariableFrontend` will serialize the value to set
-         * in cache before it is send to the backend.
-         */
-        $secondArgument = (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '7.6.0', '<'))
-            ? Argument::type('string')
-            : $conditionProcessorMock;
-
-        $transientMemoryProphecy->set($cacheIdentifier, $secondArgument, Argument::cetera())
+        $transientMemoryProphecy->set($cacheIdentifier, Argument::cetera())
             ->shouldBeCalledTimes(1)
             ->will(function ($arguments) use ($transientMemoryProphecy) {
                 $transientMemoryProphecy->has($arguments[0])
@@ -93,7 +84,7 @@ class ConditionProcessorFactoryTest extends AbstractUnitTest
         CacheService::get()->setCacheInstance($cacheInstance);
 
         // Actually executing the tests...
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
 
         $conditionProcessorFactoryMock1 = $this->getConditionProcessorFactoryMock($cacheIdentifier);
         $conditionProcessorFactoryMock1->expects($this->once())

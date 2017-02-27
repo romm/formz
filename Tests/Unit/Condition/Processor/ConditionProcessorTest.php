@@ -9,6 +9,7 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
+use Romm\Formz\Configuration\Form\Condition\Activation\Activation;
 use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
@@ -28,16 +29,19 @@ class ConditionProcessorTest extends AbstractUnitTest
      */
     public function activationConditionTreeForFieldIsStoredInLocalCache()
     {
-        $conditionProcessor = new ConditionProcessor($this->getFormObject());
+        $conditionProcessor = new ConditionProcessor($this->getDefaultFormObject());
 
         $field1 = new Field;
         $field1->setFieldName('foo');
         $field2 = new Field;
         $field2->setFieldName('bar');
-        $this->inject($field2, 'activation', new EmptyActivation);
+        $field2->setActivation(new Activation);
 
         $conditionParserFactoryProphecy = $this->getConditionParserProphecy(
-            Argument::allOf($field1->getActivation(), $field2->getActivation()),
+            Argument::that(function ($activation) use ($field1, $field2) {
+                return $activation === $field1->getActivation()
+                    || $activation === $field2->getActivation();
+            }),
             $conditionProcessor
         );
 
@@ -60,7 +64,7 @@ class ConditionProcessorTest extends AbstractUnitTest
      */
     public function activationConditionTreeForValidationIsStoredInLocalCache()
     {
-        $conditionProcessor = new ConditionProcessor($this->getFormObject());
+        $conditionProcessor = new ConditionProcessor($this->getDefaultFormObject());
 
         $field = new Field;
         $field->setFieldName('foo');
@@ -74,7 +78,10 @@ class ConditionProcessorTest extends AbstractUnitTest
         $this->inject($validation2, 'activation', new EmptyActivation);
 
         $conditionParserFactoryProphecy = $this->getConditionParserProphecy(
-            Argument::allOf($validation1->getActivation(), $validation2->getActivation()),
+            Argument::that(function ($activation) use ($validation1, $validation2) {
+                return $activation === $validation1->getActivation()
+                    || $activation === $validation2->getActivation();
+            }),
             $conditionProcessor
         );
 
@@ -124,17 +131,19 @@ class ConditionProcessorTest extends AbstractUnitTest
                     ->method('getFields')
                     ->willReturnCallback(function () use ($conditionProcessor) {
                         $validation1 = new Validation;
+                        $validation1->setValidationName('foo');
                         $validation2 = new Validation;
+                        $validation2->setValidationName('bar');
 
                         $field1 = new Field;
                         $field1->setFieldName('foo');
-                        $field1->addValidation('foo', $validation1);
-                        $field1->addValidation('bar', $validation2);
+                        $field1->addValidation($validation1);
+                        $field1->addValidation($validation2);
 
                         $field2 = new Field;
                         $field2->setFieldName('bar');
-                        $field2->addValidation('foo', $validation1);
-                        $field2->addValidation('bar', $validation2);
+                        $field2->addValidation($validation1);
+                        $field2->addValidation($validation2);
 
                         return [$field1, $field2];
                     });
@@ -159,7 +168,7 @@ class ConditionProcessorTest extends AbstractUnitTest
         /** @var ConditionProcessor|\PHPUnit_Framework_MockObject_MockObject $conditionProcessor */
         $conditionProcessor = $this->getMockBuilder(ConditionProcessor::class)
             ->setMethods(['getNewConditionTreeFromActivation'])
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$this->getDefaultFormObject()])
             ->getMock();
 
         $conditionProcessor->expects($this->once())
@@ -191,11 +200,11 @@ class ConditionProcessorTest extends AbstractUnitTest
         $conditionParserFactoryProphecy = $this->prophet->prophesize(ConditionParserFactory::class);
         $conditionParserFactoryProphecy->parse($activations)
             ->shouldBeCalled()
-            ->will(function () use ($prophet, $conditionProcessor) {
+            ->will(function ($arguments) use ($prophet, $conditionProcessor) {
                 /** @var ConditionTree|ObjectProphecy $conditionTreeProphecy */
                 $conditionTreeProphecy = $prophet->prophesize(ConditionTree::class);
 
-                $conditionTreeProphecy->attachConditionProcessor($conditionProcessor)
+                $conditionTreeProphecy->injectDependencies($conditionProcessor, $arguments[0])
                     ->shouldBeCalled()
                     ->willReturn($conditionTreeProphecy);
 
