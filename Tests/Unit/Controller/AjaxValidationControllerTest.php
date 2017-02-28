@@ -284,7 +284,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         /** @var PropertyMapper $propertyMapper */
         $propertyMapper = new PropertyMapper;
         $this->inject($propertyMapper, 'objectManager', Core::get()->getObjectManager());
-        $propertyMapper->injectConfigurationBuilder(new PropertyMappingConfigurationBuilder);
+        $this->inject($propertyMapper, 'configurationBuilder', new PropertyMappingConfigurationBuilder);
         $propertyMapper->initializeObject();
 
         $ajaxValidationController->method('getPropertyMapper')
