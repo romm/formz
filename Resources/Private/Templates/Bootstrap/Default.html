@@ -5,35 +5,53 @@
 <f:layout name="{layout}" />
 
 <f:section name="Label">
-	<formz:renderSection section="Label.Before" />
+    <formz:renderSection section="Label.Before" />
 
-	<label class="control-label" for="{fieldId}">{label}</label>
+    <label class="control-label" for="{fieldId}">{label}</label>
 
-	<formz:renderSection section="Label.After" />
+    <formz:renderSection section="Label.After" />
 </f:section>
 
 <f:section name="Field">
-	<formz:renderSection section="Field" />
+    <formz:renderSection section="Field" />
 </f:section>
 
 <f:section name="Feedback">
-	<formz:renderSection section="Feedback.Out.Before" />
+    <formz:renderSection section="Feedback.Out.Before" />
 
-	<span class="help-block" formz-field-feedback-container="{fieldName}">
+    <span class="help-block" formz-field-feedback-container="{fieldName}">
 		<formz:renderSection section="Feedback.In.Before" />
 
 		<span formz-field-feedback-list="{fieldName}">
 			<f:form.validationResults for="{formName}.{fieldName}">
-				<f:for each="{validationResults.errors}" as="error">
-					<formz:formatMessage message="{error}" />
-				</f:for>
-			</f:form.validationResults>
+				<f:if condition="{validationResults.errors}">
+					<div class="text-error">
+						<f:for each="{validationResults.errors}" as="error">
+							<formz:formatMessage message="{error}" />
+						</f:for>
+					</div>
+				</f:if>
+				<f:if condition="{validationResults.warnings}">
+					<div class="text-warning">
+						<f:for each="{validationResults.warnings}" as="warning">
+							<formz:formatMessage message="{warning}" />
+						</f:for>
+					</div>
+				</f:if>
+				<f:if condition="{validationResults.notices}">
+					<div class="text-info">
+						<f:for each="{validationResults.notices}" as="notice">
+							<formz:formatMessage message="{notice}" />
+						</f:for>
+					</div>
+				</f:if>
+            </f:form.validationResults>
 		</span>
 
 		<formz:renderSection section="Feedback.In.After" />
 	</span>
 
-	<formz:renderSection section="Feedback.Out.After" />
+    <formz:renderSection section="Feedback.Out.After" />
 </f:section>
 
 </html>
