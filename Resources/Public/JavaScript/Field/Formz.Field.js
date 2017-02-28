@@ -66,13 +66,13 @@ Formz.Field = (function () {
         return {
             /**
              * Will empty the feedback container, which can be filled again with
-             * the function `insertErrors()`.
+             * the function `insertMessages()`.
              */
             refreshFeedback: function () {
-                var errorContainerElement = this.getFeedbackListContainer();
+                var feedbackListContainerElement = this.getFeedbackListContainer();
 
-                if (errorContainerElement != null) {
-                    errorContainerElement.innerHTML = '';
+                if (feedbackListContainerElement != null) {
+                    feedbackListContainerElement.innerHTML = '';
                 }
 
                 eventsManager.dispatch('refreshFeedback');
@@ -82,26 +82,27 @@ Formz.Field = (function () {
              * Will refresh the messages displayed in the feedback container of
              * this field.
              *
-             * @param {Object} errors
+             * @param {Object} messages
+             * @param {string} type
              */
-            insertErrors: function (errors) {
-                var errorContainerElement = this.getFeedbackListContainer();
+            insertMessages: function (messages, type) {
+                var feedbackListContainerElement = this.getFeedbackListContainer();
 
-                if (errorContainerElement != null) {
-                    if (Formz.objectSize(errors) > 0) {
+                if (feedbackListContainerElement != null) {
+                    if (Formz.objectSize(messages) > 0) {
                         var messageTemplate = this.getMessageTemplate();
 
-                        for (var validationRuleName in errors) {
-                            if (errors.hasOwnProperty(validationRuleName)) {
-                                for (var errorName in errors[validationRuleName]) {
-                                    if (errors[validationRuleName].hasOwnProperty(errorName)) {
-                                        errorContainerElement.innerHTML += messageTemplate
+                        for (var validationRuleName in messages) {
+                            if (messages.hasOwnProperty(validationRuleName)) {
+                                for (var name in messages[validationRuleName]) {
+                                    if (messages[validationRuleName].hasOwnProperty(name)) {
+                                        feedbackListContainerElement.innerHTML += messageTemplate
                                             .replace('#FIELD#', this.getName())
                                             .replace('#FIELD_ID#', Formz.camelCaseToDashed('formz-' + this.getForm().getName() + '-' + this.getName()))
                                             .replace('#VALIDATOR#', Formz.camelCaseToDashed(validationRuleName))
-                                            .replace('#TYPE#', 'error')
-                                            .replace('#KEY#', errorName)
-                                            .replace('#MESSAGE#', errors[validationRuleName][errorName]);
+                                            .replace('#TYPE#', type)
+                                            .replace('#KEY#', name)
+                                            .replace('#MESSAGE#', messages[validationRuleName][name]);
                                     }
                                 }
                             }
@@ -385,7 +386,9 @@ Formz.Field = (function () {
 
                 // Emptying the field feedback container.
                 states.field.refreshFeedback();
-                states.field.insertErrors(states.field.getErrors());
+                states.field.insertMessages(states.field.getErrors(), 'error');
+                states.field.insertMessages(states.field.getWarnings(), 'warning');
+                states.field.insertMessages(states.field.getNotices(), 'notice');
             });
 
             states.field.onValidationDone(function () {
@@ -508,12 +511,14 @@ Formz.Field = (function () {
          * @param {string}             name
          * @param {Object}             configuration
          * @param {Formz.FormInstance} form
-         * @param {Array}              existingErrors
+         * @param {Object}             existingErrors
+         * @param {Object}             existingWarnings
+         * @param {Object}             existingNotices
          * @param {string}             submittedFieldValue
          * @param {boolean}            wasValidated
          * @returns {?Formz.FullField}
          */
-        get: function (name, configuration, form, existingErrors, submittedFieldValue, wasValidated) {
+        get: function (name, configuration, form, existingErrors, existingWarnings, existingNotices, submittedFieldValue, wasValidated) {
             if ('' === name || null === form) {
                 return null;
             }
@@ -522,6 +527,8 @@ Formz.Field = (function () {
                 name: name,
                 configuration: configuration,
                 existingErrors: existingErrors,
+                existingWarnings: existingWarnings,
+                existingNotices: existingNotices,
                 submittedFieldValue: submittedFieldValue,
                 wasValidated: wasValidated,
                 form: form,

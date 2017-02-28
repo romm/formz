@@ -31,6 +31,11 @@ class MessageService implements SingletonInterface
     protected $signalSlotDispatcher;
 
     /**
+     * @var int
+     */
+    protected $unknownCount = 0;
+
+    /**
      * Returns the validation name of a message: if it is an instance of
      * `FormzMessageInterface`, we can fetch it, otherwise `unknown` is
      * returned.
@@ -42,7 +47,7 @@ class MessageService implements SingletonInterface
     {
         return ($message instanceof FormzMessageInterface)
             ? $message->getValidationName()
-            : 'unknown';
+            : 'unknown-' . $this->unknownCount++;
     }
 
     /**
@@ -57,7 +62,7 @@ class MessageService implements SingletonInterface
     {
         return ($message instanceof FormzMessageInterface)
             ? $message->getMessageKey()
-            : 'unknown';
+            : 'unknown-' . $this->unknownCount++;
     }
 
     /**

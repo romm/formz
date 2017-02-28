@@ -17,7 +17,7 @@ use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -35,7 +35,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
     public function getFormRequestDataJavaScriptCode()
     {
         $submittedFormValues = [];
-        $fieldsExistingErrors = [];
+        $fieldsExistingMessages = [];
         $originalRequest = $this->getControllerContext()
             ->getRequest()
             ->getOriginalRequest();
@@ -46,7 +46,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
 
         if ($formWasSubmitted) {
             $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
-            $fieldsExistingErrors = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
+            $fieldsExistingMessages = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingMessages());
         }
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
@@ -54,7 +54,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
         $javaScriptCode = <<<JS
 (function() {
     Formz.Form.beforeInitialization($formName, function(form) {
-        form.injectRequestData($submittedFormValues, $fieldsExistingErrors, $formWasSubmitted)
+        form.injectRequestData($submittedFormValues, $fieldsExistingMessages, $formWasSubmitted)
     });
 })();
 JS;
@@ -86,14 +86,14 @@ JS;
     }
 
     /**
-     * This function checks every error which may exist on every property of the
-     * form (used to tell to JavaScript which errors already exist).
+     * This function checks every message which may exist on every property of
+     * the form (used to tell to JavaScript which messages already exist).
      *
      * @return array
      */
-    protected function getFieldsExistingErrors()
+    protected function getFieldsExistingMessages()
     {
-        $fieldsErrors = [];
+        $fieldsMessages = [];
         $request = $this->getControllerContext()
             ->getRequest();
 
@@ -103,22 +103,49 @@ JS;
             $formFieldsResult = $requestResult->forProperty($this->getFormObject()->getName())->getSubResults();
 
             foreach ($this->getFormObject()->getProperties() as $fieldName) {
-                if (array_key_exists($fieldName, $formFieldsResult)
-                    && $formFieldsResult[$fieldName]->hasErrors()
-                ) {
-                    $fieldsErrors[$fieldName] = [];
+                if (array_key_exists($fieldName, $formFieldsResult)) {
+                    $messages = [];
+                    $result = $formFieldsResult[$fieldName];
 
-                    foreach ($formFieldsResult[$fieldName]->getErrors() as $error) {
-                        /** @var Error $error */
-                        $validationName = MessageService::get()->getMessageValidationName($error);
-                        $messageKey = MessageService::get()->getMessageKey($error);
-
-                        $fieldsErrors[$fieldName][$validationName] = [$messageKey => $error->render()];
+                    if ($result->hasErrors()) {
+                        $messages['errors'] = $this->formatMessages($result->getErrors());
                     }
+
+                    if ($result->hasWarnings()) {
+                        $messages['warnings'] = $this->formatMessages($result->getWarnings());
+                    }
+
+                    if ($result->hasNotices()) {
+                        $messages['notices'] = $this->formatMessages($result->getNotices());
+                    }
+
+                    $fieldsMessages[$fieldName] = $messages;
                 }
             }
         }
 
-        return $fieldsErrors;
+        return $fieldsMessages;
+    }
+
+    /**
+     * @param Message[] $messages
+     * @return array
+     */
+    protected function formatMessages(array $messages)
+    {
+        $sortedMessages = [];
+
+        foreach ($messages as $message) {
+            $validationName = MessageService::get()->getMessageValidationName($message);
+            $messageKey = MessageService::get()->getMessageKey($message);
+
+            if (false === isset($sortedMessages[$validationName])) {
+                $sortedMessages[$validationName] = [];
+            }
+
+            $sortedMessages[$validationName][$messageKey] = $message->render();
+        }
+
+        return $sortedMessages;
     }
 }

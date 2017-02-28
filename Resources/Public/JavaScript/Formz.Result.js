@@ -18,12 +18,62 @@ Formz.Result = (function () {
          *
          * @type {Object<string>}
          */
-        var errorsMessages = {};
+        var errorMessages = {};
+
+        /**
+         * Contains all the warning messages.
+         *
+         * @type {Object<string>}
+         */
+        var warningMessages = {};
+
+        /**
+         * Contains all the notice messages.
+         *
+         * @type {Object<string>}
+         */
+        var noticeMessages = {};
 
         /**
          * @type {Object}
          */
         var data = {};
+
+        /**
+         * @param {Object} states             Object containing informations.
+         * @param {string} states.name        Name (key) of the message.
+         * @param {string} states.message     Text of the message.
+         * @param {Array}  [states.arguments] Arguments to be replaced in the translated message.
+         */
+        var sanitizeMessageStates = function (states) {
+            var name = states.name || 'default';
+            var message = states.message || '';
+            var arguments = states.arguments || [];
+
+            if (null === message
+                || typeof message === 'undefined'
+            ) {
+                message = '';
+            }
+
+            message = message.toString();
+
+            if ('' === message) {
+                message = defaultErrorMessage;
+            }
+
+            message = Formz.Localization.getLocalization(message);
+
+            for (var i = 0; i < arguments.length; i++) {
+                message = message.replace('{' + i + '}', arguments[i].toString());
+            }
+
+            return {
+                name: name,
+                message: message,
+                arguments: arguments
+            };
+        };
 
         /**
          * @namespace Formz.ResultInstance
@@ -39,38 +89,17 @@ Formz.Result = (function () {
              * @param {Array}  [states.arguments] Arguments to be replaced in the translated message.
              */
             addError: function (states) {
-                var name = states.name || 'default';
-                var message = states.message || '';
-                var arguments = states.arguments || [];
-
-                if (null === message
-                    || typeof message === 'undefined'
-                ) {
-                    message = '';
-                }
-
-                message = message.toString();
-
-                if ('' === message) {
-                    message = defaultErrorMessage;
-                }
-
-                message = Formz.Localization.getLocalization(message);
-
-                for (var i = 0; i < arguments.length; i++) {
-                    message = message.replace('{' + i + '}', arguments[i].toString());
-                }
-
-                errorsMessages[name] = message;
+                states = sanitizeMessageStates(states);
+                errorMessages[states.name] = states.message;
             },
 
             /**
-             * Returns the errors messages of the result.
+             * Returns the error messages of the result.
              *
              * @returns {Object<string>}
              */
             getErrors: function () {
-                return errorsMessages;
+                return errorMessages;
             },
 
             /**
@@ -79,7 +108,69 @@ Formz.Result = (function () {
              * @returns {boolean}
              */
             hasErrors: function () {
-                return Formz.objectSize(errorsMessages) > 0;
+                return Formz.objectSize(errorMessages) > 0;
+            },
+
+            /**
+             * Adds a warning to the result.
+             *
+             * @param {Object} states             Object containing informations.
+             * @param {string} states.name        Name (key) of the message.
+             * @param {string} states.message     Text of the message.
+             * @param {Array}  [states.arguments] Arguments to be replaced in the translated message.
+             */
+            addWarning: function (states) {
+                states = sanitizeMessageStates(states);
+                warningMessages[states.name] = states.message;
+            },
+
+            /**
+             * Returns the warning messages of the result.
+             *
+             * @returns {Object<string>}
+             */
+            getWarnings: function () {
+                return warningMessages;
+            },
+
+            /**
+             * Returns true if the result contains warnings.
+             *
+             * @returns {boolean}
+             */
+            hasWarnings: function () {
+                return Formz.objectSize(warningMessages) > 0;
+            },
+            
+            /**
+             * Adds a notice to the result.
+             *
+             * @param {Object} states             Object containing informations.
+             * @param {string} states.name        Name (key) of the message.
+             * @param {string} states.message     Text of the message.
+             * @param {Array}  [states.arguments] Arguments to be replaced in the translated message.
+             */
+            addNotice: function (states) {
+                states = sanitizeMessageStates(states);
+                noticeMessages[states.name] = states.message;
+            },
+
+            /**
+             * Returns the notice messages of the result.
+             *
+             * @returns {Object<string>}
+             */
+            getNotices: function () {
+                return noticeMessages;
+            },
+
+            /**
+             * Returns true if the result contains notices.
+             *
+             * @returns {boolean}
+             */
+            hasNotices: function () {
+                return Formz.objectSize(noticeMessages) > 0;
             },
 
             /**

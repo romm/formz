@@ -47,7 +47,7 @@ Formz.Form = (function () {
         /**
          * @type {Object<Array>}
          */
-        var existingErrors = {};
+        var existingMessages = {};
 
         /**
          * @type {boolean}
@@ -82,9 +82,23 @@ Formz.Form = (function () {
             var configurationFields = configuration['fields'];
             for (var fieldName in configurationFields) {
                 if (configurationFields.hasOwnProperty(fieldName)) {
-                    var fieldExistingErrors = (fieldName in existingErrors)
-                        ? existingErrors[fieldName]
-                        : [];
+                    var existingErrors = {};
+                    var existingWarning = {};
+                    var existingNotices = {};
+
+                    if (fieldName in existingMessages) {
+                        var fieldExistingMessages = existingMessages[fieldName];
+
+                        if ('errors' in fieldExistingMessages) {
+                            existingErrors = fieldExistingMessages['errors'];
+                        }
+                        if ('warnings' in fieldExistingMessages) {
+                            existingWarning = fieldExistingMessages['warnings'];
+                        }
+                        if ('notices' in fieldExistingMessages) {
+                            existingNotices = fieldExistingMessages['notices'];
+                        }
+                    }
 
                     var submittedFieldValue = (fieldName in submittedValues)
                         ? submittedValues[fieldName]
@@ -94,7 +108,9 @@ Formz.Form = (function () {
                         fieldName,
                         configurationFields[fieldName],
                         formInstance,
-                        fieldExistingErrors,
+                        existingErrors,
+                        existingWarning,
+                        existingNotices,
                         submittedFieldValue,
                         formWasValidated
                     );
@@ -195,12 +211,12 @@ Formz.Form = (function () {
 
             /**
              * @param {string}  submittedFormValues
-             * @param {string}  existingFormErrors
+             * @param {string}  existingFormMessages
              * @param {boolean} formValidationDone
              */
-            injectRequestData: function (submittedFormValues, existingFormErrors, formValidationDone) {
+            injectRequestData: function (submittedFormValues, existingFormMessages, formValidationDone) {
                 submittedValues = submittedFormValues;
-                existingErrors = existingFormErrors;
+                existingMessages = existingFormMessages;
                 formWasValidated = formValidationDone;
             }
         };

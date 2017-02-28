@@ -141,7 +141,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $this->assertFalse($result['success']);
         $this->assertEquals(
             ContextService::get()->translate(AjaxValidationController::DEFAULT_ERROR_MESSAGE_KEY),
-            $result['message'][0]
+            $result['messages']['errors']['default']
         );
     }
 
@@ -251,7 +251,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     {
         $expectedResult = [
             'success' => true,
-            'message' => ''
+            'messages' => []
         ];
 
         $formObject = $this->getDefaultFormObject();
@@ -302,7 +302,6 @@ class AjaxValidationControllerTest extends AbstractUnitTest
 
                 return $method->invoke($view);
             });
-
 
         $this->inject($ajaxValidationController, 'view', $view);
 
