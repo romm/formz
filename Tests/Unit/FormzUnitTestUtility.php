@@ -118,18 +118,18 @@ trait FormzUnitTestUtility
 
         // Reset asset handler factory instances.
         $reflectedClass = new \ReflectionClass(AssetHandlerFactory::class);
-        $objectManagerProperty = $reflectedClass->getProperty('factoryInstances');
-        $objectManagerProperty->setAccessible(true);
-        $objectManagerProperty->setValue([]);
-        $objectManagerProperty->setAccessible(false);
+        $property = $reflectedClass->getProperty('factoryInstances');
+        $property->setAccessible(true);
+        $property->setValue([]);
+        $property->setAccessible(false);
 
         // Reset configuration factory instances.
         $configurationFactory = Core::instantiate(ConfigurationFactory::class);
         $reflectedObject = new \ReflectionObject($configurationFactory);
-        $objectManagerProperty = $reflectedObject->getProperty('instances');
-        $objectManagerProperty->setAccessible(true);
-        $objectManagerProperty->setValue($configurationFactory, []);
-        $objectManagerProperty->setAccessible(false);
+        $property = $reflectedObject->getProperty('instances');
+        $property->setAccessible(true);
+        $property->setValue($configurationFactory, []);
+        $property->setAccessible(false);
 
         UnitTestContainer::get()->resetInstances();
     }
@@ -156,7 +156,7 @@ trait FormzUnitTestUtility
      */
     private function createFormObject(array $fields)
     {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject$formObject */
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
             ->setMethods(['buildConfigurationObject'])
             ->setConstructorArgs([

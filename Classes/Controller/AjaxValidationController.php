@@ -30,8 +30,8 @@ use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
+use TYPO3\CMS\Extbase\Property\PropertyMapper;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 class AjaxValidationController extends ActionController
@@ -187,7 +187,7 @@ class AjaxValidationController extends ActionController
         $this->formObject = $this->getFormObject();
         $this->checkConfigurationValidationResult();
         $validation = $this->getFieldValidation();
-        $form = $this->buildObject();
+        $form = $this->buildFormObject();
         $fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
         $validatorDataObject = new ValidatorDataObject($this->formObject, $form, $validation);
 
@@ -306,24 +306,11 @@ class AjaxValidationController extends ActionController
      *
      * @return FormInterface
      */
-    protected function buildObject()
+    protected function buildFormObject()
     {
         $values = $this->cleanValuesFromUrl($this->form);
-        /** @var ReflectionService $reflectionService */
-        $reflectionService = Core::instantiate(ReflectionService::class);
-        /** @var FormInterface $object */
-        $object = Core::instantiate($this->formClassName);
-        $properties = $reflectionService->getClassPropertyNames($this->formClassName);
 
-        foreach ($properties as $propertyName) {
-            if (ObjectAccess::isPropertySettable($object, $propertyName)
-                && isset($values[$propertyName])
-            ) {
-                ObjectAccess::setProperty($object, $propertyName, $values[$propertyName]);
-            }
-        }
-
-        return $object;
+        return $this->getPropertyMapper()->convert($values, $this->formClassName);
     }
 
     /**
@@ -377,5 +364,16 @@ class AjaxValidationController extends ActionController
         unset($values['__trustedProperties']);
 
         return reset($values);
+    }
+
+    /**
+     * @return PropertyMapper
+     */
+    protected function getPropertyMapper()
+    {
+        /** @var PropertyMapper $propertyMapper */
+        $propertyMapper = Core::instantiate(PropertyMapper::class);
+
+        return $propertyMapper;
     }
 }
