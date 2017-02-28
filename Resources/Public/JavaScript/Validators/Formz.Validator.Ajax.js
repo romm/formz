@@ -68,16 +68,18 @@
                         try {
                             var ajaxResult = JSON.parse(request.responseText);
 
-                            if (false === ajaxResult['success']) {
-                                if ('messages' in ajaxResult) {
-                                    var messages = ajaxResult['messages'];
+                            if ('messages' in ajaxResult) {
+                                var messages = ajaxResult['messages'];
 
-                                    addMessages(messages, 'errors', states['result']);
-                                    addMessages(messages, 'warnings', states['result']);
-                                    addMessages(messages, 'notices', states['result']);
-                                } else {
-                                    addDefaultError();
-                                }
+                                addMessages(messages, 'errors', states['result']);
+                                addMessages(messages, 'warnings', states['result']);
+                                addMessages(messages, 'notices', states['result']);
+                            }
+
+                            if (false === ajaxResult['success']
+                                && false === states['result'].hasErrors()
+                            ) {
+                                addDefaultError();
                             }
 
                             callback();

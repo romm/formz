@@ -1,12 +1,12 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
 
-use Romm\Formz\AssetHandler\Css\ErrorContainerDisplayCssAssetHandler;
+use Romm\Formz\AssetHandler\Css\FeedbackContainerDisplayCssAssetHandler;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 
-class ErrorContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
+class FeedbackContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
 {
     use AssetHandlerTestTrait;
 
@@ -21,8 +21,8 @@ class ErrorContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
-        /** @var ErrorContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
-        $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(ErrorContainerDisplayCssAssetHandler::class);
+        /** @var FeedbackContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
+        $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(FeedbackContainerDisplayCssAssetHandler::class);
         $errorContainerDisplayCss = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss();
 
         $this->assertEquals($this->trimString($errorContainerDisplayCss), $expectedCss);

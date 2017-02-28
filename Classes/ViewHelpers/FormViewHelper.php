@@ -338,7 +338,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
             if (true === $this->formService->formWasSubmitted()) {
                 $dataAttributes += ['formz-submission-done' => '1'];
-                $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($formResult);
+                $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes($formResult);
             }
         }
 

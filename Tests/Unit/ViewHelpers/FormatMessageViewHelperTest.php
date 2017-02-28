@@ -97,7 +97,7 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
             ],
             [
                 'message'  => new Message('foo', 1337),
-                'expected' => '<span class="js-validation-rule-unknown-0 js-validation-type-message js-validation-message-unknown-1">foo</span>'
+                'expected' => '<span class="js-validation-rule-unknown-0 js-validation-type-message js-validation-message-unknown-0">foo</span>'
             ],
             [
                 'message'         => new Error('foo', 1337, 'bar', 'baz'),

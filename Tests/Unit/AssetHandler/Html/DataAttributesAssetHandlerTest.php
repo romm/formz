@@ -71,7 +71,7 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
 
         /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
         $dataAttributesAssetHandler = $assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
-        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($requestResult);
+        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsMessagesDataAttributes($requestResult);
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
 
@@ -89,8 +89,8 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
         return [
             'defaultSingleErrorCheck'  => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                                 => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'unknown', 'unknown') => '1'
+                    DataAttributesAssetHandler::getFieldDataMessageKey('foo')                                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('foo', 'error', 'unknown', 'unknown') => '1'
                 ],
                 [
                     'foo' => [
@@ -102,8 +102,8 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             ],
             'customSingleErrorCheck'   => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                             => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello', 'world') => '1'
+                    DataAttributesAssetHandler::getFieldDataMessageKey('foo')                                      => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('foo', 'error', 'hello', 'world') => '1'
                 ],
                 [
                     'foo' => [
@@ -117,9 +117,9 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             ],
             'multipleErrorCheck'       => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                                 => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'unknown', 'unknown') => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'hello', 'world')     => '1'
+                    DataAttributesAssetHandler::getFieldDataMessageKey('foo')                                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('foo', 'error', 'unknown', 'unknown') => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('foo', 'error', 'hello', 'world')     => '1'
                 ],
                 [
                     'foo' => [
@@ -136,11 +136,11 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             ],
             'multipleFieldsErrorCheck' => [
                 [
-                    DataAttributesAssetHandler::getFieldDataErrorKey('foo')                                 => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('foo', 'unknown', 'unknown') => '1',
-                    DataAttributesAssetHandler::getFieldDataErrorKey('bar')                                 => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'unknown', 'unknown') => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationErrorKey('bar', 'hello', 'world')     => '1'
+                    DataAttributesAssetHandler::getFieldDataMessageKey('foo')                                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('foo', 'error', 'unknown', 'unknown') => '1',
+                    DataAttributesAssetHandler::getFieldDataMessageKey('bar')                                          => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'error', 'unknown', 'unknown') => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'error', 'hello', 'world')     => '1'
                 ],
                 [
                     'foo' => [

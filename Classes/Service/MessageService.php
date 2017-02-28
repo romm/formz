@@ -33,7 +33,12 @@ class MessageService implements SingletonInterface
     /**
      * @var int
      */
-    protected $unknownCount = 0;
+    protected $unknownValidationCount = 0;
+
+    /**
+     * @var int
+     */
+    protected $unknownKeyCount = 0;
 
     /**
      * Returns the validation name of a message: if it is an instance of
@@ -47,7 +52,7 @@ class MessageService implements SingletonInterface
     {
         return ($message instanceof FormzMessageInterface)
             ? $message->getValidationName()
-            : 'unknown-' . $this->unknownCount++;
+            : 'unknown-' . $this->unknownValidationCount++;
     }
 
     /**
@@ -62,7 +67,7 @@ class MessageService implements SingletonInterface
     {
         return ($message instanceof FormzMessageInterface)
             ? $message->getMessageKey()
-            : 'unknown-' . $this->unknownCount++;
+            : 'unknown-' . $this->unknownKeyCount++;
     }
 
     /**
