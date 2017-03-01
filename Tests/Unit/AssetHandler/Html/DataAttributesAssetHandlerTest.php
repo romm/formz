@@ -2,7 +2,6 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Error\Error;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -45,27 +44,30 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
      * Checks that the field error data attributes are valid.
      *
      * @param array $expectedResult
-     * @param array $fieldErrors
+     * @param array $fieldMessages
      *
      * @dataProvider checkFieldsErrorsDataAttributesDataProvider
      * @test
      */
-    public function checkFieldsErrorsDataAttributes(array $expectedResult, array $fieldErrors)
+    public function checkFieldsErrorsDataAttributes(array $expectedResult, array $fieldMessages)
     {
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(ExtendedForm::class);
         $requestResult = new FormResult();
 
-        foreach ($fieldErrors as $fieldName => $errors) {
-            foreach ($errors as $errorData) {
-                $error = new Error(
-                    $errorData['message'],
+        foreach ($fieldMessages as $fieldName => $messages) {
+            foreach ($messages as $data) {
+                $type = 'Romm\\Formz\\Error\\' . ucfirst($data['type']);
+                $addMethod = 'add' . ucfirst($data['type']);
+
+                $message = new $type(
+                    $data['message'],
                     42,
-                    $errorData['validationName'],
-                    $errorData['messageKey'],
+                    $data['validationName'],
+                    $data['messageKey'],
                     [],
                     ''
                 );
-                $requestResult->forProperty($fieldName)->addError($error);
+                $requestResult->forProperty($fieldName)->$addMethod($message);
             }
         }
 
@@ -95,6 +97,7 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                 [
                     'foo' => [
                         [
+                            'type'    => 'error',
                             'message' => 'foo'
                         ]
                     ]
@@ -108,6 +111,7 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                 [
                     'foo' => [
                         [
+                            'type'           => 'error',
                             'message'        => 'foo',
                             'validationName' => 'hello',
                             'messageKey'     => 'world'
@@ -124,9 +128,11 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                 [
                     'foo' => [
                         [
+                            'type'    => 'error',
                             'message' => 'foo'
                         ],
                         [
+                            'type'           => 'error',
                             'message'        => 'foo',
                             'validationName' => 'hello',
                             'messageKey'     => 'world'
@@ -136,26 +142,41 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             ],
             'multipleFieldsErrorCheck' => [
                 [
-                    DataAttributesAssetHandler::getFieldDataMessageKey('foo')                                          => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('foo', 'error', 'unknown', 'unknown') => '1',
-                    DataAttributesAssetHandler::getFieldDataMessageKey('bar')                                          => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'error', 'unknown', 'unknown') => '1',
-                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'error', 'hello', 'world')     => '1'
+                    DataAttributesAssetHandler::getFieldDataMessageKey('foo')                                            => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('foo', 'error', 'unknown', 'unknown')   => '1',
+                    DataAttributesAssetHandler::getFieldDataMessageKey('bar')                                            => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'error', 'unknown', 'unknown')   => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'error', 'hello', 'world')       => '1',
+                    DataAttributesAssetHandler::getFieldDataMessageKey('bar', 'warning')                                 => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'warning', 'unknown', 'unknown') => '1',
+                    DataAttributesAssetHandler::getFieldDataMessageKey('bar', 'notice')                                  => '1',
+                    DataAttributesAssetHandler::getFieldDataValidationMessageKey('bar', 'notice', 'unknown', 'unknown')  => '1'
                 ],
                 [
                     'foo' => [
                         [
+                            'type'    => 'error',
                             'message' => 'foo'
                         ]
                     ],
                     'bar' => [
                         [
+                            'type'    => 'error',
                             'message' => 'bar'
                         ],
                         [
+                            'type'           => 'error',
                             'message'        => 'bar',
                             'validationName' => 'hello',
                             'messageKey'     => 'world'
+                        ],
+                        [
+                            'type'    => 'warning',
+                            'message' => 'bar'
+                        ],
+                        [
+                            'type'    => 'notice',
+                            'message' => 'bar'
                         ]
                     ]
                 ]
