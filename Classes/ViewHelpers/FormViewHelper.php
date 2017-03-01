@@ -24,7 +24,6 @@ use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -231,13 +230,8 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             /** @var array $formInstance */
             $formInstance = $originalRequest->getArgument($this->getFormObjectName());
 
-            $formRequestResult = AbstractFormValidator::getFormValidationResult(
-                $this->getFormObjectClassName(),
-                $this->getFormObjectName()
-            );
-
             $this->formService->setFormInstance($formInstance);
-            $this->formService->setFormResult($formRequestResult);
+            $this->formService->setFormResult($this->formService->getFormObject()->getLastValidationResult());
             $this->formService->markFormAsSubmitted();
         } elseif (null !== $this->arguments['object']) {
             $formInstance = $this->arguments['object'];
@@ -338,7 +332,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
             if (true === $this->formService->formWasSubmitted()) {
                 $dataAttributes += ['formz-submission-done' => '1'];
-                $dataAttributes += $dataAttributesAssetHandler->getFieldsErrorsDataAttributes($formResult);
+                $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes($formResult);
             }
         }
 

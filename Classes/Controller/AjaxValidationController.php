@@ -16,6 +16,7 @@ namespace Romm\Formz\Controller;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
@@ -24,6 +25,7 @@ use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -152,7 +154,9 @@ class AjaxValidationController extends ActionController
         // Default technical error result if the function can not be reached.
         $result = [
             'success' => false,
-            'message' => [ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY)]
+            'messages' => [
+                'errors' => ['default' => ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY)]
+            ]
         ];
 
         // We prevent any external message to be displayed here.
@@ -164,7 +168,7 @@ class AjaxValidationController extends ActionController
             $result['data'] = ['errorCode' => $exception->getCode()];
 
             if (ExtensionService::get()->isInDebugMode()) {
-                $result['message'] = $this->getDebugMessageForException($exception);
+                $result['messages']['errors']['default'] = $this->getDebugMessageForException($exception);
             }
         }
 
@@ -198,7 +202,10 @@ class AjaxValidationController extends ActionController
             $validatorDataObject
         );
 
-        return $this->convertResultToJson($validator->validate($fieldValue));
+        $result = $validator->validate($fieldValue);
+        $result = MessageService::get()->sanitizeValidatorResult($result, $validation);
+
+        return $this->convertResultToJson($result);
     }
 
     /**
@@ -322,14 +329,39 @@ class AjaxValidationController extends ActionController
      */
     protected function convertResultToJson(Result $result)
     {
-        $error = ($result->hasErrors())
-            ? $result->getFirstError()->getMessage()
-            : '';
+        $messages = [];
+
+        if ($result->hasErrors()) {
+            $messages['errors'] = $this->formatMessages($result->getErrors());
+        }
+
+        if ($result->hasWarnings()) {
+            $messages['warnings'] = $this->formatMessages($result->getWarnings());
+        }
+
+        if ($result->hasNotices()) {
+            $messages['notices'] = $this->formatMessages($result->getNotices());
+        }
 
         return [
             'success' => !$result->hasErrors(),
-            'message' => $error
+            'messages' => $messages
         ];
+    }
+
+    /**
+     * @param FormzMessageInterface[] $messages
+     * @return array
+     */
+    protected function formatMessages(array $messages)
+    {
+        $sortedMessages = [];
+
+        foreach ($messages as $message) {
+            $sortedMessages[$message->getMessageKey()] = $message->getMessage();
+        }
+
+        return $sortedMessages;
     }
 
     /**

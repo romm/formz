@@ -96,10 +96,6 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
                 'expected' => '<span class="js-validation-rule-bar js-validation-type-notice js-validation-message-baz">foo</span>'
             ],
             [
-                'message'  => new Message('foo', 1337),
-                'expected' => '<span class="js-validation-rule-unknown js-validation-type-message js-validation-message-unknown">foo</span>'
-            ],
-            [
                 'message'         => new Error('foo', 1337, 'bar', 'baz'),
                 'expected'        => 'foo - formz-foo-foo - error - bar - baz - foo',
                 'messageTemplate' => '#FIELD# - #FIELD_ID# - #TYPE# - #VALIDATOR# - #KEY# - #MESSAGE#'

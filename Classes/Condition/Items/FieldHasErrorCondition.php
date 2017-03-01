@@ -61,7 +61,7 @@ class FieldHasErrorCondition extends AbstractConditionItem
     {
         return sprintf(
             '[%s="1"]',
-            DataAttributesAssetHandler::getFieldDataValidationErrorKey($this->fieldName, $this->validationName, $this->errorName)
+            DataAttributesAssetHandler::getFieldDataValidationMessageKey($this->fieldName, 'error', $this->validationName, $this->errorName)
         );
     }
 

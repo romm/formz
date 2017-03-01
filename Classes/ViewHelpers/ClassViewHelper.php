@@ -221,7 +221,16 @@ class ClassViewHelper extends AbstractViewHelper
                 }
                 break;
             case self::CLASS_VALID:
-                if (false === $propertyResult->hasErrors()) {
+                $formObject = $this->formService->getFormObject();
+                $field = $formObject->getConfiguration()->getField($this->fieldName);
+
+                if (false === $propertyResult->hasErrors()
+                    && false === $formObject->hasLastValidationResult()
+                    || (
+                        $formObject->hasLastValidationResult()
+                        && false === $formObject->getLastValidationResult()->fieldIsDeactivated($field)
+                    )
+                ) {
                     $result .= ' ' . $this->classValue;
                 }
                 break;

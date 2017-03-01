@@ -18,7 +18,6 @@ use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
-use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\ViewHelpers\Service\FieldService;
 use Romm\Formz\ViewHelpers\Service\FormService;
@@ -95,8 +94,8 @@ class FormatMessageViewHelper extends AbstractViewHelper
                 $fieldName,
                 $fieldId,
                 $this->getMessageType($message),
-                MessageService::get()->getMessageValidationName($message),
-                MessageService::get()->getMessageKey($message),
+                $message->getValidationName(),
+                $message->getMessageKey(),
                 $message->getMessage()
             ],
             $field->getSettings()->getMessageTemplate()
@@ -113,9 +112,9 @@ class FormatMessageViewHelper extends AbstractViewHelper
     {
         $message = $this->arguments['message'];
 
-        if (false === $message instanceof Message) {
+        if (false === $message instanceof FormzMessageInterface) {
             throw new InvalidArgumentTypeException(
-                'The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . Message::class . '".',
+                'The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . FormzMessageInterface::class . '".',
                 1467021406
             );
         }
@@ -124,10 +123,10 @@ class FormatMessageViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param Message $message
+     * @param FormzMessageInterface $message
      * @return string
      */
-    protected function getMessageType(Message $message)
+    protected function getMessageType(FormzMessageInterface $message)
     {
         if ($message instanceof Error) {
             $messageType = 'error';

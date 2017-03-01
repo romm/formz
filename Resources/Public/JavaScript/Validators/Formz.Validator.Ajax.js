@@ -2,6 +2,32 @@
     // @todo
     var checkValues = {};
 
+    /**
+     * @param {Object}               messages
+     * @param {string}               type
+     * @param {Formz.ResultInstance} result
+     */
+    var addMessages = function(messages, type, result) {
+        if (type in messages) {
+            for (var key in messages[type]) {
+                if (messages[type].hasOwnProperty(key)) {
+                    var message = {
+                        name: key,
+                        message: messages[type][key]
+                    };
+
+                    if (type === 'errors') {
+                        result.addError(message);
+                    } else if (type === 'warnings') {
+                        result.addWarning(message);
+                    } else if (type === 'notices') {
+                        result.addNotice(message);
+                    }
+                }
+            }
+        }
+    };
+
     Formz.Validation.registerValidator(
         'AjaxValidator',
         /**
@@ -20,6 +46,7 @@
             if (value !== '') {
                 var addDefaultError = function() {
                     var message = field.getForm().getConfiguration()['settings']['defaultErrorMessage'];
+
                     states['result'].addError({
                         name: 'default',
                         message: message
@@ -41,15 +68,18 @@
                         try {
                             var ajaxResult = JSON.parse(request.responseText);
 
-                            if (false === ajaxResult['success']) {
-                                if ('message' in ajaxResult) {
-                                    states['result'].addError({
-                                        name: 'default',
-                                        message: ajaxResult['message']
-                                    });
-                                } else {
-                                    addDefaultError();
-                                }
+                            if ('messages' in ajaxResult) {
+                                var messages = ajaxResult['messages'];
+
+                                addMessages(messages, 'errors', states['result']);
+                                addMessages(messages, 'warnings', states['result']);
+                                addMessages(messages, 'notices', states['result']);
+                            }
+
+                            if (false === ajaxResult['success']
+                                && false === states['result'].hasErrors()
+                            ) {
+                                addDefaultError();
                             }
 
                             callback();

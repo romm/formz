@@ -24,6 +24,7 @@ use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -219,6 +220,16 @@ class FormValidatorExecutor
     }
 
     /**
+     * Will save the validation result in the form object instance.
+     *
+     * @internal
+     */
+    public function saveValidationResult()
+    {
+        $this->getFormObject()->setLastValidationResult($this->result);
+    }
+
+    /**
      * @param Field      $field
      * @param Validation $validation
      * @return Result
@@ -237,6 +248,7 @@ class FormValidatorExecutor
         );
 
         $validatorResult = $validator->validate($fieldValue);
+        $validatorResult = MessageService::get()->sanitizeValidatorResult($validatorResult, $validation);
 
         if ($validator instanceof AbstractValidator
             && false === empty($validationData = $validator->getValidationData())

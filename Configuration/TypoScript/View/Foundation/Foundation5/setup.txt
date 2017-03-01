@@ -1,5 +1,9 @@
 config.tx_formz {
-    settings.defaultFieldSettings.messageTemplate = <small class="#TYPE#">#MESSAGE#</small>
+    settings {
+        defaultFieldSettings {
+            messageTemplate = <small class="#TYPE# js-validation-rule-#VALIDATOR# js-validation-message-#KEY#">#MESSAGE#</small>
+        }
+    }
 
     view {
         classes {
