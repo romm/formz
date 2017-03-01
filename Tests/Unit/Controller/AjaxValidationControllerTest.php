@@ -14,6 +14,7 @@ use Romm\Formz\Service\ContextService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Fixture\Validation\Validator\ExceptionDummyValidator;
+use Romm\Formz\Tests\Fixture\Validation\Validator\MessagesValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
@@ -152,7 +153,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
      *
      * @test
      */
-    public function ExceptionCatchInProtectedRequestWithDebugModeShouldCustomizeResultMessage()
+    public function exceptionCatchInProtectedRequestWithDebugModeShouldCustomizeResultMessage()
     {
         $formObject = $this->getDefaultFormObject();
         $validation = new Validation;
@@ -260,6 +261,39 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $validation->setValidationName('bar');
         $validation->activateAjaxUsage();
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
+
+        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
+
+        $ajaxValidationController->setProtectedRequestMode(false);
+        $ajaxValidationController->runAction();
+        $result = $ajaxValidationController->getView()->render();
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    /**
+     * Checks that errors, warnings and notices are added to the result array.
+     *
+     * @test
+     */
+    public function messagesTypesAreReturnedInResult()
+    {
+        $expectedResult = [
+            'success' => false,
+            'messages' => [
+                'errors' => [MessagesValidator::MESSAGE_1 => MessagesValidator::MESSAGE_1],
+                'warnings' => [MessagesValidator::MESSAGE_2 => MessagesValidator::MESSAGE_2],
+                'notices' => [MessagesValidator::MESSAGE_3 => MessagesValidator::MESSAGE_3]
+            ]
+        ];
+
+        $formObject = $this->getDefaultFormObject();
+
+        $messagesValidator = new Validation;
+        $messagesValidator->setClassName(MessagesValidator::class);
+        $messagesValidator->setValidationName('bar');
+        $messagesValidator->activateAjaxUsage();
+        $formObject->getConfiguration()->getField('foo')->addValidation($messagesValidator);
 
         $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
 
