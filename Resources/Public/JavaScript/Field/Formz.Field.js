@@ -327,7 +327,9 @@ Formz.Field = (function () {
     /**
      * @param {Object}                            states
      * @param {Formz.FullField}                   states.field
-     * @param {Array}                             states.existingErrors
+     * @param {Object}                            states.existingErrors
+     * @param {Object}                            states.existingWarnings
+     * @param {Object}                            states.existingNotices
      * @param {Formz.EventsManagerInstance}       states.eventsManager
      */
     var manageFieldEvents = function (states) {
@@ -411,24 +413,29 @@ Formz.Field = (function () {
         (function () {
             var dataAttributesService = Formz.Field.DataAttributesService.get(states.field);
 
-            dataAttributesService.addErrorsDataAttributes(states.existingErrors);
+            dataAttributesService.addMessagesDataAttributes(states.existingErrors, 'error');
+            dataAttributesService.addMessagesDataAttributes(states.existingWarnings, 'warning');
+            dataAttributesService.addMessagesDataAttributes(states.existingNotices, 'notice');
             dataAttributesService.saveAllDataAttributes();
 
             states.field.onValidationBegins(function () {
                 dataAttributesService.refreshValueDataAttribute();
                 dataAttributesService.removeValidDataAttribute();
-                dataAttributesService.removeErrorsDataAttributes();
+                dataAttributesService.removeMessagesDataAttributes();
             });
 
             states.field.onValidationDone(function (result) {
-                dataAttributesService.removeErrorsDataAttributes();
+                dataAttributesService.removeMessagesDataAttributes();
 
                 if (result.hasErrors()) {
                     dataAttributesService.removeValidDataAttribute();
-                    dataAttributesService.addErrorsDataAttributes(states.field.getErrors());
                 } else {
                     dataAttributesService.addValidDataAttribute();
                 }
+
+                dataAttributesService.addMessagesDataAttributes(states.field.getErrors(), 'error');
+                dataAttributesService.addMessagesDataAttributes(states.field.getWarnings(), 'warning');
+                dataAttributesService.addMessagesDataAttributes(states.field.getNotices(), 'notice');
 
                 dataAttributesService.saveAllDataAttributes();
             });
@@ -442,7 +449,7 @@ Formz.Field = (function () {
             });
 
             states.eventsManager.on('refreshFeedback', function () {
-                dataAttributesService.removeErrorsDataAttributes();
+                dataAttributesService.removeMessagesDataAttributes();
             });
         })();
 
@@ -516,9 +523,10 @@ Formz.Field = (function () {
          * @param {Object}             existingNotices
          * @param {string}             submittedFieldValue
          * @param {boolean}            wasValidated
+         * @param {boolean}            isDeactivated
          * @returns {?Formz.FullField}
          */
-        get: function (name, configuration, form, existingErrors, existingWarnings, existingNotices, submittedFieldValue, wasValidated) {
+        get: function (name, configuration, form, existingErrors, existingWarnings, existingNotices, submittedFieldValue, wasValidated, isDeactivated) {
             if ('' === name || null === form) {
                 return null;
             }
@@ -531,6 +539,7 @@ Formz.Field = (function () {
                 existingNotices: existingNotices,
                 submittedFieldValue: submittedFieldValue,
                 wasValidated: wasValidated,
+                isDeactivated: isDeactivated,
                 form: form,
                 eventsManager: Formz.EventsManager.get()
             };
@@ -542,6 +551,8 @@ Formz.Field = (function () {
             manageFieldEvents({
                 field: fieldInstance,
                 existingErrors: existingErrors,
+                existingWarnings: existingWarnings,
+                existingNotices: existingNotices,
                 eventsManager: states.eventsManager
             });
 

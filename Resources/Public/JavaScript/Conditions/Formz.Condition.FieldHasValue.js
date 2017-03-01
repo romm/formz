@@ -13,10 +13,14 @@ Formz.Condition.registerCondition(
 
 		if (null !== field) {
 			if (value !== '') {
-				flag = (Formz.commaSeparatedValues(field.getValue()).search(value) > -1)
-			} else {
+			    var fieldValue = field.getValue();
+
+                flag = (typeof fieldValue === 'string')
+                    ? fieldValue === value
+                    : (Formz.commaSeparatedValues(fieldValue).search(value) > -1);
+            } else {
 				flag = (Formz.commaSeparatedValues(field.getValue()) == '')
-			}
+            }
 		}
 
 		return flag;

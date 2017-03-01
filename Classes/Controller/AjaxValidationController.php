@@ -16,6 +16,7 @@ namespace Romm\Formz\Controller;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
@@ -27,7 +28,6 @@ use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
@@ -202,7 +202,10 @@ class AjaxValidationController extends ActionController
             $validatorDataObject
         );
 
-        return $this->convertResultToJson($validator->validate($fieldValue));
+        $result = $validator->validate($fieldValue);
+        $result = MessageService::get()->sanitizeValidatorResult($result, $validation);
+
+        return $this->convertResultToJson($result);
     }
 
     /**
@@ -347,7 +350,7 @@ class AjaxValidationController extends ActionController
     }
 
     /**
-     * @param Message[] $messages
+     * @param FormzMessageInterface[] $messages
      * @return array
      */
     protected function formatMessages(array $messages)
@@ -355,8 +358,7 @@ class AjaxValidationController extends ActionController
         $sortedMessages = [];
 
         foreach ($messages as $message) {
-            $key = MessageService::get()->getMessageKey($message);
-            $sortedMessages[$key] = $message->getMessage();
+            $sortedMessages[$message->getMessageKey()] = $message->getMessage();
         }
 
         return $sortedMessages;

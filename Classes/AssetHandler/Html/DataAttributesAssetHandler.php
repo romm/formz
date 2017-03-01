@@ -15,8 +15,8 @@ namespace Romm\Formz\AssetHandler\Html;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -132,9 +132,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     }
 
     /**
-     * @param string $fieldName
-     * @param array  $messages
-     * @param string $type
+     * @param string                  $fieldName
+     * @param FormzMessageInterface[] $messages
+     * @param string                  $type
      * @return array
      */
     protected function addFieldMessageDataAttribute($fieldName, array $messages, $type)
@@ -142,8 +142,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         $result = [self::getFieldDataMessageKey($fieldName, $type) => '1'];
 
         foreach ($messages as $message) {
-            $validationName = MessageService::get()->getMessageValidationName($message);
-            $messageKey = MessageService::get()->getMessageKey($message);
+            $validationName = $message->getValidationName();
+            $messageKey = $message->getMessageKey();
 
             $result[self::getFieldDataValidationMessageKey($fieldName, $type, $validationName, $messageKey)] = '1';
         }

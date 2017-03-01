@@ -27,12 +27,12 @@ class FormResult extends Result
     use StoreDataTrait;
 
     /**
-     * @var array
+     * @var Field[]
      */
     protected $deactivatedFields = [];
 
     /**
-     * @var array
+     * @var Validation[]
      */
     protected $deactivatedFieldsValidation = [];
 
@@ -43,7 +43,7 @@ class FormResult extends Result
      */
     public function deactivateField(Field $field)
     {
-        $this->deactivatedFields[$field->getFieldName()] = true;
+        $this->deactivatedFields[$field->getFieldName()] = $field;
     }
 
     /**
@@ -58,6 +58,14 @@ class FormResult extends Result
     }
 
     /**
+     * @return Field[]
+     */
+    public function getDeactivatedFields()
+    {
+        return $this->deactivatedFields;
+    }
+
+    /**
      * @param Validation $validation
      */
     public function deactivateValidation(Validation $validation)
@@ -68,7 +76,7 @@ class FormResult extends Result
             $this->deactivatedFieldsValidation[$fieldName] = [];
         }
 
-        $this->deactivatedFieldsValidation[$fieldName][$validation->getValidationName()] = true;
+        $this->deactivatedFieldsValidation[$fieldName][$validation->getValidationName()] = $validation;
     }
 
     /**
@@ -81,5 +89,13 @@ class FormResult extends Result
 
         return array_key_exists($fieldName, $this->deactivatedFieldsValidation)
             && array_key_exists($validation->getValidationName(), $this->deactivatedFieldsValidation[$fieldName]);
+    }
+
+    /**
+     * @return Validation[]
+     */
+    public function getDeactivatedValidations()
+    {
+        return $this->deactivatedFieldsValidation;
     }
 }

@@ -35,11 +35,13 @@ class FeedbackContainerDisplayCssAssetHandler extends AbstractAssetHandler
 
         foreach ($formConfiguration->getFields() as $fieldName => $field) {
             $formName = $this->getFormObject()->getName();
-            $errorSelector = DataAttributesAssetHandler::getFieldDataMessageKey($fieldName);
+            $errorSelector = DataAttributesAssetHandler::getFieldDataMessageKey($fieldName, 'error');
+            $warningSelector = DataAttributesAssetHandler::getFieldDataMessageKey($fieldName, 'warning');
+            $noticeSelector = DataAttributesAssetHandler::getFieldDataMessageKey($fieldName, 'notice');
             $errorContainerCss = $field->getSettings()->getFeedbackContainerSelector();
 
             $cssBlocks[] = <<<CSS
-form[name="$formName"]:not([$errorSelector="1"]) $errorContainerCss {
+form[name="$formName"]:not([$errorSelector="1"]):not([$warningSelector="1"]):not([$noticeSelector="1"]) $errorContainerCss {
     display: none!important;
 }
 CSS;

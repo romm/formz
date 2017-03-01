@@ -14,11 +14,9 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\ArrayService;
-use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Message;
-use TYPO3\CMS\Extbase\Error\Result;
 
 /**
  * Will handle the "one time run" data needed by JavaScript: the submitted
@@ -36,17 +34,15 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
     {
         $submittedFormValues = [];
         $fieldsExistingMessages = [];
-        $originalRequest = $this->getControllerContext()
-            ->getRequest()
-            ->getOriginalRequest();
-
-        $formWasSubmitted = (null !== $originalRequest)
+        $deactivatedFields = [];
+        $formWasSubmitted = $this->getFormObject()->hasLastValidationResult()
             ? 'true'
             : 'false';
 
         if ($formWasSubmitted) {
             $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
             $fieldsExistingMessages = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingMessages());
+            $deactivatedFields = ArrayService::get()->arrayToJavaScriptJson($this->getDeactivatedFields());
         }
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
@@ -54,7 +50,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
         $javaScriptCode = <<<JS
 (function() {
     Formz.Form.beforeInitialization($formName, function(form) {
-        form.injectRequestData($submittedFormValues, $fieldsExistingMessages, $formWasSubmitted)
+        form.injectRequestData($submittedFormValues, $fieldsExistingMessages, $formWasSubmitted, $deactivatedFields)
     });
 })();
 JS;
@@ -94,33 +90,27 @@ JS;
     protected function getFieldsExistingMessages()
     {
         $fieldsMessages = [];
-        $request = $this->getControllerContext()
-            ->getRequest();
 
-        if (null !== $request->getOriginalRequest()) {
-            $requestResult = $request->getOriginalRequestMappingResults();
-            /** @var Result[] $formFieldsResult */
-            $formFieldsResult = $requestResult->forProperty($this->getFormObject()->getName())->getSubResults();
+        if ($this->getFormObject()->hasLastValidationResult()) {
+            $lastValidationResult = $this->getFormObject()->getLastValidationResult();
 
             foreach ($this->getFormObject()->getProperties() as $fieldName) {
-                if (array_key_exists($fieldName, $formFieldsResult)) {
-                    $messages = [];
-                    $result = $formFieldsResult[$fieldName];
+                $result = $lastValidationResult->forProperty($fieldName);
+                $messages = [];
 
-                    if ($result->hasErrors()) {
-                        $messages['errors'] = $this->formatMessages($result->getErrors());
-                    }
-
-                    if ($result->hasWarnings()) {
-                        $messages['warnings'] = $this->formatMessages($result->getWarnings());
-                    }
-
-                    if ($result->hasNotices()) {
-                        $messages['notices'] = $this->formatMessages($result->getNotices());
-                    }
-
-                    $fieldsMessages[$fieldName] = $messages;
+                if ($result->hasErrors()) {
+                    $messages['errors'] = $this->formatMessages($result->getErrors());
                 }
+
+                if ($result->hasWarnings()) {
+                    $messages['warnings'] = $this->formatMessages($result->getWarnings());
+                }
+
+                if ($result->hasNotices()) {
+                    $messages['notices'] = $this->formatMessages($result->getNotices());
+                }
+
+                $fieldsMessages[$fieldName] = $messages;
             }
         }
 
@@ -128,7 +118,7 @@ JS;
     }
 
     /**
-     * @param Message[] $messages
+     * @param FormzMessageInterface[] $messages
      * @return array
      */
     protected function formatMessages(array $messages)
@@ -136,8 +126,8 @@ JS;
         $sortedMessages = [];
 
         foreach ($messages as $message) {
-            $validationName = MessageService::get()->getMessageValidationName($message);
-            $messageKey = MessageService::get()->getMessageKey($message);
+            $validationName = $message->getValidationName();
+            $messageKey = $message->getMessageKey();
 
             if (false === isset($sortedMessages[$validationName])) {
                 $sortedMessages[$validationName] = [];
@@ -147,5 +137,15 @@ JS;
         }
 
         return $sortedMessages;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDeactivatedFields()
+    {
+        return ($this->getFormObject()->hasLastValidationResult())
+            ? array_keys($this->getFormObject()->getLastValidationResult()->getDeactivatedFields())
+            : [];
     }
 }

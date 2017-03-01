@@ -18,6 +18,7 @@ use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Error\FormResult;
 use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Extbase\Error\Result;
 
@@ -71,6 +72,11 @@ class FormObject
      * @var Result
      */
     protected $configurationValidationResult;
+
+    /**
+     * @var FormResult
+     */
+    protected $lastValidationResult;
 
     /**
      * @var string
@@ -306,6 +312,30 @@ class FormObject
     public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
     {
         $this->configurationFactory = $configurationFactory;
+    }
+
+    /**
+     * @return FormResult
+     */
+    public function getLastValidationResult()
+    {
+        return $this->lastValidationResult;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasLastValidationResult()
+    {
+        return null !== $this->lastValidationResult;
+    }
+
+    /**
+     * @param FormResult $lastValidationResult
+     */
+    public function setLastValidationResult($lastValidationResult)
+    {
+        $this->lastValidationResult = $lastValidationResult;
     }
 
     /**

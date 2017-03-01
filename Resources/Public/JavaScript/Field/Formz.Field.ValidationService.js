@@ -10,6 +10,7 @@ Formz.Field.ValidationService = (function () {
      * @param {Object}                             states.existingNotices
      * @param {string}                             states.submittedFieldValue
      * @param {boolean}                            states.wasValidated
+     * @param {boolean}                            states.isDeactivated
      * @returns {Formz.Field.ValidationServiceInstance}
      */
     var servicePrototype = function (states) {
@@ -128,6 +129,11 @@ Formz.Field.ValidationService = (function () {
         var validatorsCheckedDuringLastValidation = (true === states.wasValidated)
             ? '*'
             : [];
+
+        /**
+         * @type {boolean}
+         */
+        var isDeactivated = states.isDeactivated;
 
         /**
          * Internal recursive function to validate the field.
@@ -273,7 +279,7 @@ Formz.Field.ValidationService = (function () {
                     }
                 }
             }
-            
+
             if (result.hasNotices()) {
                 var notices = result.getNotices();
 
@@ -337,7 +343,7 @@ Formz.Field.ValidationService = (function () {
             }
             warnings[validatorName][name] = message;
         };
-        
+
         /**
          * Adds an notice to this field.
          *
@@ -360,6 +366,20 @@ Formz.Field.ValidationService = (function () {
             errors = {};
             warnings = {};
             notices = {};
+        };
+
+        var activate = function () {
+            if (true === isDeactivated) {
+                isDeactivated = false;
+                eventsManager.dispatch('reactivated');
+            }
+        };
+
+        var deactivate = function () {
+            if (false === isDeactivated) {
+                isDeactivated = true;
+                eventsManager.dispatch('deactivated');
+            }
         };
 
         /**
@@ -675,14 +695,14 @@ Formz.Field.ValidationService = (function () {
                     var self = this;
 
                     var stopValidationCallBack = function () {
-                        eventsManager.dispatch('deactivated');
+                        deactivate();
                     };
 
                     var endingCallBack = function () {
                         if (getStringValue() !== lastValidatedValue) {
                             self.validate();
                         } else {
-                            eventsManager.dispatch('reactivated');
+                            activate();
                         }
                     };
 
@@ -725,7 +745,7 @@ Formz.Field.ValidationService = (function () {
             getWarnings: function () {
                 return warnings;
             },
-            
+
             /**
              * @see getErrors()
              *
@@ -806,6 +826,7 @@ Formz.Field.ValidationService = (function () {
          * @param {Object}                      states.existingNotices
          * @param {string}                      states.submittedFieldValue
          * @param {boolean}                     states.wasValidated
+         * @param {boolean}                     states.isDeactivated
          * @param {Formz.EventsManagerInstance} states.eventsManager
          * @returns {Formz.Field.ValidationServiceInstance}
          */
@@ -827,7 +848,8 @@ Formz.Field.ValidationService = (function () {
                 existingWarnings: states.existingWarnings,
                 existingNotices: states.existingNotices,
                 submittedFieldValue: states.submittedFieldValue,
-                wasValidated: states.wasValidated
+                wasValidated: states.wasValidated,
+                isDeactivated: states.isDeactivated
             });
         }
     }

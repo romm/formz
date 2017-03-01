@@ -17,7 +17,7 @@ class FeedbackContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
      */
     public function errorContainerDisplayCssIsValid()
     {
-        $expectedCss = 'form[name="foo"]:not([formz-error-foo="1"])[formz-field-feedback-container="foo"]{display:none!important;}';
+        $expectedCss = 'form[name="foo"]:not([formz-error-foo="1"]):not([formz-warning-foo="1"]):not([formz-notice-foo="1"])[formz-field-feedback-container="foo"]{display:none!important;}';
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
 
@@ -25,7 +25,7 @@ class FeedbackContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
         $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(FeedbackContainerDisplayCssAssetHandler::class);
         $errorContainerDisplayCss = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss();
 
-        $this->assertEquals($this->trimString($errorContainerDisplayCss), $expectedCss);
+        $this->assertEquals($expectedCss, $this->trimString($errorContainerDisplayCss));
 
         unset($assetHandlerFactory);
     }

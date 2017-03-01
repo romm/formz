@@ -67,6 +67,11 @@ Formz.Form = (function () {
         var fieldsHaveBeenInitialized = false;
 
         /**
+         * @type {Array}
+         */
+        var deactivatedFields = [];
+
+        /**
          * Initializes all the fields of this form: an instance is created for
          * every field.
          *
@@ -104,6 +109,8 @@ Formz.Form = (function () {
                         ? submittedValues[fieldName]
                         : '';
 
+                    var isDeactivated = -1 !== deactivatedFields.indexOf(fieldName);
+
                     var field = Formz.Field.get(
                         fieldName,
                         configurationFields[fieldName],
@@ -112,7 +119,8 @@ Formz.Form = (function () {
                         existingWarning,
                         existingNotices,
                         submittedFieldValue,
-                        formWasValidated
+                        formWasValidated,
+                        isDeactivated
                     );
                     if (field.getElements().length > 0) {
                         fields[fieldName] = field;
@@ -213,11 +221,13 @@ Formz.Form = (function () {
              * @param {string}  submittedFormValues
              * @param {string}  existingFormMessages
              * @param {boolean} formValidationDone
+             * @param {Array}   deactivatedFieldsNames
              */
-            injectRequestData: function (submittedFormValues, existingFormMessages, formValidationDone) {
+            injectRequestData: function (submittedFormValues, existingFormMessages, formValidationDone, deactivatedFieldsNames) {
                 submittedValues = submittedFormValues;
                 existingMessages = existingFormMessages;
                 formWasValidated = formValidationDone;
+                deactivatedFields = deactivatedFieldsNames;
             }
         };
 

@@ -82,19 +82,6 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected $result;
 
     /**
-     * Contains the validation results of all forms which were validated. The
-     * key is the form name (the property `formName` in the form configuration)
-     * and the value is an instance of `FormResult`.
-     *
-     * Note: we need to store the results here, because the TYPO3 request
-     * handler builds an instance of Extbase's `Result` from scratch, so we are
-     * not able to retrieve the `FormResult` instance afterward.
-     *
-     * @var FormResult[]
-     */
-    private static $formsValidationResults = [];
-
-    /**
      * Checks the given form instance, and launches the validation if it is a
      * correct form.
      *
@@ -142,7 +129,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
             FormService::addFormWithErrors($form);
         }
 
-        self::$formsValidationResults[get_class($form) . '::' . $this->options['name']] = $this->result;
+        $formValidatorExecutor->saveValidationResult();
     }
 
     /**
@@ -176,23 +163,6 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         if (method_exists($this, $functionName)) {
             call_user_func([$this, $functionName]);
         }
-    }
-
-    /**
-     * Returns the validation result of the asked form. The form name matches
-     * the property `formName` of the form configuration.
-     *
-     * @param string $formClassName
-     * @param string $formName
-     * @return null|FormResult
-     */
-    public static function getFormValidationResult($formClassName, $formName)
-    {
-        $key = $formClassName . '::' . $formName;
-
-        return (true === isset(self::$formsValidationResults[$key]))
-            ? self::$formsValidationResults[$key]
-            : null;
     }
 
     /**
