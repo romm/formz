@@ -303,7 +303,6 @@ class AjaxValidationControllerTest extends AbstractUnitTest
                 return $method->invoke($view);
             });
 
-
         $this->inject($ajaxValidationController, 'view', $view);
 
         $formObject = $formObject ?: $this->getDefaultFormObject();
