@@ -78,8 +78,10 @@ class ConditionParser implements SingletonInterface
         $this->resetParser($condition);
 
         $rootNode = ($condition instanceof EmptyActivation)
-            ? NullNode::get()
+            ? null
             : $this->getNodeRecursive();
+
+        $rootNode = $rootNode ?: NullNode::get();
 
         return GeneralUtility::makeInstance(ConditionTree::class, $rootNode, $this->result);
     }
