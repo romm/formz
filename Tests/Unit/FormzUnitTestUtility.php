@@ -23,13 +23,13 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Object\Container\Container;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 trait FormzUnitTestUtility
 {
@@ -118,18 +118,18 @@ trait FormzUnitTestUtility
 
         // Reset asset handler factory instances.
         $reflectedClass = new \ReflectionClass(AssetHandlerFactory::class);
-        $objectManagerProperty = $reflectedClass->getProperty('factoryInstances');
-        $objectManagerProperty->setAccessible(true);
-        $objectManagerProperty->setValue([]);
-        $objectManagerProperty->setAccessible(false);
+        $property = $reflectedClass->getProperty('factoryInstances');
+        $property->setAccessible(true);
+        $property->setValue([]);
+        $property->setAccessible(false);
 
         // Reset configuration factory instances.
         $configurationFactory = Core::instantiate(ConfigurationFactory::class);
         $reflectedObject = new \ReflectionObject($configurationFactory);
-        $objectManagerProperty = $reflectedObject->getProperty('instances');
-        $objectManagerProperty->setAccessible(true);
-        $objectManagerProperty->setValue($configurationFactory, []);
-        $objectManagerProperty->setAccessible(false);
+        $property = $reflectedObject->getProperty('instances');
+        $property->setAccessible(true);
+        $property->setValue($configurationFactory, []);
+        $property->setAccessible(false);
 
         UnitTestContainer::get()->resetInstances();
     }
@@ -156,7 +156,7 @@ trait FormzUnitTestUtility
      */
     private function createFormObject(array $fields)
     {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject$formObject */
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
             ->setMethods(['buildConfigurationObject'])
             ->setConstructorArgs([
@@ -375,14 +375,14 @@ trait FormzUnitTestUtility
      */
     protected function addFormzConfiguration(array $configuration)
     {
-        $this->setFormzConfiguration(array_merge_recursive(
+        ArrayUtility::mergeRecursiveWithOverrule(
             $this->formzConfiguration,
             [
                 'config' => [
                     'tx_formz' => $configuration
                 ]
             ]
-        ));
+        );
     }
 
     /**
@@ -410,7 +410,7 @@ trait FormzUnitTestUtility
      */
     protected function setExtensionConfigurationValue($key, $value)
     {
-        $this->extensionConfiguration[$key] = $value;
+        $this->extensionConfiguration = ArrayUtility::setValueByPath($this->extensionConfiguration, $key, $value, '.');
     }
 
     /**
@@ -468,7 +468,7 @@ trait FormzUnitTestUtility
             $configurationCallBack = function () {
                 $configuration = ArrayUtility::setValueByPath(
                     $this->formzConfiguration,
-                    'config.tx_formz.forms',
+                    'config/tx_formz/forms',
                     $this->formConfiguration
                 );
 

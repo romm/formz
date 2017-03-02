@@ -66,13 +66,13 @@ Formz.Field = (function () {
         return {
             /**
              * Will empty the feedback container, which can be filled again with
-             * the function `insertErrors()`.
+             * the function `insertMessages()`.
              */
             refreshFeedback: function () {
-                var errorContainerElement = this.getFeedbackListContainer();
+                var feedbackListContainerElement = this.getFeedbackListContainer();
 
-                if (errorContainerElement != null) {
-                    errorContainerElement.innerHTML = '';
+                if (feedbackListContainerElement != null) {
+                    feedbackListContainerElement.innerHTML = '';
                 }
 
                 eventsManager.dispatch('refreshFeedback');
@@ -82,26 +82,27 @@ Formz.Field = (function () {
              * Will refresh the messages displayed in the feedback container of
              * this field.
              *
-             * @param {Object} errors
+             * @param {Object} messages
+             * @param {string} type
              */
-            insertErrors: function (errors) {
-                var errorContainerElement = this.getFeedbackListContainer();
+            insertMessages: function (messages, type) {
+                var feedbackListContainerElement = this.getFeedbackListContainer();
 
-                if (errorContainerElement != null) {
-                    if (Formz.objectSize(errors) > 0) {
+                if (feedbackListContainerElement != null) {
+                    if (Formz.objectSize(messages) > 0) {
                         var messageTemplate = this.getMessageTemplate();
 
-                        for (var validationRuleName in errors) {
-                            if (errors.hasOwnProperty(validationRuleName)) {
-                                for (var errorName in errors[validationRuleName]) {
-                                    if (errors[validationRuleName].hasOwnProperty(errorName)) {
-                                        errorContainerElement.innerHTML += messageTemplate
+                        for (var validationRuleName in messages) {
+                            if (messages.hasOwnProperty(validationRuleName)) {
+                                for (var name in messages[validationRuleName]) {
+                                    if (messages[validationRuleName].hasOwnProperty(name)) {
+                                        feedbackListContainerElement.innerHTML += messageTemplate
                                             .replace('#FIELD#', this.getName())
                                             .replace('#FIELD_ID#', Formz.camelCaseToDashed('formz-' + this.getForm().getName() + '-' + this.getName()))
                                             .replace('#VALIDATOR#', Formz.camelCaseToDashed(validationRuleName))
-                                            .replace('#TYPE#', 'error')
-                                            .replace('#KEY#', errorName)
-                                            .replace('#MESSAGE#', errors[validationRuleName][errorName]);
+                                            .replace('#TYPE#', type)
+                                            .replace('#KEY#', name)
+                                            .replace('#MESSAGE#', messages[validationRuleName][name]);
                                     }
                                 }
                             }
@@ -326,7 +327,9 @@ Formz.Field = (function () {
     /**
      * @param {Object}                            states
      * @param {Formz.FullField}                   states.field
-     * @param {Array}                             states.existingErrors
+     * @param {Object}                            states.existingErrors
+     * @param {Object}                            states.existingWarnings
+     * @param {Object}                            states.existingNotices
      * @param {Formz.EventsManagerInstance}       states.eventsManager
      */
     var manageFieldEvents = function (states) {
@@ -385,7 +388,9 @@ Formz.Field = (function () {
 
                 // Emptying the field feedback container.
                 states.field.refreshFeedback();
-                states.field.insertErrors(states.field.getErrors());
+                states.field.insertMessages(states.field.getErrors(), 'error');
+                states.field.insertMessages(states.field.getWarnings(), 'warning');
+                states.field.insertMessages(states.field.getNotices(), 'notice');
             });
 
             states.field.onValidationDone(function () {
@@ -408,24 +413,29 @@ Formz.Field = (function () {
         (function () {
             var dataAttributesService = Formz.Field.DataAttributesService.get(states.field);
 
-            dataAttributesService.addErrorsDataAttributes(states.existingErrors);
+            dataAttributesService.addMessagesDataAttributes(states.existingErrors, 'error');
+            dataAttributesService.addMessagesDataAttributes(states.existingWarnings, 'warning');
+            dataAttributesService.addMessagesDataAttributes(states.existingNotices, 'notice');
             dataAttributesService.saveAllDataAttributes();
 
             states.field.onValidationBegins(function () {
                 dataAttributesService.refreshValueDataAttribute();
                 dataAttributesService.removeValidDataAttribute();
-                dataAttributesService.removeErrorsDataAttributes();
+                dataAttributesService.removeMessagesDataAttributes();
             });
 
             states.field.onValidationDone(function (result) {
-                dataAttributesService.removeErrorsDataAttributes();
+                dataAttributesService.removeMessagesDataAttributes();
 
                 if (result.hasErrors()) {
                     dataAttributesService.removeValidDataAttribute();
-                    dataAttributesService.addErrorsDataAttributes(states.field.getErrors());
                 } else {
                     dataAttributesService.addValidDataAttribute();
                 }
+
+                dataAttributesService.addMessagesDataAttributes(states.field.getErrors(), 'error');
+                dataAttributesService.addMessagesDataAttributes(states.field.getWarnings(), 'warning');
+                dataAttributesService.addMessagesDataAttributes(states.field.getNotices(), 'notice');
 
                 dataAttributesService.saveAllDataAttributes();
             });
@@ -439,7 +449,7 @@ Formz.Field = (function () {
             });
 
             states.eventsManager.on('refreshFeedback', function () {
-                dataAttributesService.removeErrorsDataAttributes();
+                dataAttributesService.removeMessagesDataAttributes();
             });
         })();
 
@@ -508,12 +518,15 @@ Formz.Field = (function () {
          * @param {string}             name
          * @param {Object}             configuration
          * @param {Formz.FormInstance} form
-         * @param {Array}              existingErrors
+         * @param {Object}             existingErrors
+         * @param {Object}             existingWarnings
+         * @param {Object}             existingNotices
          * @param {string}             submittedFieldValue
          * @param {boolean}            wasValidated
+         * @param {boolean}            isDeactivated
          * @returns {?Formz.FullField}
          */
-        get: function (name, configuration, form, existingErrors, submittedFieldValue, wasValidated) {
+        get: function (name, configuration, form, existingErrors, existingWarnings, existingNotices, submittedFieldValue, wasValidated, isDeactivated) {
             if ('' === name || null === form) {
                 return null;
             }
@@ -522,8 +535,11 @@ Formz.Field = (function () {
                 name: name,
                 configuration: configuration,
                 existingErrors: existingErrors,
+                existingWarnings: existingWarnings,
+                existingNotices: existingNotices,
                 submittedFieldValue: submittedFieldValue,
                 wasValidated: wasValidated,
+                isDeactivated: isDeactivated,
                 form: form,
                 eventsManager: Formz.EventsManager.get()
             };
@@ -535,6 +551,8 @@ Formz.Field = (function () {
             manageFieldEvents({
                 field: fieldInstance,
                 existingErrors: existingErrors,
+                existingWarnings: existingWarnings,
+                existingNotices: existingNotices,
                 eventsManager: states.eventsManager
             });
 

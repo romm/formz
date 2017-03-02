@@ -9,10 +9,10 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
 use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Extbase\Error\Error;
 
 class ClassViewHelperTest extends AbstractViewHelperUnitTest
@@ -24,18 +24,19 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      * @test
      * @dataProvider renderViewHelperDataProvider
      *
-     * @param string      $expects   The expected result returned by the view helper.
-     * @param array       $classes   Array of classes which will be injected in the Formz configuration object.
-     * @param array       $arguments Arguments sent to the view helper.
-     * @param FormService $formService
-     * @param string      $expectedException
+     * @param string                 $expects   The expected result returned by the view helper.
+     * @param array                  $classes   Array of classes which will be injected in the Formz configuration object.
+     * @param array                  $arguments Arguments sent to the view helper.
+     * @param FormViewHelperService  $formService
+     * @param FieldViewHelperService $fieldService
+     * @param string                 $expectedException
      */
     public function renderViewHelper(
         $expects,
         array $classes,
         array $arguments,
-        FormService $formService,
-        FieldService $fieldService,
+        FormViewHelperService $formService,
+        FieldViewHelperService $fieldService,
         $expectedException = null
     ) {
         if (null !== $expectedException) {
@@ -208,25 +209,25 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
-     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDefaultFormService()
     {
-        return $this->getMockBuilder(FormService::class)
+        return $this->getMockBuilder(FormViewHelperService::class)
             ->setMethods(['getFormObject'])
             ->getMock();
     }
 
     /**
-     * @return FieldService
+     * @return FieldViewHelperService
      */
     protected function getDefaultFieldService()
     {
-        return new FieldService;
+        return new FieldViewHelperService;
     }
 
     /**
-     * @return FieldService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getFieldServiceWithField()
     {
@@ -240,7 +241,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
-     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getServiceWithNoErrorResult()
     {
@@ -252,7 +253,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
-     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getServiceWithErrorResult()
     {

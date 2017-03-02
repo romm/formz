@@ -18,10 +18,9 @@ use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
-use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -48,12 +47,12 @@ class FormatMessageViewHelper extends AbstractViewHelper
     protected $escapeOutput = false;
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -95,8 +94,8 @@ class FormatMessageViewHelper extends AbstractViewHelper
                 $fieldName,
                 $fieldId,
                 $this->getMessageType($message),
-                MessageService::get()->getMessageValidationName($message),
-                MessageService::get()->getMessageKey($message),
+                $message->getValidationName(),
+                $message->getMessageKey(),
                 $message->getMessage()
             ],
             $field->getSettings()->getMessageTemplate()
@@ -107,15 +106,15 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return Message|FormzMessageInterface
-     * @throws \Exception
+     * @throws InvalidArgumentTypeException
      */
     protected function getMessage()
     {
         $message = $this->arguments['message'];
 
-        if (false === $message instanceof Message) {
+        if (false === $message instanceof FormzMessageInterface) {
             throw new InvalidArgumentTypeException(
-                'The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . Message::class . '".',
+                'The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . FormzMessageInterface::class . '".',
                 1467021406
             );
         }
@@ -124,10 +123,10 @@ class FormatMessageViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param Message $message
+     * @param FormzMessageInterface $message
      * @return string
      */
-    protected function getMessageType(Message $message)
+    protected function getMessageType(FormzMessageInterface $message)
     {
         if ($message instanceof Error) {
             $messageType = 'error';
@@ -144,7 +143,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws InvalidEntryException
      */
     protected function getFieldName()
     {
@@ -169,7 +168,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return Field
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     protected function getField()
     {
@@ -190,17 +189,17 @@ class FormatMessageViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param FormService $service
+     * @param FormViewHelperService $service
      */
-    public function injectFormService(FormService $service)
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

@@ -11,14 +11,16 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\ViewHelpers\Service;
+namespace Romm\Formz\Service\ViewHelper;
 
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Exceptions\ContextNotFoundException;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\ViewHelpers\FormViewHelper;
+use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Extbase\Mvc\Request;
 
 /**
  * This class contains methods that help view helpers to manipulate data and
@@ -27,7 +29,7 @@ use TYPO3\CMS\Core\SingletonInterface;
  * It is mainly configured inside the `FormViewHelper`, and used in other
  * view helpers.
  */
-class FormService implements SingletonInterface
+class FormViewHelperService implements SingletonInterface
 {
     /**
      * @var bool
@@ -60,9 +62,10 @@ class FormService implements SingletonInterface
     public function resetState()
     {
         $this->formContext = false;
+        $this->formWasSubmitted = false;
+        $this->formObject = null;
         $this->formInstance = null;
         $this->formResult = null;
-        $this->formWasSubmitted = false;
     }
 
     /**
@@ -70,17 +73,20 @@ class FormService implements SingletonInterface
      * function `formContextExists()`.
      *
      * @throws \Exception
+     * @return FormViewHelperService
      */
     public function activateFormContext()
     {
         if (true === $this->formContext) {
-            throw new \Exception(
+            throw new DuplicateEntryException(
                 'You can not use a form view helper inside another one.',
                 1465242575
             );
         }
 
         $this->formContext = true;
+
+        return $this;
     }
 
     /**
@@ -91,6 +97,34 @@ class FormService implements SingletonInterface
     public function formContextExists()
     {
         return $this->formContext;
+    }
+
+    /**
+     * This function will check and inject the form instance and its submission
+     * result.
+     *
+     * @param string  $formName
+     * @param Request $originalRequest
+     * @param         $formInstance
+     */
+    public function setUpData($formName, $originalRequest, $formInstance)
+    {
+        if (null !== $originalRequest
+            && $originalRequest->hasArgument($formName)
+        ) {
+            /** @var array $formInstance */
+            $formInstance = $originalRequest->getArgument($formName);
+
+            $this->setFormInstance($formInstance);
+            $this->setFormResult($this->formObject->getLastValidationResult());
+            $this->markFormAsSubmitted();
+        } elseif (null !== $formInstance) {
+            $formValidator = $this->getFormValidator($formName);
+            $formRequestResult = $formValidator->validateWithoutSavingResults($formInstance);
+
+            $this->setFormInstance($formInstance);
+            $this->setFormResult($formRequestResult);
+        }
     }
 
     /**
@@ -113,19 +147,11 @@ class FormService implements SingletonInterface
     }
 
     /**
-     * Checks that the current `FormViewHelper` exists. If not, an exception is
-     * thrown.
-     *
-     * @throws \Exception
+     * @return array|FormInterface
      */
-    public function checkIsInsideFormViewHelper()
+    public function getFormInstance()
     {
-        if (false === $this->formContextExists()) {
-            throw new ContextNotFoundException(
-                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FormViewHelper::class . '".',
-                1465243085
-            );
-        }
+        return $this->formInstance;
     }
 
     /**
@@ -137,14 +163,6 @@ class FormService implements SingletonInterface
     public function setFormInstance($formInstance)
     {
         $this->formInstance = $formInstance;
-    }
-
-    /**
-     * @return array|FormInterface
-     */
-    public function getFormInstance()
-    {
-        return $this->formInstance;
     }
 
     /**
@@ -177,5 +195,14 @@ class FormService implements SingletonInterface
     public function setFormObject(FormObject $formObject)
     {
         $this->formObject = $formObject;
+    }
+
+    /**
+     * @param string $formName
+     * @return DefaultFormValidator
+     */
+    protected function getFormValidator($formName)
+    {
+        return Core::instantiate(DefaultFormValidator::class, ['name' => $formName]);
     }
 }

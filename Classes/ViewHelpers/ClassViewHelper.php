@@ -17,8 +17,8 @@ use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -55,12 +55,12 @@ class ClassViewHelper extends AbstractViewHelper
     protected static $acceptedClassesNameSpace = [self::CLASS_ERRORS, self::CLASS_VALID];
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -216,14 +216,10 @@ class ClassViewHelper extends AbstractViewHelper
 
         switch ($this->classNameSpace) {
             case self::CLASS_ERRORS:
-                if (true === $propertyResult->hasErrors()) {
-                    $result .= ' ' . $this->classValue;
-                }
+                $result = $this->getPropertyErrorClass($propertyResult);
                 break;
             case self::CLASS_VALID:
-                if (false === $propertyResult->hasErrors()) {
-                    $result .= ' ' . $this->classValue;
-                }
+                $result = $this->getPropertyValidClass($propertyResult);
                 break;
         }
 
@@ -231,17 +227,51 @@ class ClassViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param FormService $service
+     * @param Result $propertyResult
+     * @return string
      */
-    public function injectFormService(FormService $service)
+    protected function getPropertyErrorClass(Result $propertyResult)
+    {
+        return (true === $propertyResult->hasErrors())
+            ? ' ' . $this->classValue
+            : '';
+    }
+
+    /**
+     * @param Result $propertyResult
+     * @return string
+     */
+    protected function getPropertyValidClass(Result $propertyResult)
+    {
+        $result = '';
+        $formObject = $this->formService->getFormObject();
+        $field = $formObject->getConfiguration()->getField($this->fieldName);
+
+        if (false === $propertyResult->hasErrors()
+            && false === $formObject->hasLastValidationResult()
+            || (
+                $formObject->hasLastValidationResult()
+                && false === $formObject->getLastValidationResult()->fieldIsDeactivated($field)
+            )
+        ) {
+            $result .= ' ' . $this->classValue;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param FormViewHelperService $service
+     */
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

@@ -184,7 +184,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      * @param array  $arguments
      * @param string $title
      * @return mixed
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     private function addMessage($type, $key, $code, array $arguments, $title)
     {

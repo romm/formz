@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\ViewHelpers\Legacy;
+namespace Romm\Formz\Service\ViewHelper\Legacy;
 
 /**
  * @see OldFormViewHelper

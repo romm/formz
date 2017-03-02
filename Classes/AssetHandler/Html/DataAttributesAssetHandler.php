@@ -15,8 +15,8 @@ namespace Romm\Formz\AssetHandler\Html;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -33,6 +33,7 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  *    validation rules), the form gets the attribute: `formz-valid-{field name}`.
  *  - Fields errors: when a field validation fails with an error, the form gets
  *    the attribute: `formz-error-{field name}-{name of the error}`.
+ *  - Fields warnings and notices: same as errors.
  */
 class DataAttributesAssetHandler extends AbstractAssetHandler
 {
@@ -61,7 +62,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
                     ? implode(' ', $value)
                     : $value;
 
-                $result[self::getFieldDataValueKey($fieldName)] = $value;
+                if (false === empty($value)) {
+                    $result[self::getFieldDataValueKey($fieldName)] = $value;
+                }
             }
         }
 
@@ -95,7 +98,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     }
 
     /**
-     * Handles the data attributes for the fields which got errors.
+     * Handles the data attributes for the fields which got errors, warnings and
+     * notices.
      *
      * Examples:
      * - `formz-error-email="1"`
@@ -104,26 +108,75 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      * @param FormResult $requestResult
      * @return array
      */
-    public function getFieldsErrorsDataAttributes(FormResult $requestResult)
+    public function getFieldsMessagesDataAttributes(FormResult $requestResult)
     {
         $result = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        /** @var Result $fieldResult */
         foreach ($requestResult->getSubResults() as $fieldName => $fieldResult) {
-            if (true === $fieldResult->hasErrors()
-                && true === $formConfiguration->hasField($fieldName)
+            if (true === $formConfiguration->hasField($fieldName)
                 && false === $requestResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
             ) {
-                $result[self::getFieldDataErrorKey($fieldName)] = '1';
-
-                foreach ($fieldResult->getErrors() as $error) {
-                    $validationName = MessageService::get()->getMessageValidationName($error);
-                    $messageKey = MessageService::get()->getMessageKey($error);
-
-                    $result[self::getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)] = '1';
-                }
+                $result += $this->getFieldErrorMessages($fieldName, $fieldResult);
+                $result += $this->getFieldWarningMessages($fieldName, $fieldResult);
+                $result += $this->getFieldNoticeMessages($fieldName, $fieldResult);
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param Result $fieldResult
+     * @return array
+     */
+    protected function getFieldErrorMessages($fieldName, Result $fieldResult)
+    {
+        return (true === $fieldResult->hasErrors())
+            ? $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getErrors(), 'error')
+            : [];
+    }
+
+    /**
+     * @param string $fieldName
+     * @param Result $fieldResult
+     * @return array
+     */
+    protected function getFieldWarningMessages($fieldName, Result $fieldResult)
+    {
+        return (true === $fieldResult->hasWarnings())
+            ? $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getWarnings(), 'warning')
+            : [];
+    }
+
+    /**
+     * @param string $fieldName
+     * @param Result $fieldResult
+     * @return array
+     */
+    protected function getFieldNoticeMessages($fieldName, Result $fieldResult)
+    {
+        return (true === $fieldResult->hasNotices())
+            ? $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getNotices(), 'notice')
+            : [];
+    }
+
+    /**
+     * @param string                  $fieldName
+     * @param FormzMessageInterface[] $messages
+     * @param string                  $type
+     * @return array
+     */
+    protected function addFieldMessageDataAttribute($fieldName, array $messages, $type)
+    {
+        $result = [self::getFieldDataMessageKey($fieldName, $type) => '1'];
+
+        foreach ($messages as $message) {
+            $validationName = $message->getValidationName();
+            $messageKey = $message->getMessageKey();
+
+            $result[self::getFieldDataValidationMessageKey($fieldName, $type, $validationName, $messageKey)] = '1';
         }
 
         return $result;
@@ -178,32 +231,43 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     }
 
     /**
-     * Formats the data error attribute key for a given field name.
+     * Formats the data message attribute key for a given field name.
      *
      * @param string $fieldName Name of the field.
+     * @param string $type      Type of the message: `error`, `warning` or `notice`.
      * @return string
      */
-    public static function getFieldDataErrorKey($fieldName)
+    public static function getFieldDataMessageKey($fieldName, $type = 'error')
     {
-        return 'formz-error-' . StringService::get()->sanitizeString($fieldName);
+        return 'formz-' . $type . '-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
-     * Formats the data error attribute key for a given failed validation for
+     * @return string
+     */
+    public static function getFieldSubmissionDone()
+    {
+        return 'formz-submission-done';
+    }
+
+    /**
+     * Formats the data message attribute key for a given failed validation for
      * the given field name.
      *
      * @param string $fieldName
+     * @param string $type Type of the message: `error`, `warning` or `notice`.
      * @param string $validationName
      * @param string $messageKey
      * @return string
      */
-    public static function getFieldDataValidationErrorKey($fieldName, $validationName, $messageKey)
+    public static function getFieldDataValidationMessageKey($fieldName, $type, $validationName, $messageKey)
     {
         $stringService = StringService::get();
 
         return vsprintf(
-            'formz-error-%s-%s-%s',
+            'formz-%s-%s-%s-%s',
             [
+                $type,
                 $stringService->sanitizeString($fieldName),
                 $stringService->sanitizeString($validationName),
                 $stringService->sanitizeString($messageKey)

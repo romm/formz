@@ -16,6 +16,7 @@ namespace Romm\Formz\Controller;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
@@ -24,14 +25,15 @@ use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
+use TYPO3\CMS\Extbase\Property\PropertyMapper;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 class AjaxValidationController extends ActionController
@@ -152,7 +154,9 @@ class AjaxValidationController extends ActionController
         // Default technical error result if the function can not be reached.
         $result = [
             'success' => false,
-            'message' => [ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY)]
+            'messages' => [
+                'errors' => ['default' => ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY)]
+            ]
         ];
 
         // We prevent any external message to be displayed here.
@@ -164,7 +168,7 @@ class AjaxValidationController extends ActionController
             $result['data'] = ['errorCode' => $exception->getCode()];
 
             if (ExtensionService::get()->isInDebugMode()) {
-                $result['message'] = $this->getDebugMessageForException($exception);
+                $result['messages']['errors']['default'] = $this->getDebugMessageForException($exception);
             }
         }
 
@@ -187,7 +191,7 @@ class AjaxValidationController extends ActionController
         $this->formObject = $this->getFormObject();
         $this->checkConfigurationValidationResult();
         $validation = $this->getFieldValidation();
-        $form = $this->buildObject();
+        $form = $this->buildFormObject();
         $fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
         $validatorDataObject = new ValidatorDataObject($this->formObject, $form, $validation);
 
@@ -198,7 +202,10 @@ class AjaxValidationController extends ActionController
             $validatorDataObject
         );
 
-        return $this->convertResultToJson($validator->validate($fieldValue));
+        $result = $validator->validate($fieldValue);
+        $result = MessageService::get()->sanitizeValidatorResult($result, $validation);
+
+        return $this->convertResultToJson($result);
     }
 
     /**
@@ -306,24 +313,11 @@ class AjaxValidationController extends ActionController
      *
      * @return FormInterface
      */
-    protected function buildObject()
+    protected function buildFormObject()
     {
         $values = $this->cleanValuesFromUrl($this->form);
-        /** @var ReflectionService $reflectionService */
-        $reflectionService = Core::instantiate(ReflectionService::class);
-        /** @var FormInterface $object */
-        $object = Core::instantiate($this->formClassName);
-        $properties = $reflectionService->getClassPropertyNames($this->formClassName);
 
-        foreach ($properties as $propertyName) {
-            if (ObjectAccess::isPropertySettable($object, $propertyName)
-                && isset($values[$propertyName])
-            ) {
-                ObjectAccess::setProperty($object, $propertyName, $values[$propertyName]);
-            }
-        }
-
-        return $object;
+        return $this->getPropertyMapper()->convert($values, $this->formClassName);
     }
 
     /**
@@ -335,14 +329,39 @@ class AjaxValidationController extends ActionController
      */
     protected function convertResultToJson(Result $result)
     {
-        $error = ($result->hasErrors())
-            ? $result->getFirstError()->getMessage()
-            : '';
+        $messages = [];
+
+        if ($result->hasErrors()) {
+            $messages['errors'] = $this->formatMessages($result->getErrors());
+        }
+
+        if ($result->hasWarnings()) {
+            $messages['warnings'] = $this->formatMessages($result->getWarnings());
+        }
+
+        if ($result->hasNotices()) {
+            $messages['notices'] = $this->formatMessages($result->getNotices());
+        }
 
         return [
             'success' => !$result->hasErrors(),
-            'message' => $error
+            'messages' => $messages
         ];
+    }
+
+    /**
+     * @param FormzMessageInterface[] $messages
+     * @return array
+     */
+    protected function formatMessages(array $messages)
+    {
+        $sortedMessages = [];
+
+        foreach ($messages as $message) {
+            $sortedMessages[$message->getMessageKey()] = $message->getMessage();
+        }
+
+        return $sortedMessages;
     }
 
     /**
@@ -377,5 +396,16 @@ class AjaxValidationController extends ActionController
         unset($values['__trustedProperties']);
 
         return reset($values);
+    }
+
+    /**
+     * @return PropertyMapper
+     */
+    protected function getPropertyMapper()
+    {
+        /** @var PropertyMapper $propertyMapper */
+        $propertyMapper = Core::instantiate(PropertyMapper::class);
+
+        return $propertyMapper;
     }
 }

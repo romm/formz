@@ -5,9 +5,12 @@ Formz.Field.ValidationService = (function () {
      * @param {Function}                           states.validationDataCallback
      * @param {Formz.Field.EventsManagerInstance}  states.eventsManager
      * @param {String}                             states.defaultErrorMessage
-     * @param {Array}                              states.existingErrors
+     * @param {Object}                             states.existingErrors
+     * @param {Object}                             states.existingWarnings
+     * @param {Object}                             states.existingNotices
      * @param {string}                             states.submittedFieldValue
      * @param {boolean}                            states.wasValidated
+     * @param {boolean}                            states.isDeactivated
      * @returns {Formz.Field.ValidationServiceInstance}
      */
     var servicePrototype = function (states) {
@@ -83,6 +86,20 @@ Formz.Field.ValidationService = (function () {
         var errors = states.existingErrors || {};
 
         /**
+         * Contains the current warnings found by this validation service.
+         *
+         * @type {Object<Object>}
+         */
+        var warnings = states.existingWarnings || {};
+
+        /**
+         * Contains the current notices found by this validation service.
+         *
+         * @type {Object<Object>}
+         */
+        var notices = states.existingNotices || {};
+
+        /**
          * @type {boolean}
          */
         var wasValidated = states.wasValidated || false;
@@ -112,6 +129,11 @@ Formz.Field.ValidationService = (function () {
         var validatorsCheckedDuringLastValidation = (true === states.wasValidated)
             ? '*'
             : [];
+
+        /**
+         * @type {boolean}
+         */
+        var isDeactivated = states.isDeactivated;
 
         /**
          * Internal recursive function to validate the field.
@@ -240,9 +262,30 @@ Formz.Field.ValidationService = (function () {
             validationRunning = false;
             if (result.hasErrors()) {
                 var errors = result.getErrors();
+
                 for (var errorName in errors) {
                     if (errors.hasOwnProperty(errorName)) {
                         addError(validationRuleName, errorName, errors[errorName]);
+                    }
+                }
+            }
+
+            if (result.hasWarnings()) {
+                var warnings = result.getWarnings();
+
+                for (var warningName in warnings) {
+                    if (warnings.hasOwnProperty(warningName)) {
+                        addWarning(validationRuleName, warningName, warnings[warningName]);
+                    }
+                }
+            }
+
+            if (result.hasNotices()) {
+                var notices = result.getNotices();
+
+                for (var noticeName in notices) {
+                    if (notices.hasOwnProperty(noticeName)) {
+                        addNotice(validationRuleName, noticeName, notices[noticeName]);
                     }
                 }
             }
@@ -276,23 +319,67 @@ Formz.Field.ValidationService = (function () {
          * Adds an error to this field.
          *
          * @param {string} validatorName Name of the validator which returned the error.
-         * @param {string} errorName     Name of the error, e.g. "default".
+         * @param {string} name          Name of the error, e.g. "default".
          * @param {string} message       Message of the error.
          */
-        var addError = function (validatorName, errorName, message) {
+        var addError = function (validatorName, name, message) {
             if (false == validatorName in errors) {
                 errors[validatorName] = {};
             }
-            errors[validatorName][errorName] = message;
+            errors[validatorName][name] = message;
             lastValidationErrorName = validatorName;
+        };
+
+        /**
+         * Adds an warning to this field.
+         *
+         * @param {string} validatorName Name of the validator which returned the warning.
+         * @param {string} name          Name of the warning, e.g. "default".
+         * @param {string} message       Message of the warning.
+         */
+        var addWarning = function (validatorName, name, message) {
+            if (false == validatorName in warnings) {
+                warnings[validatorName] = {};
+            }
+            warnings[validatorName][name] = message;
+        };
+
+        /**
+         * Adds an notice to this field.
+         *
+         * @param {string} validatorName Name of the validator which returned the notice.
+         * @param {string} name          Name of the notice, e.g. "default".
+         * @param {string} message       Message of the notice.
+         */
+        var addNotice = function (validatorName, name, message) {
+            if (false == validatorName in notices) {
+                notices[validatorName] = {};
+            }
+            notices[validatorName][name] = message;
         };
 
         /**
          * Resets the errors of this field.
          */
-        var resetErrors = function () {
+        var resetMessages = function () {
             lastValidationErrorName = null;
             errors = {};
+            warnings = {};
+            notices = {};
+        };
+
+        var activate = function () {
+            if (true === isDeactivated) {
+                isDeactivated = false;
+                eventsManager.dispatch('reactivated');
+            }
+        };
+
+        var deactivate = function () {
+            if (false === isDeactivated) {
+                isDeactivated = true;
+                eventsManager.dispatch('deactivated');
+            }
         };
 
         /**
@@ -371,7 +458,7 @@ Formz.Field.ValidationService = (function () {
 
                 validationRunning = true;
 
-                resetErrors();
+                resetMessages();
                 validatorsCheckedDuringLastValidation = [];
                 wasValidated = true;
                 lastValidatedValue = getStringValue();
@@ -608,14 +695,14 @@ Formz.Field.ValidationService = (function () {
                     var self = this;
 
                     var stopValidationCallBack = function () {
-                        eventsManager.dispatch('deactivated');
+                        deactivate();
                     };
 
                     var endingCallBack = function () {
                         if (getStringValue() !== lastValidatedValue) {
                             self.validate();
                         } else {
-                            eventsManager.dispatch('reactivated');
+                            activate();
                         }
                     };
 
@@ -648,6 +735,24 @@ Formz.Field.ValidationService = (function () {
              */
             getErrors: function () {
                 return errors;
+            },
+
+            /**
+             * @see getErrors()
+             *
+             * @returns {Object.<Object>}
+             */
+            getWarnings: function () {
+                return warnings;
+            },
+
+            /**
+             * @see getErrors()
+             *
+             * @returns {Object.<Object>}
+             */
+            getNotices: function () {
+                return notices;
             },
 
             /**
@@ -716,9 +821,12 @@ Formz.Field.ValidationService = (function () {
         /**
          * @param {Object}                      states
          * @param {Formz.FullField}             states.field
-         * @param {Array}                       states.existingErrors
+         * @param {Object}                      states.existingErrors
+         * @param {Object}                      states.existingWarnings
+         * @param {Object}                      states.existingNotices
          * @param {string}                      states.submittedFieldValue
          * @param {boolean}                     states.wasValidated
+         * @param {boolean}                     states.isDeactivated
          * @param {Formz.EventsManagerInstance} states.eventsManager
          * @returns {Formz.Field.ValidationServiceInstance}
          */
@@ -737,8 +845,11 @@ Formz.Field.ValidationService = (function () {
                 eventsManager: states.eventsManager,
                 defaultErrorMessage: states.field.getForm().getConfiguration()['settings']['defaultErrorMessage'],
                 existingErrors: states.existingErrors,
+                existingWarnings: states.existingWarnings,
+                existingNotices: states.existingNotices,
                 submittedFieldValue: states.submittedFieldValue,
-                wasValidated: states.wasValidated
+                wasValidated: states.wasValidated,
+                isDeactivated: states.isDeactivated
             });
         }
     }

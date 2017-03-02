@@ -3,6 +3,7 @@ namespace Romm\Formz\Tests\Unit\Form;
 
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\Configuration;
+use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -232,5 +233,20 @@ class FormObjectTest extends AbstractUnitTest
         $this->assertFalse($validationResult->hasErrors());
 
         unset($formObject);
+    }
+
+    /**
+     * @test
+     */
+    public function setLastValidationResultSetsLastValidationResult()
+    {
+        $formObject = new FormObject('foo', 'foo');
+
+        $validationResult = new FormResult;
+
+        $this->assertFalse($formObject->hasLastValidationResult());
+        $formObject->setLastValidationResult($validationResult);
+        $this->assertTrue($formObject->hasLastValidationResult());
+        $this->assertSame($validationResult, $formObject->getLastValidationResult());
     }
 }

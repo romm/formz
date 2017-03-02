@@ -14,11 +14,13 @@
 namespace Romm\Formz\Service;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Message as FormzMessage;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Error\Message;
+use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class MessageService implements SingletonInterface
@@ -31,33 +33,58 @@ class MessageService implements SingletonInterface
     protected $signalSlotDispatcher;
 
     /**
-     * Returns the validation name of a message: if it is an instance of
-     * `FormzMessageInterface`, we can fetch it, otherwise `unknown` is
-     * returned.
+     * This function will go through all errors, warnings and notices and check
+     * if they are instances of `FormzMessageInterface`. If not, they are
+     * converted in order to have more informations that are needed later.
      *
-     * @param Message $message
-     * @return string
+     * @param Result     $result
+     * @param Validation $validation
+     * @return Result
      */
-    public function getMessageValidationName(Message $message)
+    public function sanitizeValidatorResult(Result $result, Validation $validation)
     {
-        return ($message instanceof FormzMessageInterface)
-            ? $message->getValidationName()
-            : 'unknown';
+        $newResult = new Result;
+
+        $this->sanitizeValidatorResultMessages('error', $result->getFlattenedErrors(), $newResult, $validation);
+        $this->sanitizeValidatorResultMessages('warning', $result->getFlattenedWarnings(), $newResult, $validation);
+        $this->sanitizeValidatorResultMessages('notice', $result->getFlattenedNotices(), $newResult, $validation);
+
+        return $newResult;
     }
 
     /**
-     * Returns the key of a message: if it is an instance of
-     * `FormzMessageInterface`, we can fetch it, otherwise `unknown` is
-     * returned.
-     *
-     * @param Message $message
-     * @return string
+     * @param string     $type
+     * @param array      $messages
+     * @param Result     $newResult
+     * @param Validation $validation
      */
-    public function getMessageKey(Message $message)
+    protected function sanitizeValidatorResultMessages($type, array $messages, Result $newResult, Validation $validation)
     {
-        return ($message instanceof FormzMessageInterface)
-            ? $message->getMessageKey()
-            : 'unknown';
+        $addMethod = 'add' . ucfirst($type);
+        $objectType = 'Romm\\Formz\\Error\\' . ucfirst($type);
+        $unknownCounter = 0;
+
+        /** @var Message[] $messagesList */
+        foreach ($messages as $path => $messagesList) {
+            foreach ($messagesList as $message) {
+                if (false === $message instanceof FormzMessageInterface) {
+                    $message = new $objectType(
+                        $message->getMessage(),
+                        $message->getCode(),
+                        $validation->getValidationName(),
+                        'unknown-' . ++$unknownCounter,
+                        $message->getArguments(),
+                        $message->getTitle()
+                    );
+                }
+
+                if (empty($path)) {
+                    $newResult->$addMethod($message);
+                } else {
+                    $newResult->forProperty($path)->$addMethod($message);
+                }
+            }
+        }
     }
 
     /**

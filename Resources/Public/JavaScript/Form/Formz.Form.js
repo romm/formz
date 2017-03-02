@@ -47,7 +47,7 @@ Formz.Form = (function () {
         /**
          * @type {Object<Array>}
          */
-        var existingErrors = {};
+        var existingMessages = {};
 
         /**
          * @type {boolean}
@@ -67,6 +67,11 @@ Formz.Form = (function () {
         var fieldsHaveBeenInitialized = false;
 
         /**
+         * @type {Array}
+         */
+        var deactivatedFields = [];
+
+        /**
          * Initializes all the fields of this form: an instance is created for
          * every field.
          *
@@ -82,21 +87,40 @@ Formz.Form = (function () {
             var configurationFields = configuration['fields'];
             for (var fieldName in configurationFields) {
                 if (configurationFields.hasOwnProperty(fieldName)) {
-                    var fieldExistingErrors = (fieldName in existingErrors)
-                        ? existingErrors[fieldName]
-                        : [];
+                    var existingErrors = {};
+                    var existingWarning = {};
+                    var existingNotices = {};
+
+                    if (fieldName in existingMessages) {
+                        var fieldExistingMessages = existingMessages[fieldName];
+
+                        if ('errors' in fieldExistingMessages) {
+                            existingErrors = fieldExistingMessages['errors'];
+                        }
+                        if ('warnings' in fieldExistingMessages) {
+                            existingWarning = fieldExistingMessages['warnings'];
+                        }
+                        if ('notices' in fieldExistingMessages) {
+                            existingNotices = fieldExistingMessages['notices'];
+                        }
+                    }
 
                     var submittedFieldValue = (fieldName in submittedValues)
                         ? submittedValues[fieldName]
                         : '';
 
+                    var isDeactivated = -1 !== deactivatedFields.indexOf(fieldName);
+
                     var field = Formz.Field.get(
                         fieldName,
                         configurationFields[fieldName],
                         formInstance,
-                        fieldExistingErrors,
+                        existingErrors,
+                        existingWarning,
+                        existingNotices,
                         submittedFieldValue,
-                        formWasValidated
+                        formWasValidated,
+                        isDeactivated
                     );
                     if (field.getElements().length > 0) {
                         fields[fieldName] = field;
@@ -195,13 +219,15 @@ Formz.Form = (function () {
 
             /**
              * @param {string}  submittedFormValues
-             * @param {string}  existingFormErrors
+             * @param {string}  existingFormMessages
              * @param {boolean} formValidationDone
+             * @param {Array}   deactivatedFieldsNames
              */
-            injectRequestData: function (submittedFormValues, existingFormErrors, formValidationDone) {
+            injectRequestData: function (submittedFormValues, existingFormMessages, formValidationDone, deactivatedFieldsNames) {
                 submittedValues = submittedFormValues;
-                existingErrors = existingFormErrors;
+                existingMessages = existingFormMessages;
                 formWasValidated = formValidationDone;
+                deactivatedFields = deactivatedFieldsNames;
             }
         };
 

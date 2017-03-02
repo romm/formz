@@ -55,7 +55,6 @@ class AssetHandlerFactory
     /**
      * @param FormObject        $formObject Name of the form class.
      * @param ControllerContext $controllerContext
-     * @throws \Exception
      */
     protected function __construct(FormObject $formObject, ControllerContext $controllerContext)
     {

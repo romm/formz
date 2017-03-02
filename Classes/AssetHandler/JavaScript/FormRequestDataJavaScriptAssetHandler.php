@@ -14,11 +14,9 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\ArrayService;
-use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Error;
-use TYPO3\CMS\Extbase\Error\Result;
 
 /**
  * Will handle the "one time run" data needed by JavaScript: the submitted
@@ -35,18 +33,16 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
     public function getFormRequestDataJavaScriptCode()
     {
         $submittedFormValues = [];
-        $fieldsExistingErrors = [];
-        $originalRequest = $this->getControllerContext()
-            ->getRequest()
-            ->getOriginalRequest();
-
-        $formWasSubmitted = (null !== $originalRequest)
+        $fieldsExistingMessages = [];
+        $deactivatedFields = [];
+        $formWasSubmitted = $this->getFormObject()->hasLastValidationResult()
             ? 'true'
             : 'false';
 
         if ($formWasSubmitted) {
             $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
-            $fieldsExistingErrors = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingErrors());
+            $fieldsExistingMessages = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingMessages());
+            $deactivatedFields = ArrayService::get()->arrayToJavaScriptJson($this->getDeactivatedFields());
         }
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
@@ -54,7 +50,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
         $javaScriptCode = <<<JS
 (function() {
     Formz.Form.beforeInitialization($formName, function(form) {
-        form.injectRequestData($submittedFormValues, $fieldsExistingErrors, $formWasSubmitted)
+        form.injectRequestData($submittedFormValues, $fieldsExistingMessages, $formWasSubmitted, $deactivatedFields)
     });
 })();
 JS;
@@ -86,39 +82,70 @@ JS;
     }
 
     /**
-     * This function checks every error which may exist on every property of the
-     * form (used to tell to JavaScript which errors already exist).
+     * This function checks every message which may exist on every property of
+     * the form (used to tell to JavaScript which messages already exist).
      *
      * @return array
      */
-    protected function getFieldsExistingErrors()
+    protected function getFieldsExistingMessages()
     {
-        $fieldsErrors = [];
-        $request = $this->getControllerContext()
-            ->getRequest();
+        $fieldsMessages = [];
 
-        if (null !== $request->getOriginalRequest()) {
-            $requestResult = $request->getOriginalRequestMappingResults();
-            /** @var Result[] $formFieldsResult */
-            $formFieldsResult = $requestResult->forProperty($this->getFormObject()->getName())->getSubResults();
+        if ($this->getFormObject()->hasLastValidationResult()) {
+            $lastValidationResult = $this->getFormObject()->getLastValidationResult();
 
             foreach ($this->getFormObject()->getProperties() as $fieldName) {
-                if (array_key_exists($fieldName, $formFieldsResult)
-                    && $formFieldsResult[$fieldName]->hasErrors()
-                ) {
-                    $fieldsErrors[$fieldName] = [];
+                $result = $lastValidationResult->forProperty($fieldName);
+                $messages = [];
 
-                    foreach ($formFieldsResult[$fieldName]->getErrors() as $error) {
-                        /** @var Error $error */
-                        $validationName = MessageService::get()->getMessageValidationName($error);
-                        $messageKey = MessageService::get()->getMessageKey($error);
-
-                        $fieldsErrors[$fieldName][$validationName] = [$messageKey => $error->render()];
-                    }
+                if ($result->hasErrors()) {
+                    $messages['errors'] = $this->formatMessages($result->getErrors());
                 }
+
+                if ($result->hasWarnings()) {
+                    $messages['warnings'] = $this->formatMessages($result->getWarnings());
+                }
+
+                if ($result->hasNotices()) {
+                    $messages['notices'] = $this->formatMessages($result->getNotices());
+                }
+
+                $fieldsMessages[$fieldName] = $messages;
             }
         }
 
-        return $fieldsErrors;
+        return $fieldsMessages;
+    }
+
+    /**
+     * @param FormzMessageInterface[] $messages
+     * @return array
+     */
+    protected function formatMessages(array $messages)
+    {
+        $sortedMessages = [];
+
+        foreach ($messages as $message) {
+            $validationName = $message->getValidationName();
+            $messageKey = $message->getMessageKey();
+
+            if (false === isset($sortedMessages[$validationName])) {
+                $sortedMessages[$validationName] = [];
+            }
+
+            $sortedMessages[$validationName][$messageKey] = $message->render();
+        }
+
+        return $sortedMessages;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDeactivatedFields()
+    {
+        return ($this->getFormObject()->hasLastValidationResult())
+            ? array_keys($this->getFormObject()->getLastValidationResult()->getDeactivatedFields())
+            : [];
     }
 }

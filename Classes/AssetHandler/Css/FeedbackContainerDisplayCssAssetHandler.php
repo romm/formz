@@ -20,7 +20,7 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
  * This asset handler generates the CSS code which will automatically hide the
  * error container of the fields when they have no errors.
  */
-class ErrorContainerDisplayCssAssetHandler extends AbstractAssetHandler
+class FeedbackContainerDisplayCssAssetHandler extends AbstractAssetHandler
 {
 
     /**
@@ -35,11 +35,13 @@ class ErrorContainerDisplayCssAssetHandler extends AbstractAssetHandler
 
         foreach ($formConfiguration->getFields() as $fieldName => $field) {
             $formName = $this->getFormObject()->getName();
-            $errorSelector = DataAttributesAssetHandler::getFieldDataErrorKey($fieldName);
+            $errorSelector = DataAttributesAssetHandler::getFieldDataMessageKey($fieldName, 'error');
+            $warningSelector = DataAttributesAssetHandler::getFieldDataMessageKey($fieldName, 'warning');
+            $noticeSelector = DataAttributesAssetHandler::getFieldDataMessageKey($fieldName, 'notice');
             $errorContainerCss = $field->getSettings()->getFeedbackContainerSelector();
 
             $cssBlocks[] = <<<CSS
-form[name="$formName"]:not([$errorSelector="1"]) $errorContainerCss {
+form[name="$formName"]:not([$errorSelector="1"]):not([$warningSelector="1"]):not([$noticeSelector="1"]) $errorContainerCss {
     display: none!important;
 }
 CSS;

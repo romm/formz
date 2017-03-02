@@ -5,6 +5,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use ReflectionObject;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Controller\AjaxValidationController;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
@@ -13,10 +14,13 @@ use Romm\Formz\Service\ContextService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Fixture\Validation\Validator\ExceptionDummyValidator;
+use Romm\Formz\Tests\Fixture\Validation\Validator\MessagesValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
+use TYPO3\CMS\Extbase\Property\PropertyMapper;
+use TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationBuilder;
 
 class AjaxValidationControllerTest extends AbstractUnitTest
 {
@@ -138,7 +142,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $this->assertFalse($result['success']);
         $this->assertEquals(
             ContextService::get()->translate(AjaxValidationController::DEFAULT_ERROR_MESSAGE_KEY),
-            $result['message'][0]
+            $result['messages']['errors']['default']
         );
     }
 
@@ -149,7 +153,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
      *
      * @test
      */
-    public function ExceptionCatchInProtectedRequestWithDebugModeShouldCustomizeResultMessage()
+    public function exceptionCatchInProtectedRequestWithDebugModeShouldCustomizeResultMessage()
     {
         $formObject = $this->getDefaultFormObject();
         $validation = new Validation;
@@ -248,7 +252,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     {
         $expectedResult = [
             'success' => true,
-            'message' => ''
+            'messages' => []
         ];
 
         $formObject = $this->getDefaultFormObject();
@@ -268,6 +272,39 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     }
 
     /**
+     * Checks that errors, warnings and notices are added to the result array.
+     *
+     * @test
+     */
+    public function messagesTypesAreReturnedInResult()
+    {
+        $expectedResult = [
+            'success' => false,
+            'messages' => [
+                'errors' => [MessagesValidator::MESSAGE_1 => MessagesValidator::MESSAGE_1],
+                'warnings' => [MessagesValidator::MESSAGE_2 => MessagesValidator::MESSAGE_2],
+                'notices' => [MessagesValidator::MESSAGE_3 => MessagesValidator::MESSAGE_3]
+            ]
+        ];
+
+        $formObject = $this->getDefaultFormObject();
+
+        $messagesValidator = new Validation;
+        $messagesValidator->setClassName(MessagesValidator::class);
+        $messagesValidator->setValidationName('bar');
+        $messagesValidator->activateAjaxUsage();
+        $formObject->getConfiguration()->getField('foo')->addValidation($messagesValidator);
+
+        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
+
+        $ajaxValidationController->setProtectedRequestMode(false);
+        $ajaxValidationController->runAction();
+        $result = $ajaxValidationController->getView()->render();
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    /**
      * @param FormObject $formObject
      * @return AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -275,8 +312,17 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     {
         /** @var AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject $ajaxValidationController */
         $ajaxValidationController = $this->getMockBuilder(AjaxValidationController::class)
-            ->setMethods(['getArgument', 'getFormObject', 'throwStatus', 'getDebugMessageForException'])
+            ->setMethods(['getArgument', 'getFormObject', 'getPropertyMapper', 'throwStatus', 'getDebugMessageForException'])
             ->getMock();
+
+        /** @var PropertyMapper $propertyMapper */
+        $propertyMapper = new PropertyMapper;
+        $this->inject($propertyMapper, 'objectManager', Core::get()->getObjectManager());
+        $this->inject($propertyMapper, 'configurationBuilder', new PropertyMappingConfigurationBuilder);
+        $propertyMapper->initializeObject();
+
+        $ajaxValidationController->method('getPropertyMapper')
+            ->willReturn($propertyMapper);
 
         $view = $this->getMockBuilder(JsonView::class)
             ->setMethods(['render'])

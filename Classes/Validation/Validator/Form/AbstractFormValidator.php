@@ -82,17 +82,9 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected $result;
 
     /**
-     * Contains the validation results of all forms which were validated. The
-     * key is the form name (the property `formName` in the form configuration)
-     * and the value is an instance of `FormResult`.
-     *
-     * Note: we need to store the results here, because the TYPO3 request
-     * handler builds an instance of Extbase's `Result` from scratch, so we are
-     * not able to retrieve the `FormResult` instance afterward.
-     *
-     * @var FormResult[]
+     * @var FormValidatorExecutor
      */
-    private static $formsValidationResults = [];
+    protected $formValidatorExecutor;
 
     /**
      * Checks the given form instance, and launches the validation if it is a
@@ -100,9 +92,21 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      *
      * @param FormInterface $form The form instance to be validated.
      * @return FormResult
-     * @throws InvalidArgumentTypeException
      */
     final public function validate($form)
+    {
+        $this->validateWithoutSavingResults($form);
+        $this->formValidatorExecutor->saveValidationResult();
+
+        return $this->result;
+    }
+
+    /**
+     * @param FormInterface $form
+     * @return FormResult
+     * @throws InvalidArgumentTypeException
+     */
+    public function validateWithoutSavingResults($form)
     {
         if (false === $form instanceof FormInterface) {
             throw new InvalidArgumentTypeException(
@@ -112,6 +116,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         }
 
         $this->result = new FormResult;
+        $this->formValidatorExecutor = $this->getFormValidatorExecutor($form);
 
         $this->isValid($form);
 
@@ -125,13 +130,12 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      */
     final public function isValid($form)
     {
-        $formValidatorExecutor = $this->getFormValidatorExecutor($form);
-        $formValidatorExecutor->applyBehaviours();
-        $formValidatorExecutor->checkFieldsActivation();
+        $this->formValidatorExecutor->applyBehaviours();
+        $this->formValidatorExecutor->checkFieldsActivation();
 
         $this->beforeValidationProcess();
 
-        $formValidatorExecutor->validateFields(function (Field $field) {
+        $this->formValidatorExecutor->validateFields(function (Field $field) {
             $this->callAfterFieldValidationMethod($field);
         });
 
@@ -141,8 +145,6 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
             // Storing the form for possible third party further usage.
             FormService::addFormWithErrors($form);
         }
-
-        self::$formsValidationResults[get_class($form) . '::' . $this->options['name']] = $this->result;
     }
 
     /**
@@ -176,23 +178,6 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         if (method_exists($this, $functionName)) {
             call_user_func([$this, $functionName]);
         }
-    }
-
-    /**
-     * Returns the validation result of the asked form. The form name matches
-     * the property `formName` of the form configuration.
-     *
-     * @param string $formClassName
-     * @param string $formName
-     * @return null|FormResult
-     */
-    public static function getFormValidationResult($formClassName, $formName)
-    {
-        $key = $formClassName . '::' . $formName;
-
-        return (true === isset(self::$formsValidationResults[$key]))
-            ? self::$formsValidationResults[$key]
-            : null;
     }
 
     /**

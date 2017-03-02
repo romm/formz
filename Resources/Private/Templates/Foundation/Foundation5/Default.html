@@ -26,9 +26,27 @@
 	<div formz-field-feedback-container="{fieldName}">
 		<div formz-field-feedback-list="{fieldName}">
 			<f:form.validationResults for="{formName}.{fieldName}">
-				<f:for each="{validationResults.errors}" as="error">
-					<formz:formatMessage message="{error}" />
-				</f:for>
+				<f:if condition="{validationResults.errors}">
+					<div class="error">
+						<f:for each="{validationResults.errors}" as="error">
+							<formz:formatMessage message="{error}" />
+						</f:for>
+					</div>
+				</f:if>
+				<f:if condition="{validationResults.warnings}">
+					<div class="warning">
+						<f:for each="{validationResults.warnings}" as="warning">
+							<formz:formatMessage message="{warning}" />
+						</f:for>
+					</div>
+				</f:if>
+				<f:if condition="{validationResults.notices}">
+					<div class="info">
+						<f:for each="{validationResults.notices}" as="notice">
+							<formz:formatMessage message="{notice}" />
+						</f:for>
+					</div>
+				</f:if>
 			</f:form.validationResults>
 		</div>
 

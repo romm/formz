@@ -3,9 +3,9 @@ namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Exceptions\ContextNotFoundException;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\ViewHelpers\OptionViewHelper;
-use Romm\Formz\ViewHelpers\Service\FieldService;
 
 class OptionViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -14,18 +14,18 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelper()
     {
-        /** @var FieldService|\PHPUnit_Framework_MockObject_MockObject $formService */
-        $formService = $this->getMockBuilder(FieldService::class)
+        /** @var FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject $formService */
+        $formService = $this->getMockBuilder(FieldViewHelperService::class)
             ->setMethods(['setFieldOption'])
             ->getMock();
         $formService->expects($this->once())
             ->method('setFieldOption')
             ->with('foo', 'bar');
 
-        $fieldService = new FieldService;
+        $fieldService = new FieldViewHelperService;
         $fieldService->setCurrentField(new Field);
 
-        UnitTestContainer::get()->registerMockedInstance(FieldService::class, $formService);
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $formService);
 
         $viewHelper = new OptionViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
@@ -48,7 +48,7 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
     {
         $viewHelper = new OptionViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService(new FieldService);
+        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();
 
         $this->setExpectedException(ContextNotFoundException::class);

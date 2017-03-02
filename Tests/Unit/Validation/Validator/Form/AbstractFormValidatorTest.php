@@ -20,7 +20,14 @@ class AbstractFormValidatorTest extends AbstractUnitTest
         /** @var DefaultFormValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
         $validator = $this->getMockBuilder(DefaultFormValidator::class)
             ->disableOriginalConstructor()
+            ->setMethods(['getFormValidatorExecutor'])
             ->getMock();
+
+        $validator->method('getFormValidatorExecutor')
+            ->willReturnCallback(function () {
+                return $this->getMockBuilder(FormValidatorExecutor::class)
+                    ->getMock();
+            });
 
         /** @noinspection PhpParamsInspection */
         $validator->validate(new \stdClass);
@@ -79,7 +86,7 @@ class AbstractFormValidatorTest extends AbstractUnitTest
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutorMock */
         $formValidatorExecutorMock = $this->getMockBuilder(FormValidatorExecutor::class)
-            ->setMethods(['applyBehaviours', 'checkFieldsActivation', 'validateFields'])
+            ->setMethods(['applyBehaviours', 'checkFieldsActivation', 'validateFields', 'saveValidationResult'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -107,6 +114,13 @@ class AbstractFormValidatorTest extends AbstractUnitTest
             ->method('validateFields')
             ->willReturnCallback(function () use (&$counter) {
                 $this->assertEquals(2, $counter);
+                $counter++;
+            });
+
+        $formValidatorExecutorMock->expects($this->once())
+            ->method('saveValidationResult')
+            ->willReturnCallback(function () use (&$counter) {
+                $this->assertEquals(3, $counter);
             });
 
         $validatorMock->validate(new DefaultForm);
