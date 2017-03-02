@@ -14,8 +14,9 @@
 namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\SectionService;
+use Romm\Formz\Exceptions\ContextNotFoundException;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -32,7 +33,7 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
     protected $escapeOutput = false;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -49,7 +50,12 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public function render()
     {
-        $this->fieldService->checkIsInsideFieldViewHelper();
+        if (false === $this->fieldService->fieldContextExists()) {
+            throw new ContextNotFoundException(
+                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
+                1488473956
+            );
+        }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
@@ -62,8 +68,8 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        /** @var SectionService $sectionService */
-        $sectionService = Core::instantiate(SectionService::class);
+        /** @var SectionViewHelperService $sectionService */
+        $sectionService = Core::instantiate(SectionViewHelperService::class);
 
         $closure = $sectionService->getSectionClosure($arguments['section']);
 
@@ -73,9 +79,9 @@ class RenderSectionViewHelper extends AbstractViewHelper implements CompilableIn
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

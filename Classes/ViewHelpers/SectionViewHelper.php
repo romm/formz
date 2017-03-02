@@ -14,8 +14,9 @@
 namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\SectionService;
+use Romm\Formz\Exceptions\ContextNotFoundException;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -30,7 +31,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 class SectionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -47,7 +48,12 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function render()
     {
-        $this->fieldService->checkIsInsideFieldViewHelper();
+        if (false === $this->fieldService->fieldContextExists()) {
+            throw new ContextNotFoundException(
+                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
+                1488474106
+            );
+        }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
@@ -57,16 +63,16 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        /** @var SectionService $sectionService */
-        $sectionService = Core::instantiate(SectionService::class);
+        /** @var SectionViewHelperService $sectionService */
+        $sectionService = Core::instantiate(SectionViewHelperService::class);
 
         $sectionService->addSectionClosure($arguments['name'], $renderChildrenClosure);
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

@@ -57,7 +57,7 @@ class FormObjectFactory implements SingletonInterface
      * @param string $className
      * @param string $name
      * @return FormObject
-     * @throws \Exception
+     * @throws ClassNotFoundException
      */
     public function getInstanceFromClassName($className, $name)
     {

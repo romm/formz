@@ -23,13 +23,13 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Object\Container\Container;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 trait FormzUnitTestUtility
 {
@@ -375,14 +375,14 @@ trait FormzUnitTestUtility
      */
     protected function addFormzConfiguration(array $configuration)
     {
-        $this->setFormzConfiguration(array_merge_recursive(
+        ArrayUtility::mergeRecursiveWithOverrule(
             $this->formzConfiguration,
             [
                 'config' => [
                     'tx_formz' => $configuration
                 ]
             ]
-        ));
+        );
     }
 
     /**
@@ -410,7 +410,7 @@ trait FormzUnitTestUtility
      */
     protected function setExtensionConfigurationValue($key, $value)
     {
-        $this->extensionConfiguration[$key] = $value;
+        $this->extensionConfiguration = ArrayUtility::setValueByPath($this->extensionConfiguration, $key, $value, '.');
     }
 
     /**
@@ -468,7 +468,7 @@ trait FormzUnitTestUtility
             $configurationCallBack = function () {
                 $configuration = ArrayUtility::setValueByPath(
                     $this->formzConfiguration,
-                    'config.tx_formz.forms',
+                    'config/tx_formz/forms',
                     $this->formConfiguration
                 );
 

@@ -18,6 +18,7 @@ use Romm\Formz\Error\FormResult;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\StringService;
+use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
@@ -61,7 +62,9 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
                     ? implode(' ', $value)
                     : $value;
 
-                $result[self::getFieldDataValueKey($fieldName)] = $value;
+                if (false === empty($value)) {
+                    $result[self::getFieldDataValueKey($fieldName)] = $value;
+                }
             }
         }
 
@@ -114,21 +117,49 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
             if (true === $formConfiguration->hasField($fieldName)
                 && false === $requestResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
             ) {
-                if (true === $fieldResult->hasErrors()) {
-                    $result += $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getErrors(), 'error');
-                }
-
-                if (true === $fieldResult->hasWarnings()) {
-                    $result += $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getWarnings(), 'warning');
-                }
-
-                if (true === $fieldResult->hasNotices()) {
-                    $result += $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getNotices(), 'notice');
-                }
+                $result += $this->getFieldErrorMessages($fieldName, $fieldResult);
+                $result += $this->getFieldWarningMessages($fieldName, $fieldResult);
+                $result += $this->getFieldNoticeMessages($fieldName, $fieldResult);
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param Result $fieldResult
+     * @return array
+     */
+    protected function getFieldErrorMessages($fieldName, Result $fieldResult)
+    {
+        return (true === $fieldResult->hasErrors())
+            ? $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getErrors(), 'error')
+            : [];
+    }
+
+    /**
+     * @param string $fieldName
+     * @param Result $fieldResult
+     * @return array
+     */
+    protected function getFieldWarningMessages($fieldName, Result $fieldResult)
+    {
+        return (true === $fieldResult->hasWarnings())
+            ? $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getWarnings(), 'warning')
+            : [];
+    }
+
+    /**
+     * @param string $fieldName
+     * @param Result $fieldResult
+     * @return array
+     */
+    protected function getFieldNoticeMessages($fieldName, Result $fieldResult)
+    {
+        return (true === $fieldResult->hasNotices())
+            ? $this->addFieldMessageDataAttribute($fieldName, $fieldResult->getNotices(), 'notice')
+            : [];
     }
 
     /**
@@ -209,6 +240,14 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public static function getFieldDataMessageKey($fieldName, $type = 'error')
     {
         return 'formz-' . $type . '-' . StringService::get()->sanitizeString($fieldName);
+    }
+
+    /**
+     * @return string
+     */
+    public static function getFieldSubmissionDone()
+    {
+        return 'formz-submission-done';
     }
 
     /**

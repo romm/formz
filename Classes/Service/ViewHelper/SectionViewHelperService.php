@@ -11,11 +11,11 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\ViewHelpers\Service;
+namespace Romm\Formz\Service\ViewHelper;
 
 use TYPO3\CMS\Core\SingletonInterface;
 
-class SectionService implements SingletonInterface
+class SectionViewHelperService implements SingletonInterface
 {
     /**
      * Contains the closures which will render the registered sections. The keys
@@ -54,7 +54,7 @@ class SectionService implements SingletonInterface
     /**
      * Resets the list of closures.
      */
-    public function resetSectionClosures()
+    public function resetState()
     {
         $this->sections = [];
     }

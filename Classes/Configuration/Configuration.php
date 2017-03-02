@@ -64,7 +64,6 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      * Will initialize correctly the configuration object settings.
      *
      * @return ServiceFactory
-     * @throws \Exception
      */
     public static function getConfigurationObjectServices()
     {

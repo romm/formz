@@ -16,13 +16,14 @@ namespace Romm\Formz\ViewHelpers;
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
-use Romm\Formz\ViewHelpers\Service\SectionService;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
@@ -54,17 +55,17 @@ class FieldViewHelper extends AbstractViewHelper
     public static $reservedVariablesNames = ['layout', 'formName', 'fieldName', 'fieldId'];
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
     /**
-     * @var SectionService
+     * @var SectionViewHelperService
      */
     protected $sectionService;
 
@@ -94,7 +95,12 @@ class FieldViewHelper extends AbstractViewHelper
          * First, we check if this view helper is called from within the
          * `FormViewHelper`, because it would not make sense anywhere else.
          */
-        $this->formService->checkIsInsideFormViewHelper();
+        if (false === $this->formService->formContextExists()) {
+            throw new ContextNotFoundException(
+                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FormViewHelper::class . '".',
+                1465243085
+            );
+        }
 
         /*
          * Then, we inject the wanted field in the `FieldService` so we can know
@@ -130,9 +136,8 @@ class FieldViewHelper extends AbstractViewHelper
         /*
          * Resetting all services data.
          */
-        $this->fieldService->removeCurrentField();
-        $this->fieldService->resetFieldOptions();
-        $this->sectionService->resetSectionClosures();
+        $this->fieldService->resetState();
+        $this->sectionService->resetState();
 
         $viewHelperVariableContainer->setView($currentView);
         $this->restoreOriginalArguments($templateArguments);
@@ -303,25 +308,25 @@ class FieldViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param FormService $service
+     * @param FormViewHelperService $service
      */
-    public function injectFormService(FormService $service)
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }
 
     /**
-     * @param SectionService $sectionService
+     * @param SectionViewHelperService $sectionService
      */
-    public function injectSectionService(SectionService $sectionService)
+    public function injectSectionService(SectionViewHelperService $sectionService)
     {
         $this->sectionService = $sectionService;
     }

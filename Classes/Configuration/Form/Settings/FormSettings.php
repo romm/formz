@@ -50,6 +50,14 @@ class FormSettings extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string $defaultClass
+     */
+    public function setDefaultClass($defaultClass)
+    {
+        $this->defaultClass = $defaultClass;
+    }
+
+    /**
      * @return string
      */
     public function getDefaultErrorMessage()

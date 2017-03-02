@@ -14,7 +14,7 @@ call_user_func(
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][\Romm\Formz\Service\CacheService::CACHE_IDENTIFIER] = [
                 'backend'  => \TYPO3\CMS\Core\Cache\Backend\SimpleFileBackend::class,
                 'frontend' => \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class,
-                'groups'   => ['all', 'system', 'pages'],
+                'groups'   => ['all', 'system', 'pages']
             ];
         }
 
@@ -36,14 +36,14 @@ call_user_func(
         $typo3Version = \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version();
 
         if (version_compare($typo3Version, '8.3.0', '<')) {
-            $container->registerImplementation(\Romm\Formz\ViewHelpers\FormViewHelper::class, \Romm\Formz\ViewHelpers\Legacy\OldFormViewHelper::class);
+            $container->registerImplementation(\Romm\Formz\ViewHelpers\FormViewHelper::class, \Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper::class);
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\Romm\Formz\ViewHelpers\FormViewHelper::class] = [
-                'className' => \Romm\Formz\ViewHelpers\Legacy\OldFormViewHelper::class
+                'className' => \Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper::class
             ];
         } else {
-            $container->registerImplementation(\Romm\Formz\ViewHelpers\FormViewHelper::class, \Romm\Formz\ViewHelpers\Legacy\FormViewHelper::class);
+            $container->registerImplementation(\Romm\Formz\ViewHelpers\FormViewHelper::class, \Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper::class);
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\Romm\Formz\ViewHelpers\FormViewHelper::class] = [
-                'className' => \Romm\Formz\ViewHelpers\Legacy\FormViewHelper::class
+                'className' => \Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper::class
             ];
         }
     },

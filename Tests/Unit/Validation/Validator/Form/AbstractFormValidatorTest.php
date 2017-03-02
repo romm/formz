@@ -20,7 +20,14 @@ class AbstractFormValidatorTest extends AbstractUnitTest
         /** @var DefaultFormValidator|\PHPUnit_Framework_MockObject_MockObject $validator */
         $validator = $this->getMockBuilder(DefaultFormValidator::class)
             ->disableOriginalConstructor()
+            ->setMethods(['getFormValidatorExecutor'])
             ->getMock();
+
+        $validator->method('getFormValidatorExecutor')
+            ->willReturnCallback(function () {
+                return $this->getMockBuilder(FormValidatorExecutor::class)
+                    ->getMock();
+            });
 
         /** @noinspection PhpParamsInspection */
         $validator->validate(new \stdClass);

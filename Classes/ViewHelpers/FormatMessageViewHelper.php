@@ -19,8 +19,8 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -47,12 +47,12 @@ class FormatMessageViewHelper extends AbstractViewHelper
     protected $escapeOutput = false;
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -106,7 +106,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return Message|FormzMessageInterface
-     * @throws \Exception
+     * @throws InvalidArgumentTypeException
      */
     protected function getMessage()
     {
@@ -143,7 +143,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws InvalidEntryException
      */
     protected function getFieldName()
     {
@@ -168,7 +168,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return Field
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     protected function getField()
     {
@@ -189,17 +189,17 @@ class FormatMessageViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param FormService $service
+     * @param FormViewHelperService $service
      */
-    public function injectFormService(FormService $service)
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

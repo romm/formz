@@ -14,7 +14,8 @@
 namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\Exceptions\ContextNotFoundException;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -50,7 +51,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -73,7 +74,12 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        $this->fieldService->checkIsInsideFieldViewHelper();
+        if (false === $this->fieldService->fieldContextExists()) {
+            throw new ContextNotFoundException(
+                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
+                1465243085
+            );
+        }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
@@ -83,16 +89,16 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        /** @var FieldService $service */
-        $service = Core::instantiate(FieldService::class);
+        /** @var FieldViewHelperService $service */
+        $service = Core::instantiate(FieldViewHelperService::class);
 
         $service->setFieldOption($arguments['name'], $arguments['value']);
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }
