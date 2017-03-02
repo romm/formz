@@ -14,8 +14,10 @@
 namespace Romm\Formz\Service;
 
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
+use TYPO3\CMS\Core\Cache\Backend\BackendInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -49,9 +51,14 @@ class CacheService implements SingletonInterface
     {
         $backendCache = $this->typoScriptService->getExtensionConfigurationFromPath('settings.defaultBackendCache');
 
-        if (false === class_exists($backendCache)
-            && false === in_array(AbstractBackend::class, class_parents($backendCache))
-        ) {
+        if (false === class_exists($backendCache)) {
+            throw new ClassNotFoundException(
+                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" was not found (current value: "' . (string)$backendCache . '")',
+                1488475103
+            );
+        }
+
+        if (false === in_array(BackendInterface::class, class_implements($backendCache))) {
             throw new \Exception(
                 'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
                 1459251263
@@ -78,14 +85,6 @@ class CacheService implements SingletonInterface
         }
 
         return $this->cacheInstance;
-    }
-
-    /**
-     * @param FrontendInterface $cacheInstance
-     */
-    public function setCacheInstance(FrontendInterface $cacheInstance)
-    {
-        $this->cacheInstance = $cacheInstance;
     }
 
     /**

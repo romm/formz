@@ -21,6 +21,7 @@ class Settings extends AbstractFormzConfiguration
 
     /**
      * @var string
+     * @validate Romm.ConfigurationObject:ClassImplements(interface=TYPO3\CMS\Core\Cache\Backend\BackendInterface)
      */
     protected $defaultBackendCache = FileBackend::class;
 
