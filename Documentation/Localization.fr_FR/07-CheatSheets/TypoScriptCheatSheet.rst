@@ -125,7 +125,7 @@ Vous pouvez retrouvez tous les détails des propriétés au chapitre « :ref:`us
 
                         # On active ce champ seulement lorsque le champ
                         # `password` est valide.
-                        activation.condition = passwordIsValid
+                        activation.expression = passwordIsValid
                     }
                 }
             }

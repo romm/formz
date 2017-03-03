@@ -139,7 +139,7 @@ Activation du validateur
     Requis ?
         Non
     Description
-        Il est possible d'activer un validateur seulement dans certains cas. Le principe est exactement le même que l'activation des champs, voir « :ref:`Conditions d'activation <fieldsActivation-items>` » et « :ref:`Activation du champ <fieldsActivation-condition>` ».
+        Il est possible d'activer un validateur seulement dans certains cas. Le principe est exactement le même que l'activation des champs, voir « :ref:`Conditions d'activation <fieldsActivation-conditions>` » et « :ref:`Activation du champ <fieldsActivation-expression>` ».
 
         Exemple — on active la règle ``required`` du champ ``passwordRepeat`` seulement lorsque le champ ``password`` est valide :
 
