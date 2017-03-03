@@ -43,8 +43,8 @@ class ConditionParserFactory implements SingletonInterface
     {
         $hash = 'condition-tree-' .
             sha1(serialize([
-                $condition->getCondition(),
-                $condition->getItems()
+                $condition->getExpression(),
+                $condition->getConditions()
             ]));
 
         if (false === array_key_exists($hash, $this->trees)) {

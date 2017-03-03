@@ -30,7 +30,7 @@ class ActivationResolver extends AbstractActivation implements MixedTypesInterfa
     final public static function getInstanceClassName(MixedTypesResolver $resolver)
     {
         $data = $resolver->getData();
-        $objectType = (empty(trim($data['condition'])))
+        $objectType = (empty(trim($data['expression'])))
             ? EmptyActivation::class
             : Activation::class;
 

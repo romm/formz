@@ -61,7 +61,7 @@ Activation conditions
     Required?
         No
     Description
-        Contains the list of activation conditions which are usable by all the fields of this form. These conditions may then be used in the activation logical expressions of a field (see “:ref:`fieldsActivation-condition`”) or a field validation.
+        Contains the list of activation conditions which are usable by all the fields of this form. These conditions may then be used in the activation logical expressions of a field (see “:ref:`fieldsActivation-expression`”) or a field validation.
 
         For more information on this, read the chapter “:ref:`usersManual-typoScript-configurationActivation`”.
 

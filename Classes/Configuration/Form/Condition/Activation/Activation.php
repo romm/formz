@@ -19,5 +19,5 @@ class Activation extends AbstractActivation
      * @var string
      * @validate NotEmpty
      */
-    protected $condition;
+    protected $expression;
 }

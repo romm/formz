@@ -32,7 +32,7 @@ TXT;
             'fields'              => [
                 'foo' => [
                     'activation' => [
-                        'condition' => 'test'
+                        'expression' => 'test'
                     ]
                 ]
             ]
