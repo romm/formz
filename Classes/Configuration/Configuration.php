@@ -24,6 +24,7 @@ use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\CacheService as InternalCacheService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
@@ -70,7 +71,8 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
         return ServiceFactory::getInstance()
             ->attach(ServiceInterface::SERVICE_CACHE)
             ->with(ServiceInterface::SERVICE_CACHE)
-            ->setOption(CacheService::OPTION_CACHE_BACKEND, \Romm\Formz\Service\CacheService::get()->getBackendCache())
+            ->setOption(CacheService::OPTION_CACHE_NAME, InternalCacheService::CONFIGURATION_OBJECT_CACHE_IDENTIFIER)
+            ->setOption(CacheService::OPTION_CACHE_BACKEND, InternalCacheService::get()->getBackendCache())
             ->attach(ServiceInterface::SERVICE_PARENTS)
             ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
             ->attach(ServiceInterface::SERVICE_MIXED_TYPES);
