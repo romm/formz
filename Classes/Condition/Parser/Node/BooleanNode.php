@@ -59,6 +59,7 @@ class BooleanNode extends AbstractNode
     public function along(callable $callback)
     {
         $this->leftNode->along($callback);
+        call_user_func($callback, $this);
         $this->rightNode->along($callback);
     }
 
@@ -240,5 +241,13 @@ class BooleanNode extends AbstractNode
     protected function processLogicalOrPhp(PhpConditionDataObject $dataObject)
     {
         return $this->leftNode->getPhpResult($dataObject) || $this->rightNode->getPhpResult($dataObject);
+    }
+
+    /**
+     * @return string
+     */
+    public function getOperator()
+    {
+        return $this->operator;
     }
 }
