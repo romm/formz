@@ -34,7 +34,7 @@ TXT;
                     'validation' => [
                         'required' => [
                             'activation' => [
-                                'condition' => 'test'
+                                'expression' => 'test'
                             ]
                         ]
                     ]

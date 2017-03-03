@@ -36,7 +36,7 @@ class ConditionIsValidValidator extends AbstractValidator
                 'validator.form.condition_is_valid.error',
                 'formz',
                 [
-                    $condition->getCondition(),
+                    $condition->getExpression(),
                     $conditionTree->getValidationResult()->getFirstError()->getMessage()
                 ]
             );
