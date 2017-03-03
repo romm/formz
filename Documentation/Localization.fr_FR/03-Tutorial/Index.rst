@@ -121,7 +121,7 @@ Vous devrez donc suivre les indications du chapitre « :ref:`usersManual` » pou
                             required < config.tx_formz.validators.required
                         }
 
-                        activation.condition = someFieldIsValid
+                        activation.expression = someFieldIsValid
                     }
                 }
             }

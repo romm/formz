@@ -126,7 +126,7 @@ Add an activation condition
 
         .. note::
 
-            This function is used by Formz core, in code automatically generated from values written in the TypoScript configuration of the :ref:`fields activation conditions <fieldsActivation-condition>`.
+            This function is used by Formz core, in code automatically generated from values written in the TypoScript configuration of the :ref:`fields activation conditions <fieldsActivation-expression>`.
 
 .. _developerManual-javaScript-field-addActivationConditionForValidator:
 

@@ -18,10 +18,10 @@ class ConditionIsValidValidatorTest extends AbstractUnitTest
 
         /** @var AbstractActivation|\PHPUnit_Framework_MockObject_MockObject $condition */
         $condition = $this->getMockBuilder(AbstractActivation::class)
-            ->setMethods(['getCondition'])
+            ->setMethods(['getExpression'])
             ->getMockForAbstractClass();
 
-        $condition->method('getCondition')
+        $condition->method('getExpression')
             ->willReturn('invalid condition expression');
 
         $result = $validator->validate($condition);

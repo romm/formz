@@ -28,9 +28,9 @@ Propriété                                                                     
 
 :ref:`behaviours <fieldsBehaviours>`                                                    Comportements du champ
 
-:ref:`activation.items <fieldsActivation-items>`                                        Conditions d'activation
+:ref:`activation.conditions <fieldsActivation-conditions>`                              Conditions d'activation
 
-:ref:`activation.condition <fieldsActivation-condition>`                                Expression d'activation du champ
+:ref:`activation.expression <fieldsActivation-expression>`                              Expression d'activation du champ
 
 :ref:`settings.fieldContainerSelector <fieldsSettings-fieldContainerSelector>`          Sélecteur du conteneur du champ
 
@@ -110,7 +110,7 @@ Comportements du champ
 
             Notez que les configurations des comportements sont récupérées directement de ``config.tx_formz.behaviours``. Cela empêche une redondance de configuration lorsque les comportements sont utilisés à plusieurs endroits.
 
-.. _fieldsActivation-items:
+.. _fieldsActivation-conditions:
 
 Conditions d'activation
 -----------------------
@@ -118,7 +118,7 @@ Conditions d'activation
 .. container:: table-row
 
     Propriété
-        ``activation.items``
+        ``activation.conditions``
     Requis ?
         Non
     Description
@@ -138,7 +138,7 @@ Conditions d'activation
                 }
             }
 
-.. _fieldsActivation-condition:
+.. _fieldsActivation-expression:
 
 Activation du champ
 -------------------
@@ -146,7 +146,7 @@ Activation du champ
 .. container:: table-row
 
     Propriété
-        ``activation.condition``
+        ``activation.expression``
     Requis ?
         Non
     Description

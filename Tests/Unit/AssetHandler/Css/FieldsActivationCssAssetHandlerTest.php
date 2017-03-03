@@ -30,7 +30,7 @@ class FieldsActivationCssAssetHandlerTest extends AbstractUnitTest
             'fields'              => [
                 'foo' => [
                     'activation' => [
-                        'condition' => 'test'
+                        'expression' => 'test'
                     ]
                 ]
             ]

@@ -83,7 +83,10 @@ class ConditionParser implements SingletonInterface
 
         $rootNode = $rootNode ?: NullNode::get();
 
-        return GeneralUtility::makeInstance(ConditionTree::class, $rootNode, $this->result);
+        /** @var ConditionTree $tree */
+        $tree = GeneralUtility::makeInstance(ConditionTree::class, $rootNode, $this->result);
+
+        return $tree;
     }
 
     /**
@@ -95,7 +98,7 @@ class ConditionParser implements SingletonInterface
         $this->result = GeneralUtility::makeInstance(Result::class);
 
         $this->scope = $this->getNewScope();
-        $this->scope->setExpression($this->splitConditionExpression($condition->getCondition()));
+        $this->scope->setExpression($this->splitConditionExpression($condition->getExpression()));
     }
 
     /**
@@ -230,10 +233,10 @@ class ConditionParser implements SingletonInterface
      */
     private function processTokenCondition($condition)
     {
-        if (false === $this->condition->hasItem($condition)) {
+        if (false === $this->condition->hasCondition($condition)) {
             $this->addError('The condition "' . $condition . '" does not exist.', 1457628378);
         } else {
-            $node = new ConditionNode($condition, $this->condition->getItem($condition));
+            $node = new ConditionNode($condition, $this->condition->getCondition($condition));
             $this->scope
                 ->setNode($node)
                 ->shiftExpression();

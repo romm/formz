@@ -61,7 +61,7 @@ Liste des conditions d'activation
 
 Retrouvez ci-dessous la liste des conditions d'activation disponibles dans le cœur de Formz.
 
-Elles peuvent être utilisées par les champs (cf. « :ref:`Conditions d'activation <fieldsActivation-items>` ») et les validateurs (cf « :ref:`Activation du validateur <validatorsActivation>` »).
+Elles peuvent être utilisées par les champs (cf. « :ref:`Conditions d'activation <fieldsActivation-conditions>` ») et les validateurs (cf « :ref:`Activation du validateur <validatorsActivation>` »).
 
 .. toctree::
     :maxdepth: 5

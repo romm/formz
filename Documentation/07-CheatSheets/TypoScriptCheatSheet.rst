@@ -124,7 +124,7 @@ You can find details of the properties at the chapter “:ref:`usersManual-typoS
 
                         # The field is activated only when the field `password`
                         # is valid.
-                        activation.condition = passwordIsValid
+                        activation.expression = passwordIsValid
                     }
                 }
             }
