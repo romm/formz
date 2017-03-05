@@ -95,10 +95,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     public function addForm(FormObject $form)
     {
         if (true === $this->hasForm($form->getClassName(), $form->getName())) {
-            throw new DuplicateEntryException(
-                'The form "' . $form->getName() . '" of class "' . $form->getClassName() . '" was already registered. You can only register a form once. Check the function `hasForm()`.',
-                1477255145
-            );
+            throw DuplicateEntryException::formWasAlreadyRegistered($form);
         }
 
         $form->getConfiguration()->setParents([$this]);

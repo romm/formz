@@ -13,6 +13,79 @@
 
 namespace Romm\Formz\Exceptions;
 
-class ContextNotFoundException extends Exception
+use Romm\Formz\ViewHelpers\FieldViewHelper;
+use Romm\Formz\ViewHelpers\FormViewHelper;
+use Romm\Formz\ViewHelpers\OptionViewHelper;
+use Romm\Formz\ViewHelpers\RenderSectionViewHelper;
+use Romm\Formz\ViewHelpers\SectionViewHelper;
+
+class ContextNotFoundException extends FormzException
 {
+    const FORM_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "' . FormViewHelper::class . '".';
+
+    const FIELD_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "' . FieldViewHelper::class . '".';
+
+    /**
+     * @code 1465243085
+     *
+     * @return ContextNotFoundException
+     */
+    final public static function fieldViewHelperFormContextNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_CONTEXT_NOT_FOUND,
+            [FieldViewHelper::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1465243287
+     *
+     * @return ContextNotFoundException
+     */
+    final public static function optionViewHelperFieldContextNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FIELD_CONTEXT_NOT_FOUND,
+            [OptionViewHelper::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1488473956
+     *
+     * @return ContextNotFoundException
+     */
+    final public static function renderSectionViewHelperFieldContextNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FIELD_CONTEXT_NOT_FOUND,
+            [RenderSectionViewHelper::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1488474106
+     *
+     * @return ContextNotFoundException
+     */
+    final public static function sectionViewHelperFieldContextNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FIELD_CONTEXT_NOT_FOUND,
+            [SectionViewHelper::class]
+        );
+
+        return $exception;
+    }
 }

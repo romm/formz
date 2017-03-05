@@ -13,6 +13,26 @@
 
 namespace Romm\Formz\Exceptions;
 
-class InvalidOptionValueException extends Exception
+use Romm\Formz\Form\FormInterface;
+
+class InvalidOptionValueException extends FormzException
 {
+    const WRONG_FORM_TYPE = 'The form class must be an instance of "' . FormInterface::class . '", given value: "%s".';
+
+    /**
+     * @code 1457442462
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function formViewHelperWrongFormType($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_TYPE,
+            [$name]
+        );
+
+        return $exception;
+    }
 }

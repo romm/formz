@@ -9,7 +9,6 @@ use Romm\Formz\Error\Notice;
 use Romm\Formz\Error\Warning;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
@@ -124,7 +123,7 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
                 'message'           => new Error('foo', 1337, 'bar', 'baz'),
                 'expected'          => null,
                 'messageTemplate'   => null,
-                'expectedException' => InvalidEntryException::class,
+                'expectedException' => EntryNotFoundException::class,
                 'field'             => new Field
             ]
         ];

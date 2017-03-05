@@ -4,6 +4,7 @@ namespace Romm\Formz\Tests\Unit\Form;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -57,7 +58,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function wrongClassTypeGivenThrowsException()
     {
-        $this->setExpectedException(ClassNotFoundException::class);
+        $this->setExpectedException(InvalidArgumentTypeException::class);
         $formObjectFactory = new FormObjectFactory;
 
         $formObjectFactory->getInstanceFromClassName(\stdClass::class, 'foo');

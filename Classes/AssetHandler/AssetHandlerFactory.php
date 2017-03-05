@@ -93,19 +93,13 @@ class AssetHandlerFactory
     {
         if (false === array_key_exists($className, $this->instances)) {
             if (false === class_exists($className)) {
-                throw new ClassNotFoundException(
-                    'Trying to get an asset handler with a wrong class name: "' . $className . '".',
-                    1477468381
-                );
+                throw ClassNotFoundException::wrongAssetHandlerClassName($className);
             }
 
             $instance = GeneralUtility::makeInstance($className, $this);
 
             if (false === $instance instanceof AbstractAssetHandler) {
-                throw new InvalidArgumentTypeException(
-                    'The asset handler object must be an instance of "' . AbstractAssetHandler::class . '", current type: "' . get_class($instance) . '".',
-                    1477468571
-                );
+                throw InvalidArgumentTypeException::wrongAssetHandlerType(get_class($instance));
             }
 
             $this->instances[$className] = $instance;

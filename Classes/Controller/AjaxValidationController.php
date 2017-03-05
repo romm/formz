@@ -227,10 +227,7 @@ class AjaxValidationController extends ActionController
         }
 
         if (false === empty($argumentsMissing)) {
-            throw new MissingArgumentException(
-                'One or more arguments are missing in the request: "' . implode('", "', $argumentsMissing) . '".',
-                1487673983
-            );
+            throw MissingArgumentException::ajaxControllerMissingArguments($argumentsMissing);
         }
     }
 
@@ -253,10 +250,7 @@ class AjaxValidationController extends ActionController
         $validationResult = $this->formObject->getConfigurationValidationResult();
 
         if (true === $validationResult->hasErrors()) {
-            throw new InvalidConfigurationException(
-                'The form configuration contains errors.',
-                1487671395
-            );
+            throw InvalidConfigurationException::ajaxControllerInvalidFormConfiguration();
         }
     }
 
@@ -271,19 +265,13 @@ class AjaxValidationController extends ActionController
         $field = $formConfiguration->getField($this->fieldName);
 
         if (false === $field->hasValidation($this->validatorName)) {
-            throw new EntryNotFoundException(
-                'The field "' . $this->fieldName . '" does not have a rule "' . $this->validatorName . '".',
-                1487672956
-            );
+            throw EntryNotFoundException::ajaxControllerValidationNotFoundForField($this->validatorName, $this->fieldName);
         }
 
         $fieldValidationConfiguration = $field->getValidationByName($this->validatorName);
 
         if (false === $fieldValidationConfiguration->doesUseAjax()) {
-            throw new InvalidConfigurationException(
-                'The validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" is not configured to work with Ajax. Please add the option "useAjax".',
-                1487673434
-            );
+            throw InvalidConfigurationException::ajaxControllerAjaxValidationNotActivated($this->validatorName, $this->fieldName);
         }
 
         return $fieldValidationConfiguration;
@@ -299,10 +287,7 @@ class AjaxValidationController extends ActionController
         $formConfiguration = $formObject->getConfiguration();
 
         if (false === $formConfiguration->hasField($this->fieldName)) {
-            throw new EntryNotFoundException(
-                'The field "' . $this->fieldName . '" was not found in the form "' . $this->formName . '" with class "' . $this->formClassName . '".',
-                1487671603
-            );
+            throw EntryNotFoundException::ajaxControllerFieldNotFound($this->fieldName, $formObject);
         }
 
         return $formConfiguration;

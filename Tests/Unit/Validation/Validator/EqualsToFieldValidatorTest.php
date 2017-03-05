@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Validation\Validator;
 
-use Romm\Formz\Exceptions\InvalidOptionValueException;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -96,7 +96,7 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
                 'value'   => 'bar',
                 'options' => [EqualsToFieldValidator::OPTION_FIELD => 'bar'],
                 [],
-                InvalidOptionValueException::class
+                EntryNotFoundException::class
             ]
         ];
     }

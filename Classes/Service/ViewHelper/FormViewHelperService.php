@@ -72,16 +72,13 @@ class FormViewHelperService implements SingletonInterface
      * Will activate the form context, changing the result returned by the
      * function `formContextExists()`.
      *
-     * @throws \Exception
      * @return FormViewHelperService
+     * @throws DuplicateEntryException
      */
     public function activateFormContext()
     {
         if (true === $this->formContext) {
-            throw new DuplicateEntryException(
-                'You can not use a form view helper inside another one.',
-                1465242575
-            );
+            throw DuplicateEntryException::duplicatedFormContext();
         }
 
         $this->formContext = true;
@@ -103,9 +100,9 @@ class FormViewHelperService implements SingletonInterface
      * This function will check and inject the form instance and its submission
      * result.
      *
-     * @param string  $formName
-     * @param Request $originalRequest
-     * @param         $formInstance
+     * @param string              $formName
+     * @param Request             $originalRequest
+     * @param array|FormInterface $formInstance
      */
     public function setUpData($formName, $originalRequest, $formInstance)
     {

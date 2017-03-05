@@ -17,7 +17,6 @@ use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
@@ -113,10 +112,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $message = $this->arguments['message'];
 
         if (false === $message instanceof FormzMessageInterface) {
-            throw new InvalidArgumentTypeException(
-                'The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . FormzMessageInterface::class . '".',
-                1467021406
-            );
+            throw InvalidArgumentTypeException::formatMessageViewHelperMessageInvalidType($message);
         }
 
         return $message;
@@ -143,7 +139,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return string
-     * @throws InvalidEntryException
+     * @throws EntryNotFoundException
      */
     protected function getFieldName()
     {
@@ -157,10 +153,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
         }
 
         if (null === $fieldName) {
-            throw new InvalidEntryException(
-                'The field could not be fetched, please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
-                1467624152
-            );
+            throw EntryNotFoundException::formatMessageViewHelperFieldNotFound($fieldName);
         }
 
         return $fieldName;
@@ -176,13 +169,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $fieldName = $this->getFieldName();
 
         if (false === $formObject->getConfiguration()->hasField($fieldName)) {
-            throw new EntryNotFoundException(
-                vsprintf(
-                    'The Form "%s" does not have a field "%s"',
-                    [$formObject->getName(), $fieldName]
-                ),
-                1473084335
-            );
+            throw EntryNotFoundException::formatMessageViewHelperFieldNotFoundInForm($fieldName, $formObject);
         }
 
         return $formObject->getConfiguration()->getField($fieldName);

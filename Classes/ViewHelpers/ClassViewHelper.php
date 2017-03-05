@@ -126,10 +126,7 @@ class ClassViewHelper extends AbstractViewHelper
         list($this->classNameSpace, $this->className) = GeneralUtility::trimExplode('.', $this->arguments['name']);
 
         if (false === in_array($this->classNameSpace, self::$acceptedClassesNameSpace)) {
-            throw new InvalidEntryException(
-                'The class "' . $this->arguments['name'] . '" is not valid: the namespace of the error must be one of the following: ' . implode(', ', self::$acceptedClassesNameSpace) . '.',
-                1467623504
-            );
+            throw InvalidEntryException::invalidCssClassNamespace($this->arguments['name'], self::$acceptedClassesNameSpace);
         }
     }
 
@@ -153,10 +150,7 @@ class ClassViewHelper extends AbstractViewHelper
         }
 
         if (null === $this->fieldName) {
-            throw new EntryNotFoundException(
-                'The field could not be fetched for the class "' . $this->arguments['name'] . '": please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
-                1467623761
-            );
+            throw EntryNotFoundException::classViewHelperFieldNotFound($this->arguments['name']);
         }
     }
 
@@ -179,10 +173,7 @@ class ClassViewHelper extends AbstractViewHelper
         $class = ObjectAccess::getProperty($classesConfiguration, $this->classNameSpace);
 
         if (false === $class->hasItem($this->className)) {
-            throw new UnregisteredConfigurationException(
-                'The class "' . $this->arguments['name'] . '" is not valid: the class name "' . $this->className . '" was not found in the namespace "' . $this->classNameSpace . '".',
-                1467623662
-            );
+            throw UnregisteredConfigurationException::cssClassNameNotFound($this->arguments['name'], $this->className, $this->classNameSpace);
         }
 
         $this->classValue = $class->getItem($this->className);
