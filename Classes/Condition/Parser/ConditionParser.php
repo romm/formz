@@ -53,6 +53,12 @@ class ConditionParser implements SingletonInterface
     const LOGICAL_AND = '&&';
     const LOGICAL_OR = '||';
 
+    const ERROR_CODE_INVALID_CLOSING_PARENTHESIS = 1457969163;
+    const ERROR_CODE_CLOSING_PARENTHESIS_NOT_FOUND = 1457544856;
+    const ERROR_CODE_CONDITION_NOT_FOUND = 1457628378;
+    const ERROR_CODE_LOGICAL_OPERATOR_PRECEDED = 1457544986;
+    const ERROR_CODE_LOGICAL_OPERATOR_FOLLOWED = 1457545071;
+
     /**
      * @var Result
      */
@@ -189,7 +195,7 @@ class ConditionParser implements SingletonInterface
      */
     protected function processTokenClosingParenthesis()
     {
-        $this->addError('Parenthesis closes invalid group.', 1457969163);
+        $this->addError('Parenthesis closes invalid group.', self::ERROR_CODE_INVALID_CLOSING_PARENTHESIS);
     }
 
     /**
@@ -202,7 +208,7 @@ class ConditionParser implements SingletonInterface
     protected function processTokenLogicalOperator($operator)
     {
         if (null === $this->scope->getNode()) {
-            $this->addError('Logical operator must be preceded by a valid operation.', 1457544986);
+            $this->addError('Logical operator must be preceded by a valid operation.', self::ERROR_CODE_LOGICAL_OPERATOR_PRECEDED);
         } else {
             if (self::LOGICAL_OR === $operator) {
                 if (null !== $this->scope->getLastOrNode()) {
@@ -237,7 +243,7 @@ class ConditionParser implements SingletonInterface
     protected function processTokenCondition($condition)
     {
         if (false === $this->condition->hasCondition($condition)) {
-            $this->addError('The condition "' . $condition . '" does not exist.', 1457628378);
+            $this->addError('The condition "' . $condition . '" does not exist.', self::ERROR_CODE_CONDITION_NOT_FOUND);
         } else {
             $node = new ConditionNode($condition, $this->condition->getCondition($condition));
             $this->scope
@@ -276,7 +282,7 @@ class ConditionParser implements SingletonInterface
     protected function processLastLogicalOperatorNode()
     {
         if (null !== $this->scope->getCurrentLeftNode()) {
-            $this->addError('Logical operator must be followed by a valid operation.', 1457545071);
+            $this->addError('Logical operator must be followed by a valid operation.', self::ERROR_CODE_LOGICAL_OPERATOR_FOLLOWED);
         } elseif (null !== $this->scope->getLastOrNode()) {
             $node = new BooleanNode($this->scope->getLastOrNode(), $this->scope->getNode(), self::LOGICAL_OR);
             $this->scope->setNode($node);
@@ -323,7 +329,7 @@ class ConditionParser implements SingletonInterface
         while ($parenthesis > 0) {
             $index++;
             if ($index > count($expression)) {
-                $this->addError('Parenthesis not correctly closed.', 1457544856);
+                $this->addError('Parenthesis not correctly closed.', self::ERROR_CODE_CLOSING_PARENTHESIS_NOT_FOUND);
             }
 
             if ('(' === $expression[$index]) {

@@ -110,7 +110,7 @@ class ConditionParserTest extends AbstractUnitTest
              */
             [
                 'conditions'     => [
-                    'foo' => $this->getFieldHasValueCondition('foo', 'bar'),
+                    'foo' => $this->getFieldHasValueCondition('foo', 'bar')
                 ],
                 'expression'     => 'foo',
                 'treeExpression' => 'condition:fieldHasValue(foo;bar)'
@@ -120,7 +120,7 @@ class ConditionParserTest extends AbstractUnitTest
              */
             [
                 'conditions'     => [
-                    'foo' => $this->getFieldIsValidCondition('baz'),
+                    'foo' => $this->getFieldIsValidCondition('baz')
                 ],
                 'expression'     => 'foo',
                 'treeExpression' => 'condition:fieldIsValid(baz)'
@@ -270,7 +270,7 @@ class ConditionParserTest extends AbstractUnitTest
                 'conditions'     => [
                     'foo' => $this->getFieldHasValueCondition('foo1', 'bar1'),
                     'bar' => $this->getFieldHasValueCondition('foo2', 'bar2'),
-                    'baz' => $this->getFieldHasValueCondition('foo3', 'bar3'),
+                    'baz' => $this->getFieldHasValueCondition('foo3', 'bar3')
                 ],
                 'expression'     => 'foo && bar || baz',
                 'treeExpression' => 'condition:fieldHasValue(foo1;bar1)<->bool(&&)<->condition:fieldHasValue(foo2;bar2)<->bool(||)<->condition:fieldHasValue(foo3;bar3)'
@@ -282,7 +282,7 @@ class ConditionParserTest extends AbstractUnitTest
                 'conditions'     => [
                     'foo' => $this->getFieldHasValueCondition('foo1', 'bar1'),
                     'bar' => $this->getFieldHasValueCondition('foo2', 'bar2'),
-                    'baz' => $this->getFieldHasValueCondition('foo3', 'bar3'),
+                    'baz' => $this->getFieldHasValueCondition('foo3', 'bar3')
                 ],
                 'expression'     => 'foo&&bar||baz',
                 'treeExpression' => 'condition:fieldHasValue(foo1;bar1)<->bool(&&)<->condition:fieldHasValue(foo2;bar2)<->bool(||)<->condition:fieldHasValue(foo3;bar3)'
@@ -294,7 +294,7 @@ class ConditionParserTest extends AbstractUnitTest
                 'conditions'     => [
                     'foo' => $this->getFieldHasValueCondition('foo1', 'bar1'),
                     'bar' => $this->getFieldHasValueCondition('foo2', 'bar2'),
-                    'baz' => $this->getFieldHasValueCondition('foo3', 'bar3'),
+                    'baz' => $this->getFieldHasValueCondition('foo3', 'bar3')
                 ],
                 'expression'     => '(foo)&&(bar||baz)',
                 'treeExpression' => 'condition:fieldHasValue(foo1;bar1)<->bool(&&)<->condition:fieldHasValue(foo2;bar2)<->bool(||)<->condition:fieldHasValue(foo3;bar3)'
@@ -306,7 +306,7 @@ class ConditionParserTest extends AbstractUnitTest
                 'conditions'     => [
                     'foo' => $this->getFieldIsValidCondition('foo'),
                     'bar' => $this->getFieldIsValidCondition('bar'),
-                    'baz' => $this->getFieldIsValidCondition('baz'),
+                    'baz' => $this->getFieldIsValidCondition('baz')
                 ],
                 'expression'     => '((foo) && (((bar))) || (baz))',
                 'treeExpression' => 'condition:fieldIsValid(foo)<->bool(&&)<->condition:fieldIsValid(bar)<->bool(||)<->condition:fieldIsValid(baz)'
@@ -318,10 +318,95 @@ class ConditionParserTest extends AbstractUnitTest
                 'conditions'     => [
                     'foo' => $this->getFieldIsValidCondition('foo'),
                     'bar' => $this->getFieldIsValidCondition('bar'),
-                    'baz' => $this->getFieldIsValidCondition('baz'),
+                    'baz' => $this->getFieldIsValidCondition('baz')
                 ],
                 'expression'     => '(foo && bar) || (bar && baz) || (foo && baz)',
                 'treeExpression' => 'condition:fieldIsValid(foo)<->bool(&&)<->condition:fieldIsValid(bar)<->bool(||)<->condition:fieldIsValid(bar)<->bool(&&)<->condition:fieldIsValid(baz)<->bool(||)<->condition:fieldIsValid(foo)<->bool(&&)<->condition:fieldIsValid(baz)'
+            ]
+        ];
+    }
+
+    /**
+     * @todo
+     *
+     * @test
+     * @dataProvider parseConditionReturnsErrorDataProvider
+     * @param array  $conditions
+     * @param string $expression
+     * @param string $errorCode
+     */
+    public function parseConditionReturnsError(array $conditions, $expression, $errorCode)
+    {
+        $parser = new ConditionParser;
+        $activation = new Activation;
+
+        foreach ($conditions as $name => $condition) {
+            $activation->addCondition($name, $condition);
+        }
+
+        $activation->setExpression($expression);
+
+        $tree = $parser->parse($activation);
+
+        $this->assertTrue($tree->getValidationResult()->hasErrors());
+        $this->assertEquals($errorCode, $tree->getValidationResult()->getFirstError()->getCode());
+    }
+
+    /**
+     * @return array
+     */
+    public function parseConditionReturnsErrorDataProvider()
+    {
+        return [
+            [
+                /*
+                 * Condition that doesn't exist.
+                 */
+                'conditions'     => [
+                    'foo' => $this->getFieldHasValueCondition('foo', 'bar')
+                ],
+                'expression'     => 'baz',
+                'errorCode'     => ConditionParser::ERROR_CODE_CONDITION_NOT_FOUND
+            ],
+            /*
+             * Closing parenthesis is invalid.
+             */
+            [
+                'conditions'     => [
+                    'foo' => $this->getFieldHasValueCondition('foo', 'bar')
+                ],
+                'expression'     => 'foo)',
+                'errorCode'     => ConditionParser::ERROR_CODE_INVALID_CLOSING_PARENTHESIS
+            ],
+            /*
+             * Closing parenthesis not found.
+             */
+            [
+                'conditions'     => [
+                    'foo' => $this->getFieldHasValueCondition('foo', 'bar')
+                ],
+                'expression'     => '(foo',
+                'errorCode'     => ConditionParser::ERROR_CODE_CLOSING_PARENTHESIS_NOT_FOUND
+            ],
+            /*
+             * Logical operator must be preceded by an operation.
+             */
+            [
+                'conditions'     => [
+                    'foo' => $this->getFieldHasValueCondition('foo', 'bar')
+                ],
+                'expression'     => '&& foo',
+                'errorCode'     => ConditionParser::ERROR_CODE_LOGICAL_OPERATOR_PRECEDED
+            ],
+            /*
+             * Logical operator must be preceded by an operation.
+             */
+            [
+                'conditions'     => [
+                    'foo' => $this->getFieldHasValueCondition('foo', 'bar')
+                ],
+                'expression'     => 'foo &&',
+                'errorCode'     => ConditionParser::ERROR_CODE_LOGICAL_OPERATOR_FOLLOWED
             ]
         ];
     }
