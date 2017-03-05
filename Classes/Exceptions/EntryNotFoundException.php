@@ -26,13 +26,13 @@ class EntryNotFoundException extends FormzException
 
     const CONDITION_NOT_FOUND = 'No condition "%s" was found.';
 
-    const VALIDATION_NOT_FOUND = 'The validation "%s" was not found. Please use the function `' . AbstractActivation::class . 'hasValidation()` before.';
+    const VALIDATION_NOT_FOUND = 'The validation "%s" was not found. Please use the function `%s::hasValidation()` before.';
 
     const VALIDATION_NOT_FOUND_FOR_FIELD = 'The field "%s" does not have a rule "%s".';
 
     const ERROR_KEY_NOT_FOUND_FOR_VALIDATOR = 'The error key "%s" does not exist for the validator "%s".';
 
-    const VIEW_HELPER_FIELD_NOT_FOUND = 'The field "%s" could not be fetched for the view helper "%s": please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter `field` of this view helper with the field name you want.';
+    const VIEW_HELPER_FIELD_NOT_FOUND = 'The field "%s" could not be fetched for the view helper "%s": please either use this view helper inside the view helper "%s", or fill the parameter `field` of this view helper with the field name you want.';
 
     const FIELD_VIEW_HELPER_LAYOUT_NOT_FOUND = 'The layout "%s" could not be found. Please check your TypoScript configuration.';
 
@@ -68,7 +68,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VALIDATION_NOT_FOUND,
-            [$name]
+            [$name, AbstractActivation::class]
         );
 
         return $exception;
@@ -157,7 +157,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_HELPER_FIELD_NOT_FOUND,
-            [$fieldName, ClassViewHelper::class]
+            [$fieldName, ClassViewHelper::class, FieldViewHelper::class]
         );
 
         return $exception;
@@ -174,7 +174,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_HELPER_FIELD_NOT_FOUND,
-            [$fieldName, FormatMessageViewHelper::class]
+            [$fieldName, FormatMessageViewHelper::class, FieldViewHelper::class]
         );
 
         return $exception;

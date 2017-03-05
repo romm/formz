@@ -21,9 +21,9 @@ use Romm\Formz\ViewHelpers\SectionViewHelper;
 
 class ContextNotFoundException extends FormzException
 {
-    const FORM_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "' . FormViewHelper::class . '".';
+    const FORM_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "%s".';
 
-    const FIELD_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "' . FieldViewHelper::class . '".';
+    const FIELD_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "%s".';
 
     /**
      * @code 1465243085
@@ -35,7 +35,7 @@ class ContextNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_CONTEXT_NOT_FOUND,
-            [FieldViewHelper::class]
+            [FieldViewHelper::class, FormViewHelper::class]
         );
 
         return $exception;
@@ -51,7 +51,7 @@ class ContextNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_CONTEXT_NOT_FOUND,
-            [OptionViewHelper::class]
+            [OptionViewHelper::class, FieldViewHelper::class]
         );
 
         return $exception;
@@ -67,7 +67,7 @@ class ContextNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_CONTEXT_NOT_FOUND,
-            [RenderSectionViewHelper::class]
+            [RenderSectionViewHelper::class, FieldViewHelper::class]
         );
 
         return $exception;
@@ -83,7 +83,7 @@ class ContextNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_CONTEXT_NOT_FOUND,
-            [SectionViewHelper::class]
+            [SectionViewHelper::class, FieldViewHelper::class]
         );
 
         return $exception;

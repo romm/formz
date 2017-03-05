@@ -21,17 +21,17 @@ use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
 
 class InvalidArgumentTypeException extends FormzException
 {
-    const WRONG_ASSET_HANDLER_TYPE = 'The asset handler object must be an instance of "' . AbstractAssetHandler::class . '", current type: "%s".';
+    const WRONG_ASSET_HANDLER_TYPE = 'The asset handler object must be an instance of "%s", current type: "%s".';
 
-    const WRONG_FORM_TYPE = 'The form class must be an instance of "' . FormInterface::class . '", given value: "%s".';
+    const WRONG_FORM_TYPE = 'The form class must be an instance of "%s", given value: "%s".';
 
-    const VALIDATING_WRONG_FORM_TYPE = 'Trying to validate a form that does not implement the interface "' . FormInterface::class . '". Given class: "%s"';
+    const VALIDATING_WRONG_FORM_TYPE = 'Trying to validate a form that does not implement the interface "%s". Given class: "%s"';
 
-    const FIELD_VIEW_HELPER_INVALID_TYPE_NAME_ARGUMENT = 'The argument `name` of the view helper "' . FieldViewHelper::class . '" must be a string.';
+    const FIELD_VIEW_HELPER_INVALID_TYPE_NAME_ARGUMENT = 'The argument `name` of the view helper "%s" must be a string.';
 
     const FIELD_VIEW_HELPER_LAYOUT_NOT_STRING = 'The argument `layout` must be a string (%s given).';
 
-    const FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE = 'The argument `message` for the view helper "' . FormatMessageViewHelper::class . '" must be an instance of "' . FormzMessageInterface::class . '" (%s given).';
+    const FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE = 'The argument `message` for the view helper "%s" must be an instance of "%s" (%s given).';
 
     /**
      * @code 1477468571
@@ -44,7 +44,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_ASSET_HANDLER_TYPE,
-            [$className]
+            [AbstractAssetHandler::class, $className]
         );
 
         return $exception;
@@ -61,7 +61,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
-            [$className]
+            [FormInterface::class, $className]
         );
 
         return $exception;
@@ -78,7 +78,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VALIDATING_WRONG_FORM_TYPE,
-            [$className]
+            [FormInterface::class, $className]
         );
 
         return $exception;
@@ -92,7 +92,10 @@ class InvalidArgumentTypeException extends FormzException
     final public static function fieldViewHelperInvalidTypeNameArgument()
     {
         /** @var self $exception */
-        $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_INVALID_TYPE_NAME_ARGUMENT);
+        $exception = self::getNewExceptionInstance(
+            self::FIELD_VIEW_HELPER_INVALID_TYPE_NAME_ARGUMENT,
+            [FieldViewHelper::class]
+        );
 
         return $exception;
     }
@@ -124,7 +127,11 @@ class InvalidArgumentTypeException extends FormzException
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(self::FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE,
-            [gettype($value)]
+            [
+                FormatMessageViewHelper::class,
+                FormzMessageInterface::class,
+                gettype($value)
+            ]
         );
 
         return $exception;

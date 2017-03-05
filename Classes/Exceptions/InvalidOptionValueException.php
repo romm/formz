@@ -17,7 +17,7 @@ use Romm\Formz\Form\FormInterface;
 
 class InvalidOptionValueException extends FormzException
 {
-    const WRONG_FORM_TYPE = 'The form class must be an instance of "' . FormInterface::class . '", given value: "%s".';
+    const WRONG_FORM_TYPE = 'The form class must be an instance of "%s", given value: "%s".';
 
     /**
      * @code 1457442462
@@ -30,7 +30,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
-            [$name]
+            [FormInterface::class, $name]
         );
 
         return $exception;
