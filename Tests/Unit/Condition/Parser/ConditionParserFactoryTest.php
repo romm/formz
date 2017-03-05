@@ -10,7 +10,8 @@ class ConditionParserFactoryTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function parsedTreeIsStoredInLocalCache() {
+    public function parsedTreeIsStoredInLocalCache()
+    {
         /** @var ConditionParserFactory|\PHPUnit_Framework_MockObject_MockObject $conditionParserFactory */
         $conditionParserFactory = $this->getMockBuilder(ConditionParserFactory::class)
             ->setMethods(['getConditionTree'])

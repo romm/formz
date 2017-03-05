@@ -16,12 +16,12 @@ namespace Romm\Formz\Condition\Parser\Node;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 
-interface ProcessorDependencyAwareInterface
+interface ActivationDependencyAwareInterface
 {
     /**
      * @param ConditionProcessor  $processor
      * @param ActivationInterface $activation
      * @return void
      */
-    public function injectProcessorDependencies(ConditionProcessor $processor, ActivationInterface $activation);
+    public function injectDependencies(ConditionProcessor $processor, ActivationInterface $activation);
 }
