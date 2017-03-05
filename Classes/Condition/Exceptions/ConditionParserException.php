@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Condition\Exceptions;
 
-use Romm\Formz\Exceptions\Exception;
+use Romm\Formz\Exceptions\FormzException;
 
-class ConditionParserException extends Exception
+class ConditionParserException extends FormzException
 {
 }
