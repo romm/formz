@@ -8,6 +8,7 @@ use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
+use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
@@ -141,7 +142,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderNotExistingFieldThrowsException()
     {
-        $this->setExpectedException(EntryNotFoundException::class);
+        $this->setExpectedException(PropertyNotAccessibleException::class);
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);

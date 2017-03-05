@@ -380,25 +380,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             : $this->getFormClassNameFromControllerAction();
 
         if (false === class_exists($formClassName)) {
-            throw new ClassNotFoundException(
-                vsprintf(
-                    'Invalid value for the form class name (current value: "%s"). You need to either fill the parameter "formClassName" in the view helper, or specify the type of the parameter "$%s" for the method "%s::%s()".',
-                    [
-                        $formClassName,
-                        $this->getFormObjectName(),
-                        $this->getControllerName(),
-                        $this->getControllerActionName()
-                    ]
-                ),
-                1457442014
-            );
+            throw ClassNotFoundException::formViewHelperClassNotFound($formClassName, $this->getFormObjectName(), $this->getControllerName(), $this->getControllerActionName());
         }
 
         if (false === in_array(FormInterface::class, class_implements($formClassName))) {
-            throw new InvalidOptionValueException(
-                'Invalid value for the form class name (current value: "' . $formClassName . '"); it must be an instance of "' . FormInterface::class . '".',
-                1457442462
-            );
+            throw InvalidOptionValueException::formViewHelperWrongFormType($formClassName);
         }
 
         return $formClassName;
@@ -421,17 +407,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $methodParameters = $reflectionService->getMethodParameters($controllerObjectName, $actionName);
 
         if (false === isset($methodParameters[$this->getFormObjectName()])) {
-            throw new EntryNotFoundException(
-                vsprintf(
-                    'The method "%s::%s()" must have a parameter "$%s". Note that you can also change the parameter "name" of the form view helper.',
-                    [
-                        $controllerObjectName,
-                        $actionName,
-                        $this->getFormObjectName()
-                    ]
-                ),
-                1457441846
-            );
+            throw EntryNotFoundException::formViewHelperControllerActionArgumentMissing($controllerObjectName, $actionName, $this->getFormObjectName());
         }
 
         return $methodParameters[$this->getFormObjectName()]['type'];

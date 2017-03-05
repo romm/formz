@@ -76,10 +76,7 @@ class FieldIsEmptyCondition extends AbstractConditionItem
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw new InvalidConditionException(
-                'The field "' . $this->fieldName . '" does not exist.',
-                1488191994
-            );
+            throw InvalidConditionException::conditionFieldIsEmptyFieldNotFound($this->fieldName);
         }
 
         return true;

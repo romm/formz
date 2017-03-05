@@ -111,10 +111,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     public function getValidationByName($validationName)
     {
         if (false === $this->hasValidation($validationName)) {
-            throw new EntryNotFoundException(
-                'The validation "' . $validationName . '" was not found. Please use the function "hasValidation()" befo',
-                1487672276
-            );
+            throw EntryNotFoundException::validationNotFound($validationName);
         }
 
         return $this->validation[$validationName];

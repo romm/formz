@@ -139,17 +139,11 @@ class FieldHasErrorCondition extends AbstractConditionItem
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw new InvalidConditionException(
-                'The field "' . $this->fieldName . '" does not exist.',
-                1488192037
-            );
+            throw InvalidConditionException::conditionFieldHasErrorFieldNotFound($this->fieldName);
         }
 
         if (false === $configuration->getField($this->fieldName)->hasValidation($this->validationName)) {
-            throw new InvalidConditionException(
-                'The validation "' . $this->validationName . '" does not exist for the field "' . $this->fieldName . '".',
-                1488192055
-            );
+            throw InvalidConditionException::conditionFieldHasErrorValidationNotFound($this->validationName, $this->fieldName);
         }
 
         return true;

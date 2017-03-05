@@ -13,6 +13,24 @@
 
 namespace Romm\Formz\Exceptions;
 
-class MissingArgumentException extends Exception
+class MissingArgumentException extends FormzException
 {
+    const REQUEST_ARGUMENTS_MISSING = 'One or more arguments are missing in the request: "%s".';
+
+    /**
+     * @code 1487673983
+     *
+     * @param array $missingArguments
+     * @return MissingArgumentException
+     */
+    final public static function ajaxControllerMissingArguments(array $missingArguments)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::REQUEST_ARGUMENTS_MISSING,
+            [implode('", "', $missingArguments)]
+        );
+
+        return $exception;
+    }
 }

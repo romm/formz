@@ -189,10 +189,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     private function addMessage($type, $key, $code, array $arguments, $title)
     {
         if (!isset($this->messages[$key])) {
-            throw new EntryNotFoundException(
-                'The error key "' . $key . '" does not exist for the validator "' . get_class($this) . '".',
-                1455272659
-            );
+            throw EntryNotFoundException::errorKeyNotFoundForValidator($key, $this);
         }
 
         return new $type(

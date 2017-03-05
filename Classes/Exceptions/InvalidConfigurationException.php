@@ -13,6 +13,40 @@
 
 namespace Romm\Formz\Exceptions;
 
-class InvalidConfigurationException extends Exception
+class InvalidConfigurationException extends FormzException
 {
+    const INVALID_FORM_CONFIGURATION = 'The form configuration contains errors.';
+
+    const AJAX_VALIDATION_NOT_ACTIVATED = 'The validation "%s" of the field "%s" is not configured to work with Ajax. Please add the option `useAjax`.';
+
+    /**
+     * @code 1487671395
+     *
+     * @return InvalidConfigurationException
+     */
+    final public static function ajaxControllerInvalidFormConfiguration()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(self::INVALID_FORM_CONFIGURATION);
+
+        return $exception;
+    }
+
+    /**
+     * @code 1487673434
+     *
+     * @param string $validationName
+     * @param string $fieldName
+     * @return InvalidConfigurationException
+     */
+    final public static function ajaxControllerAjaxValidationNotActivated($validationName, $fieldName)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::AJAX_VALIDATION_NOT_ACTIVATED,
+            [$validationName, $fieldName]
+        );
+
+        return $exception;
+    }
 }

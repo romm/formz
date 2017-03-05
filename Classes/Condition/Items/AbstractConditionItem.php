@@ -149,21 +149,14 @@ JS;
         } catch (InvalidConditionException $exception) {
             /** @var Field|Validation $rootObject */
             $rootObject = $this->activation->getRootObject();
+            $conditionName = $this->conditionNode->getConditionName();
+            $formClassName = $this->formObject->getClassName();
 
-            throw new InvalidConditionException(
-                vsprintf(
-                    'Invalid configuration for the condition "%s", used on %s of the form "%s"; error message is « %s ».',
-                    [
-                        $this->conditionNode->getConditionName(),
-                        ($rootObject instanceof Field)
-                            ? 'the field "' . $rootObject->getFieldName() . '"'
-                            : 'the validation "' . $rootObject->getValidationName() . '" of the field "' . $rootObject->getParentField()->getFieldName() . '"',
-                        $this->formObject->getClassName(),
-                        $exception->getMessage()
-                    ]
-                ),
-                $exception->getCode()
-            );
+            if ($rootObject instanceof Field) {
+                throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+            } elseif ($rootObject instanceof Validation) {
+                throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+            }
         }
 
         return true;
