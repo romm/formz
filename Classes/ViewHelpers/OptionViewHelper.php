@@ -75,10 +75,7 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
     public function render()
     {
         if (false === $this->fieldService->fieldContextExists()) {
-            throw new ContextNotFoundException(
-                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
-                1465243085
-            );
+            throw ContextNotFoundException::optionViewHelperFieldContextNotFound();
         }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);

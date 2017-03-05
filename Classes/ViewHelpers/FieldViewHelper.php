@@ -20,6 +20,7 @@ use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
+use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
@@ -96,10 +97,7 @@ class FieldViewHelper extends AbstractViewHelper
          * `FormViewHelper`, because it would not make sense anywhere else.
          */
         if (false === $this->formService->formContextExists()) {
-            throw new ContextNotFoundException(
-                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FormViewHelper::class . '".',
-                1465243085
-            );
+            throw ContextNotFoundException::fieldViewHelperFormContextNotFound();
         }
 
         /*
@@ -196,8 +194,8 @@ class FieldViewHelper extends AbstractViewHelper
      * Throws an error if the field is not found or incorrect.
      *
      * @param string $fieldName
-     * @throws EntryNotFoundException
      * @throws InvalidArgumentTypeException
+     * @throws PropertyNotAccessibleException
      */
     protected function injectFieldInService($fieldName)
     {
@@ -205,14 +203,9 @@ class FieldViewHelper extends AbstractViewHelper
         $formConfiguration = $formObject->getConfiguration();
 
         if (false === is_string($fieldName)) {
-            throw new InvalidArgumentTypeException(
-                'The argument "name" of the view helper "' . __CLASS__ . '" must be a string.',
-                1465243479
-            );
+            throw InvalidArgumentTypeException::fieldViewHelperInvalidTypeNameArgument();
         } elseif (false === $formConfiguration->hasField($fieldName)) {
-            throw new EntryNotFoundException(
-                'The form "' . $formObject->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.',
-                1465243619);
+            throw PropertyNotAccessibleException::fieldViewHelperFieldNotAccessibleInForm($formObject, $fieldName);
         }
 
         $this->fieldService->setCurrentField($formConfiguration->getField($fieldName));
@@ -232,36 +225,25 @@ class FieldViewHelper extends AbstractViewHelper
         $layout = $this->arguments['layout'];
 
         if (false === is_string($layout)) {
-            throw new InvalidArgumentTypeException(
-                'The argument "layout" must be a string (' . gettype($layout) . ' given).',
-                1485786193
-            );
+            throw InvalidArgumentTypeException::invalidTypeNameArgumentFieldViewHelper($layout);
         }
 
         list($layoutName, $templateName) = GeneralUtility::trimExplode('.', $layout);
-        if (false === is_string($templateName)) {
+
+        if (empty($templateName)) {
             $templateName = 'default';
         }
 
         if (empty($layoutName)) {
-            throw new InvalidArgumentValueException(
-                'The layout name cannot be empty, please fill with a value.',
-                1485786285
-            );
+            throw InvalidArgumentValueException::fieldViewHelperEmptyLayout();
         }
 
         if (false === $viewConfiguration->hasLayout($layoutName)) {
-            throw new EntryNotFoundException(
-                'The layout "' . $layout . '" could not be found. Please check your TypoScript configuration.',
-                1465243586
-            );
+            throw EntryNotFoundException::fieldViewHelperLayoutNotFound($layout);
         }
 
         if (false === $viewConfiguration->getLayout($layoutName)->hasItem($templateName)) {
-            throw new EntryNotFoundException(
-                'The layout "' . $layout . '" does not have an item "' . $templateName . '".',
-                1485867803
-            );
+            throw EntryNotFoundException::fieldViewHelperLayoutItemNotFound($layout, $templateName);
         }
 
         return $viewConfiguration->getLayout($layoutName)->getItem($templateName);

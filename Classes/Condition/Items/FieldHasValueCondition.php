@@ -91,10 +91,7 @@ class FieldHasValueCondition extends AbstractConditionItem
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw new InvalidConditionException(
-                'The field "' . $this->fieldName . '" does not exist.',
-                1488192031
-            );
+            throw InvalidConditionException::conditionFieldHasValueFieldNotFound($this->fieldName);
         }
 
         return true;

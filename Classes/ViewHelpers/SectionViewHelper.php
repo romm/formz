@@ -49,10 +49,7 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     public function render()
     {
         if (false === $this->fieldService->fieldContextExists()) {
-            throw new ContextNotFoundException(
-                'The view helper "' . get_called_class() . '" must be used inside the view helper "' . FieldViewHelper::class . '".',
-                1488474106
-            );
+            throw ContextNotFoundException::sectionViewHelperFieldContextNotFound();
         }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);

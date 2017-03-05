@@ -98,10 +98,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     public function getCondition($name)
     {
         if (false === $this->hasCondition($name)) {
-            throw new EntryNotFoundException(
-                'No condition "' . $name . '" was found.',
-                1488482191
-            );
+            throw EntryNotFoundException::conditionNotFound($name);
         }
 
         $items = $this->getConditions();

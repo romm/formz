@@ -109,10 +109,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     public function validateWithoutSavingResults($form)
     {
         if (false === $form instanceof FormInterface) {
-            throw new InvalidArgumentTypeException(
-                'Trying to validate a form that does not implement the interface "' . FormInterface::class . '". Given class: "' . get_class($form) . '"',
-                1487865158
-            );
+            throw InvalidArgumentTypeException::validatingWrongFormType(get_class($form));
         }
 
         $this->result = new FormResult;
