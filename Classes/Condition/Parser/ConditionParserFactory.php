@@ -36,19 +36,19 @@ class ConditionParserFactory implements SingletonInterface
      * several nodes which represent the condition. See the class
      * `ConditionTree` for more information.
      *
-     * @param ActivationInterface $condition The condition instance.
+     * @param ActivationInterface $activation
      * @return ConditionTree
      */
-    public function parse(ActivationInterface $condition)
+    public function parse(ActivationInterface $activation)
     {
         $hash = 'condition-tree-' .
             sha1(serialize([
-                $condition->getExpression(),
-                $condition->getConditions()
+                $activation->getExpression(),
+                $activation->getConditions()
             ]));
 
         if (false === array_key_exists($hash, $this->trees)) {
-            $this->trees[$hash] = $this->getConditionTree($hash, $condition);
+            $this->trees[$hash] = $this->getConditionTree($hash, $activation);
         }
 
         return $this->trees[$hash];
@@ -56,10 +56,10 @@ class ConditionParserFactory implements SingletonInterface
 
     /**
      * @param string              $cacheIdentifier
-     * @param ActivationInterface $condition
+     * @param ActivationInterface $activation
      * @return ConditionTree
      */
-    protected function getConditionTree($cacheIdentifier, ActivationInterface $condition)
+    protected function getConditionTree($cacheIdentifier, ActivationInterface $activation)
     {
         $cacheInstance = CacheService::get()->getCacheInstance();
 
@@ -67,10 +67,19 @@ class ConditionParserFactory implements SingletonInterface
         if ($cacheInstance->has($cacheIdentifier)) {
             $instance = $cacheInstance->get($cacheIdentifier);
         } else {
-            $instance = ConditionParser::get()->parse($condition);
+            $instance = $this->buildConditionTree($activation);
             $cacheInstance->set($cacheIdentifier, $instance);
         }
 
         return $instance;
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     * @return ConditionTree
+     */
+    protected function buildConditionTree(ActivationInterface $activation)
+    {
+        return ConditionParser::get()->parse($activation);
     }
 }

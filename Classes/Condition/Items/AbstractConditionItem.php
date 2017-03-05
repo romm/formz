@@ -147,7 +147,6 @@ JS;
         try {
             $this->checkConditionConfiguration();
         } catch (InvalidConditionException $exception) {
-            /** @var Field|Validation $rootObject */
             $rootObject = $this->activation->getRootObject();
             $conditionName = $this->conditionNode->getConditionName();
             $formClassName = $this->formObject->getClassName();
