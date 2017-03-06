@@ -72,7 +72,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function formObjectFromClassNameIsStoredAndFetchedFromCache()
     {
-        $formObject = new FormObject(DefaultForm::class, 'foo');
+        $formObject = new FormObject(DefaultForm::class, 'foo', []);
 
         /** @var ConfigurationFactory $configurationFactory */
         $configurationFactory = Core::instantiate(ConfigurationFactory::class);

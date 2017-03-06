@@ -71,4 +71,13 @@ class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorIn
             ? $this->items[$itemName]
             : null;
     }
+
+    /**
+     * @param string $itemName
+     * @param string $value
+     */
+    public function addItem($itemName, $value)
+    {
+        $this->items[$itemName] = $value;
+    }
 }

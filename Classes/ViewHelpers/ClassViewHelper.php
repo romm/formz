@@ -173,7 +173,7 @@ class ClassViewHelper extends AbstractViewHelper
         $class = ObjectAccess::getProperty($classesConfiguration, $this->classNameSpace);
 
         if (false === $class->hasItem($this->className)) {
-            throw UnregisteredConfigurationException::cssClassNameNotFound($this->arguments['name'], $this->className, $this->classNameSpace);
+            throw UnregisteredConfigurationException::cssClassNameNotFound($this->arguments['name'], $this->classNameSpace, $this->className);
         }
 
         $this->classValue = $class->getItem($this->className);

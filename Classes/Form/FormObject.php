@@ -13,13 +13,9 @@
 
 namespace Romm\Formz\Form;
 
-use Romm\ConfigurationObject\ConfigurationObjectFactory;
-use Romm\ConfigurationObject\ConfigurationObjectInstance;
-use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -28,12 +24,6 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class FormObject
 {
-
-    /**
-     * @var ConfigurationFactory
-     */
-    protected $configurationFactory;
-
     /**
      * Name of the form.
      *
@@ -54,24 +44,9 @@ class FormObject
     protected $properties = [];
 
     /**
-     * Contains the form configuration.
-     *
-     * @var array
+     * @var FormObjectConfiguration
      */
-    protected $configurationArray = [];
-
-    /**
-     * Contains the form configuration object, which was created from the
-     * configuration array.
-     *
-     * @var ConfigurationObjectInstance
-     */
-    protected $configurationObject;
-
-    /**
-     * @var Result
-     */
-    protected $configurationValidationResult;
+    protected $configuration;
 
     /**
      * @var FormResult
@@ -84,11 +59,6 @@ class FormObject
     protected $hash;
 
     /**
-     * @var string
-     */
-    protected $lastConfigurationHash;
-
-    /**
      * @var bool
      */
     protected $hashShouldBeCalculated = true;
@@ -99,22 +69,21 @@ class FormObject
      *
      * @param string $className
      * @param string $name
+     * @param array  $formConfiguration
      */
-    public function __construct($className, $name)
+    public function __construct($className, $name, array $formConfiguration)
     {
         $this->className = $className;
         $this->name = $name;
+        $this->setUpConfiguration($formConfiguration);
     }
 
     /**
-     * @return Form
+     * @param array $formConfiguration
      */
-    public function getConfiguration()
+    protected function setUpConfiguration(array $formConfiguration)
     {
-        /** @var Form $configuration */
-        $configuration = $this->getConfigurationObject()->getObject(true);
-
-        return $configuration;
+        $this->configuration = Core::instantiate(FormObjectConfiguration::class, $this, $formConfiguration);
     }
 
     /**
@@ -167,6 +136,28 @@ class FormObject
     }
 
     /**
+     * @return Form
+     */
+    public function getConfiguration()
+    {
+        /** @var Form $configuration */
+        $configuration = $this->configuration->getConfigurationObject()->getObject(true);
+
+        return $configuration;
+    }
+
+    /**
+     * This function will merge and return the validation results of both the
+     * global Formz configuration object, and this form configuration object.
+     *
+     * @return Result
+     */
+    public function getConfigurationValidationResult()
+    {
+        return $this->configuration->getConfigurationValidationResult();
+    }
+
+    /**
      * Returns the hash, which should be calculated only once for performance
      * concerns.
      *
@@ -185,118 +176,6 @@ class FormObject
     }
 
     /**
-     * @return array
-     * @internal Should not be used, it is here only for unit tests.
-     */
-    public function getConfigurationArray()
-    {
-        return $this->configurationArray;
-    }
-
-    /**
-     * @param array $configuration
-     * @return $this
-     */
-    public function setConfigurationArray($configuration)
-    {
-        $this->configurationArray = $this->sanitizeConfiguration($configuration);
-        $this->hashShouldBeCalculated = true;
-
-        return $this;
-    }
-
-    /**
-     * Returns an instance of configuration object. Checks if it was previously
-     * stored in cache, otherwise it is created from scratch.
-     *
-     * @return ConfigurationObjectInstance
-     */
-    protected function getConfigurationObject()
-    {
-        if (null === $this->configurationObject
-            || $this->lastConfigurationHash !== $this->getHash()
-        ) {
-            $cacheInstance = CacheService::get()->getCacheInstance();
-            $cacheIdentifier = 'configuration-' . $this->getHash();
-            $this->lastConfigurationHash = $this->getHash();
-
-            if ($cacheInstance->has($cacheIdentifier)) {
-                $configurationObject = $cacheInstance->get($cacheIdentifier);
-            } else {
-                $configurationObject = $this->buildConfigurationObject();
-
-                if (false === $configurationObject->getValidationResult()->hasErrors()) {
-                    $cacheInstance->set($cacheIdentifier, $configurationObject);
-                }
-            }
-
-            $this->configurationObject = $configurationObject;
-        }
-
-        return $this->configurationObject;
-    }
-
-    /**
-     * This function will merge and return the validation results of both the
-     * global Formz configuration object, and this form configuration object.
-     *
-     * @return Result
-     */
-    public function getConfigurationValidationResult()
-    {
-        if (null === $this->configurationValidationResult
-            || $this->lastConfigurationHash !== $this->getHash()
-        ) {
-            $this->configurationValidationResult = new Result;
-            $formzConfigurationValidationResult = $this->configurationFactory
-                ->getFormzConfiguration()
-                ->getValidationResult();
-
-            $this->configurationValidationResult->merge($formzConfigurationValidationResult);
-
-            $this->configurationValidationResult->forProperty('forms.' . $this->getClassName())
-                ->merge($this->getConfigurationObject()->getValidationResult());
-        }
-
-        return $this->configurationValidationResult;
-    }
-
-    /**
-     * @return ConfigurationObjectInstance
-     */
-    protected function buildConfigurationObject()
-    {
-        return ConfigurationObjectFactory::getInstance()
-            ->get(Form::class, $this->configurationArray);
-    }
-
-    /**
-     * This function will clean the configuration array by removing useless data
-     * and updating needed ones.
-     *
-     * @param array $configuration
-     * @return array
-     */
-    protected function sanitizeConfiguration(array $configuration)
-    {
-        // Removing configuration of fields which do not exist for this form.
-        $sanitizedFieldsConfiguration = [];
-        $fieldsConfiguration = (isset($configuration['fields']))
-            ? $configuration['fields']
-            : [];
-
-        foreach ($this->properties as $property) {
-            $sanitizedFieldsConfiguration[$property] = (isset($fieldsConfiguration[$property]))
-                ? $fieldsConfiguration[$property]
-                : [];
-        }
-
-        $configuration['fields'] = $sanitizedFieldsConfiguration;
-
-        return $configuration;
-    }
-
-    /**
      * Returns the calculated hash of this class.
      *
      * @return string
@@ -304,14 +183,6 @@ class FormObject
     protected function calculateHash()
     {
         return sha1(serialize($this));
-    }
-
-    /**
-     * @param ConfigurationFactory $configurationFactory
-     */
-    public function injectConfigurationFactory(ConfigurationFactory $configurationFactory)
-    {
-        $this->configurationFactory = $configurationFactory;
     }
 
     /**
@@ -346,7 +217,7 @@ class FormObject
      */
     public function __sleep()
     {
-        return ['name', 'className', 'properties', 'configurationArray', 'hash'];
+        return ['name', 'className', 'properties', 'hash', 'configuration'];
     }
 
     /**
@@ -357,9 +228,5 @@ class FormObject
     public function __wakeup()
     {
         $this->hashShouldBeCalculated = (null === $this->hash);
-
-        /** @var ConfigurationFactory $configurationFactory */
-        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
-        $this->injectConfigurationFactory($configurationFactory);
     }
 }

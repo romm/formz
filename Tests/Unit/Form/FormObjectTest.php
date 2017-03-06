@@ -1,8 +1,6 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Form;
 
-use Romm\ConfigurationObject\ConfigurationObjectInstance;
-use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -51,7 +49,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function formObjectWithAddedPropertyHasProperty()
     {
-        $formObject = $this->getDefaultFormObject();
+        $formObject = $this->createFormObject();
 
         $this->assertFalse($formObject->hasProperty('foo'));
         $this->assertFalse($formObject->hasProperty('bar'));
@@ -64,62 +62,6 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
-     * Setting a basic configuration array should be saved properly.
-     *
-     * @test
-     */
-    public function configurationArrayCanBeSet()
-    {
-        $formObject = $this->getDefaultFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => 'foo'
-            ],
-            'bar'    => 'bar'
-        ];
-
-        $formObject->addProperty('foo');
-        $formObject->setConfigurationArray($arrayConfiguration);
-
-        $this->assertEquals($arrayConfiguration, $formObject->getConfigurationArray());
-
-        unset($formObject);
-    }
-
-    /**
-     * When injecting an array configuration, the property `fields` of the array
-     * should contain only fields that were added with the function
-     * `addProperty()`.
-     *
-     * The function will sanitize the array by removing the fields not found in
-     * the properties list.
-     *
-     * @test
-     */
-    public function configurationArrayDeletesAdditionalFields()
-    {
-        $formObject = $this->getDefaultFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => 'foo'
-            ],
-            'bar'    => 'bar'
-        ];
-        $additionalFieldsArrayConfiguration = [
-            'fields' => [
-                'bar' => 'bar'
-            ]
-        ];
-
-        $formObject->addProperty('foo');
-        $formObject->setConfigurationArray(array_merge_recursive($arrayConfiguration, $additionalFieldsArrayConfiguration));
-
-        $this->assertEquals($arrayConfiguration, $formObject->getConfigurationArray());
-
-        unset($formObject);
-    }
-
-    /**
      * Checking that the hash can be retrieved with its getter.
      *
      * @test
@@ -129,7 +71,7 @@ class FormObjectTest extends AbstractUnitTest
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilder(FormObject::class)
             ->setMethods(['calculateHash'])
-            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME])
+            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME, []])
             ->getMock();
         $hash = 'foo';
 
@@ -153,7 +95,7 @@ class FormObjectTest extends AbstractUnitTest
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilder(FormObject::class)
             ->setMethods(['calculateHash'])
-            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME])
+            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME, []])
             ->getMock();
 
         $formObject->expects($this->once())
@@ -168,49 +110,6 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
-     * Checks that the configuration object is stored in cache, so it is not
-     * built every time it is fetched.
-     *
-     * @test
-     */
-    public function configurationObjectIsStoredInCache()
-    {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMockBuilder(FormObject::class)
-            ->setMethods(['buildConfigurationObject'])
-            ->setConstructorArgs([\stdClass::class, 'foo'])
-            ->getMock();
-
-        $formzConfiguration = new Configuration();
-        $result = new Result();
-        $configurationObjectInstance = new ConfigurationObjectInstance($formzConfiguration, $result);
-
-        $formObject->expects($this->once())
-            ->method('buildConfigurationObject')
-            ->willReturn($configurationObjectInstance);
-
-        for ($i = 0; $i < 3; $i++) {
-            $formObject->getConfiguration();
-        }
-
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject2 */
-        $formObject2 = $this->getMockBuilder(FormObject::class)
-            ->setMethods(['buildConfigurationObject'])
-            ->setConstructorArgs([\stdClass::class, 'foo'])
-            ->getMock();
-
-        $formObject2->expects($this->never())
-            ->method('buildConfigurationObject');
-
-        for ($i = 0; $i < 3; $i++) {
-            $formObject2->getConfiguration();
-        }
-
-        unset($formObject);
-        unset($formObject2);
-    }
-
-    /**
      * Checks that the configuration validation result is correctly built and
      * can be fetched.
      *
@@ -219,14 +118,7 @@ class FormObjectTest extends AbstractUnitTest
     public function configurationValidationResultCanBeGet()
     {
         $formObject = $this->getDefaultFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => []
-            ]
-        ];
-
         $formObject->addProperty('foo');
-        $formObject->setConfigurationArray($arrayConfiguration);
 
         $validationResult = $formObject->getConfigurationValidationResult();
         $this->assertInstanceOf(Result::class, $validationResult);
@@ -240,7 +132,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function setLastValidationResultSetsLastValidationResult()
     {
-        $formObject = new FormObject('foo', 'foo');
+        $formObject = new FormObject('foo', 'foo', []);
 
         $validationResult = new FormResult;
 

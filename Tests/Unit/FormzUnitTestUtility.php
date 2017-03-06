@@ -9,6 +9,7 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService;
@@ -154,14 +155,15 @@ trait FormzUnitTestUtility
      * @param array $fields
      * @return FormObject
      */
-    private function createFormObject(array $fields)
+    protected function createFormObject(array $fields = [])
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
-            ->setMethods(['buildConfigurationObject'])
+            ->setMethods(['getConfiguration', 'getConfigurationValidationResult', 'setUpConfiguration'])
             ->setConstructorArgs([
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
-                AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
+                AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME,
+                []
             ])
             ->getMock();
 
@@ -171,24 +173,30 @@ trait FormzUnitTestUtility
             $field = new Field();
             $field->setFieldName($fieldName);
             $formConfiguration->addField($field);
+
+            $formObject->addProperty($fieldName);
         }
 
         $configurationObjectInstance = new ConfigurationObjectInstance($formConfiguration, new Result);
         $configurationObjectInstance->setValidationResult(new Result);
 
-        $formObject->method('buildConfigurationObject')
-            ->willReturn($configurationObjectInstance);
+        $formzConfiguration = new Configuration;
 
-        /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactoryMock */
-        $configurationFactoryMock = $this->getMockBuilderWrap(ConfigurationFactory::class)
-            ->setMethods(['getFormzConfiguration'])
-            ->getMock();
+        $errors = new ViewClass;
+        $errors->addItem('foo', 'foo');
+        $formzConfiguration->getView()->getClasses()->setErrors($errors);
 
-        $formzConfiguration = new ConfigurationObjectInstance(new Configuration, new Result);
-        $configurationFactoryMock->method('getFormzConfiguration')
-            ->willReturn($formzConfiguration);
+        $valid = new ViewClass;
+        $valid->addItem('bar', 'bar');
+        $formzConfiguration->getView()->getClasses()->setValid($valid);
 
-        $formObject->injectConfigurationFactory($configurationFactoryMock);
+        $formConfiguration->setParents([$formzConfiguration]);
+
+        $formObject->method('getConfiguration')
+            ->willReturn($configurationObjectInstance->getObject(true));
+
+        $formObject->method('getConfigurationValidationResult')
+            ->willReturn(new Result);
 
         return $formObject;
     }

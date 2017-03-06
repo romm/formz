@@ -117,13 +117,12 @@ class FormObjectFactory implements SingletonInterface
      */
     protected function createInstance($className, $name)
     {
+        $formConfiguration = $this->typoScriptService->getFormConfiguration($className);
+
         /** @var FormObject $instance */
-        $instance = Core::instantiate(FormObject::class, $className, $name);
+        $instance = Core::instantiate(FormObject::class, $className, $name, $formConfiguration);
 
         $this->insertObjectProperties($instance);
-
-        $formConfiguration = $this->typoScriptService->getFormConfiguration($className);
-        $instance->setConfigurationArray($formConfiguration);
 
         $instance->getHash();
 
