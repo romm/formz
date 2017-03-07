@@ -61,12 +61,28 @@ class FieldSettings extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string $selector
+     */
+    public function setFieldContainerSelector($selector)
+    {
+        $this->fieldContainerSelector = $selector;
+    }
+
+    /**
      * @param null $fieldName
      * @return string
      */
     public function getFeedbackContainerSelector($fieldName = null)
     {
         return $this->formatSelector($this->getSettingsProperty('feedbackContainerSelector'), $fieldName);
+    }
+
+    /**
+     * @param string $selector
+     */
+    public function setFeedbackContainerSelector($selector)
+    {
+        $this->feedbackContainerSelector = $selector;
     }
 
     /**

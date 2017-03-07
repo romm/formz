@@ -2,10 +2,8 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -26,6 +24,13 @@ class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
 (function(){Formz.Form.beforeInitialization('foo',function(form){form.injectRequestData({"foo":"foo"},{"foo":{"errors":{"foo":{"bar":"error"}}}},true,["foo"])});})();
 TXT;
 
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
+
+        $assetHandler = new FormRequestDataJavaScriptAssetHandler($assetHandlerFactory);
+
+        $formObject = $assetHandler->getFormObject();
+        $formObject->markFormAsSubmitted();
+
         $originalRequest = new Request;
         $originalRequest->setArgument('foo', ['foo' => 'foo']);
 
@@ -35,8 +40,7 @@ TXT;
         $result = new Result;
         $formResult = new FormResult;
 
-        $field = new Field;
-        $field->setFieldName('foo');
+        $field = $formObject->getConfiguration()->getField('foo');
         $formResult->deactivateField($field);
 
         $error = new Error(
@@ -52,17 +56,13 @@ TXT;
         $result->forProperty('foo')
             ->merge($formResult);
 
+        $formObject->setFormResult($formResult);
+
         $request->setOriginalRequestMappingResults($result);
 
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
         $assetHandlerFactory->getControllerContext()->setRequest($request);
 
-        /** @var FormRequestDataJavaScriptAssetHandler $formRequestDataJavaScriptAssetHandler */
-        $formRequestDataJavaScriptAssetHandler = $assetHandlerFactory->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
-        $formRequestDataJavaScriptAssetHandler->getFormObject()
-            ->setLastValidationResult($formResult);
-
-        $javaScriptCode = $formRequestDataJavaScriptAssetHandler->getFormRequestDataJavaScriptCode();
+        $javaScriptCode = $assetHandler->getFormRequestDataJavaScriptCode();
 
         $this->assertEquals(
             $expectedResult,

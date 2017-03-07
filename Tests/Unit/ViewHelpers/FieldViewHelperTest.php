@@ -124,7 +124,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $this->injectDependenciesIntoViewHelper($viewHelper);
 
         $formService = new FormViewHelperService;
-        $formService->setFormObject(new FormObject('foo', 'bar'));
+        $formService->setFormObject(new FormObject('foo', 'bar', []));
         $formService->activateFormContext();
         $viewHelper->injectFormService($formService);
 

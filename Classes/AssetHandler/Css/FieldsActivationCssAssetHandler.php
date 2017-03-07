@@ -14,6 +14,8 @@
 namespace Romm\Formz\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Condition\Parser\ConditionTree;
+use Romm\Formz\Configuration\Form\Field\Field;
 
 /**
  * This asset handler generates the CSS code which will automatically hide
@@ -37,13 +39,11 @@ class FieldsActivationCssAssetHandler extends AbstractAssetHandler
         $cssBlocks = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        foreach ($formConfiguration->getFields() as $fieldName => $field) {
+        foreach ($formConfiguration->getFields() as $field) {
             $formName = $this->getFormObject()->getName();
             $fieldContainerSelector = $field->getSettings()->getFieldContainerSelector();
 
-            $cssTree = $this->conditionProcessor
-                ->getActivationConditionTreeForField($field)
-                ->getCssConditions();
+            $cssTree = $this->getConditionTreeForField($field)->getCssConditions();
 
             if (false === empty($cssTree)) {
                 $fullNodeData = [];
@@ -54,7 +54,7 @@ class FieldsActivationCssAssetHandler extends AbstractAssetHandler
 
                 $nodesSelector = implode(',' . CRLF, $fullNodeData);
 
-                $cssBlocks[] = $this->getSingleFieldCssBlock($formName, $fieldName, $fieldContainerSelector, $nodesSelector);
+                $cssBlocks[] = $this->getSingleFieldCssBlock($formName, $field, $fieldContainerSelector, $nodesSelector);
             }
         }
 
@@ -65,23 +65,32 @@ class FieldsActivationCssAssetHandler extends AbstractAssetHandler
      * This function is just here to make the class more readable.
      *
      * @param string $formName               Name of the form.
-     * @param string $fieldName              Name of the field.
+     * @param Field  $field                  Field instance.
      * @param string $fieldContainerSelector Selector for the field container.
      * @param string $nodesSelector          Nodes used to display the field container.
      * @return string
      */
-    protected function getSingleFieldCssBlock($formName, $fieldName, $fieldContainerSelector, $nodesSelector)
+    protected function getSingleFieldCssBlock($formName, $field, $fieldContainerSelector, $nodesSelector)
     {
         return <<<CSS
-/* Hiding the container of the field "$fieldName" by default */
+/* Hiding the container of the field "{$field->getFieldName()}" by default */
 form[name="$formName"] $fieldContainerSelector {
     display: none;
 }
 
-/* Showing the container of the field "$fieldName" */
+/* Showing the container of the field "{$field->getFieldName()}" */
 $nodesSelector {
     display: block;
 }
 CSS;
+    }
+
+    /**
+     * @param Field $field
+     * @return ConditionTree
+     */
+    protected function getConditionTreeForField(Field $field)
+    {
+        return $this->conditionProcessor->getActivationConditionTreeForField($field);
     }
 }

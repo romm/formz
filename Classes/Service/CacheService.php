@@ -137,8 +137,8 @@ class CacheService implements SingletonInterface
             return;
         }
 
-        foreach ($files as $assetCacheFile) {
-            unlink($assetCacheFile);
+        foreach ($files as $file) {
+            touch($file, 0);
         }
     }
 }

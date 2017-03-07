@@ -2,8 +2,7 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
-use Romm\Formz\Condition\Items\FieldIsValidCondition;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
+use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 
@@ -18,30 +17,32 @@ class FieldsActivationCssAssetHandlerTest extends AbstractUnitTest
      */
     public function fieldsActivationCssIsValid()
     {
-        $expectedCss = 'form[name="foo"][formz-field-container="foo"]{display:none;}form[name="foo"][formz-valid-foo="1"][formz-field-container="foo"]{display:block;}';
+        $expectedCss = 'form[name="foo"][formz-field-container="foo"]{display:none;}form[name="foo"]CSS-CONDITION[formz-field-container="foo"]{display:block;}';
 
-        $defaultFormConfiguration = [
-            'activationCondition' => [
-                'test' => [
-                    'type'      => FieldIsValidCondition::CONDITION_NAME,
-                    'fieldName' => 'foo'
-                ]
-            ],
-            'fields'              => [
-                'foo' => [
-                    'activation' => [
-                        'expression' => 'test'
-                    ]
-                ]
-            ]
-        ];
-        $this->setFormConfigurationFromClassName(DefaultForm::class, $defaultFormConfiguration);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
+        /** @var FieldsActivationCssAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        $assetHandler = $this->getMockBuilder(FieldsActivationCssAssetHandler::class)
+            ->setMethods(['getConditionTreeForField'])
+            ->setConstructorArgs([$assetHandlerFactory])
+            ->getMock();
 
-        /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
-        $fieldsActivationCssAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsActivationCssAssetHandler::class);
-        $fieldsActivationCss = $fieldsActivationCssAssetHandler->getFieldsActivationCss();
+        $assetHandler->expects($this->once())
+            ->method('getConditionTreeForField')
+            ->willReturnCallback(function () {
+                $tree = $this->getMockBuilder(ConditionTree::class)
+                    ->disableOriginalConstructor()
+                    ->setMethods(['getCssConditions'])
+                    ->getMock();
+
+                $tree->expects($this->once())
+                    ->method('getCssConditions')
+                    ->willReturn(['CSS-CONDITION']);
+
+                return $tree;
+            });
+
+        $fieldsActivationCss = $assetHandler->getFieldsActivationCss();
 
         $this->assertEquals($expectedCss, $this->removeMultiLinesComments($this->trimString($fieldsActivationCss)));
 

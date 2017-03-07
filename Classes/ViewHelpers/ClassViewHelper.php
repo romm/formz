@@ -173,7 +173,7 @@ class ClassViewHelper extends AbstractViewHelper
         $class = ObjectAccess::getProperty($classesConfiguration, $this->classNameSpace);
 
         if (false === $class->hasItem($this->className)) {
-            throw UnregisteredConfigurationException::cssClassNameNotFound($this->arguments['name'], $this->className, $this->classNameSpace);
+            throw UnregisteredConfigurationException::cssClassNameNotFound($this->arguments['name'], $this->classNameSpace, $this->className);
         }
 
         $this->classValue = $class->getItem($this->className);
@@ -187,14 +187,17 @@ class ClassViewHelper extends AbstractViewHelper
      */
     protected function getFormResultClass()
     {
-        $formResult = $this->formService->getFormResult();
-        $propertyResult = ($formResult)
-            ? $formResult->forProperty($this->fieldName)
-            : null;
+        $result = '';
+        $formObject = $this->formService->getFormObject();
 
-        return ($this->formService->formWasSubmitted() && null !== $propertyResult)
-            ? $this->getPropertyResultClass($propertyResult)
-            : '';
+        if ($formObject->formWasSubmitted()
+            && $formObject->hasFormResult()
+        ) {
+            $fieldResult = $formObject->getFormResult()->forProperty($this->fieldName);
+            $result = $this->getPropertyResultClass($fieldResult);
+        }
+
+        return $result;
     }
 
     /**
@@ -239,11 +242,7 @@ class ClassViewHelper extends AbstractViewHelper
         $field = $formObject->getConfiguration()->getField($this->fieldName);
 
         if (false === $propertyResult->hasErrors()
-            && false === $formObject->hasLastValidationResult()
-            || (
-                $formObject->hasLastValidationResult()
-                && false === $formObject->getLastValidationResult()->fieldIsDeactivated($field)
-            )
+            && false === $formObject->getFormResult()->fieldIsDeactivated($field)
         ) {
             $result .= ' ' . $this->classValue;
         }

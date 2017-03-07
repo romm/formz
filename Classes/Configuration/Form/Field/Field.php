@@ -87,20 +87,6 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
-     * @param $validationName
-     * @return Validation
-     * @throws EntryNotFoundException
-     */
-    public function getValidationByName($validationName)
-    {
-        if (false === $this->hasValidation($validationName)) {
-            throw EntryNotFoundException::validationNotFound($validationName);
-        }
-
-        return $this->validation[$validationName];
-    }
-
-    /**
      * @param string $validationName
      * @return bool
      */
@@ -115,6 +101,21 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     public function addValidation(Validation $validation)
     {
         $this->validation[$validation->getValidationName()] = $validation;
+        $validation->setParents([$this]);
+    }
+
+    /**
+     * @param $validationName
+     * @return Validation
+     * @throws EntryNotFoundException
+     */
+    public function getValidationByName($validationName)
+    {
+        if (false === $this->hasValidation($validationName)) {
+            throw EntryNotFoundException::validationNotFound($validationName);
+        }
+
+        return $this->validation[$validationName];
     }
 
     /**

@@ -23,21 +23,20 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
             DataAttributesAssetHandler::getFieldDataValueKey('bar') => 'john doe'
         ];
 
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(ExtendedForm::class);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(true);
 
-        $requestResult = new FormResult();
-        $form = new ExtendedForm();
+        /** @var ExtendedForm $form */
+        $form = $assetHandlerFactory->getFormObject()->getForm();
         $form->setFoo('foo');
         $form->setBar(['john', 'doe']);
 
-        /** @var DataAttributesAssetHandler $dataAttributesValuesAssetHandler */
-        $dataAttributesValuesAssetHandler = $assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
-        $dataAttributesValues = $dataAttributesValuesAssetHandler->getFieldsValuesDataAttributes($form, $requestResult);
+        $dataAttributesValuesAssetHandler = new DataAttributesAssetHandler($assetHandlerFactory);
+
+        $dataAttributesValues = $dataAttributesValuesAssetHandler->getFieldsValuesDataAttributes(new FormResult);
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
 
         unset($assetHandlerFactory);
-        unset($requestResult);
     }
 
     /**
@@ -51,8 +50,8 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
      */
     public function checkFieldsErrorsDataAttributes(array $expectedResult, array $fieldMessages)
     {
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(ExtendedForm::class);
-        $requestResult = new FormResult();
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(true);
+        $formResult = $assetHandlerFactory->getFormObject()->getFormResult();
 
         foreach ($fieldMessages as $fieldName => $messages) {
             foreach ($messages as $data) {
@@ -67,18 +66,17 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
                     [],
                     ''
                 );
-                $requestResult->forProperty($fieldName)->$addMethod($message);
+                $formResult->forProperty($fieldName)->$addMethod($message);
             }
         }
 
         /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
         $dataAttributesAssetHandler = $assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
-        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsMessagesDataAttributes($requestResult);
+        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
 
         unset($assetHandlerFactory);
-        unset($requestResult);
     }
 
     /**
@@ -197,15 +195,13 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
         ];
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(ExtendedForm::class);
-        $requestResult = new FormResult();
 
         /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
         $dataAttributesAssetHandler = $assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
-        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsValidDataAttributes($requestResult);
+        $dataAttributesValues = $dataAttributesAssetHandler->getFieldsValidDataAttributes();
 
         $this->assertEquals($expectedResult, $dataAttributesValues);
 
         unset($assetHandlerFactory);
-        unset($requestResult);
     }
 }

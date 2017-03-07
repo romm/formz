@@ -4,6 +4,7 @@ namespace Romm\Formz\Tests\Unit\Validation\Validator;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -69,7 +70,7 @@ abstract class AbstractValidatorUnitTest extends AbstractUnitTest
         $validation = new Validation;
         $validation->setArrayIndex('foo');
 
-        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $this->getForm(), $validation);
+        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validation);
 
         return (empty($methods))
             ? new $className($options, $validatorDataObject)
@@ -84,9 +85,10 @@ abstract class AbstractValidatorUnitTest extends AbstractUnitTest
      */
     protected function getFormObject()
     {
-        return $this->getMockBuilder(FormObject::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formObject = $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
+
+        return $formObject;
     }
 
     /**

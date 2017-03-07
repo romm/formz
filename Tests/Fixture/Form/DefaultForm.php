@@ -11,7 +11,7 @@ class DefaultForm implements FormInterface
     /**
      * @var string
      */
-    protected $foo;
+    protected $foo = 'foo';
 
     /**
      * @return string

@@ -14,6 +14,8 @@
 namespace Romm\Formz\Configuration\Settings;
 
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
+use Romm\Formz\Configuration\Form\Settings\FormSettings;
 use TYPO3\CMS\Core\Cache\Backend\FileBackend;
 
 class Settings extends AbstractFormzConfiguration
@@ -34,6 +36,12 @@ class Settings extends AbstractFormzConfiguration
      */
     protected $defaultFieldSettings;
 
+    public function __construct()
+    {
+        $this->defaultFormSettings = new FormSettings;
+        $this->defaultFieldSettings = new FieldSettings;
+    }
+
     /**
      * @return string
      */
@@ -43,7 +51,7 @@ class Settings extends AbstractFormzConfiguration
     }
 
     /**
-     * @return \Romm\Formz\Configuration\Form\Settings\FormSettings
+     * @return FormSettings
      */
     public function getDefaultFormSettings()
     {
@@ -51,7 +59,7 @@ class Settings extends AbstractFormzConfiguration
     }
 
     /**
-     * @return \Romm\Formz\Configuration\Form\Field\Settings\FieldSettings
+     * @return FieldSettings
      */
     public function getDefaultFieldSettings()
     {

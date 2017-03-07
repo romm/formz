@@ -155,7 +155,8 @@ class AssetHandlerConnectorManager
      */
     protected function fileExists($absolutePath)
     {
-        return file_exists($absolutePath);
+        return file_exists($absolutePath)
+            && 0 !== filemtime($absolutePath);
     }
 
     /**

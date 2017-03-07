@@ -43,18 +43,19 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      *
      * Example: `formz-value-color="blue"`
      *
-     * @param FormInterface|array $formInstance
-     * @param FormResult          $requestResult
+     * @param FormResult $formResult
      * @return array
      */
-    public function getFieldsValuesDataAttributes($formInstance, FormResult $requestResult)
+    public function getFieldsValuesDataAttributes(FormResult $formResult)
     {
         $result = [];
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formObject = $this->getFormObject();
+        $formConfiguration = $formObject->getConfiguration();
+        $formInstance = $formObject->getForm();
 
-        foreach ($this->getFormObject()->getProperties() as $fieldName) {
+        foreach ($formObject->getProperties() as $fieldName) {
             if (true === $formConfiguration->hasField($fieldName)
-                && false === $requestResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
+                && false === $formResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
                 && $this->isPropertyGettable($formInstance, $fieldName)
             ) {
                 $value = ObjectAccess::getProperty($formInstance, $fieldName);
@@ -105,17 +106,17 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      * - `formz-error-email="1"`
      * - `formz-error-email-rule-default="1"`
      *
-     * @param FormResult $requestResult
      * @return array
      */
-    public function getFieldsMessagesDataAttributes(FormResult $requestResult)
+    public function getFieldsMessagesDataAttributes()
     {
         $result = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formResult = $this->getFormObject()->getFormResult();
 
-        foreach ($requestResult->getSubResults() as $fieldName => $fieldResult) {
+        foreach ($formResult->getSubResults() as $fieldName => $fieldResult) {
             if (true === $formConfiguration->hasField($fieldName)
-                && false === $requestResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
+                && false === $formResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
             ) {
                 $result += $this->getFieldErrorMessages($fieldName, $fieldResult);
                 $result += $this->getFieldWarningMessages($fieldName, $fieldResult);
@@ -187,19 +188,19 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      *
      * Example: `formz-valid-email="1"`
      *
-     * @param FormResult $requestResult
      * @return array
      */
-    public function getFieldsValidDataAttributes(FormResult $requestResult)
+    public function getFieldsValidDataAttributes()
     {
         $result = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formResult = $this->getFormObject()->getFormResult();
 
         foreach ($formConfiguration->getFields() as $field) {
             $fieldName = $field->getFieldName();
 
-            if (false === $requestResult->fieldIsDeactivated($field)
-                && false === $requestResult->forProperty($fieldName)->hasErrors()
+            if (false === $formResult->fieldIsDeactivated($field)
+                && false === $formResult->forProperty($fieldName)->hasErrors()
             ) {
                 $result[self::getFieldDataValidKey($fieldName)] = '1';
             }

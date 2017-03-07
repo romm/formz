@@ -2,7 +2,6 @@
 namespace Romm\Formz\Tests\Unit\Validation\Validator\DataObject;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
-use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
@@ -14,18 +13,17 @@ class ValidatorDataObjectTest extends AbstractUnitTest
      */
     public function constructorPropertiesAreGettable()
     {
+        /** @var FormObject $formObject */
         $formObject = $this->getMockBuilder(FormObject::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
+        /** @var Validation $validation */
         $validation = $this->getMockBuilder(Validation::class)
             ->getMock();
 
-        $validatorDataObject = new ValidatorDataObject($formObject, $form, $validation);
+        $validatorDataObject = new ValidatorDataObject($formObject, $validation);
 
         $this->assertSame($formObject, $validatorDataObject->getFormObject());
-        $this->assertSame($form, $validatorDataObject->getForm());
         $this->assertSame($validation, $validatorDataObject->getValidation());
     }
 }

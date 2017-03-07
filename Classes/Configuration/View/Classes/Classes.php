@@ -47,10 +47,26 @@ class Classes extends AbstractFormzConfiguration
     }
 
     /**
+     * @param ViewClass $errors
+     */
+    public function setErrors($errors)
+    {
+        $this->errors = $errors;
+    }
+
+    /**
      * @return ViewClass
      */
     public function getValid()
     {
         return $this->valid;
+    }
+
+    /**
+     * @param ViewClass $valid
+     */
+    public function setValid($valid)
+    {
+        $this->valid = $valid;
     }
 }
