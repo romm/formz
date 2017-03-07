@@ -2,6 +2,7 @@
 namespace Romm\Formz\Tests\Unit;
 
 use Prophecy\Prophet;
+use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
@@ -57,11 +58,6 @@ trait FormzUnitTestUtility
     /**
      * @var array
      */
-    protected $formConfiguration = [];
-
-    /**
-     * @var array
-     */
     protected $extensionConfiguration = [];
 
     /**
@@ -96,6 +92,12 @@ trait FormzUnitTestUtility
         $this->initializeConfigurationObjectTestServices();
 
         FacadeService::get()->reset();
+
+        /*
+         * Will return a configuration that can be manipulated during tests.
+         */
+        $this->formzConfiguration = FormzConfiguration::getDefaultConfiguration();
+
         $this->backUpPackageManager();
         $this->overrideExtbaseContainer();
         $this->changeReflectionCache();
@@ -170,8 +172,9 @@ trait FormzUnitTestUtility
         $formConfiguration = new Form;
 
         foreach ($fields as $fieldName) {
-            $field = new Field();
+            $field = new Field;
             $field->setFieldName($fieldName);
+            $field->setParents([$formConfiguration]);
             $formConfiguration->addField($field);
 
             $formObject->addProperty($fieldName);
@@ -180,7 +183,10 @@ trait FormzUnitTestUtility
         $configurationObjectInstance = new ConfigurationObjectInstance($formConfiguration, new Result);
         $configurationObjectInstance->setValidationResult(new Result);
 
-        $formzConfiguration = new Configuration;
+        $formzConfigurationArray = ArrayUtility::getValueByPath($this->formzConfiguration, 'config/tx_formz');
+        $formzConfigurationObject = ConfigurationObjectFactory::getInstance()->get(Configuration::class, $formzConfigurationArray);
+        /** @var Configuration $formzConfiguration */
+        $formzConfiguration = $formzConfigurationObject->getObject(true);
 
         $errors = new ViewClass;
         $errors->addItem('foo', 'foo');
@@ -295,11 +301,6 @@ trait FormzUnitTestUtility
 
         FacadeService::get()->forceInstance(ExtensionService::class, $extensionServiceMock);
 
-        /*
-         * Will return a configuration that can be manipulated during tests.
-         */
-        $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
-
         $extensionServiceMock->method('getFullExtensionConfiguration')
             ->willReturnCallback(function () {
                 return $this->extensionConfiguration;
@@ -371,14 +372,6 @@ trait FormzUnitTestUtility
     }
 
     /**
-     * @param array $formzConfiguration
-     */
-    protected function setFormzConfiguration(array $formzConfiguration)
-    {
-        $this->formzConfiguration = $formzConfiguration;
-    }
-
-    /**
      * @param array $configuration
      */
     protected function addFormzConfiguration(array $configuration)
@@ -391,17 +384,6 @@ trait FormzUnitTestUtility
                 ]
             ]
         );
-    }
-
-    /**
-     * Sets the array configuration for a given form class name.
-     *
-     * @param string $className
-     * @param array  $configuration
-     */
-    protected function setFormConfigurationFromClassName($className, array $configuration)
-    {
-        $this->formConfiguration[$className] = $configuration;
     }
 
     /**
@@ -474,13 +456,7 @@ trait FormzUnitTestUtility
                 ->getMock();
 
             $configurationCallBack = function () {
-                $configuration = ArrayUtility::setValueByPath(
-                    $this->formzConfiguration,
-                    'config/tx_formz/forms',
-                    $this->formConfiguration
-                );
-
-                return $configuration;
+                return $this->formzConfiguration;
             };
 
             $this->mockedTypoScriptService->method('getFrontendTypoScriptConfiguration')

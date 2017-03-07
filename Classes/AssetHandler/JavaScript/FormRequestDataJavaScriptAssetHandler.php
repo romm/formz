@@ -35,15 +35,18 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
         $submittedFormValues = [];
         $fieldsExistingMessages = [];
         $deactivatedFields = [];
-        $formWasSubmitted = $this->getFormObject()->hasLastValidationResult()
-            ? 'true'
-            : 'false';
+        $formWasSubmitted = 'false';
 
-        if ($formWasSubmitted) {
-            $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
-            $fieldsExistingMessages = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingMessages());
-            $deactivatedFields = ArrayService::get()->arrayToJavaScriptJson($this->getDeactivatedFields());
+        if ($this->getFormObject()->formWasSubmitted()) {
+            $formWasSubmitted = 'true';
+            $submittedFormValues = $this->getSubmittedFormValues();
+            $fieldsExistingMessages = $this->getFieldsExistingMessages();
+            $deactivatedFields = $this->getDeactivatedFields();
         }
+
+        $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($submittedFormValues);
+        $fieldsExistingMessages = ArrayService::get()->arrayToJavaScriptJson($fieldsExistingMessages);
+        $deactivatedFields = ArrayService::get()->arrayToJavaScriptJson($deactivatedFields);
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
 
@@ -90,12 +93,15 @@ JS;
     protected function getFieldsExistingMessages()
     {
         $fieldsMessages = [];
+        $formObject = $this->getFormObject();
 
-        if ($this->getFormObject()->hasLastValidationResult()) {
-            $lastValidationResult = $this->getFormObject()->getLastValidationResult();
+        if ($formObject->formWasSubmitted()
+            && $formObject->hasFormResult()
+        ) {
+            $formResult = $this->getFormObject()->getFormResult();
 
             foreach ($this->getFormObject()->getProperties() as $fieldName) {
-                $result = $lastValidationResult->forProperty($fieldName);
+                $result = $formResult->forProperty($fieldName);
                 $messages = [];
 
                 if ($result->hasErrors()) {
@@ -144,8 +150,8 @@ JS;
      */
     protected function getDeactivatedFields()
     {
-        return ($this->getFormObject()->hasLastValidationResult())
-            ? array_keys($this->getFormObject()->getLastValidationResult()->getDeactivatedFields())
+        return ($this->getFormObject()->hasFormResult())
+            ? array_keys($this->getFormObject()->getFormResult()->getDeactivatedFields())
             : [];
     }
 }

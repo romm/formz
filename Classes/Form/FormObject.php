@@ -49,19 +49,24 @@ class FormObject
     protected $configuration;
 
     /**
+     * @var FormInterface
+     */
+    protected $form;
+
+    /**
+     * @var bool
+     */
+    protected $formWasSubmitted = false;
+
+    /**
      * @var FormResult
      */
-    protected $lastValidationResult;
+    protected $formResult;
 
     /**
      * @var string
      */
     protected $hash;
-
-    /**
-     * @var bool
-     */
-    protected $hashShouldBeCalculated = true;
 
     /**
      * You should never create a new instance of this class directly, use the
@@ -76,14 +81,6 @@ class FormObject
         $this->className = $className;
         $this->name = $name;
         $this->setUpConfiguration($formConfiguration);
-    }
-
-    /**
-     * @param array $formConfiguration
-     */
-    protected function setUpConfiguration(array $formConfiguration)
-    {
-        $this->configuration = Core::instantiate(FormObjectConfiguration::class, $this, $formConfiguration);
     }
 
     /**
@@ -103,19 +100,11 @@ class FormObject
     }
 
     /**
-     * Registers a new property for this form.
-     *
-     * @param string $name
-     * @return $this
+     * @return array
      */
-    public function addProperty($name)
+    public function getProperties()
     {
-        if (false === $this->hasProperty($name)) {
-            $this->properties[] = $name;
-            $this->hashShouldBeCalculated = true;
-        }
-
-        return $this;
+        return $this->properties;
     }
 
     /**
@@ -128,11 +117,19 @@ class FormObject
     }
 
     /**
-     * @return array
+     * Registers a new property for this form.
+     *
+     * @param string $name
+     * @return $this
      */
-    public function getProperties()
+    public function addProperty($name)
     {
-        return $this->properties;
+        if (false === $this->hasProperty($name)) {
+            $this->properties[] = $name;
+            $this->resetHash();
+        }
+
+        return $this;
     }
 
     /**
@@ -158,6 +155,73 @@ class FormObject
     }
 
     /**
+     * @return FormInterface
+     */
+    public function getForm()
+    {
+        return $this->form;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasForm()
+    {
+        return null !== $this->form;
+    }
+
+    /**
+     * @param FormInterface $form
+     */
+    public function setForm(FormInterface $form)
+    {
+        $this->form = $form;
+    }
+
+    /**
+     * Will mark the form as submitted (change the result returned by the
+     * function `formWasSubmitted()`).
+     */
+    public function markFormAsSubmitted()
+    {
+        $this->formWasSubmitted = true;
+    }
+
+    /**
+     * Returns `true` if the form was submitted by the user.
+     *
+     * @return bool
+     */
+    public function formWasSubmitted()
+    {
+        return $this->formWasSubmitted;
+    }
+
+    /**
+     * @return FormResult
+     */
+    public function getFormResult()
+    {
+        return $this->formResult;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFormResult()
+    {
+        return null !== $this->formResult;
+    }
+
+    /**
+     * @param FormResult $formResult
+     */
+    public function setFormResult($formResult)
+    {
+        $this->formResult = $formResult;
+    }
+
+    /**
      * Returns the hash, which should be calculated only once for performance
      * concerns.
      *
@@ -165,14 +229,19 @@ class FormObject
      */
     public function getHash()
     {
-        if (true === $this->hashShouldBeCalculated
-            || null === $this->hash
-        ) {
-            $this->hashShouldBeCalculated = false;
+        if (null === $this->hash) {
             $this->hash = $this->calculateHash();
         }
 
         return $this->hash;
+    }
+
+    /**
+     * @param array $formConfiguration
+     */
+    protected function setUpConfiguration(array $formConfiguration)
+    {
+        $this->configuration = Core::instantiate(FormObjectConfiguration::class, $this, $formConfiguration);
     }
 
     /**
@@ -186,27 +255,11 @@ class FormObject
     }
 
     /**
-     * @return FormResult
+     * Resets the hash, which will be calculated on next access.
      */
-    public function getLastValidationResult()
+    protected function resetHash()
     {
-        return $this->lastValidationResult;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasLastValidationResult()
-    {
-        return null !== $this->lastValidationResult;
-    }
-
-    /**
-     * @param FormResult $lastValidationResult
-     */
-    public function setLastValidationResult($lastValidationResult)
-    {
-        $this->lastValidationResult = $lastValidationResult;
+        $this->hash = null;
     }
 
     /**
@@ -218,15 +271,5 @@ class FormObject
     public function __sleep()
     {
         return ['name', 'className', 'properties', 'hash', 'configuration'];
-    }
-
-    /**
-     * When this class is unserialized, we update the flag to know if the hash
-     * should be calculated or not (if it was calculated before it was
-     * serialized, there is no need to calculate it again).
-     */
-    public function __wakeup()
-    {
-        $this->hashShouldBeCalculated = (null === $this->hash);
     }
 }

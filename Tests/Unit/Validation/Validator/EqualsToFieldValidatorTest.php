@@ -19,7 +19,7 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
      *
      * @test
      * @dataProvider validatorWorksDataProvider
-     * @param        $value
+     * @param string $value
      * @param array  $options
      * @param array  $errors
      * @param string $expectedException
@@ -31,6 +31,30 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
         }
 
         $this->validateValidator($value, $options, $errors);
+    }
+
+    /**
+     * @return array
+     */
+    public function validatorWorksDataProvider()
+    {
+        return [
+            'Correct value'                  => [
+                'value'   => 'foo',
+                'options' => [EqualsToFieldValidator::OPTION_FIELD => 'foo']
+            ],
+            'Incorrect value'                => [
+                'value'   => 'bar',
+                'options' => [EqualsToFieldValidator::OPTION_FIELD => 'foo'],
+                'errors'  => [EqualsToFieldValidator::MESSAGE_DEFAULT]
+            ],
+            'Unknown field throws exception' => [
+                'value'     => 'bar',
+                'options'   => [EqualsToFieldValidator::OPTION_FIELD => 'bar'],
+                'errors'    => [],
+                'exception' => EntryNotFoundException::class
+            ]
+        ];
     }
 
     /**
@@ -59,6 +83,8 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
 
         $formObjectMock->addProperty('foo');
 
+        $formObjectMock->setForm(new DefaultForm);
+
         return $formObjectMock;
     }
 
@@ -75,29 +101,5 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
         $form = $formProphecy->reveal();
 
         return $form;
-    }
-
-    /**
-     * @return array
-     */
-    public function validatorWorksDataProvider()
-    {
-        return [
-            'Correct value' => [
-                'value'   => 'bar',
-                'options' => [EqualsToFieldValidator::OPTION_FIELD => 'foo']
-            ],
-            'Incorrect value' => [
-                'value'   => 'baz',
-                'options' => [EqualsToFieldValidator::OPTION_FIELD => 'foo'],
-                [EqualsToFieldValidator::MESSAGE_DEFAULT]
-            ],
-            'Unknown field throws exception' => [
-                'value'   => 'bar',
-                'options' => [EqualsToFieldValidator::OPTION_FIELD => 'bar'],
-                [],
-                EntryNotFoundException::class
-            ]
-        ];
     }
 }

@@ -15,6 +15,7 @@ use Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper;
 use Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
+use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -61,6 +62,61 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $result = $viewHelper->render();
 
         $this->assertEquals('LLL::form.typoscript_not_included.error_message', $result);
+    }
+
+    /**
+     * The argument `form` given to the view helper should be attached to the
+     * `FormObject` if it is a valid form instance, and the form was not
+     * submitted.
+     *
+     * @test
+     */
+    public function formArgumentIsGivenToFormObject()
+    {
+        $form = new DefaultForm;
+
+        $formObject = $this->getMockBuilder(FormObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setForm'])
+            ->getMock();
+
+        $formObject->expects($this->once())
+            ->method('setForm')
+            ->with($form);
+
+        $viewHelper = $this->getFormViewHelperMock(['getFormClassName'], $formObject);
+        $viewHelper->setArguments(['object' => $form]);
+        $viewHelper->initializeArguments();
+        $viewHelper->initialize();
+    }
+
+    /**
+     * The argument `form` given to the view helper should be attached to the
+     * `FormObject` if it is a valid form instance, and the form was not
+     * submitted.
+     *
+     * @test
+     */
+    public function formArgumentIsNotGivenToFormObjectIfFormWasSubmitted()
+    {
+        $form = new DefaultForm;
+
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
+        $formObject = $this->getMockBuilder(FormObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setForm'])
+            ->getMock();
+
+        $formObject->expects($this->never())
+            ->method('setForm')
+            ->with($form);
+
+        $formObject->markFormAsSubmitted();
+
+        $viewHelper = $this->getFormViewHelperMock(['getFormClassName'], $formObject);
+        $viewHelper->setArguments(['object' => $form]);
+        $viewHelper->initializeArguments();
+        $viewHelper->initialize();
     }
 
     /**
@@ -174,8 +230,12 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $fieldsValuesDataAttributes = ['data-attributes-values' => 'foo'];
         $mergedDataAttributes = array_merge($fieldsValuesDataAttributes);
 
-        $formInstance = new DefaultForm;
-        $formInstance->setFoo('foo');
+        $formObject = $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
+        $formObject->setFormResult(new FormResult);
+
+        $formService = new FormViewHelperService;
+        $formService->setFormObject($formObject);
 
         $viewHelper = $this->getFormViewHelperMock(
             [
@@ -184,10 +244,12 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
                 'handleAssets',
                 'getDataAttributesAssetHandler',
                 'getFormClassName'
-            ]
+            ],
+            $formObject
         );
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
+        $viewHelper->injectFormService($formService);
 
         $tagBuilder = $this->getMockBuilder(TagBuilder::class)
             ->setMethods(['addAttributes'])
@@ -219,12 +281,6 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
                 return $assetHandlerMock;
             });
 
-        $formService = new FormViewHelperService;
-        $viewHelper->injectFormService($formService);
-
-        $formService->setFormInstance($formInstance);
-        $formService->setFormResult(new FormResult);
-
         $viewHelper->render();
     }
 
@@ -246,8 +302,13 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
             $fieldsMessagesDataAttributes
         );
 
-        $formInstance = new DefaultForm;
-        $formInstance->setFoo('foo');
+        $formObject = $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
+        $formObject->setFormResult(new FormResult);
+        $formObject->markFormAsSubmitted();
+
+        $formService = new FormViewHelperService;
+        $formService->setFormObject($formObject);
 
         $viewHelper = $this->getFormViewHelperMock(
             [
@@ -256,10 +317,12 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
                 'handleAssets',
                 'getDataAttributesAssetHandler',
                 'getFormClassName'
-            ]
+            ],
+            $formObject
         );
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
+        $viewHelper->injectFormService($formService);
 
         $tagBuilder = $this->getMockBuilder(TagBuilder::class)
             ->setMethods(['addAttributes'])
@@ -293,19 +356,68 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
                 return $assetHandlerMock;
             });
 
-        /** @var FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject $formService */
-        $formService = $this->getMockBuilder(FormViewHelperService::class)
-            ->setMethods(['formWasSubmitted'])
-            ->getMock();
+        $viewHelper->render();
+    }
 
-        $formService->expects($this->once())
-            ->method('formWasSubmitted')
-            ->willReturn(true);
+    /**
+     * If a form instance if given to the `FormObject` (mostly with the `object`
+     * argument of the `FormViewHelper`), and if there is no validation result
+     * for the form, a temporary result is fetched to be given to the data
+     * attributes asset handler managing the fields values.
+     *
+     * @test
+     */
+    public function temporaryFormValidationResultIsFetchedForFieldsValuesDataAttributes()
+    {
+        $formObject = $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
 
-        $viewHelper->injectFormService($formService);
+        $viewHelper = $this->getFormViewHelperMock(
+            [
+                'addDefaultClass',
+                'applyBehavioursOnSubmittedForm',
+                'handleAssets',
+                'getDataAttributesAssetHandler',
+                'getFormClassName',
+                'getFormValidator'
+            ],
+            $formObject
+        );
+        $viewHelper->initializeArguments();
+        $viewHelper->initialize();
 
-        $formService->setFormInstance($formInstance);
-        $formService->setFormResult(new FormResult);
+        $formResult = new FormResult;
+
+        $viewHelper->expects($this->once())
+            ->method('getFormValidator')
+            ->willReturnCallback(function () use ($formResult) {
+                $formValidation = $this->getMockBuilder(DefaultFormValidator::class)
+                    ->disableOriginalConstructor()
+                    ->setMethods(['validateGhost'])
+                    ->getMock();
+
+                $formValidation->expects($this->once())
+                    ->method('validateGhost')
+                    ->willReturn($formResult);
+
+                return $formValidation;
+            });
+
+        $viewHelper->expects($this->once())
+            ->method('getDataAttributesAssetHandler')
+            ->willReturnCallback(function () use ($formResult) {
+                $assetHandlerMock = $this->getMockBuilder(DataAttributesAssetHandler::class)
+                    ->disableOriginalConstructor()
+                    ->setMethods(['getFieldsValuesDataAttributes'])
+                    ->getMock();
+
+                $assetHandlerMock->expects($this->once())
+                    ->method('getFieldsValuesDataAttributes')
+                    ->with($formResult)
+                    ->willReturn([]);
+
+                return $assetHandlerMock;
+            });
 
         $viewHelper->render();
     }

@@ -134,11 +134,11 @@ class FormObjectTest extends AbstractUnitTest
     {
         $formObject = new FormObject('foo', 'foo', []);
 
-        $validationResult = new FormResult;
+        $formResult = new FormResult;
 
-        $this->assertFalse($formObject->hasLastValidationResult());
-        $formObject->setLastValidationResult($validationResult);
-        $this->assertTrue($formObject->hasLastValidationResult());
-        $this->assertSame($validationResult, $formObject->getLastValidationResult());
+        $this->assertFalse($formObject->hasFormResult());
+        $formObject->setFormResult($formResult);
+        $this->assertTrue($formObject->hasFormResult());
+        $this->assertSame($formResult, $formObject->getFormResult());
     }
 }

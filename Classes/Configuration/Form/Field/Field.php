@@ -101,6 +101,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     public function addValidation(Validation $validation)
     {
         $this->validation[$validation->getValidationName()] = $validation;
+        $validation->setParents([$this]);
     }
 
     /**

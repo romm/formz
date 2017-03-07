@@ -86,6 +86,16 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      */
     protected $formValidatorExecutor;
 
+    protected function initializeValidator($form)
+    {
+        if (false === $form instanceof FormInterface) {
+            throw InvalidArgumentTypeException::validatingWrongFormType(get_class($form));
+        }
+
+        $this->result = new FormResult;
+        $this->formValidatorExecutor = $this->getFormValidatorExecutor($form);
+    }
+
     /**
      * Checks the given form instance, and launches the validation if it is a
      * correct form.
@@ -95,25 +105,31 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      */
     final public function validate($form)
     {
-        $this->validateWithoutSavingResults($form);
-        $this->formValidatorExecutor->saveValidationResult();
+        $this->initializeValidator($form);
+
+        $formObject = $this->formValidatorExecutor->getFormObject();
+        $formObject->markFormAsSubmitted();
+        $formObject->setForm($form);
+
+        $this->validateGhost($form, false);
+
+        $formObject->setFormResult($this->result);
 
         return $this->result;
     }
 
     /**
+     * Validates the form, but wont save form data in the form object.
+     *
      * @param FormInterface $form
+     * @param bool          $initialize
      * @return FormResult
-     * @throws InvalidArgumentTypeException
      */
-    public function validateWithoutSavingResults($form)
+    public function validateGhost($form, $initialize = true)
     {
-        if (false === $form instanceof FormInterface) {
-            throw InvalidArgumentTypeException::validatingWrongFormType(get_class($form));
+        if ($initialize) {
+            $this->initializeValidator($form);
         }
-
-        $this->result = new FormResult;
-        $this->formValidatorExecutor = $this->getFormValidatorExecutor($form);
 
         $this->isValid($form);
 

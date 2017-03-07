@@ -29,6 +29,7 @@ use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -124,6 +125,18 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             $this->formObject = $this->getFormObject();
             $this->formService->setFormObject($this->formObject);
             $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
+
+            /*
+             * If the argument `object` was filled with an instance of Form, it
+             * is added to the `FormObject`.
+             */
+            $objectArgument = $this->arguments['object'];
+
+            if ($objectArgument instanceof FormInterface
+                && false === $this->formObject->formWasSubmitted()
+            ) {
+                $this->formObject->setForm($objectArgument);
+            }
         }
 
         /*
@@ -201,13 +214,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
          * when the form was actually submitted by the user, or when the
          * argument `object` of the view helper is filled with a form instance.
          */
-        $this->formService
-            ->activateFormContext()
-            ->setUpData(
-                $this->getFormObjectName(),
-                $this->controllerContext->getRequest()->getOriginalRequest(),
-                $this->arguments['object']
-            );
+        $this->formService->activateFormContext();
 
         /*
          * Adding the default class configured in TypoScript configuration to
@@ -255,19 +262,20 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function applyBehavioursOnSubmittedForm()
     {
-        if ($this->formService->formWasSubmitted()) {
+        if ($this->formObject->formWasSubmitted()) {
             /** @var BehavioursManager $behavioursManager */
             $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
 
+            $originalRequest = $this->controllerContext->getRequest()->getOriginalRequest();
+            /** @var array $originalForm */
+            $originalForm = $originalRequest->getArgument($this->getFormObjectName());
+
             $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
-                $this->formService->getFormInstance(),
+                $originalForm,
                 $this->formObject->getConfiguration()
             );
 
-            $this->controllerContext
-                ->getRequest()
-                ->getOriginalRequest()
-                ->setArgument($this->getFormObjectName(), $formProperties);
+            $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
         }
     }
 
@@ -299,20 +307,25 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected function handleDataAttributes()
     {
         $dataAttributes = [];
-        $object = $this->formService->getFormInstance();
-        $formResult = $this->formService->getFormResult();
+
         $dataAttributesAssetHandler = $this->getDataAttributesAssetHandler();
 
-        if ($object && $formResult) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($object, $formResult);
+        if ($this->formObject->hasForm()) {
+            if (false === $this->formObject->hasFormResult()) {
+                $form = $this->formObject->getForm();
+                $formValidator = $this->getFormValidator($this->getFormObjectName());
+                $formResult = $formValidator->validateGhost($form);
+            } else {
+                $formResult = $this->formObject->getFormResult();
+            }
+
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($formResult);
         }
 
-        if ($formResult
-            && true === $this->formService->formWasSubmitted()
-        ) {
+        if (true === $this->formObject->formWasSubmitted()) {
             $dataAttributes += [DataAttributesAssetHandler::getFieldSubmissionDone() => '1'];
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($formResult);
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes($formResult);
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes();
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
         }
 
         $this->tag->addAttributes($dataAttributes);
@@ -448,6 +461,18 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     }
 
     /**
+     * @param string $formName
+     * @return DefaultFormValidator
+     */
+    protected function getFormValidator($formName)
+    {
+        /** @var DefaultFormValidator $validation */
+        $validation = Core::instantiate(DefaultFormValidator::class, ['name' => $formName]);
+
+        return $validation;
+    }
+
+    /**
      * @return AssetHandlerConnectorManager
      */
     protected function getAssetHandlerConnectorManager()
@@ -460,7 +485,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function getDataAttributesAssetHandler()
     {
-        return $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
+        /** @var DataAttributesAssetHandler $assetHandler */
+        $assetHandler = $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
+
+        return $assetHandler;
     }
 
     /**

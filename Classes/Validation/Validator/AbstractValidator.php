@@ -95,7 +95,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
         parent::__construct($options);
 
         $this->dataObject = $dataObject;
-        $this->form = $dataObject->getForm();
+        $this->form = $dataObject->getFormObject()->getForm();
         $this->messages = MessageService::get()->filterMessages(
             $this->dataObject->getValidation()->getMessages(),
             $this->supportedMessages,

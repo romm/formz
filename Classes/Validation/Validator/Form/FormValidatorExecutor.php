@@ -107,7 +107,7 @@ class FormValidatorExecutor
     {
         /** @var BehavioursManager $behavioursManager */
         $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
-        $behavioursManager->applyBehaviourOnFormInstance($this->form, $this->getFormObject());
+        $behavioursManager->applyBehaviourOnFormInstance($this->getFormObject());
 
         return $this;
     }
@@ -220,16 +220,6 @@ class FormValidatorExecutor
     }
 
     /**
-     * Will save the validation result in the form object instance.
-     *
-     * @internal
-     */
-    public function saveValidationResult()
-    {
-        $this->getFormObject()->setLastValidationResult($this->result);
-    }
-
-    /**
      * @param Field      $field
      * @param Validation $validation
      * @return Result
@@ -238,7 +228,7 @@ class FormValidatorExecutor
     {
         $fieldName = $field->getFieldName();
         $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);
-        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $this->form, $validation);
+        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validation);
 
         /** @var ValidatorInterface $validator */
         $validator = GeneralUtility::makeInstance(
@@ -360,7 +350,7 @@ class FormValidatorExecutor
     /**
      * @return FormObject
      */
-    protected function getFormObject()
+    public function getFormObject()
     {
         if (null === $this->formObject) {
             /** @var FormObjectFactory $formObjectFactory */

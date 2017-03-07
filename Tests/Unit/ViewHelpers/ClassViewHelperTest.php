@@ -9,7 +9,7 @@ use Romm\Formz\Exceptions\UnregisteredConfigurationException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
-use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Extbase\Validation\Error;
 
 class ClassViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -69,6 +69,8 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelperDataProvider()
     {
+        $this->formzSetUp();
+
         return [
             /*
              * Basic configuration: everything is configured correctly, but
@@ -200,14 +202,12 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getDefaultFormService()
     {
-        $formObject = $this->getDefaultFormObject();
-
         $service = $this->getMockBuilder(FormViewHelperService::class)
             ->setMethods(['getFormObject'])
             ->getMock();
 
         $service->method('getFormObject')
-            ->willReturn($formObject);
+            ->willReturn($this->getDefaultFormObject());
 
         return $service;
     }
@@ -240,8 +240,8 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     protected function getServiceWithNoErrorResult()
     {
         $service = $this->getDefaultFormService();
-        $service->markFormAsSubmitted();
-        $service->setFormResult(new FormResult);
+        $service->getFormObject()->markFormAsSubmitted();
+        $service->getFormObject()->setFormResult(new FormResult);
 
         return $service;
     }
@@ -252,7 +252,8 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     protected function getServiceWithErrorResult()
     {
         $service = $this->getServiceWithNoErrorResult();
-        $service->getFormResult()
+        $service->getFormObject()
+            ->getFormResult()
             ->forProperty('foo')
             ->addError(new Error('foo', 1337));
 

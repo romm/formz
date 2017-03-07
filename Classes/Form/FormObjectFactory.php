@@ -105,7 +105,9 @@ class FormObjectFactory implements SingletonInterface
      */
     public function getInstanceFromFormInstance(FormInterface $form, $name)
     {
-        return $this->getInstanceFromClassName(get_class($form), $name);
+        $formObject = $this->getInstanceFromClassName(get_class($form), $name);
+
+        return $formObject;
     }
 
     /**
