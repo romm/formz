@@ -46,6 +46,13 @@ call_user_func(
                 'className' => \Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper::class
             ];
         }
+
+        if (version_compare($typo3Version, '7.3.0', '<')) {
+            $container->registerImplementation(\Romm\Formz\ViewHelpers\Slot\HasViewHelper::class, \Romm\Formz\Service\ViewHelper\Legacy\OldHasViewHelper::class);
+            $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\Romm\Formz\ViewHelpers\Slot\HasViewHelper::class] = [
+                'className' => \Romm\Formz\Service\ViewHelper\Legacy\OldHasViewHelper::class
+            ];
+        }
     },
     $_EXTKEY
 );

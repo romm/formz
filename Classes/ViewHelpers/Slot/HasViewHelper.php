@@ -42,6 +42,8 @@ class HasViewHelper extends AbstractConditionViewHelper implements CompilableInt
 
     /**
      * @inheritdoc
+     *
+     * @throws ContextNotFoundException
      */
     protected function callRenderMethod()
     {

@@ -2,10 +2,13 @@
 namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Legacy\Slot\OldHasViewHelper;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
 use Romm\Formz\ViewHelpers\Slot\HasViewHelper;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 class HasViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -17,7 +20,7 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
         $slotArgument = 'foo-slot';
 
         /** @var HasViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMockBuilder(HasViewHelper::class)
+        $viewHelper = $this->getMockBuilder($this->getSlotHasViewHelperClassName())
             ->setMethods(['renderThenChild', 'renderElseChild'])
             ->getMock();
 
@@ -48,9 +51,12 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
         $viewHelper->setArguments(['slot' => $slotArgument]);
-        $viewHelper->initializeArguments();
 
-        $viewHelper->render();
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $viewHelper->injectReflectionService(new ReflectionService);
+        }
+
+        $viewHelper->initializeArgumentsAndRender();
     }
 
     /**
@@ -61,7 +67,7 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
         $slotArgument = 'foo-slot';
 
         /** @var HasViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
-        $viewHelper = $this->getMockBuilder(HasViewHelper::class)
+        $viewHelper = $this->getMockBuilder($this->getSlotHasViewHelperClassName())
             ->setMethods(['renderThenChild', 'renderElseChild'])
             ->getMock();
 
@@ -89,11 +95,24 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
 
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
-        $this->injectDependenciesIntoViewHelper($viewHelper);
+        $viewHelper->setRenderingContext($this->renderingContext);
         $viewHelper->injectFieldService($fieldService);
         $viewHelper->setArguments(['slot' => $slotArgument]);
-        $viewHelper->initializeArguments();
 
-        $viewHelper->render();
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $viewHelper->injectReflectionService(new ReflectionService);
+        }
+
+        $viewHelper->initializeArgumentsAndRender();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSlotHasViewHelperClassName()
+    {
+        return (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '7.3.0', '<'))
+            ? OldHasViewHelper::class
+            : HasViewHelper::class;
     }
 }
