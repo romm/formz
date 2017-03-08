@@ -1,6 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
+use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\Slot\OldHasViewHelper;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
@@ -98,6 +99,28 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper->setRenderingContext($this->renderingContext);
         $viewHelper->injectFieldService($fieldService);
         $viewHelper->setArguments(['slot' => $slotArgument]);
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $viewHelper->injectReflectionService(new ReflectionService);
+        }
+
+        $viewHelper->initializeArgumentsAndRender();
+    }
+
+    /**
+     * This ViewHelper must be used from inside a `FieldViewHelper`.
+     *
+     * @test
+     */
+    public function renderViewHelperWithoutFieldThrowsException()
+    {
+        $this->setExpectedException(ContextNotFoundException::class);
+
+        $className = $this->getSlotHasViewHelperClassName();
+        /** @var HasViewHelper $viewHelper */
+        $viewHelper = new $className;
+        $this->injectDependenciesIntoViewHelper($viewHelper);
+        $viewHelper->injectFieldService(new FieldViewHelperService);
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $viewHelper->injectReflectionService(new ReflectionService);

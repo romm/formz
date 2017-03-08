@@ -61,12 +61,12 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelperWithoutFieldThrowsException()
     {
+        $this->setExpectedException(ContextNotFoundException::class);
+
         $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();
-
-        $this->setExpectedException(ContextNotFoundException::class);
 
         $viewHelper->render();
     }
