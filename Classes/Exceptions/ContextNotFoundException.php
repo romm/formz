@@ -16,6 +16,7 @@ namespace Romm\Formz\Exceptions;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormViewHelper;
 use Romm\Formz\ViewHelpers\OptionViewHelper;
+use Romm\Formz\ViewHelpers\Slot\HasViewHelper;
 use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
 use Romm\Formz\ViewHelpers\SlotViewHelper;
 
@@ -84,6 +85,22 @@ class ContextNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FIELD_CONTEXT_NOT_FOUND,
             [SlotViewHelper::class, FieldViewHelper::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1488988566
+     *
+     * @return ContextNotFoundException
+     */
+    final public static function slotHasViewHelperFieldContextNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FIELD_CONTEXT_NOT_FOUND,
+            [HasViewHelper::class, FieldViewHelper::class]
         );
 
         return $exception;
