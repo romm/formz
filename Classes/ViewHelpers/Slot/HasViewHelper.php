@@ -43,13 +43,13 @@ class HasViewHelper extends AbstractConditionViewHelper implements CompilableInt
     /**
      * @inheritdoc
      */
-    public function render()
+    protected function callRenderMethod()
     {
         if (false === $this->fieldService->fieldContextExists()) {
             throw ContextNotFoundException::slotHasViewHelperFieldContextNotFound();
         }
 
-        return parent::render();
+        return parent::callRenderMethod();
     }
 
     /**
