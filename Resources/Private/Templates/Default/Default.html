@@ -9,14 +9,14 @@
 </f:section>
 
 <f:section name="Field">
-    <formz:renderSection section="Field" />
+    <formz:slot.render slot="Field" />
 </f:section>
 
 <f:section name="Feedback">
-	<formz:renderSection section="Feedback.Out.Before" />
+	<formz:slot.render slot="Feedback.Out.Before" />
 
 	<div formz-field-feedback-container="{fieldName}">
-		<formz:renderSection section="Feedback.In.Before" />
+		<formz:slot.render slot="Feedback.In.Before" />
 
 		<div formz-field-feedback-list="{fieldName}">
             <f:form.validationResults for="{formName}.{fieldName}">
@@ -44,10 +44,10 @@
             </f:form.validationResults>
 		</div>
 
-		<formz:renderSection section="Feedback.In.After" />
+		<formz:slot.render slot="Feedback.In.After" />
 	</div>
 
-	<formz:renderSection section="Feedback.Out.After" />
+	<formz:slot.render slot="Feedback.Out.After" />
 </f:section>
 
 </html>

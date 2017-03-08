@@ -71,13 +71,13 @@ In the example below, the block ``info-customer`` is hidden as long as the butto
 
     <formz:form name="myForm" action="submitForm">
         <formz:field name="isCustomer" layout="default">
-            <formz:section name="Field">
+            <formz:slot name="Field">
                 Are you a customer?
                 <br />
                 <f:form.radio property="isCustomer" value="1" />&nbsp;Yes
                 <br />
                 <f:form.radio property="isCustomer" value="0" />&nbsp;No
-            </formz:section>
+            </formz:slot>
         </formz:field>
 
         <div class="info-customer">

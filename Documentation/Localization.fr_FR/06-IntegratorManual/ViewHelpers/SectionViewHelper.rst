@@ -5,12 +5,12 @@
 
 .. include:: ../../../Includes.txt
 
-.. _integratorManual-viewHelpers-section:
+.. _integratorManual-viewHelpers-slot:
 
-Section
-=======
+Slot
+====
 
-Définit une section dont le rendu pourra être utilisé dans le layout du champ avec le ViewHelper « :ref:`integratorManual-viewHelpers-renderSection` ».
+Définit un slot dont le rendu pourra être utilisé dans le layout du champ avec le ViewHelper « :ref:`integratorManual-viewHelpers-slot-render` ».
 
 Le but de ce ViewHelper est de pouvoir dynamiser certaines parties du layout, pour pouvoir par exemple afficher des messages informatifs pour certains champs.
 
@@ -24,10 +24,10 @@ Arguments
 ======================= ================================================================================================================
 Argument                Description
 ======================= ================================================================================================================
-\* ``name``             Nom de la section.
+\* ``name``             Nom du slot.
 
-                        Notez que si vous utilisez le nom d'une section qui n'est pas utilisée dans la layout du champ, cette section ne
-                        sera donc pas rendue.
+                        Notez que si vous utilisez le nom d'un slot qui n'est pas utilisé dans la layout du champ, ce slot ne sera donc
+                        pas rendue.
 ======================= ================================================================================================================
 
 Exemple
@@ -43,11 +43,11 @@ Exemple
 
         <formz:field name="email" layout="default">
 
-            Cette section apparaît juste avant l'affichage de la liste des messages
+            Ce slot apparaît juste avant l'affichage de la liste des messages
             de validation.
-            <formz:section name="Feedback.Out.Before">
+            <formz:slot name="Feedback.Out.Before">
                 <div class="info">Hello world!</div>
-            </formz:section>
+            </formz:slot>
 
         </formz:field>
 

@@ -11,25 +11,28 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\ViewHelpers;
+namespace Romm\Formz\ViewHelpers\Slot;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
+use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\ViewHelpers\AbstractViewHelper;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
- * This view helper registers a section which will not be rendered directly, but
- * with the usage of the `RenderSection` view helper.
+ * This is the rendering function for the `slot` view helper.
  *
- * It is used to manage dynamic parts of the layouts used with the `field` view
- * helper: every layout can call as many sections as it needs, and this sections
- * must then be registered using this view helper.
+ * @see \Romm\Formz\ViewHelpers\SlotViewHelper
  */
-class SectionViewHelper extends AbstractViewHelper implements CompilableInterface
+class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
 {
+    /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
     /**
      * @var FieldViewHelperService
      */
@@ -40,7 +43,7 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
      */
     public function initializeArguments()
     {
-        $this->registerArgument('name', 'string', 'Name of the section.', true);
+        $this->registerArgument('slot', 'string', 'Instance of the slot which will be rendered.', true);
     }
 
     /**
@@ -49,21 +52,27 @@ class SectionViewHelper extends AbstractViewHelper implements CompilableInterfac
     public function render()
     {
         if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::sectionViewHelperFieldContextNotFound();
+            throw ContextNotFoundException::slotRenderViewHelperFieldContextNotFound();
         }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
     /**
+     * Will render the slot with the given name, only if the slot is found.
+     *
      * @inheritdoc
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        /** @var SectionViewHelperService $sectionService */
-        $sectionService = Core::instantiate(SectionViewHelperService::class);
+        /** @var SlotViewHelperService $slotService */
+        $slotService = Core::instantiate(SlotViewHelperService::class);
 
-        $sectionService->addSectionClosure($arguments['name'], $renderChildrenClosure);
+        $closure = $slotService->getSlotClosure($arguments['slot']);
+
+        return (null !== $closure)
+            ? $closure()
+            : '';
     }
 
     /**

@@ -24,13 +24,13 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
 
   Définit la valeur d'une option, qui pourra être utilisée dans le rendu d'un champ.
 
-- :ref:`formz:section <integratorManual-viewHelpers-section>`
+- :ref:`formz:slot <integratorManual-viewHelpers-slot>`
 
-  Définit une section dans le gabarit d'un champ.
+  Définit un slot dans le gabarit d'un champ.
 
-- :ref:`formz:renderSection <integratorManual-viewHelpers-renderSection>`
+- :ref:`formz:slot.render <integratorManual-viewHelpers-slot-render>`
 
-  Lance le rendu d'une section définie dans le gabarit d'un champ.
+  Lance le rendu d'un slot défini dans le gabarit d'un champ.
 
 - :ref:`formz:formatMessage <integratorManual-viewHelpers-formatMessage>`
 
@@ -48,7 +48,7 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
     FormViewHelper
     FieldViewHelper
     OptionViewHelper
-    SectionViewHelper
-    RenderSectionViewHelper
+    SlotViewHelper
+    Slot\RenderViewHelper
     FormatMessageViewHelper
     ClassViewHelper

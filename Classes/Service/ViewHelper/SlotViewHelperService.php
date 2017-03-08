@@ -15,39 +15,39 @@ namespace Romm\Formz\Service\ViewHelper;
 
 use TYPO3\CMS\Core\SingletonInterface;
 
-class SectionViewHelperService implements SingletonInterface
+class SlotViewHelperService implements SingletonInterface
 {
     /**
-     * Contains the closures which will render the registered sections. The keys
-     * of this array are the names of the sections.
+     * Contains the closures which will render the registered slots. The keys
+     * of this array are the names of the slots.
      *
      * @var callable[]
      */
-    private $sections = [];
+    private $slots = [];
 
     /**
-     * Adds a closure - which will render the section with the given name - to
-     * the private storage in this class.
+     * Adds a closure - which will render the slot with the given name - to the
+     * private storage in this class.
      *
      * @param string   $name
      * @param callable $closure
      */
-    public function addSectionClosure($name, $closure)
+    public function addSlotClosure($name, $closure)
     {
-        $this->sections[$name] = $closure;
+        $this->slots[$name] = $closure;
     }
 
     /**
-     * Returns the closure which will render the section with the given name. If
+     * Returns the closure which will render the slot with the given name. If
      * nothing is found, `null` is returned.
      *
      * @param string $name
      * @return callable|null
      */
-    public function getSectionClosure($name)
+    public function getSlotClosure($name)
     {
-        return (true === isset($this->sections[$name]))
-            ? $this->sections[$name]
+        return (true === isset($this->slots[$name]))
+            ? $this->slots[$name]
             : null;
     }
 
@@ -56,6 +56,6 @@ class SectionViewHelperService implements SingletonInterface
      */
     public function resetState()
     {
-        $this->sections = [];
+        $this->slots = [];
     }
 }

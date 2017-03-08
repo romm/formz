@@ -1,13 +1,14 @@
 <?php
-namespace Romm\Formz\Tests\Unit\ViewHelpers;
+namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
+use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
-use Romm\Formz\ViewHelpers\RenderSectionViewHelper;
+use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
+use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
 
-class RenderSectionViewHelperTest extends AbstractViewHelperUnitTest
+class RenderViewHelperTest extends AbstractViewHelperUnitTest
 {
     /**
      * @test
@@ -22,19 +23,19 @@ class RenderSectionViewHelperTest extends AbstractViewHelperUnitTest
             ->method('fieldContextExists')
             ->willReturn(true);
 
-        /** @var SectionViewHelperService|\PHPUnit_Framework_MockObject_MockObject $sectionService */
-        $sectionService = $this->getMockBuilder(SectionViewHelperService::class)
-            ->setMethods(['getSectionClosure'])
+        /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
+        $slotService = $this->getMockBuilder(SlotViewHelperService::class)
+            ->setMethods(['getSlotClosure'])
             ->getMock();
-        $sectionService->expects($this->once())
-            ->method('getSectionClosure')
+        $slotService->expects($this->once())
+            ->method('getSlotClosure')
             ->willReturn(function () {
                 return 'foo';
             });
 
-        UnitTestContainer::get()->registerMockedInstance(SectionViewHelperService::class, $sectionService);
+        UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
-        $viewHelper = new RenderSectionViewHelper;
+        $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
         $viewHelper->initializeArguments();
@@ -52,7 +53,7 @@ class RenderSectionViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelperWithoutFieldThrowsException()
     {
-        $viewHelper = new RenderSectionViewHelper;
+        $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();

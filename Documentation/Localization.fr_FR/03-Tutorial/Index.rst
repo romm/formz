@@ -154,19 +154,19 @@ Ci-dessous un exemple simple d'intégration de formulaire.
             <formz:field name="someField" layout="default">
                 <formz:option name="label" value="Some Field" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
 
             <formz:field name="someOtherField" layout="default">
                 <formz:option name="label" value="Some other Field" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </fieldset>
     </formz:form>

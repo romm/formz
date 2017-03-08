@@ -5,12 +5,12 @@
 
 .. include:: ../../Includes.txt
 
-.. _integratorManual-viewHelpers-section:
+.. _integratorManual-viewHelpers-slot:
 
-Section
-=======
+Slot
+====
 
-Defines a section which can be rendered in the field layout with the ViewHelper “:ref:`integratorManual-viewHelpers-renderSection`”.
+Defines a slot which can be rendered in the field layout with the ViewHelper “:ref:`integratorManual-viewHelpers-slot-render`”.
 
 The goal of this ViewHelper is to dynamize some parts of the layout, for instance to be able to display informative messages for some fields.
 
@@ -24,9 +24,9 @@ Arguments
 ======================= ================================================================================================================
 Argument                Description
 ======================= ================================================================================================================
-\* ``name``             Name of the section.
+\* ``name``             Name of the slot.
 
-                        Note that if you use the name of a section which is not used in the field layout, this section wont be rendered.
+                        Note that if you use the name of a slot which is not used in the field layout, this slot wont be rendered.
 ======================= ================================================================================================================
 
 Example
@@ -42,10 +42,10 @@ Example
 
         <formz:field name="email" layout="default">
 
-            This section appears just before the list of validation messages.
-            <formz:section name="Feedback.Out.Before">
+            This slot appears just before the list of validation messages.
+            <formz:slot name="Feedback.Out.Before">
                 <div class="info">Hello world!</div>
-            </formz:section>
+            </formz:slot>
 
         </formz:field>
 

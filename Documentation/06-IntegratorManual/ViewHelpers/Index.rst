@@ -24,13 +24,13 @@ Formz provides a set of ViewHelpers to help integration:
 
   Defines the value of an option, which can be used later in the field rendering.
 
-- :ref:`formz:section <integratorManual-viewHelpers-section>`
+- :ref:`formz:slot <integratorManual-viewHelpers-slot>`
 
-  Defines a section in the template of a field.
+  Defines a slot in the template of a field.
 
-- :ref:`formz:renderSection <integratorManual-viewHelpers-renderSection>`
+- :ref:`formz:slot.render <integratorManual-viewHelpers-slot-render>`
 
-  Launches the rendering of a section defined in the template of a field.
+  Launches the rendering of a slot defined in the template of a field.
 
 - :ref:`formz:formatMessage <integratorManual-viewHelpers-formatMessage>`
 
@@ -48,7 +48,7 @@ Formz provides a set of ViewHelpers to help integration:
     FormViewHelper
     FieldViewHelper
     OptionViewHelper
-    SectionViewHelper
-    RenderSectionViewHelper
+    SlotViewHelper
+    Slot\RenderViewHelper
     FormatMessageViewHelper
     ClassViewHelper

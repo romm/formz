@@ -24,7 +24,7 @@ use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
-use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
+use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
@@ -66,9 +66,9 @@ class FieldViewHelper extends AbstractViewHelper
     protected $fieldService;
 
     /**
-     * @var SectionViewHelperService
+     * @var SlotViewHelperService
      */
-    protected $sectionService;
+    protected $slotService;
 
     /**
      * @var array
@@ -108,8 +108,7 @@ class FieldViewHelper extends AbstractViewHelper
 
         /*
          * Calling this here will process every view helper beneath this one,
-         * allowing options and sections to be used correctly in the field
-         * layout.
+         * allowing options and slots to be used correctly in the field layout.
          */
         $this->renderChildren();
 
@@ -135,7 +134,7 @@ class FieldViewHelper extends AbstractViewHelper
          * Resetting all services data.
          */
         $this->fieldService->resetState();
-        $this->sectionService->resetState();
+        $this->slotService->resetState();
 
         $viewHelperVariableContainer->setView($currentView);
         $this->restoreOriginalArguments($templateArguments);
@@ -306,10 +305,10 @@ class FieldViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param SectionViewHelperService $sectionService
+     * @param SlotViewHelperService $slotService
      */
-    public function injectSectionService(SectionViewHelperService $sectionService)
+    public function injectSlotService(SlotViewHelperService $slotService)
     {
-        $this->sectionService = $sectionService;
+        $this->slotService = $slotService;
     }
 }
