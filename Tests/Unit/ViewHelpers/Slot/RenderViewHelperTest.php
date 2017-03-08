@@ -15,6 +15,8 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelper()
     {
+        $slotArgument = 'foo-slot';
+
         /** @var FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject $fieldService */
         $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
             ->setMethods(['fieldContextExists'])
@@ -25,10 +27,15 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
-            ->setMethods(['getSlotClosure'])
+            ->setMethods(['getSlotClosure', 'hasSlotClosure'])
             ->getMock();
         $slotService->expects($this->once())
+            ->method('hasSlotClosure')
+            ->with($slotArgument)
+            ->willReturn(true);
+        $slotService->expects($this->once())
             ->method('getSlotClosure')
+            ->with($slotArgument)
             ->willReturn(function () {
                 return 'foo';
             });
@@ -38,6 +45,7 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
+        $viewHelper->setArguments(['slot' => $slotArgument]);
         $viewHelper->initializeArguments();
 
         $this->assertEquals(

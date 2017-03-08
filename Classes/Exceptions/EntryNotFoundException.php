@@ -40,6 +40,8 @@ class EntryNotFoundException extends FormzException
 
     const FORM_VIEW_HELPER_CONTROLLER_ACTION_ARGUMENT_MISSING = 'The method `%s::%s()` must have a parameter `$%s`. Note that you can also change the parameter `name` of the form view helper.';
 
+    const SLOT_NOT_FOUND = 'No slot "%s" was found.';
+
     /**
      * @code 1488482191
      *
@@ -247,6 +249,23 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_VIEW_HELPER_CONTROLLER_ACTION_ARGUMENT_MISSING,
             [$controllerObjectName, $actionName, $formName]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1488988452
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function slotNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::SLOT_NOT_FOUND,
+            [$name]
         );
 
         return $exception;

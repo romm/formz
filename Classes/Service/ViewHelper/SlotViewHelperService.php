@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\Service\ViewHelper;
 
+use Closure;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class SlotViewHelperService implements SingletonInterface
@@ -21,7 +23,7 @@ class SlotViewHelperService implements SingletonInterface
      * Contains the closures which will render the registered slots. The keys
      * of this array are the names of the slots.
      *
-     * @var callable[]
+     * @var Closure[]
      */
     private $slots = [];
 
@@ -29,26 +31,37 @@ class SlotViewHelperService implements SingletonInterface
      * Adds a closure - which will render the slot with the given name - to the
      * private storage in this class.
      *
-     * @param string   $name
-     * @param callable $closure
+     * @param string  $name
+     * @param Closure $closure
      */
-    public function addSlotClosure($name, $closure)
+    public function addSlotClosure($name, Closure $closure)
     {
         $this->slots[$name] = $closure;
     }
 
     /**
-     * Returns the closure which will render the slot with the given name. If
-     * nothing is found, `null` is returned.
+     * Returns the closure which will render the slot with the given name.
      *
      * @param string $name
-     * @return callable|null
+     * @return Closure
+     * @throws EntryNotFoundException
      */
     public function getSlotClosure($name)
     {
-        return (true === isset($this->slots[$name]))
-            ? $this->slots[$name]
-            : null;
+        if (false === $this->hasSlotClosure($name)) {
+            throw EntryNotFoundException::conditionNotFound($name);
+        }
+
+        return $this->slots[$name];
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasSlotClosure($name)
+    {
+        return true === isset($this->slots[$name]);
     }
 
     /**

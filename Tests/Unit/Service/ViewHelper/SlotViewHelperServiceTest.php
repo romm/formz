@@ -1,6 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Service\ViewHelper;
 
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
@@ -19,10 +20,14 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
             return 'bar';
         };
 
+        $this->assertFalse($slotService->hasSlotClosure('foo'));
         $slotService->addSlotClosure('foo', $fooClosure);
-        $slotService->addSlotClosure('bar', $barClosure);
-
+        $this->assertTrue($slotService->hasSlotClosure('foo'));
         $this->assertSame($fooClosure, $slotService->getSlotClosure('foo'));
+
+        $this->assertFalse($slotService->hasSlotClosure('bar'));
+        $slotService->addSlotClosure('bar', $barClosure);
+        $this->assertTrue($slotService->hasSlotClosure('bar'));
         $this->assertSame($barClosure, $slotService->getSlotClosure('bar'));
     }
 
@@ -39,6 +44,17 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
         $slotService->addSlotClosure('foo', $fooClosure);
         $slotService->resetState();
 
-        $this->assertNull($slotService->getSlotClosure('foo'));
+        $this->assertFalse($slotService->hasSlotClosure('foo'));
+    }
+
+    /**
+     * @test
+     */
+    public function getNotFoundSlotClosureThrowsException()
+    {
+        $this->setExpectedException(EntryNotFoundException::class);
+
+        $slotService = new SlotViewHelperService;
+        $slotService->getSlotClosure('bar');
     }
 }

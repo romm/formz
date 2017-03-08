@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\ViewHelpers\Slot;
 
+use Closure;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
@@ -63,16 +64,19 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      *
      * @inheritdoc
      */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    public static function renderStatic(array $arguments, Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
+        $slotName = $arguments['slot'];
+        $result = '';
 
-        $closure = $slotService->getSlotClosure($arguments['slot']);
+        if ($slotService->hasSlotClosure($slotName)) {
+            $closure = $slotService->getSlotClosure($slotName);
+            $result = $closure();
+        }
 
-        return (null !== $closure)
-            ? $closure()
-            : '';
+        return $result;
     }
 
     /**
