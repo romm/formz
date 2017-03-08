@@ -5,10 +5,10 @@
 
 .. include:: ../../Includes.txt
 
-.. _integratorManual-viewHelpers-renderSlot:
+.. _integratorManual-viewHelpers-slot-render:
 
-RenderSlot
-==========
+Slot.Render
+===========
 
 Renders a slot defined in the ViewHelper “:ref:`integratorManual-viewHelpers-field`” with the ViewHelper “:ref:`integratorManual-viewHelpers-slot`”.
 
@@ -36,8 +36,8 @@ Example
 
     {namespace formz=Romm\Formz\ViewHelpers}
 
-    <formz:renderSlot slot="Label.Before" />
+    <formz:slot.render slot="Label.Before" />
 
     <label for="{fieldId}">{label}</label>
 
-    <formz:renderSlot slot="Label.After" />
+    <formz:slot.render slot="Label.After" />

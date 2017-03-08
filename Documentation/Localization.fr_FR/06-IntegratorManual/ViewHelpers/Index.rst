@@ -28,7 +28,7 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
 
   Définit un slot dans le gabarit d'un champ.
 
-- :ref:`formz:renderSlot <integratorManual-viewHelpers-renderSlot>`
+- :ref:`formz:slot.render <integratorManual-viewHelpers-slot-render>`
 
   Lance le rendu d'un slot défini dans le gabarit d'un champ.
 
@@ -49,6 +49,6 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
     FieldViewHelper
     OptionViewHelper
     SlotViewHelper
-    RenderSlotViewHelper
+    Slot\RenderViewHelper
     FormatMessageViewHelper
     ClassViewHelper

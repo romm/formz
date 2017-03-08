@@ -103,7 +103,7 @@ Les variables suivantes sont utilisables directement dans votre template :
 
     <f:section name="Field">
         <div formz-field-container="{fieldName}">
-            <formz:renderSlot slot="Field" />
+            <formz:slot.render slot="Field" />
         </div>
     </f:section>
 

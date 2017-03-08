@@ -28,7 +28,7 @@ Formz provides a set of ViewHelpers to help integration:
 
   Defines a slot in the template of a field.
 
-- :ref:`formz:renderSlot <integratorManual-viewHelpers-renderSlot>`
+- :ref:`formz:slot.render <integratorManual-viewHelpers-slot-render>`
 
   Launches the rendering of a slot defined in the template of a field.
 
@@ -49,6 +49,6 @@ Formz provides a set of ViewHelpers to help integration:
     FieldViewHelper
     OptionViewHelper
     SlotViewHelper
-    RenderSlotViewHelper
+    Slot\RenderViewHelper
     FormatMessageViewHelper
     ClassViewHelper

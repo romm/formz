@@ -10,7 +10,7 @@
 Slot
 ====
 
-Defines a slot which can be rendered in the field layout with the ViewHelper “:ref:`integratorManual-viewHelpers-renderSlot`”.
+Defines a slot which can be rendered in the field layout with the ViewHelper “:ref:`integratorManual-viewHelpers-slot-render`”.
 
 The goal of this ViewHelper is to dynamize some parts of the layout, for instance to be able to display informative messages for some fields.
 
