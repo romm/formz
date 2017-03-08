@@ -103,7 +103,7 @@ The following variables can be used in your template:
 
     <f:section name="Field">
         <div formz-field-container="{fieldName}">
-            <formz:renderSection section="Field" />
+            <formz:renderSlot slot="Field" />
         </div>
     </f:section>
 
@@ -165,9 +165,9 @@ If you need to know more, read the chapter “:ref:`integratorManual-viewHelpers
         <formz:field name="email" layout="my-project.one-column">
             <formz:option name="required" value="1" />
 
-            <formz:section name="Field">
+            <formz:slot name="Field">
                 <f:form.textfield property="{fieldName}" id="{fieldId}" placeholder="email" />
-            </formz:section>
+            </formz:slot>
         </formz:field>
 
     </formz:form>

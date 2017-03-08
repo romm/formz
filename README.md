@@ -142,9 +142,9 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="First name" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="First name" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
 
@@ -153,9 +153,9 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="Name" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="Name" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
     </div>
@@ -166,9 +166,9 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="Email" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="Email" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
 
@@ -177,13 +177,13 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="Gender" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <label for="{fieldId}-female">Female</label>
                     <f:form.radio property="{fieldName}" id="{fieldId}-female" value="female" />
 
                     <label for="{fieldId}-male">Male</label>
                     <f:form.radio property="{fieldName}" id="{fieldId}-male" value="male" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
     </div>

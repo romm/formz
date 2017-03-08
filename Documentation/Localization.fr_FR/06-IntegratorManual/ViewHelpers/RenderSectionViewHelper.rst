@@ -5,12 +5,12 @@
 
 .. include:: ../../../Includes.txt
 
-.. _integratorManual-viewHelpers-renderSection:
+.. _integratorManual-viewHelpers-renderSlot:
 
-RenderSection
-=============
+RenderSlot
+==========
 
-Lance le rendu d'une section définie à l'intérieur du ViewHelper « :ref:`integratorManual-viewHelpers-field` » avec le ViewHelper « :ref:`integratorManual-viewHelpers-section` ».
+Lance le rendu d'un slot défini à l'intérieur du ViewHelper « :ref:`integratorManual-viewHelpers-field` » avec le ViewHelper « :ref:`integratorManual-viewHelpers-slot` ».
 
 Ce ViewHelper est utile lorsqu'il est utilisé dans un layout de champ (cf. le chapitre « :ref:`integratorManual-layouts` »).
 
@@ -24,7 +24,7 @@ Arguments
 ======================= ================================================================================================================
 Argument                Description
 ======================= ================================================================================================================
-\* ``section``          Nom de la section qui sera rendue.
+\* ``slot``             Nom du slot qui sera rendu.
 ======================= ================================================================================================================
 
 Exemple
@@ -36,8 +36,8 @@ Exemple
 
     {namespace formz=Romm\Formz\ViewHelpers}
 
-    <formz:renderSection section="Label.Before" />
+    <formz:renderSlot slot="Label.Before" />
 
     <label for="{fieldId}">{label}</label>
 
-    <formz:renderSection section="Label.After" />
+    <formz:renderSlot slot="Label.After" />

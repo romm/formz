@@ -70,13 +70,13 @@ Dans l'exemple ci-dessous, le bloc ``info-customer`` sera masqué tant que le bo
 
     <formz:form name="myForm" action="submitForm">
         <formz:field name="isCustomer" layout="default">
-            <formz:section name="Field">
+            <formz:slot name="Field">
                 Are you a customer?
                 <br />
                 <f:form.radio property="isCustomer" value="1" />&nbsp;Yes
                 <br />
                 <f:form.radio property="isCustomer" value="0" />&nbsp;No
-            </formz:section>
+            </formz:slot>
         </formz:field>
 
         <div class="info-customer">
