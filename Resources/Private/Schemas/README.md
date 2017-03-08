@@ -1,4 +1,4 @@
-The schema `Formz.xsd` was generated using TYPO3 extension `schemaker`:
+The schema `Formz.xsd` was generated using TYPO3 extension `fluidtypo3/schemaker`:
 
 - On TER: https://typo3.org/extensions/repository/view/schemaker
 - On Packagist: https://packagist.org/packages/fluidtypo3/schemaker
