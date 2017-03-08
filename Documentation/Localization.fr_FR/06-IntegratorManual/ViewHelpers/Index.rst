@@ -32,6 +32,10 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
 
   Lance le rendu d'un slot défini dans le gabarit d'un champ.
 
+- :ref:`formz:slot.has <integratorManual-viewHelpers-slot-has>`
+
+  Conditionne le rendu d'un bloc sur la présence d'un slot.
+
 - :ref:`formz:formatMessage <integratorManual-viewHelpers-formatMessage>`
 
   Permet de formatter un message renvoyé par la validation d'un champ.
@@ -49,6 +53,7 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
     FieldViewHelper
     OptionViewHelper
     SlotViewHelper
-    Slot\RenderViewHelper
+    Slot/RenderViewHelper
+    Slot/HasViewHelper
     FormatMessageViewHelper
     ClassViewHelper
