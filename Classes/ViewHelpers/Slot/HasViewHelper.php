@@ -54,7 +54,7 @@ class HasViewHelper extends AbstractConditionViewHelper implements CompilableInt
 
     /**
      * @param array $arguments
-     * @return boolean
+     * @return bool
      */
     protected static function evaluateCondition($arguments = null)
     {
