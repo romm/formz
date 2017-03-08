@@ -11,12 +11,13 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\ViewHelpers;
+namespace Romm\Formz\ViewHelpers\Slot;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\ViewHelpers\AbstractViewHelper;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -25,7 +26,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  *
  * @see \Romm\Formz\ViewHelpers\SlotViewHelper
  */
-class RenderSlotViewHelper extends AbstractViewHelper implements CompilableInterface
+class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
 {
     /**
      * @var bool
@@ -51,7 +52,7 @@ class RenderSlotViewHelper extends AbstractViewHelper implements CompilableInter
     public function render()
     {
         if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::renderSlotViewHelperFieldContextNotFound();
+            throw ContextNotFoundException::slotRenderViewHelperFieldContextNotFound();
         }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);

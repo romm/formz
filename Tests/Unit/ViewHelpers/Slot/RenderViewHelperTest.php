@@ -1,13 +1,14 @@
 <?php
-namespace Romm\Formz\Tests\Unit\ViewHelpers;
+namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
-use Romm\Formz\ViewHelpers\RenderSlotViewHelper;
+use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
+use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
 
-class RenderSlotViewHelperTest extends AbstractViewHelperUnitTest
+class RenderViewHelperTest extends AbstractViewHelperUnitTest
 {
     /**
      * @test
@@ -34,7 +35,7 @@ class RenderSlotViewHelperTest extends AbstractViewHelperUnitTest
 
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
-        $viewHelper = new RenderSlotViewHelper;
+        $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
         $viewHelper->initializeArguments();
@@ -52,7 +53,7 @@ class RenderSlotViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelperWithoutFieldThrowsException()
     {
-        $viewHelper = new RenderSlotViewHelper;
+        $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();

@@ -22,7 +22,7 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
  * This view helper registers a slot which will not be rendered directly, but
- * with the usage of the `RenderSlot` view helper.
+ * with the usage of the `slot.render` view helper.
  *
  * It is used to manage dynamic parts of the layouts used with the `field` view
  * helper: every layout can call as many slots as it needs, and this slots must
