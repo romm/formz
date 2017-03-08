@@ -16,7 +16,7 @@
 						</f:else>
 					</f:if>
 					<span class="input-group-addon">
-						<formz:renderSection section="Field-{key}" />
+						<formz:renderSlot slot="Field-{key}" />
 		            </span>
 					<f:if condition="{item.reverse}">
 						<label class="btn btn-default form-control" for="{fieldId}-{key}">{item.label}</label>

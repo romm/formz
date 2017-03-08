@@ -14,7 +14,7 @@
                         <f:if condition="{item.reverse}">
                             <f:then>
                                 <span class="prefix">
-                                    <formz:renderSection section="Field-{key}" />
+                                    <formz:renderSlot slot="Field-{key}" />
                                 </span>
                             </f:then>
                             <f:else>
@@ -30,7 +30,7 @@
                             </f:then>
                             <f:else>
                                 <span class="postfix">
-                                    <formz:renderSection section="Field-{key}" />
+                                    <formz:renderSlot slot="Field-{key}" />
                                 </span>
                             </f:else>
                         </f:if>
