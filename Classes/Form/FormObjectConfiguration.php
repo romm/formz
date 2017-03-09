@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -89,7 +89,7 @@ class FormObjectConfiguration
 
     /**
      * This function will merge and return the validation results of both the
-     * global Formz configuration object, and this form configuration object.
+     * global FormZ configuration object, and this form configuration object.
      *
      * @return Result
      */

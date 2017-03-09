@@ -10,7 +10,7 @@
 “data” attributes
 =================
 
-One of the main features of Formz is the handling of attributes, automatically updated in the HTML tag ``<form>``.
+One of the main features of FormZ is the handling of attributes, automatically updated in the HTML tag ``<form>``.
 
 These attributes allow to know exactly what is the state of every field in the form: is this field valid? What's the value of this field? Does this field contain an error?
 
@@ -45,14 +45,14 @@ In this example, there are three attributes:
 
 Thanks to these selectors, it's possible to answer almost every situation in the form, and interact with it.
 
-The core of Formz uses these selectors to show or hide the containers of the fields and their messages.
+The core of FormZ uses these selectors to show or hide the containers of the fields and their messages.
 
 -----
 
 “data” attributes list
 ----------------------
 
-Currently, Formz automatically handle the following attributes:
+Currently, FormZ automatically handle the following attributes:
 
 * ``formz-valid``
 

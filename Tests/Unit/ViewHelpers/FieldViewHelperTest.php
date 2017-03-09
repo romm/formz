@@ -13,7 +13,7 @@ use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
-use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
+use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
@@ -59,7 +59,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->method('setCurrentField')
             ->with($formObject->getConfiguration()->getField($fieldName));
 
-        $viewHelper->injectSectionService(new SectionViewHelperService);
+        $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
         $viewHelper->setArguments([
@@ -182,7 +182,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
-        $viewHelper->injectSectionService(new SectionViewHelperService);
+        $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
         $viewHelper->setArguments([
@@ -213,7 +213,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
-        $viewHelper->injectSectionService(new SectionViewHelperService);
+        $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
         $viewHelper->setArguments([
@@ -246,7 +246,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
-        $viewHelper->injectSectionService(new SectionViewHelperService);
+        $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
         $viewHelper->setArguments([
@@ -279,7 +279,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
-        $viewHelper->injectSectionService(new SectionViewHelperService);
+        $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
         $viewHelper->setArguments([
@@ -315,7 +315,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
         $viewHelper->injectFieldService($this->getMockedFieldService());
-        $viewHelper->injectSectionService(new SectionViewHelperService);
+        $viewHelper->injectSlotService(new SlotViewHelperService);
 
         $renderingContextMock = $this->getMockedRenderingContext();
 

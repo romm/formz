@@ -1,19 +1,22 @@
 <?php
-namespace Romm\Formz\Tests\Unit\ViewHelpers;
+namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\SectionViewHelperService;
+use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
-use Romm\Formz\ViewHelpers\RenderSectionViewHelper;
+use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
+use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
 
-class RenderSectionViewHelperTest extends AbstractViewHelperUnitTest
+class RenderViewHelperTest extends AbstractViewHelperUnitTest
 {
     /**
      * @test
      */
     public function renderViewHelper()
     {
+        $slotArgument = 'foo-slot';
+
         /** @var FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject $fieldService */
         $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
             ->setMethods(['fieldContextExists'])
@@ -22,21 +25,27 @@ class RenderSectionViewHelperTest extends AbstractViewHelperUnitTest
             ->method('fieldContextExists')
             ->willReturn(true);
 
-        /** @var SectionViewHelperService|\PHPUnit_Framework_MockObject_MockObject $sectionService */
-        $sectionService = $this->getMockBuilder(SectionViewHelperService::class)
-            ->setMethods(['getSectionClosure'])
+        /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
+        $slotService = $this->getMockBuilder(SlotViewHelperService::class)
+            ->setMethods(['getSlotClosure', 'hasSlotClosure'])
             ->getMock();
-        $sectionService->expects($this->once())
-            ->method('getSectionClosure')
+        $slotService->expects($this->once())
+            ->method('hasSlotClosure')
+            ->with($slotArgument)
+            ->willReturn(true);
+        $slotService->expects($this->once())
+            ->method('getSlotClosure')
+            ->with($slotArgument)
             ->willReturn(function () {
                 return 'foo';
             });
 
-        UnitTestContainer::get()->registerMockedInstance(SectionViewHelperService::class, $sectionService);
+        UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
-        $viewHelper = new RenderSectionViewHelper;
+        $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
+        $viewHelper->setArguments(['slot' => $slotArgument]);
         $viewHelper->initializeArguments();
 
         $this->assertEquals(
@@ -52,12 +61,12 @@ class RenderSectionViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelperWithoutFieldThrowsException()
     {
-        $viewHelper = new RenderSectionViewHelper;
+        $this->setExpectedException(ContextNotFoundException::class);
+
+        $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();
-
-        $this->setExpectedException(ContextNotFoundException::class);
 
         $viewHelper->render();
     }

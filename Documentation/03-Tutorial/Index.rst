@@ -69,7 +69,7 @@ Your controller will generally contain at least two actions:
 
 .. note::
 
-    To enable validation for the form, the annotation ``@validate`` must be used in the function DocBlock. It is a feature provided by Extbase, and used by Formz to ease the form validation.
+    To enable validation for the form, the annotation ``@validate`` must be used in the function DocBlock. It is a feature provided by Extbase, and used by FormZ to ease the form validation.
 
     You can find an example below:
 
@@ -154,19 +154,19 @@ Below is a basic example of a form integration:
             <formz:field name="someField" layout="default">
                 <formz:option name="label" value="Some Field" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
 
             <formz:field name="someOtherField" layout="default">
                 <formz:option name="label" value="Some other Field" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </fieldset>
     </formz:form>

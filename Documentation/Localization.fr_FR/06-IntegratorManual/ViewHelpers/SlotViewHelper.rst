@@ -3,20 +3,20 @@
 .. --------------------------------------------------
 .. -*- coding: utf-8 -*- with BOM.
 
-.. include:: ../../Includes.txt
+.. include:: ../../../Includes.txt
 
-.. _integratorManual-viewHelpers-section:
+.. _integratorManual-viewHelpers-slot:
 
-Section
-=======
+Slot
+====
 
-Defines a section which can be rendered in the field layout with the ViewHelper “:ref:`integratorManual-viewHelpers-renderSection`”.
+Définit un slot dont le rendu pourra être utilisé dans le layout du champ avec le ViewHelper « :ref:`integratorManual-viewHelpers-slot-render` ».
 
-The goal of this ViewHelper is to dynamize some parts of the layout, for instance to be able to display informative messages for some fields.
+Le but de ce ViewHelper est de pouvoir dynamiser certaines parties du layout, pour pouvoir par exemple afficher des messages informatifs pour certains champs.
 
 .. important::
 
-    This ViewHelper must be used inside a ViewHelper “:ref:`integratorManual-viewHelpers-field`”.
+    Ce ViewHelper doit impérativement être utilisé à l'intérieur d'un ViewHelper « :ref:`integratorManual-viewHelpers-field` ».
 
 Arguments
 ---------
@@ -24,12 +24,13 @@ Arguments
 ======================= ================================================================================================================
 Argument                Description
 ======================= ================================================================================================================
-\* ``name``             Name of the section.
+\* ``name``             Nom du slot.
 
-                        Note that if you use the name of a section which is not used in the field layout, this section wont be rendered.
+                        Notez que si vous utilisez le nom d'un slot qui n'est pas utilisé dans la layout du champ, ce slot ne sera donc
+                        pas rendue.
 ======================= ================================================================================================================
 
-Example
+Exemple
 -------
 
 .. code-block:: html
@@ -42,10 +43,11 @@ Example
 
         <formz:field name="email" layout="default">
 
-            This section appears just before the list of validation messages.
-            <formz:section name="Feedback.Out.Before">
+            Ce slot apparaît juste avant l'affichage de la liste des messages
+            de validation.
+            <formz:slot name="Feedback.Out.Before">
                 <div class="info">Hello world!</div>
-            </formz:section>
+            </formz:slot>
 
         </formz:field>
 

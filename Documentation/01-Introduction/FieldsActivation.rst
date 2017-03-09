@@ -10,7 +10,7 @@
 Fields activation
 =================
 
-Formz provides an easy way of handling fields activation under certain conditions.
+FormZ provides an easy way of handling fields activation under certain conditions.
 
 Principle
 ---------
@@ -33,7 +33,7 @@ In the previous cases, a field activation means several things:
 2. In JavaScript, the field validation rules will only run when the field is activated.
 3. Same on the server side, the field validation will only run when the field is activated.
 
-This field activation system presents a major advantage: Formz will be able to automatize the wanted behaviours, with PHP but also with JavaScript and CSS, by automatically generating code, which will be directly injected in the page and automatize the behaviours listed above.
+This field activation system presents a major advantage: FormZ will be able to automatize the wanted behaviours, with PHP but also with JavaScript and CSS, by automatically generating code, which will be directly injected in the page and automatize the behaviours listed above.
 
 It prevents the obligation to write CSS/JavaScript/PHP code for each field activation case, but also means that activation rules are **gathered in a single place** (TypoScript) and not dispersed in CSS/JavaScript/PHP files.
 
@@ -49,7 +49,7 @@ Conditions
 
 Conditions can be configured in two places: either at the root of a form configuration, or at the root of a field configuration.
 
-Potentially, any condition can be verified, as long as a proper PHP implementation exists. Formz already provides several basic conditions, like “:ref:`fieldHasValue <usersManual-typoScript-configurationActivation-fieldHasValue>`” or “:ref:`fieldIsValid <usersManual-typoScript-configurationActivation-fieldIsValid>`”. It is possible to create new conditions to fit specific needs.
+Potentially, any condition can be verified, as long as a proper PHP implementation exists. FormZ already provides several basic conditions, like “:ref:`fieldHasValue <usersManual-typoScript-configurationActivation-fieldHasValue>`” or “:ref:`fieldIsValid <usersManual-typoScript-configurationActivation-fieldIsValid>`”. It is possible to create new conditions to fit specific needs.
 
 You can find the different existing conditions and their configuration at the chapter “:ref:`usersManual-typoScript-configurationActivation`”.
 

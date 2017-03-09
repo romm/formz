@@ -27,7 +27,7 @@ Finally, the **maintainability becomes harder**. Indeed, if a modification must 
 Solution
 ^^^^^^^^
 
-To solve this problem, Formz allows to **regroup templates for fields in standalone views**. The code required to integrate a field is then **much shorter and more understandable, but also more maintainable**: when a modification is done in a field layout, it is done for every real field which actually uses this layout.
+To solve this problem, FormZ allows to **regroup templates for fields in standalone views**. The code required to integrate a field is then **much shorter and more understandable, but also more maintainable**: when a modification is done in a field layout, it is done for every real field which actually uses this layout.
 
 -----
 
@@ -44,7 +44,7 @@ You are then able to use this new layout with any form field.
 TypoScript Configuration
 """"""""""""""""""""""""
 
-The TypoScript configuration of your layout must be inside a **layout group**. Formz provides by default the group ``default``.
+The TypoScript configuration of your layout must be inside a **layout group**. FormZ provides by default the group ``default``.
 
 .. tip::
 
@@ -85,7 +85,7 @@ The following variables can be used in your template:
 
 .. important::
 
-    In order to be fully working with Formz, your template must respect all the rules defined in the chapter “:ref:`integratorManual-configuration`”.
+    In order to be fully working with FormZ, your template must respect all the rules defined in the chapter “:ref:`integratorManual-configuration`”.
 
 **Example:**
 
@@ -103,7 +103,7 @@ The following variables can be used in your template:
 
     <f:section name="Field">
         <div formz-field-container="{fieldName}">
-            <formz:renderSection section="Field" />
+            <formz:slot.render slot="Field" />
         </div>
     </f:section>
 
@@ -165,9 +165,9 @@ If you need to know more, read the chapter “:ref:`integratorManual-viewHelpers
         <formz:field name="email" layout="my-project.one-column">
             <formz:option name="required" value="1" />
 
-            <formz:section name="Field">
+            <formz:slot name="Field">
                 <f:form.textfield property="{fieldName}" id="{fieldId}" placeholder="email" />
-            </formz:section>
+            </formz:slot>
         </formz:field>
 
     </formz:form>

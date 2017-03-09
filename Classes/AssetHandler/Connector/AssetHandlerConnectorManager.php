@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -87,7 +87,7 @@ class AssetHandlerConnectorManager
     }
 
     /**
-     * Will take care of including internal Formz JavaScript and CSS files. They
+     * Will take care of including internal FormZ JavaScript and CSS files. They
      * will be included only once, even if the view helper is used several times
      * in the same page.
      *

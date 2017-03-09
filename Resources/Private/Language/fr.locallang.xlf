@@ -9,7 +9,7 @@
 			</trans-unit>
 
 			<trans-unit id="form.typoscript_not_included.error_message">
-				<target>La configuration TypoScript de Formz semble ne pas être inclue. Veuillez inclure le TypoScript statique « formz » sur cette page.</target>
+				<target>La configuration TypoScript de FormZ semble ne pas être inclue. Veuillez inclure le TypoScript statique « formz » sur cette page.</target>
 			</trans-unit>
 			<trans-unit id="form.wrong_configuration.error_message">
 				<target>La configuration de ce formulaire contient au moins une erreur :</target>

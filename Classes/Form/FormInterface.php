@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,13 +14,13 @@
 namespace Romm\Formz\Form;
 
 /**
- * This interface must be implemented by every form model which will use Formz
+ * This interface must be implemented by every form model which will use FormZ
  * features.
  *
  * Please note that you can (should) use the `FormTrait` trait to implement all
  * the functions required by this interface.
  *
- * Note: If you want Formz to ignore a property of your form, use the annotation
+ * Note: If you want FormZ to ignore a property of your form, use the annotation
  * `@formz-ignore` on it.
  */
 interface FormInterface

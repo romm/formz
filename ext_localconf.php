@@ -6,7 +6,7 @@ if (!defined('TYPO3_MODE')) {
 /** @noinspection PhpUndefinedVariableInspection */
 call_user_func(
     function ($extensionKey) {
-        // Registering the default Formz conditions.
+        // Registering the default FormZ conditions.
         \Romm\Formz\Condition\ConditionFactory::get()->registerDefaultConditions();
 
         // Registering the cache.
@@ -44,6 +44,13 @@ call_user_func(
             $container->registerImplementation(\Romm\Formz\ViewHelpers\FormViewHelper::class, \Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper::class);
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\Romm\Formz\ViewHelpers\FormViewHelper::class] = [
                 'className' => \Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper::class
+            ];
+        }
+
+        if (version_compare($typo3Version, '7.3.0', '<')) {
+            $container->registerImplementation(\Romm\Formz\ViewHelpers\Slot\HasViewHelper::class, \Romm\Formz\Service\ViewHelper\Legacy\OldHasViewHelper::class);
+            $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\Romm\Formz\ViewHelpers\Slot\HasViewHelper::class] = [
+                'className' => \Romm\Formz\Service\ViewHelper\Legacy\OldHasViewHelper::class
             ];
         }
     },

@@ -18,7 +18,7 @@ Read the example below to understand easily how it works.
 
 .. note::
 
-    The behaviour is handled both by PHP and JavaScript. You only have to use this ViewHelper, Formz handles the rest.
+    The behaviour is handled both by PHP and JavaScript. You only have to use this ViewHelper, FormZ handles the rest.
 
 Arguments
 ---------

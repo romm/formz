@@ -10,7 +10,7 @@
 Attributs « data »
 ==================
 
-Un des principaux fonctionnements de Formz est la gestion d'attributs, automatiquement mis à jour dans la balise HTML ``<form>``.
+Un des principaux fonctionnements de FormZ est la gestion d'attributs, automatiquement mis à jour dans la balise HTML ``<form>``.
 
 Ces attributs vont permettre de savoir précisément quel est l'état de chacun des champs du formulaire : ce champ est-il valide ? Quelle est la valeur de ce champ ? Ce champ contient-t-il une erreur ?
 
@@ -45,14 +45,14 @@ Dans cet exemple, on trouve trois attributs :
 
 Grâce à ces sélecteurs, il est possible de répondre à quasiment chaque situation possible dans le formulaire, et d'interragir avec.
 
-Le cœur de Formz utilise notamment ces sélecteurs pour montrer ou cacher les conteneurs des champs et des messages.
+Le cœur de FormZ utilise notamment ces sélecteurs pour montrer ou cacher les conteneurs des champs et des messages.
 
 -----
 
 Liste des attributs « data »
 ----------------------------
 
-Actuellement, Formz gère automatiquement les attributs suivants :
+Actuellement, FormZ gère automatiquement les attributs suivants :
 
 * ``formz-valid``
 

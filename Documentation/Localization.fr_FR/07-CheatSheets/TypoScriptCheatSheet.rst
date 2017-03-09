@@ -49,7 +49,7 @@ Vous pouvez retrouvez tous les détails des propriétés au chapitre « :ref:`us
             }
         }
 
-        # Ici on retrouvera la liste des formulaires utilisant Formz.
+        # Ici on retrouvera la liste des formulaires utilisant FormZ.
         forms {
             # La clé représente le nom de classe PHP du modèle du formulaire.
             \Vendor\Extension\Form\MyForm {

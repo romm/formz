@@ -85,7 +85,7 @@ Conditions d'activation
 
         .. note::
 
-            Il existe plusieurs types de conditions disponibles dans le cœur de Formz, cf. le chapitre « :ref:`usersManual-typoScript-configurationActivation` ».
+            Il existe plusieurs types de conditions disponibles dans le cœur de FormZ, cf. le chapitre « :ref:`usersManual-typoScript-configurationActivation` ».
 
 .. _formDefaultClass:
 

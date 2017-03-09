@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -128,7 +128,7 @@ class FieldSettings extends AbstractFormzConfiguration
     /**
      * This function will do the following: first, it will check if the wanted
      * property is set in this class instance (not null), then it returns it. If
-     * the value is null, it will fetch the global Formz configuration settings,
+     * the value is null, it will fetch the global FormZ configuration settings,
      * and return the default value for the asked property.
      *
      * Example:

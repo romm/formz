@@ -9,7 +9,7 @@
 .. _start:
 
 #####
-Formz
+FormZ
 #####
 
 .. only:: html

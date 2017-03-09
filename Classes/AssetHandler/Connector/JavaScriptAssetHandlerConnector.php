@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -74,7 +74,7 @@ class JavaScriptAssetHandlerConnector
 
     /**
      * Will include all default JavaScript files declared in the property
-     * `$javaScriptFiles` of this class, as well as the main Formz
+     * `$javaScriptFiles` of this class, as well as the main FormZ
      * configuration.
      *
      * @return $this
@@ -122,7 +122,7 @@ class JavaScriptAssetHandlerConnector
     }
 
     /**
-     * Includes Formz configuration JavaScript declaration. If the file exists,
+     * Includes FormZ configuration JavaScript declaration. If the file exists,
      * it is directly included, otherwise the JavaScript code is calculated,
      * then put in the cache file.
      *
@@ -209,7 +209,7 @@ class JavaScriptAssetHandlerConnector
         $javaScriptCode .= LF;
         $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
 
-        $this->addInlineJs('Formz - Initialization ' . $formName, $javaScriptCode);
+        $this->addInlineJs('FormZ - Initialization ' . $formName, $javaScriptCode);
 
         return $this;
     }

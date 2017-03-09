@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -263,19 +263,24 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected function applyBehavioursOnSubmittedForm()
     {
         if ($this->formObject->formWasSubmitted()) {
-            /** @var BehavioursManager $behavioursManager */
-            $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
+            $request = $this->controllerContext->getRequest()->getOriginalRequest();
 
-            $originalRequest = $this->controllerContext->getRequest()->getOriginalRequest();
-            /** @var array $originalForm */
-            $originalForm = $originalRequest->getArgument($this->getFormObjectName());
+            if ($request
+                && $request->hasArgument($this->getFormObjectName())
+            ) {
+                /** @var BehavioursManager $behavioursManager */
+                $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
 
-            $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
-                $originalForm,
-                $this->formObject->getConfiguration()
-            );
+                /** @var array $originalForm */
+                $originalForm = $request->getArgument($this->getFormObjectName());
 
-            $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
+                $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
+                    $originalForm,
+                    $this->formObject->getConfiguration()
+                );
+
+                $request->setArgument($this->getFormObjectName(), $formProperties);
+            }
         }
     }
 
@@ -338,7 +343,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     {
         $assetHandlerConnectorManager = $this->getAssetHandlerConnectorManager();
 
-        // Default Formz assets.
+        // Default FormZ assets.
         $assetHandlerConnectorManager->includeDefaultAssets();
 
         // JavaScript assets.

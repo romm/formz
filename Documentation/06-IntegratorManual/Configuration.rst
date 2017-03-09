@@ -12,12 +12,12 @@ Configuration
 
 In order for CSS and JavaScript to be able to find elements in the HTML DOM, it's necessary to respect some integration rules.
 
-Take care of respecting them when :ref:`you create new layouts <integratorManual-layouts>`, or Formz may not work properly.
+Take care of respecting them when :ref:`you create new layouts <integratorManual-layouts>`, or FormZ may not work properly.
 
 Field container
 ---------------
 
-A field must always have a **container**, which is used by Formz to **display or hide the entire block** under some conditions.
+A field must always have a **container**, which is used by FormZ to **display or hide the entire block** under some conditions.
 
 .. code-block:: html
     :linenos:
@@ -29,7 +29,7 @@ A field must always have a **container**, which is used by Formz to **display or
         <f:form.textfield property="email" id="email" />
     </div>
 
-In this example, the first element ``<div>`` is considered by Formz as the container of the field ``email``.
+In this example, the first element ``<div>`` is considered by FormZ as the container of the field ``email``.
 
 By default, the attribute which you should be using is ``formz-field-container``, which must contain the name of the field. It is possible to customize the used attribute, see “:ref:`Field container selector<fieldsSettings-fieldContainerSelector>`”.
 
@@ -38,7 +38,7 @@ By default, the attribute which you should be using is ``formz-field-container``
 Feedback container
 ------------------
 
-The same way the field container must be registered, the message container for this field must also be defined. Then, Formz can display or hide this element according to the presence of messages (mainly errors) or not.
+The same way the field container must be registered, the message container for this field must also be defined. Then, FormZ can display or hide this element according to the presence of messages (mainly errors) or not.
 
 This container is divided into two parts: a global container, and a container for the list of messages. For instance:
 

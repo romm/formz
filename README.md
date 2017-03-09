@@ -1,10 +1,10 @@
-# ![Formz](Documentation/Images/formz-icon@medium.png) Formz
+# ![FormZ](Documentation/Images/formz-icon@medium.png) FormZ • Modern form handler
 
 > [![Build Status](https://travis-ci.org/romm/formz.svg?branch=master)](https://travis-ci.org/romm/formz) [![Coverage Status](https://coveralls.io/repos/github/romm/formz/badge.svg?branch=master)](https://coveralls.io/github/romm/formz?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/romm/formz/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/romm/formz/?branch=master) [![Latest Stable Version](https://poser.pugx.org/romm/formz/v/stable)](https://packagist.org/packages/romm/formz) [![Total Downloads](https://poser.pugx.org/romm/formz/downloads)](https://packagist.org/packages/romm/formz) [![SensioLabs Insight](https://img.shields.io/sensiolabs/i/9ec58fe3-3e6c-4524-82bd-b6e2a14824a2.svg)](https://insight.sensiolabs.com/projects/9ec58fe3-3e6c-4524-82bd-b6e2a14824a2) [![StyleCI](https://styleci.io/repos/69821260/shield?branch=style-ci)](https://styleci.io/repos/69821260)
 
 > **→ [Formz official website](http://typo3-formz.com/)**
 
-> “Handle forms very easily with provided tools: TypoScript based validation, Fluid helpers, a whole JavaScript API, and more. Use pre-defined layouts for Twitter Bootstrap and Foundation to build good-looking forms in minutes. Need to build a basic form with only two fields? Need to build a huge registration form with dozens of fields? Use Formz, it will fulfill your needs!”
+> “Manage your forms easily with powerful tools: TypoScript based validation, Fluid view helpers, a whole JavaScript API, and more. Use pre-defined layouts for Twitter Bootstrap and Foundation to build nice-looking forms in minutes. Need to build a basic form with only two fields? Need to build a huge registration form with dozens of fields? Use FormZ, it will live up to your expectations!”
 
 > :heavy_exclamation_mark: *This PHP library has been developed for [![TYPO3](Resources/Public/Images/typo3-icon.png)TYPO3 CMS](https://typo3.org) and is intended to TYPO3 extension developers.*
 
@@ -16,19 +16,19 @@
 
 Forms are **common elements in the conception of a website**, as they allow a **direct interaction** between the user and the application. Technically, setting up a form can quickly become **complex** and require a **lot of time**: many aspects must be considered: **style, displaying, validation, security**…
 
-This is why Formz was born: to facilitate the **set up** and the **maintenance** of a form, by providing tools which are **simple and fast to use**, but also **powerful and flexible** to fulfill every need.
+This is why FormZ was born: to facilitate the **set up** and the **maintenance** of a form, by providing tools which are **simple and fast to use**, but also **powerful and flexible** to fulfill every need.
 
-Formz helps with the following topics:
+FormZ helps with the following topics:
 
 - **HTML** – tools are provided for Fluid, to facilitate integration.
 
 - **Validation** – with a TypoScript based configuration, every field's validation rule is easy to set up and maintain.
 
-- **Style** – with its advanced “data attributes” system, Formz can fulfill almost all possible display needs.
+- **Style** – with its advanced “data attributes” system, FormZ can fulfill almost all possible display needs.
 
 - **UX** – a whole JavaScript API is provided to make a user experience as fast and as pleasant as possible.
 
-- **Code generation** – Formz can generate JavaScript and CSS, which are then injected into the page and will automatize a part of the client-sided behaviours.
+- **Code generation** – FormZ can generate JavaScript and CSS, which are then injected into the page and will automatize a part of the client-sided behaviours.
 
 ## Example
 
@@ -40,7 +40,7 @@ Nothing can be more interesting than a little example to understand how it works
 
 **Live example:**
 
-![Formz](Documentation/Images/formz-example.gif)
+![FormZ](Documentation/Images/formz-example.gif)
 
 ---
 
@@ -142,9 +142,9 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="First name" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="First name" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
 
@@ -153,9 +153,9 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="Name" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="Name" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
     </div>
@@ -166,9 +166,9 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="Email" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="Email" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
 
@@ -177,13 +177,13 @@ class ExampleForm implements FormInterface
                 <formz:option name="label" value="Gender" />
                 <formz:option name="required" value="1" />
 
-                <formz:section name="Field">
+                <formz:slot name="Field">
                     <label for="{fieldId}-female">Female</label>
                     <f:form.radio property="{fieldName}" id="{fieldId}-female" value="female" />
 
                     <label for="{fieldId}-male">Male</label>
                     <f:form.radio property="{fieldName}" id="{fieldId}-male" value="male" />
-                </formz:section>
+                </formz:slot>
             </formz:field>
         </div>
     </div>

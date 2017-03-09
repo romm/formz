@@ -1,6 +1,6 @@
 config.tx_formz {
     settings {
-        # Default class name of the backend cache used by Formz.
+        # Default class name of the backend cache used by FormZ.
         defaultBackendCache = TYPO3\CMS\Core\Cache\Backend\FileBackend
 
         # Is only used to check if this TypoScript is included on a page which needs it.

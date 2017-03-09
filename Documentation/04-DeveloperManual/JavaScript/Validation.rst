@@ -49,7 +49,7 @@ Register a validator
              - ``data``: a list of properties which may be used during the validation.
              - ``validatorName``: name of the used validator.
 
-        2. The validator must **in every case** call ``callback();``, because this is the way Formz detects the end of the validation process. **Not calling it may break the entire Formz process.**
+        2. The validator must **in every case** call ``callback();``, because this is the way FormZ detects the end of the validation process. **Not calling it may break the entire FormZ process.**
 
         3. To add an error, you must use the result instance in ``states['result']``, see the example below.
 

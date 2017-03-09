@@ -192,7 +192,7 @@ Formz.Form = (function () {
             /**
              * This function takes care of refreshing the validation for the
              * fields which may have been changed with no detection of the whole
-             * Formz system.
+             * FormZ system.
              *
              * This actually occurs when the user submits a form, then comes
              * back to it with the return functionality of his browser.

@@ -1,8 +1,8 @@
 <?php
 /*
- * 2016 Romain CANON <romain.hydrocanon@gmail.com>
+ * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -39,6 +39,8 @@ class EntryNotFoundException extends FormzException
     const FIELD_VIEW_HELPER_LAYOUT_ITEM_NOT_FOUND = 'The layout "%s" does not have an item "%s".';
 
     const FORM_VIEW_HELPER_CONTROLLER_ACTION_ARGUMENT_MISSING = 'The method `%s::%s()` must have a parameter `$%s`. Note that you can also change the parameter `name` of the form view helper.';
+
+    const SLOT_NOT_FOUND = 'No slot "%s" was found.';
 
     /**
      * @code 1488482191
@@ -247,6 +249,23 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_VIEW_HELPER_CONTROLLER_ACTION_ARGUMENT_MISSING,
             [$controllerObjectName, $actionName, $formName]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1488988452
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function slotNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::SLOT_NOT_FOUND,
+            [$name]
         );
 
         return $exception;
