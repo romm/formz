@@ -13,27 +13,20 @@
 
 namespace Romm\Formz\ViewHelpers\Slot;
 
-use Closure;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
-use Romm\Formz\ViewHelpers\AbstractViewHelper;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractConditionViewHelper;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
 /**
- * This is the rendering function for the `slot` view helper.
+ * Will check if a given slot has been defined.
  *
  * @see \Romm\Formz\ViewHelpers\SlotViewHelper
  */
-class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
+class HasViewHelper extends AbstractConditionViewHelper implements CompilableInterface
 {
-    /**
-     * @var bool
-     */
-    protected $escapeOutput = false;
-
     /**
      * @var FieldViewHelperService
      */
@@ -44,39 +37,34 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function initializeArguments()
     {
-        $this->registerArgument('slot', 'string', 'Instance of the slot which will be rendered.', true);
+        $this->registerArgument('slot', 'string', 'Name of the slot.', true);
     }
 
     /**
      * @inheritdoc
+     *
+     * @throws ContextNotFoundException
      */
-    public function render()
+    protected function callRenderMethod()
     {
         if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::slotRenderViewHelperFieldContextNotFound();
+            throw ContextNotFoundException::slotHasViewHelperFieldContextNotFound();
         }
 
-        return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
+        return parent::callRenderMethod();
     }
 
     /**
-     * Will render the slot with the given name, only if the slot is found.
-     *
-     * @inheritdoc
+     * @param array $arguments
+     * @return bool
      */
-    public static function renderStatic(array $arguments, Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
+    protected static function evaluateCondition($arguments = null)
     {
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
         $slotName = $arguments['slot'];
-        $result = '';
 
-        if ($slotService->hasSlotClosure($slotName)) {
-            $closure = $slotService->getSlotClosure($slotName);
-            $result = $closure();
-        }
-
-        return $result;
+        return $slotService->hasSlotClosure($slotName);
     }
 
     /**

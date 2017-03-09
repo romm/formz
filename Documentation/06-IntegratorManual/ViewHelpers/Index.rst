@@ -32,6 +32,10 @@ Formz provides a set of ViewHelpers to help integration:
 
   Launches the rendering of a slot defined in the template of a field.
 
+- :ref:`formz:slot.has <integratorManual-viewHelpers-slot-has>`
+
+  Adds a condition that is verified if a slot has been defined.
+
 - :ref:`formz:formatMessage <integratorManual-viewHelpers-formatMessage>`
 
   Will format a message returned by the validation of a field.
@@ -49,6 +53,7 @@ Formz provides a set of ViewHelpers to help integration:
     FieldViewHelper
     OptionViewHelper
     SlotViewHelper
-    Slot\RenderViewHelper
+    Slot/RenderViewHelper
+    Slot/HasViewHelper
     FormatMessageViewHelper
     ClassViewHelper
