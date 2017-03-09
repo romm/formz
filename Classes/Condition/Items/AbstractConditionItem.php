@@ -82,6 +82,44 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     protected $conditionNode;
 
     /**
+     * Will launch the condition validation: the child class should implement
+     * the function `checkConditionConfiguration()` and check if the condition
+     * can be considered as valid.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    final public function validateConditionConfiguration()
+    {
+        try {
+            $this->checkConditionConfiguration();
+        } catch (InvalidConditionException $exception) {
+            $rootObject = $this->activation->getRootObject();
+            $conditionName = $this->conditionNode->getConditionName();
+            $formClassName = $this->formObject->getClassName();
+
+            if ($rootObject instanceof Field) {
+                throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+            } elseif ($rootObject instanceof Validation) {
+                throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @see validateConditionConfiguration()
+     *
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    abstract protected function checkConditionConfiguration();
+
+    /**
      * @param FormObject $formObject
      */
     public function attachFormObject(FormObject $formObject)
@@ -130,43 +168,6 @@ JS;
     {
         return static::$javaScriptFiles;
     }
-
-    /**
-     * Will launch the condition validation: the child class should implement
-     * the function `checkConditionConfiguration()` and check if the condition
-     * can be considered as valid.
-     *
-     * If any syntax/configuration error is found, an exception of type
-     * `InvalidConditionException` must be thrown.
-     *
-     * @throws InvalidConditionException
-     * @return bool
-     */
-    final public function validateConditionConfiguration()
-    {
-        try {
-            $this->checkConditionConfiguration();
-        } catch (InvalidConditionException $exception) {
-            $rootObject = $this->activation->getRootObject();
-            $conditionName = $this->conditionNode->getConditionName();
-            $formClassName = $this->formObject->getClassName();
-
-            if ($rootObject instanceof Field) {
-                throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-            } elseif ($rootObject instanceof Validation) {
-                throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @see validateConditionConfiguration()
-     * @throws InvalidConditionException
-     * @return bool
-     */
-    abstract protected function checkConditionConfiguration();
 
     /**
      * @return array
