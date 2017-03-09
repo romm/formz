@@ -19,7 +19,7 @@ abstract class AbstractConditionItemUnitTest extends AbstractUnitTest
 
         $conditionItem->expects($this->once())
             ->method('throwInvalidConditionException')
-            ->willReturnCallback(function ($exception) use($errorCode) {
+            ->willReturnCallback(function ($exception) use ($errorCode) {
                 /** @var InvalidConditionException $exception */
                 $this->assertInstanceOf(InvalidConditionException::class, $exception);
                 $this->assertEquals($errorCode, $exception->getCode());

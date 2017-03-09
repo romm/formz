@@ -131,7 +131,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
     }
 
     /**
-     * The error is not found is the field.
+     * The error is found is the field.
      *
      * @test
      */
