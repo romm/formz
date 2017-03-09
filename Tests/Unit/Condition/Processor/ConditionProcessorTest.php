@@ -194,15 +194,20 @@ class ConditionProcessorTest extends AbstractUnitTest
      */
     protected function getConditionParserProphecy(TokenInterface $activations, ConditionProcessor $conditionProcessor)
     {
-        $prophet = $this->prophet;
-
         /** @var ConditionParserFactory|ObjectProphecy $conditionParserFactoryProphecy */
-        $conditionParserFactoryProphecy = $this->prophet->prophesize(ConditionParserFactory::class);
+        $conditionParserFactoryProphecy = $this->prophesize(ConditionParserFactory::class);
+
+        $getConditionTreeProphecy = function() {
+            /** @var ConditionTree|ObjectProphecy $conditionTreeProphecy */
+            $conditionTreeProphecy = $this->prophesize(ConditionTree::class);
+
+            return $conditionTreeProphecy;
+        };
+
         $conditionParserFactoryProphecy->parse($activations)
             ->shouldBeCalled()
-            ->will(function ($arguments) use ($prophet, $conditionProcessor) {
-                /** @var ConditionTree|ObjectProphecy $conditionTreeProphecy */
-                $conditionTreeProphecy = $prophet->prophesize(ConditionTree::class);
+            ->will(function ($arguments) use ($getConditionTreeProphecy, $conditionProcessor) {
+                $conditionTreeProphecy = $getConditionTreeProphecy();
 
                 $conditionTreeProphecy->injectDependencies($conditionProcessor, $arguments[0])
                     ->shouldBeCalled()

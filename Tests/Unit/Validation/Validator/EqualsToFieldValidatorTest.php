@@ -93,7 +93,7 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
      */
     protected function getForm()
     {
-        $formProphecy = $this->prophet->prophesize(DefaultForm::class);
+        $formProphecy = $this->prophesize(DefaultForm::class);
         $formProphecy->getFoo()
             ->willReturn('bar');
 

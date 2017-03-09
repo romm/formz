@@ -1,7 +1,6 @@
 <?php
 namespace Romm\Formz\Tests\Unit;
 
-use Prophecy\Prophet;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
@@ -34,11 +33,6 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 
 trait FormzUnitTestUtility
 {
-    /**
-     * @var Prophet
-     */
-    protected $prophet;
-
     /**
      * @var EnvironmentService|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -103,8 +97,6 @@ trait FormzUnitTestUtility
         $this->injectTransientMemoryCacheInFormzCore();
         $this->setUpExtensionServiceMock();
         $this->setUpContextService();
-
-        $this->prophet = new Prophet;
     }
 
     /**
@@ -112,10 +104,6 @@ trait FormzUnitTestUtility
      */
     protected function formzTearDown()
     {
-        if ($this->prophet) {
-            $this->prophet->checkPredictions();
-        }
-
         $this->restorePackageManager();
 
         // Reset asset handler factory instances.

@@ -61,7 +61,7 @@ class ConditionProcessorFactoryTest extends AbstractUnitTest
 
         // Creating a prophecy of the cache instance used in the factory.
         /** @var TransientMemoryBackend|ObjectProphecy $transientMemoryProphecy */
-        $transientMemoryProphecy = $this->prophet->prophesize(TransientMemoryBackend::class);
+        $transientMemoryProphecy = $this->prophesize(TransientMemoryBackend::class);
 
         $transientMemoryProphecy->has($cacheIdentifier)
             ->shouldBeCalled()

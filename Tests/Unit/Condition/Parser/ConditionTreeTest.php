@@ -24,7 +24,7 @@ class ConditionTreeTest extends AbstractUnitTest
      */
     public function constructorAddsTreeDependencyToRootNode()
     {
-        $rootNodeProphecy = $this->prophet->prophesize();
+        $rootNodeProphecy = $this->prophesize();
         $rootNodeProphecy->willImplement(NodeInterface::class);
 
         $rootNodeProphecy->setTree(Argument::type(ConditionTree::class))
@@ -74,8 +74,8 @@ class ConditionTreeTest extends AbstractUnitTest
      */
     public function dependenciesAreInjectedInSubNodes()
     {
-        $conditionProcessorProphecy = $this->prophet->prophesize(ConditionProcessor::class);
-        $activationProphecy = $this->prophet->prophesize(Activation::class);
+        $conditionProcessorProphecy = $this->prophesize(ConditionProcessor::class);
+        $activationProphecy = $this->prophesize(Activation::class);
 
         $dependencyNode = $this->getMockBuilder(DependencyAwareNode::class)
             ->setMethods(['injectDependencies'])
