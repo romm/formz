@@ -136,8 +136,9 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      * @param FormInterface $form
      * @param bool          $initialize
      * @return FormResult
+     * @internal
      */
-    final public function validateGhost($form, $initialize = true)
+    public function validateGhost($form, $initialize = true)
     {
         if ($initialize) {
             $this->initializeValidator($form);
