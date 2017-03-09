@@ -16,7 +16,7 @@ It works the same way as the basic ViewHelper, expect that the argument ``name``
 
 .. important::
 
-    You **must use** this ViewHelper when integrating a form using Formz.
+    You **must use** this ViewHelper when integrating a form using FormZ.
 
 Arguments
 ---------

@@ -15,7 +15,7 @@ Configuration TypoScript
 
     You can find a resume of the TypoScript configuration in the chapter “:ref:`cheatSheets-typoScript`”.
 
-Formz TypoScript configuration is written at the path ``config.tx_formz``.
+FormZ TypoScript configuration is written at the path ``config.tx_formz``.
 
 You can find below the list of usable parameters:
 

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -46,7 +46,7 @@ class TypoScriptService implements SingletonInterface
 
     /**
      * Returns the TypoScript configuration at the given path (starting from
-     * Formz configuration root).
+     * FormZ configuration root).
      *
      * @param string $path
      * @return mixed
@@ -76,7 +76,7 @@ class TypoScriptService implements SingletonInterface
     }
 
     /**
-     * Returns the full Formz TypoScript configuration, but without the `forms`
+     * Returns the full FormZ TypoScript configuration, but without the `forms`
      * key.
      *
      * @return array

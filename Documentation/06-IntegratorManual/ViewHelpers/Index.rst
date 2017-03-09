@@ -10,11 +10,11 @@
 ViewHelpers
 ===========
 
-Formz provides a set of ViewHelpers to help integration:
+FormZ provides a set of ViewHelpers to help integration:
 
 - :ref:`formz:form <integratorManual-viewHelpers-form>`
 
-  Will initialize Formz. It replaces the ViewHelper ``form`` provided by Extbase, and must absolutely be used.
+  Will initialize FormZ. It replaces the ViewHelper ``form`` provided by Extbase, and must absolutely be used.
 
 - :ref:`formz:field <integratorManual-viewHelpers-field>`
 

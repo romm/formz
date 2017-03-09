@@ -44,7 +44,7 @@ Formz.Debug = (function () {
                         break;
                 }
 
-                console.log('%c[Formz - ' + type + '] %c' + value, color, 'color: black;');
+                console.log('%c[FormZ - ' + type + '] %c' + value, color, 'color: black;');
             }
         }
     };

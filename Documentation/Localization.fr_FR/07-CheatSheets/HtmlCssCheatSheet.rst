@@ -13,7 +13,7 @@ Anti-sèche HTML/CSS
 Auto-complétion PhpStorm
 ------------------------
 
-Formz propose un schéma permettant aux IDE comme PhpStorm de fournir une auto-complétion des ViewHelper dans les templates Fluid.
+FormZ propose un schéma permettant aux IDE comme PhpStorm de fournir une auto-complétion des ViewHelper dans les templates Fluid.
 
 Vous pouvez retrouver un guide sur l'implémentation des XSD dans les IDE ici : https://github.com/FluidTYPO3/schemaker/blob/development/README.md#how-to-use-xsd-in-ide
 

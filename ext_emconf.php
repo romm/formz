@@ -1,10 +1,10 @@
 <?php
 /** @noinspection PhpUndefinedVariableInspection */
 $EM_CONF[$_EXTKEY] = [
-    'title'       => 'Formz : Handler for forms',
+    'title'       => 'FormZ • Modern form handler',
     'version'     => '0.4.1',
     'state'       => 'beta',
-    'description' => 'Handle forms very easily with provided tools: TypoScript based validation, Fluid helpers, a whole JavaScript API, and more. Use pre-defined layouts for Twitter Bootstrap and Foundation to build good-looking forms in minutes. Need to build a basic form with only two fields? Need to build a huge registration form with dozens of fields? Use Formz, it will fulfill your needs!',
+    'description' => 'Manage your forms easily with powerful tools: TypoScript based validation, Fluid view helpers, a whole JavaScript API, and more. Use pre-defined layouts for Twitter Bootstrap and Foundation to build nice-looking forms in minutes. Need to build a basic form with only two fields? Need to build a huge registration form with dozens of fields? Use FormZ, it will live up to your expectations!',
 
     'author'       => 'Romain Canon',
     'author_email' => 'romain.hydrocanon@gmail.com',

@@ -27,7 +27,7 @@ Mais enfin, et surtout, la **maintenabilité devient plus compliquée**. En effe
 Solution
 ^^^^^^^^
 
-Pour répondre à cette problématique, Formz permet de **mutualiser les gabarits de champs dans des vues indépendantes**. Le code requis pour intégrer un champ est ainsi **beaucoup moins dense et plus compréhensible, mais également plus facilement maintenable** : lorsqu'une modification est effectuée dans le gabarit d'un champ, elle sera répercutée automatiquement sur tous les champs.
+Pour répondre à cette problématique, FormZ permet de **mutualiser les gabarits de champs dans des vues indépendantes**. Le code requis pour intégrer un champ est ainsi **beaucoup moins dense et plus compréhensible, mais également plus facilement maintenable** : lorsqu'une modification est effectuée dans le gabarit d'un champ, elle sera répercutée automatiquement sur tous les champs.
 
 -----
 
@@ -44,7 +44,7 @@ Vous serez ensuite en mesure d'utiliser votre nouveau layout avec n'importe quel
 Configuration TypoScript
 """"""""""""""""""""""""
 
-La configuration TypoScript de votre layout devra faire partie d'un **groupe de layout**. Formz propose par défaut le groupe ``default``.
+La configuration TypoScript de votre layout devra faire partie d'un **groupe de layout**. FormZ propose par défaut le groupe ``default``.
 
 .. tip::
 
@@ -85,7 +85,7 @@ Les variables suivantes sont utilisables directement dans votre template :
 
 .. important::
 
-    Afin d'être entièrement fonctionnel avec Formz, votre template devra respecter toutes les règles décrites dans le chapitre « :ref:`integratorManual-configuration` ».
+    Afin d'être entièrement fonctionnel avec FormZ, votre template devra respecter toutes les règles décrites dans le chapitre « :ref:`integratorManual-configuration` ».
 
 **Exemple :**
 

@@ -126,7 +126,7 @@ Rajouter une condition d'activation
 
         .. note::
 
-            Cette fonction est appelée par le cœur de Formz, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de champs <fieldsActivation-expression>`.
+            Cette fonction est appelée par le cœur de FormZ, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de champs <fieldsActivation-expression>`.
 
 .. _developerManual-javaScript-field-addActivationConditionForValidator:
 
@@ -178,7 +178,7 @@ Rajouter une condition d'activation pour une règle de validation
 
         .. note::
 
-            Cette fonction est appelée par le cœur de Formz, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de règles de validation <validatorsActivation>`.
+            Cette fonction est appelée par le cœur de FormZ, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de règles de validation <validatorsActivation>`.
 
 -----
 

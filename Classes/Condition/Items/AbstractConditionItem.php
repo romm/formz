@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -106,7 +106,7 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     }
 
     /**
-     * Returns a generic JavaScript code which uses Formz API to validate a
+     * Returns a generic JavaScript code which uses FormZ API to validate a
      * condition which was registered in a single JavaScript file (which is
      * filled in the `$javaScriptFiles` attribute of the PHP condition class).
      *

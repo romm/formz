@@ -10,7 +10,7 @@
 API — JavaScript
 =================
 
-To allow JavaScript more advanced behaviours than those available by default with Formz, you can use this API.
+To allow JavaScript more advanced behaviours than those available by default with FormZ, you can use this API.
 
 To fetch a form, you have to use a code similar to this one:
 

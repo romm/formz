@@ -59,7 +59,7 @@ Condition type
 Activation condition list
 -------------------------
 
-You can find below the list of all activation condition available in Formz core.
+You can find below the list of all activation condition available in FormZ core.
 
 They can be used by fields (see “:ref:`Activation conditions <fieldsActivation-conditions>`”) and validators (see “:ref:`Validator activation <validatorsActivation>`”).
 

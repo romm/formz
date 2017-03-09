@@ -6,7 +6,7 @@ if (!defined('TYPO3_MODE')) {
 /** @noinspection PhpUndefinedVariableInspection */
 call_user_func(
     function ($extensionKey) {
-        // Registering the default Formz conditions.
+        // Registering the default FormZ conditions.
         \Romm\Formz\Condition\ConditionFactory::get()->registerDefaultConditions();
 
         // Registering the cache.

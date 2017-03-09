@@ -203,7 +203,7 @@ Validateurs
 * Peut définir des messages qui pourront être surchargés en TypoScript grâce à la propriété :php:`$supportedMessages` (cf. ligne 25) ;
 * Contient également toutes les fonctionnalités des validateurs « classiques » d'Extbase, comme la propriété :php:`$supportedOptions` (cf. ligne 17).
 
-**Exemple (tiré du cœur de Formz) :**
+**Exemple (tiré du cœur de FormZ) :**
 
 .. code-block:: php
     :linenos:
@@ -298,7 +298,7 @@ Rediriger une action si l'argument est manquant
 
 Avec Extbase, il est parfois possible qu'un utilisateur essaie d'accéder à une action de soumission de formulaire, sans pour autant avoir soumis le formulaire. Par exemple, il soumet le formulaire, puis rentre l'URL obtenue dans un nouvel onglet : Extbase croira que l'utilisateur a soumis un formulaire, pour autant ce dernier n'existe pas. En temps normal, cela renvoie une erreur fatale.
 
-Formz met à disposition la fonction :php:`onRequiredArgumentIsMissing`, qui permet de vérifier qu'un argument requis est manquant, et de lancer certaines actions si c'est le cas.
+FormZ met à disposition la fonction :php:`onRequiredArgumentIsMissing`, qui permet de vérifier qu'un argument requis est manquant, et de lancer certaines actions si c'est le cas.
 
 **Exemple :**
 

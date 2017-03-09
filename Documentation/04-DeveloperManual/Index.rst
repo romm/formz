@@ -12,7 +12,7 @@ Developer manual
 
 .. only:: html
 
-    If a form requires advanced features, you may have to override existing behaviours of Formz: server-side with “:ref:`PHP <developerManual-php>`” and client-side with “:ref:`JavaScript <developerManual-javaScript>`”.
+    If a form requires advanced features, you may have to override existing behaviours of FormZ: server-side with “:ref:`PHP <developerManual-php>`” and client-side with “:ref:`JavaScript <developerManual-javaScript>`”.
 
 .. toctree::
     :maxdepth: 5

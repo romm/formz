@@ -85,7 +85,7 @@ Activation conditions
 
         .. note::
 
-            Several condition types are available with Formz core, see chapter “:ref:`usersManual-typoScript-configurationActivation`”.
+            Several condition types are available with FormZ core, see chapter “:ref:`usersManual-typoScript-configurationActivation`”.
 
 .. _formDefaultClass:
 

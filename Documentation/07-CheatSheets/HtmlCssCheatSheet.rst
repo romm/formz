@@ -13,7 +13,7 @@ HTML/CSS cheat-sheet
 PhpStorm auto-completion
 ------------------------
 
-Formz provides a schema allowing IDEs like PhpStorm to give auto-completion for its ViewHelpers in Fluid templates.
+FormZ provides a schema allowing IDEs like PhpStorm to give auto-completion for its ViewHelpers in Fluid templates.
 
 You can find a guide on integrating XSD files in your IDE here: https://github.com/FluidTYPO3/schemaker/blob/development/README.md#how-to-use-xsd-in-ide
 

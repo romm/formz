@@ -21,7 +21,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      * @dataProvider renderViewHelperDataProvider
      *
      * @param string                 $expects   The expected result returned by the view helper.
-     * @param array                  $classes   Array of classes which will be injected in the Formz configuration object.
+     * @param array                  $classes   Array of classes which will be injected in the FormZ configuration object.
      * @param array                  $arguments Arguments sent to the view helper.
      * @param FormViewHelperService  $formService
      * @param FieldViewHelperService $fieldService
@@ -74,7 +74,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
         return [
             /*
              * Basic configuration: everything is configured correctly, but
-             * no actual class is returned: only the one that is used by Formz
+             * no actual class is returned: only the one that is used by FormZ
              * JavaScript API.
              */
             [

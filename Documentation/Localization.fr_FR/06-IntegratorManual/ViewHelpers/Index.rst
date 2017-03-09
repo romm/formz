@@ -10,11 +10,11 @@
 ViewHelpers
 ===========
 
-Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
+FormZ propose une panoplie de ViewHelpers pour faciliter l'intégration :
 
 - :ref:`formz:form <integratorManual-viewHelpers-form>`
 
-  Permet d'initialiser Formz. Il remplace le ViewHelper ``form`` fournit par Extbase, et devra impérativement être utilisé.
+  Permet d'initialiser FormZ. Il remplace le ViewHelper ``form`` fournit par Extbase, et devra impérativement être utilisé.
 
 - :ref:`formz:field <integratorManual-viewHelpers-field>`
 

@@ -34,7 +34,7 @@ Forms list
     Required?
         No
     Description
-        Contains the list of forms using Formz.
+        Contains the list of forms using FormZ.
 
         More information here: “:ref:`usersManual-typoScript-configurationForms`”.
 
@@ -51,7 +51,7 @@ Type of cache
     Required?
         Yes
     Description
-        Contains the type of cache used by Formz.
+        Contains the type of cache used by FormZ.
 
 
         The default value is :php:`TYPO3\CMS\Core\Cache\Backend\FileBackend`.

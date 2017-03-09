@@ -18,7 +18,7 @@ Référez-vous à l'exemple plus bas pour comprendre plus facilement le fonction
 
 .. note::
 
-    Le comportement est géré à la fois en PHP et en JavaScript. Vous n'avez qu'à utiliser ce ViewHelper, Formz se charge du reste.
+    Le comportement est géré à la fois en PHP et en JavaScript. Vous n'avez qu'à utiliser ce ViewHelper, FormZ se charge du reste.
 
 Arguments
 ---------

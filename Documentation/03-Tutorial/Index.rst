@@ -69,7 +69,7 @@ Your controller will generally contain at least two actions:
 
 .. note::
 
-    To enable validation for the form, the annotation ``@validate`` must be used in the function DocBlock. It is a feature provided by Extbase, and used by Formz to ease the form validation.
+    To enable validation for the form, the annotation ``@validate`` must be used in the function DocBlock. It is a feature provided by Extbase, and used by FormZ to ease the form validation.
 
     You can find an example below:
 

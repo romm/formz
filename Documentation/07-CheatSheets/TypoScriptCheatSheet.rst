@@ -49,7 +49,7 @@ You can find details of the properties at the chapter “:ref:`usersManual-typoS
             }
         }
 
-        # Here is the list of forms using Formz.
+        # Here is the list of forms using FormZ.
         forms {
             # The key is the name of the PHP class of the form model.
             \Vendor\Extension\Form\MyForm {

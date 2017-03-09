@@ -12,12 +12,12 @@ Configuration
 
 Pour que CSS et JavaScript soient capables de retrouver certains éléments dans le DOM HTML, il est primordial de respecter certaines règles d'intégration.
 
-Veillez à bien les respecter lors de la :ref:`création de nouveaux layouts <integratorManual-layouts>`, ou Formz pourrait être victime de gros dysfonctionnements.
+Veillez à bien les respecter lors de la :ref:`création de nouveaux layouts <integratorManual-layouts>`, ou FormZ pourrait être victime de gros dysfonctionnements.
 
 Conteneur d'un champ
 --------------------
 
-Un champ devra toujours avoir un **conteneur**, qui notamment utilisé par Formz pour **afficher ou masquer le bloc** entier selon certaines conditions.
+Un champ devra toujours avoir un **conteneur**, qui notamment utilisé par FormZ pour **afficher ou masquer le bloc** entier selon certaines conditions.
 
 .. code-block:: html
     :linenos:
@@ -29,7 +29,7 @@ Un champ devra toujours avoir un **conteneur**, qui notamment utilisé par Formz
         <f:form.textfield property="email" id="email" />
     </div>
 
-Dans cet exemple, le premier élément ``<div>`` est considéré par Formz comme le conteneur du champ ``email``.
+Dans cet exemple, le premier élément ``<div>`` est considéré par FormZ comme le conteneur du champ ``email``.
 
 Par défaut, l'attribut à utiliser est ``formz-field-container``, qui doit contenir le nom du champ. Il est possible de personnaliser l'attribut utilisé, cf. « :ref:`Sélecteur du conteneur du champ<fieldsSettings-fieldContainerSelector>` ».
 
@@ -38,7 +38,7 @@ Par défaut, l'attribut à utiliser est ``formz-field-container``, qui doit cont
 Conteneur des messages
 ----------------------
 
-De la même manière que le conteneur de champ doit être indiqué, le conteneur de messages pour ce champ doit également être défini. Ainsi, Formz pourra afficher ou masquer cet élément selon la présence de messages (principalement des erreurs) ou non.
+De la même manière que le conteneur de champ doit être indiqué, le conteneur de messages pour ce champ doit également être défini. Ainsi, FormZ pourra afficher ou masquer cet élément selon la présence de messages (principalement des erreurs) ou non.
 
 Ce conteneur est divisé en deux parties : un conteneur global, et un conteneur pour la liste des messages. Par exemple :
 
