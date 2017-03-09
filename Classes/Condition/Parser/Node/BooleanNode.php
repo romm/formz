@@ -15,6 +15,7 @@ namespace Romm\Formz\Condition\Parser\Node;
 
 use Romm\Formz\Condition\Parser\ConditionParser;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Exceptions\InvalidConfigurationException;
 
 /**
  * A boolean node, which contains two sides and an operator.
@@ -127,7 +128,7 @@ class BooleanNode extends AbstractNode
                 $result = call_user_func($logicalOrFunction);
                 break;
             default:
-                throw new \Exception('The boolean node has a wrong operator: "' . $this->operator . '".', 1458150438);
+                throw InvalidConfigurationException::wrongBooleanNodeOperator($this->operator);
         }
 
         return $result;

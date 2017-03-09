@@ -19,6 +19,8 @@ class InvalidConfigurationException extends FormzException
 
     const AJAX_VALIDATION_NOT_ACTIVATED = 'The validation "%s" of the field "%s" is not configured to work with Ajax. Please add the option `useAjax`.';
 
+    const WRONG_BOOLEAN_NODE_OPERATOR = 'The boolean node has a wrong operator: "%s".';
+
     /**
      * @code 1487671395
      *
@@ -45,6 +47,23 @@ class InvalidConfigurationException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::AJAX_VALIDATION_NOT_ACTIVATED,
             [$validationName, $fieldName]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1458150438
+     *
+     * @param string $operator
+     * @return InvalidConfigurationException
+     */
+    final public static function wrongBooleanNodeOperator($operator)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_BOOLEAN_NODE_OPERATOR,
+            [$operator]
         );
 
         return $exception;
