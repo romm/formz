@@ -233,17 +233,6 @@ class AjaxValidationController extends ActionController
     }
 
     /**
-     * @return FormObject
-     */
-    protected function getFormObject()
-    {
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-
-        return $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
-    }
-
-    /**
      * @throws InvalidConfigurationException
      */
     protected function checkConfigurationValidationResult()
@@ -382,6 +371,17 @@ class AjaxValidationController extends ActionController
         unset($values['__trustedProperties']);
 
         return reset($values);
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getFormObject()
+    {
+        /** @var FormObjectFactory $formObjectFactory */
+        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
+
+        return $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
     }
 
     /**
