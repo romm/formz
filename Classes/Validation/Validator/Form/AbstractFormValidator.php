@@ -82,16 +82,28 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected $result;
 
     /**
+     * @var FormInterface
+     */
+    protected $form;
+
+    /**
      * @var FormValidatorExecutor
      */
-    protected $formValidatorExecutor;
+    private $formValidatorExecutor;
 
-    protected function initializeValidator($form)
+    /**
+     * Initializes all class variables.
+     *
+     * @param FormInterface $form
+     * @throws InvalidArgumentTypeException
+     */
+    private function initializeValidator($form)
     {
         if (false === $form instanceof FormInterface) {
             throw InvalidArgumentTypeException::validatingWrongFormType(get_class($form));
         }
 
+        $this->form = $form;
         $this->result = new FormResult;
         $this->formValidatorExecutor = $this->getFormValidatorExecutor($form);
     }
@@ -125,7 +137,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      * @param bool          $initialize
      * @return FormResult
      */
-    public function validateGhost($form, $initialize = true)
+    final public function validateGhost($form, $initialize = true)
     {
         if ($initialize) {
             $this->initializeValidator($form);
@@ -161,14 +173,16 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     }
 
     /**
-     * Use this function to (de)activate the validation for some given fields.
+     * Override this function in your child class to handle some pre-validation
+     * process.
      */
     protected function beforeValidationProcess()
     {
     }
 
     /**
-     * Use this function to run your own processes after the validation ran.
+     * Override this function in your child class to handle some post-validation
+     * process.
      */
     protected function afterValidationProcess()
     {
