@@ -192,6 +192,7 @@ class AjaxValidationController extends ActionController
         $this->checkConfigurationValidationResult();
         $validation = $this->getFieldValidation();
         $form = $this->buildFormObject();
+        $this->formObject->setForm($form);
         $fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
         $validatorDataObject = new ValidatorDataObject($this->formObject, $validation);
 
