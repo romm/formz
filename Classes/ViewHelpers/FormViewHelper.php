@@ -263,19 +263,24 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected function applyBehavioursOnSubmittedForm()
     {
         if ($this->formObject->formWasSubmitted()) {
-            /** @var BehavioursManager $behavioursManager */
-            $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
+            $request = $this->controllerContext->getRequest()->getOriginalRequest();
 
-            $originalRequest = $this->controllerContext->getRequest()->getOriginalRequest();
-            /** @var array $originalForm */
-            $originalForm = $originalRequest->getArgument($this->getFormObjectName());
+            if ($request
+                && $request->hasArgument($this->getFormObjectName())
+            ) {
+                /** @var BehavioursManager $behavioursManager */
+                $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
 
-            $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
-                $originalForm,
-                $this->formObject->getConfiguration()
-            );
+                /** @var array $originalForm */
+                $originalForm = $request->getArgument($this->getFormObjectName());
 
-            $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
+                $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
+                    $originalForm,
+                    $this->formObject->getConfiguration()
+                );
+
+                $request->setArgument($this->getFormObjectName(), $formProperties);
+            }
         }
     }
 
