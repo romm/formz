@@ -45,7 +45,7 @@ class FieldIsEmptyCondition extends AbstractConditionItem
      */
     public function getCssResult()
     {
-        return '[' . DataAttributesAssetHandler::getFieldDataValidKey($this->fieldName) . '=""]';
+        return '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '=""]';
     }
 
     /**
@@ -80,13 +80,5 @@ class FieldIsEmptyCondition extends AbstractConditionItem
         }
 
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
     }
 }

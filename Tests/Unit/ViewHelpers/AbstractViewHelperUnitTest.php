@@ -24,5 +24,7 @@ abstract class AbstractViewHelperUnitTest extends ViewHelperBaseTestcase
     public function tearDown()
     {
         $this->formzTearDown();
+
+        parent::tearDown();
     }
 }

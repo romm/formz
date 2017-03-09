@@ -47,10 +47,26 @@ class PhpConditionDataObject
     }
 
     /**
+     * @param FormInterface $form
+     */
+    public function setForm(FormInterface $form)
+    {
+        $this->form = $form;
+    }
+
+    /**
      * @return FormValidatorExecutor
      */
     public function getFormValidator()
     {
         return $this->formValidator;
+    }
+
+    /**
+     * @param FormValidatorExecutor $formValidator
+     */
+    public function setFormValidator(FormValidatorExecutor $formValidator)
+    {
+        $this->formValidator = $formValidator;
     }
 }

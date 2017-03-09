@@ -61,9 +61,7 @@ class FieldIsValidCondition extends AbstractConditionItem
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
         $formValidator = $dataObject->getFormValidator();
-        $field = $this->formObject
-            ->getConfiguration()
-            ->getField($this->fieldName);
+        $field = $this->formObject->getConfiguration()->getField($this->fieldName);
         $formValidator->validateField($field);
         $result = $formValidator->getResult();
 
@@ -85,24 +83,5 @@ class FieldIsValidCondition extends AbstractConditionItem
         }
 
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @param string $fieldName
-     * @return $this
-     */
-    public function setFieldName($fieldName)
-    {
-        $this->fieldName = $fieldName;
-
-        return $this;
     }
 }

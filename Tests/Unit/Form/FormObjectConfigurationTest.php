@@ -72,7 +72,7 @@ class FormObjectConfigurationTest extends AbstractUnitTest
             ->method('buildConfigurationObject')
             ->willReturn($configurationObjectInstance);
 
-        $cacheProphecy = $this->prophet->prophesize(FrontendInterface::class);
+        $cacheProphecy = $this->prophesize(FrontendInterface::class);
 
         $cacheProphecy->has(Argument::cetera())
             ->shouldBeCalled()

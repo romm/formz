@@ -1,8 +1,6 @@
 <?php
 namespace Romm\Formz\Tests\Unit;
 
-use Prophecy\Prophet;
-use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
@@ -35,11 +33,6 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
 
 trait FormzUnitTestUtility
 {
-    /**
-     * @var Prophet
-     */
-    protected $prophet;
-
     /**
      * @var EnvironmentService|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -104,8 +97,6 @@ trait FormzUnitTestUtility
         $this->injectTransientMemoryCacheInFormzCore();
         $this->setUpExtensionServiceMock();
         $this->setUpContextService();
-
-        $this->prophet = new Prophet;
     }
 
     /**
@@ -113,10 +104,6 @@ trait FormzUnitTestUtility
      */
     protected function formzTearDown()
     {
-        if ($this->prophet) {
-            $this->prophet->checkPredictions();
-        }
-
         $this->restorePackageManager();
 
         // Reset asset handler factory instances.
@@ -183,10 +170,10 @@ trait FormzUnitTestUtility
         $configurationObjectInstance = new ConfigurationObjectInstance($formConfiguration, new Result);
         $configurationObjectInstance->setValidationResult(new Result);
 
-        $formzConfigurationArray = ArrayUtility::getValueByPath($this->formzConfiguration, 'config/tx_formz');
-        $formzConfigurationObject = ConfigurationObjectFactory::getInstance()->get(Configuration::class, $formzConfigurationArray);
-        /** @var Configuration $formzConfiguration */
-        $formzConfiguration = $formzConfigurationObject->getObject(true);
+        $formzConfiguration = new Configuration();
+
+        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setFeedbackContainerSelector('[formz-field-feedback-container="#FIELD#"]');
+        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setFieldContainerSelector('[formz-field-container="#FIELD#"]');
 
         $errors = new ViewClass;
         $errors->addItem('foo', 'foo');

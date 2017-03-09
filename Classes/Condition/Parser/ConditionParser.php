@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Condition\Parser;
 
+use Romm\Formz\Condition\Exceptions\ConditionParserException;
 use Romm\Formz\Condition\Parser\Node\BooleanNode;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
@@ -27,7 +28,7 @@ use TYPO3\CMS\Extbase\Error\Result;
 
 /**
  * A parser capable of parsing a validation condition string from a field
- * configuration, by creating a tree containing nodes which represents the
+ * configuration, by creating a tree containing nodes that represent the
  * logical operations.
  *
  * Calling the function `parse()` will return an instance of `ConditionTree`
@@ -52,20 +53,26 @@ class ConditionParser implements SingletonInterface
     const LOGICAL_AND = '&&';
     const LOGICAL_OR = '||';
 
+    const ERROR_CODE_INVALID_CLOSING_PARENTHESIS = 1457969163;
+    const ERROR_CODE_CLOSING_PARENTHESIS_NOT_FOUND = 1457544856;
+    const ERROR_CODE_CONDITION_NOT_FOUND = 1457628378;
+    const ERROR_CODE_LOGICAL_OPERATOR_PRECEDED = 1457544986;
+    const ERROR_CODE_LOGICAL_OPERATOR_FOLLOWED = 1457545071;
+
     /**
      * @var Result
      */
-    private $result;
+    protected $result;
 
     /**
      * @var ActivationInterface
      */
-    private $condition;
+    protected $condition;
 
     /**
      * @var ConditionParserScope
      */
-    private $scope;
+    protected $scope;
 
     /**
      * See class documentation.
@@ -75,11 +82,17 @@ class ConditionParser implements SingletonInterface
      */
     public function parse(ActivationInterface $condition)
     {
+        $rootNode = null;
         $this->resetParser($condition);
 
-        $rootNode = ($condition instanceof EmptyActivation)
-            ? null
-            : $this->getNodeRecursive();
+        if (false === $condition instanceof EmptyActivation) {
+            try {
+                $rootNode = $this->getNodeRecursive();
+            } catch (ConditionParserException $exception) {
+                $error = new Error($exception->getMessage(), $exception->getCode());
+                $this->result->addError($error);
+            }
+        }
 
         $rootNode = $rootNode ?: NullNode::get();
 
@@ -92,7 +105,7 @@ class ConditionParser implements SingletonInterface
     /**
      * @param ActivationInterface $condition
      */
-    private function resetParser(ActivationInterface $condition)
+    protected function resetParser(ActivationInterface $condition)
     {
         $this->condition = $condition;
         $this->result = GeneralUtility::makeInstance(Result::class);
@@ -106,13 +119,9 @@ class ConditionParser implements SingletonInterface
      *
      * @return NodeInterface|null
      */
-    private function getNodeRecursive()
+    protected function getNodeRecursive()
     {
         while (false === empty($this->scope->getExpression())) {
-            if ($this->result->hasErrors()) {
-                break;
-            }
-
             $currentExpression = $this->scope->getExpression();
             $this->processToken($currentExpression[0]);
             $this->processLogicalAndNode();
@@ -132,7 +141,7 @@ class ConditionParser implements SingletonInterface
      * @param string $token
      * @return $this
      */
-    private function processToken($token)
+    protected function processToken($token)
     {
         switch ($token) {
             case ')':
@@ -161,7 +170,7 @@ class ConditionParser implements SingletonInterface
      * will be processed in a new scope, then the result is stored and the
      * process can keep up.
      */
-    private function processTokenOpeningParenthesis()
+    protected function processTokenOpeningParenthesis()
     {
         $groupNode = $this->getGroupNode($this->scope->getExpression());
 
@@ -184,9 +193,9 @@ class ConditionParser implements SingletonInterface
      * This function should not be called, because the closing parenthesis
      * should always be handled by the opening parenthesis token handler.
      */
-    private function processTokenClosingParenthesis()
+    protected function processTokenClosingParenthesis()
     {
-        $this->addError('Parenthesis closes invalid group.', 1457969163);
+        $this->addError('Parenthesis closes invalid group.', self::ERROR_CODE_INVALID_CLOSING_PARENTHESIS);
     }
 
     /**
@@ -196,10 +205,10 @@ class ConditionParser implements SingletonInterface
      *
      * @param string $operator
      */
-    private function processTokenLogicalOperator($operator)
+    protected function processTokenLogicalOperator($operator)
     {
         if (null === $this->scope->getNode()) {
-            $this->addError('Logical operator must be preceded by a valid operation.', 1457544986);
+            $this->addError('Logical operator must be preceded by a valid operation.', self::ERROR_CODE_LOGICAL_OPERATOR_PRECEDED);
         } else {
             if (self::LOGICAL_OR === $operator) {
                 if (null !== $this->scope->getLastOrNode()) {
@@ -231,10 +240,10 @@ class ConditionParser implements SingletonInterface
      *
      * @param string $condition
      */
-    private function processTokenCondition($condition)
+    protected function processTokenCondition($condition)
     {
         if (false === $this->condition->hasCondition($condition)) {
-            $this->addError('The condition "' . $condition . '" does not exist.', 1457628378);
+            $this->addError('The condition "' . $condition . '" does not exist.', self::ERROR_CODE_CONDITION_NOT_FOUND);
         } else {
             $node = new ConditionNode($condition, $this->condition->getCondition($condition));
             $this->scope
@@ -249,7 +258,7 @@ class ConditionParser implements SingletonInterface
      *
      * @return $this
      */
-    private function processLogicalAndNode()
+    protected function processLogicalAndNode()
     {
         if (null !== $this->scope->getCurrentLeftNode()
             && null !== $this->scope->getNode()
@@ -270,10 +279,10 @@ class ConditionParser implements SingletonInterface
      *
      * @return $this
      */
-    private function processLastLogicalOperatorNode()
+    protected function processLastLogicalOperatorNode()
     {
         if (null !== $this->scope->getCurrentLeftNode()) {
-            $this->addError('Logical operator must be followed by a valid operation.', 1457545071);
+            $this->addError('Logical operator must be followed by a valid operation.', self::ERROR_CODE_LOGICAL_OPERATOR_FOLLOWED);
         } elseif (null !== $this->scope->getLastOrNode()) {
             $node = new BooleanNode($this->scope->getLastOrNode(), $this->scope->getNode(), self::LOGICAL_OR);
             $this->scope->setNode($node);
@@ -293,17 +302,13 @@ class ConditionParser implements SingletonInterface
      * @param array $expression
      * @return array
      */
-    private function getGroupNode(array $expression)
+    protected function getGroupNode(array $expression)
     {
         $index = $this->getGroupNodeClosingIndex($expression);
         $finalSplitCondition = [];
 
-        if (-1 === $index) {
-            $this->addError('Parenthesis not correctly closed.', 1457544856);
-        } else {
-            for ($i = 1; $i < $index; $i++) {
-                $finalSplitCondition[] = $expression[$i];
-            }
+        for ($i = 1; $i < $index; $i++) {
+            $finalSplitCondition[] = $expression[$i];
         }
 
         return $finalSplitCondition;
@@ -316,7 +321,7 @@ class ConditionParser implements SingletonInterface
      * @param array $expression
      * @return int
      */
-    private function getGroupNodeClosingIndex(array $expression)
+    protected function getGroupNodeClosingIndex(array $expression)
     {
         $parenthesis = 1;
         $index = 0;
@@ -324,8 +329,7 @@ class ConditionParser implements SingletonInterface
         while ($parenthesis > 0) {
             $index++;
             if ($index > count($expression)) {
-                $index = -1;
-                break;
+                $this->addError('Parenthesis not correctly closed.', self::ERROR_CODE_CLOSING_PARENTHESIS_NOT_FOUND);
             }
 
             if ('(' === $expression[$index]) {
@@ -345,7 +349,7 @@ class ConditionParser implements SingletonInterface
      * @param string $condition
      * @return array
      */
-    private function splitConditionExpression($condition)
+    protected function splitConditionExpression($condition)
     {
         preg_match_all('/(\w+|\(|\)|\&\&|\|\|)/', trim($condition), $result);
 
@@ -355,7 +359,7 @@ class ConditionParser implements SingletonInterface
     /**
      * @return ConditionParserScope
      */
-    private function getNewScope()
+    protected function getNewScope()
     {
         return new ConditionParserScope;
     }
@@ -363,10 +367,10 @@ class ConditionParser implements SingletonInterface
     /**
      * @param string $message
      * @param int    $code
+     * @throws ConditionParserException
      */
-    private function addError($message, $code)
+    protected function addError($message, $code)
     {
-        $error = new Error($message, $code);
-        $this->result->addError($error);
+        throw new ConditionParserException($message, $code);
     }
 }

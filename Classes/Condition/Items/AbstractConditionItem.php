@@ -82,28 +82,34 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     protected $conditionNode;
 
     /**
-     * @param FormObject $formObject
+     * Will launch the condition validation: the child class should implement
+     * the function `checkConditionConfiguration()` and check if the condition
+     * can be considered as valid.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
+     * @throws InvalidConditionException
+     * @return bool
      */
-    public function attachFormObject(FormObject $formObject)
+    final public function validateConditionConfiguration()
     {
-        $this->formObject = $formObject;
+        try {
+            $this->checkConditionConfiguration();
+        } catch (InvalidConditionException $exception) {
+            $this->throwInvalidConditionException($exception);
+        }
+
+        return true;
     }
 
     /**
-     * @param ActivationInterface $activation
+     * @see validateConditionConfiguration()
+     *
+     * @throws InvalidConditionException
+     * @return bool
      */
-    public function attachActivation(ActivationInterface $activation)
-    {
-        $this->activation = $activation;
-    }
-
-    /**
-     * @param ConditionNode $conditionNode
-     */
-    public function attachConditionNode(ConditionNode $conditionNode)
-    {
-        $this->conditionNode = $conditionNode;
-    }
+    abstract protected function checkConditionConfiguration();
 
     /**
      * Returns a generic JavaScript code which uses FormZ API to validate a
@@ -132,42 +138,45 @@ JS;
     }
 
     /**
-     * Will launch the condition validation: the child class should implement
-     * the function `checkConditionConfiguration()` and check if the condition
-     * can be considered as valid.
-     *
-     * If any syntax/configuration error is found, an exception of type
-     * `InvalidConditionException` must be thrown.
-     *
+     * @param InvalidConditionException $exception
      * @throws InvalidConditionException
-     * @return bool
      */
-    final public function validateConditionConfiguration()
+    protected function throwInvalidConditionException(InvalidConditionException $exception)
     {
-        try {
-            $this->checkConditionConfiguration();
-        } catch (InvalidConditionException $exception) {
-            /** @var Field|Validation $rootObject */
-            $rootObject = $this->activation->getRootObject();
-            $conditionName = $this->conditionNode->getConditionName();
-            $formClassName = $this->formObject->getClassName();
+        $rootObject = $this->activation->getRootObject();
+        $conditionName = $this->conditionNode->getConditionName();
+        $formClassName = $this->formObject->getClassName();
 
-            if ($rootObject instanceof Field) {
-                throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-            } elseif ($rootObject instanceof Validation) {
-                throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-            }
+        if ($rootObject instanceof Field) {
+            throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        } elseif ($rootObject instanceof Validation) {
+            throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
         }
-
-        return true;
     }
 
     /**
-     * @see validateConditionConfiguration()
-     * @throws InvalidConditionException
-     * @return bool
+     * @param FormObject $formObject
      */
-    abstract protected function checkConditionConfiguration();
+    public function attachFormObject(FormObject $formObject)
+    {
+        $this->formObject = $formObject;
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     */
+    public function attachActivation(ActivationInterface $activation)
+    {
+        $this->activation = $activation;
+    }
+
+    /**
+     * @param ConditionNode $conditionNode
+     */
+    public function attachConditionNode(ConditionNode $conditionNode)
+    {
+        $this->conditionNode = $conditionNode;
+    }
 
     /**
      * @return array

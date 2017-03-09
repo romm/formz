@@ -45,22 +45,6 @@ class FieldHasValueCondition extends AbstractConditionItem
     protected $fieldValue;
 
     /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFieldValue()
-    {
-        return $this->fieldValue;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getCssResult()
@@ -77,12 +61,10 @@ class FieldHasValueCondition extends AbstractConditionItem
      */
     public function getJavaScriptResult()
     {
-        return $this->getDefaultJavaScriptCall(
-            [
-                'fieldName'  => $this->fieldName,
-                'fieldValue' => $this->fieldValue
-            ]
-        );
+        return $this->getDefaultJavaScriptCall([
+            'fieldName'  => $this->fieldName,
+            'fieldValue' => $this->fieldValue
+        ]);
     }
 
     /**

@@ -79,20 +79,20 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
+     * @return Validation[]
+     */
+    public function getValidation()
+    {
+        return $this->validation;
+    }
+
+    /**
      * @param string $validationName
      * @return bool
      */
     public function hasValidation($validationName)
     {
         return true === isset($this->validation[$validationName]);
-    }
-
-    /**
-     * @return Validation[]
-     */
-    public function getValidation()
-    {
-        return $this->validation;
     }
 
     /**

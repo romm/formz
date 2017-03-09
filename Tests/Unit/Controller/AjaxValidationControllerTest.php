@@ -38,7 +38,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
             ->method('throwStatus');
 
         /** @var Request|ObjectProphecy $requestProphecy */
-        $requestProphecy = $this->prophet->prophesize(Request::class);
+        $requestProphecy = $this->prophesize(Request::class);
 
         $requestProphecy->getMethod()
             ->shouldBeCalled()
@@ -63,7 +63,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
             ->method('throwStatus');
 
         /** @var Request|ObjectProphecy $requestProphecy */
-        $requestProphecy = $this->prophet->prophesize(Request::class);
+        $requestProphecy = $this->prophesize(Request::class);
 
         $requestProphecy->getMethod()
             ->shouldBeCalled()

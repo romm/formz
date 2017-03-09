@@ -63,8 +63,8 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     protected $useAjax = false;
 
     /**
-     * Name of the validation. By default, it is the key of this validation in
-     * the array containing all validations for the parent field.
+     * Name of the validation. By default, it is the key of this instance in the
+     * array containing all the validation for the parent field.
      *
      * @var string
      */
@@ -176,6 +176,14 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
+     * @param string $validationName
+     */
+    public function setValidationName($validationName)
+    {
+        $this->validationName = $validationName;
+    }
+
+    /**
      * @return bool
      */
     public function doesUseAjax()
@@ -189,14 +197,6 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     public function activateAjaxUsage($flag = true)
     {
         $this->useAjax = (bool)$flag;
-    }
-
-    /**
-     * @param string $validationName
-     */
-    public function setValidationName($validationName)
-    {
-        $this->validationName = $validationName;
     }
 
     /**

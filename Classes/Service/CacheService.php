@@ -26,6 +26,7 @@ class CacheService implements SingletonInterface
     use ExtendedFacadeInstanceTrait;
 
     const CACHE_IDENTIFIER = 'cache_formz';
+    const CONFIGURATION_OBJECT_CACHE_IDENTIFIER = 'cache_formz_configuration_object';
     const GENERATED_FILES_PATH = 'typo3temp/FormZ/';
 
     /**

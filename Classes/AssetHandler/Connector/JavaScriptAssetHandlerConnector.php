@@ -14,6 +14,7 @@
 namespace Romm\Formz\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
@@ -61,6 +62,11 @@ class JavaScriptAssetHandlerConnector
     private $assetHandlerConnectorManager;
 
     /**
+     * @var AssetHandlerFactory
+     */
+    private $assetHandlerFactory;
+
+    /**
      * @var EnvironmentService
      */
     protected $environmentService;
@@ -70,6 +76,7 @@ class JavaScriptAssetHandlerConnector
     public function __construct(AssetHandlerConnectorManager $assetHandlerConnectorManager)
     {
         $this->assetHandlerConnectorManager = $assetHandlerConnectorManager;
+        $this->assetHandlerFactory = $assetHandlerConnectorManager->getAssetHandlerFactory();
     }
 
     /**
@@ -192,10 +199,7 @@ class JavaScriptAssetHandlerConnector
      */
     public function generateAndIncludeInlineJavaScript()
     {
-        $formName = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getFormObject()
-            ->getName();
+        $formName = $this->assetHandlerFactory->getFormObject()->getName();
 
         $javaScriptCode = $this->getFormRequestDataJavaScriptAssetHandler()
             ->getFormRequestDataJavaScriptCode();
@@ -244,9 +248,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getJavaScriptFiles()
     {
-        $formObject = $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getFormObject();
+        $formObject = $this->assetHandlerFactory->getFormObject();
 
         $javaScriptFiles = $this->getFieldsValidationJavaScriptAssetHandler()
             ->getJavaScriptValidationFiles();
@@ -334,9 +336,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getFormzConfigurationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
     }
 
     /**
@@ -344,9 +344,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getFormInitializationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(FormInitializationJavaScriptAssetHandler::class);
     }
 
     /**
@@ -354,9 +352,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getFieldsValidationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(FieldsValidationJavaScriptAssetHandler::class);
     }
 
     /**
@@ -364,9 +360,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getFieldsActivationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(FieldsActivationJavaScriptAssetHandler::class);
     }
 
     /**
@@ -374,9 +368,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getFieldsValidationActivationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(FieldsValidationActivationJavaScriptAssetHandler::class);
     }
 
     /**
@@ -384,9 +376,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getFormRequestDataJavaScriptAssetHandler()
     {
-        return $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(FormRequestDataJavaScriptAssetHandler::class);
     }
 
     /**
@@ -394,9 +384,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getFormzLocalizationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerConnectorManager
-            ->getAssetHandlerFactory()
-            ->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
     }
 
     /**
