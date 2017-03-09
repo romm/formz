@@ -87,4 +87,41 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
 
         $this->assertTrue($result);
     }
+
+    /**
+     * @test
+     */
+    public function getCssResult()
+    {
+        $conditionItem = new FieldHasValueCondition;
+        $conditionItem->setFieldName('foo');
+        $conditionItem->setFieldValue('bar');
+
+        $this->assertEquals('[formz-value-foo~="bar"]', $conditionItem->getCssResult());
+    }
+
+    /**
+     * @test
+     */
+    public function getCssResultEmpty()
+    {
+        $conditionItem = new FieldHasValueCondition;
+        $conditionItem->setFieldName('foo');
+
+        $this->assertEquals('[formz-value-foo=""]', $conditionItem->getCssResult());
+    }
+
+    /**
+     * @test
+     */
+    public function getJavaScriptResult()
+    {
+        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasValueCondition\', form, {"fieldName":"foo","fieldValue":"bar"})';
+
+        $conditionItem = new FieldHasValueCondition;
+        $conditionItem->setFieldName('foo');
+        $conditionItem->setFieldValue('bar');
+
+        $this->assertEquals($assert, $conditionItem->getJavaScriptResult());
+    }
 }

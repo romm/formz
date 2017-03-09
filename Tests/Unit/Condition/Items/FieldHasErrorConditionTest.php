@@ -171,4 +171,32 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
 
         $this->assertTrue($result);
     }
+
+    /**
+     * @test
+     */
+    public function getCssResult()
+    {
+        $conditionItem = new FieldHasErrorCondition;
+        $conditionItem->setFieldName('foo');
+        $conditionItem->setValidationName('bar');
+        $conditionItem->setErrorName('baz');
+
+        $this->assertEquals('[formz-error-foo-bar-baz="1"]', $conditionItem->getCssResult());
+    }
+
+    /**
+     * @test
+     */
+    public function getJavaScriptResult()
+    {
+        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasErrorCondition\', form, {"fieldName":"foo","validationName":"bar","errorName":"baz"})';
+
+        $conditionItem = new FieldHasErrorCondition;
+        $conditionItem->setFieldName('foo');
+        $conditionItem->setValidationName('bar');
+        $conditionItem->setErrorName('baz');
+
+        $this->assertEquals($assert, $conditionItem->getJavaScriptResult());
+    }
 }

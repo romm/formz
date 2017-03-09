@@ -85,4 +85,28 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
 
         $this->assertTrue($result);
     }
+
+    /**
+     * @test
+     */
+    public function getCssResultEmpty()
+    {
+        $conditionItem = new FieldIsEmptyCondition;
+        $conditionItem->setFieldName('foo');
+
+        $this->assertEquals('[formz-value-foo=""]', $conditionItem->getCssResult());
+    }
+
+    /**
+     * @test
+     */
+    public function getJavaScriptResult()
+    {
+        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsEmptyCondition\', form, {"fieldName":"foo"})';
+
+        $conditionItem = new FieldIsEmptyCondition;
+        $conditionItem->setFieldName('foo');
+
+        $this->assertEquals($assert, $conditionItem->getJavaScriptResult());
+    }
 }
