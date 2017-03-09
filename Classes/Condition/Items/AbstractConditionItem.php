@@ -97,15 +97,7 @@ abstract class AbstractConditionItem implements ConditionItemInterface
         try {
             $this->checkConditionConfiguration();
         } catch (InvalidConditionException $exception) {
-            $rootObject = $this->activation->getRootObject();
-            $conditionName = $this->conditionNode->getConditionName();
-            $formClassName = $this->formObject->getClassName();
-
-            if ($rootObject instanceof Field) {
-                throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-            } elseif ($rootObject instanceof Validation) {
-                throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-            }
+            $this->throwInvalidConditionException($exception);
         }
 
         return true;
@@ -118,30 +110,6 @@ abstract class AbstractConditionItem implements ConditionItemInterface
      * @return bool
      */
     abstract protected function checkConditionConfiguration();
-
-    /**
-     * @param FormObject $formObject
-     */
-    public function attachFormObject(FormObject $formObject)
-    {
-        $this->formObject = $formObject;
-    }
-
-    /**
-     * @param ActivationInterface $activation
-     */
-    public function attachActivation(ActivationInterface $activation)
-    {
-        $this->activation = $activation;
-    }
-
-    /**
-     * @param ConditionNode $conditionNode
-     */
-    public function attachConditionNode(ConditionNode $conditionNode)
-    {
-        $this->conditionNode = $conditionNode;
-    }
 
     /**
      * Returns a generic JavaScript code which uses FormZ API to validate a
@@ -167,6 +135,47 @@ JS;
     public function getJavaScriptFiles()
     {
         return static::$javaScriptFiles;
+    }
+
+    /**
+     * @param InvalidConditionException $exception
+     * @throws InvalidConditionException
+     */
+    protected function throwInvalidConditionException(InvalidConditionException $exception)
+    {
+        $rootObject = $this->activation->getRootObject();
+        $conditionName = $this->conditionNode->getConditionName();
+        $formClassName = $this->formObject->getClassName();
+
+        if ($rootObject instanceof Field) {
+            throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        } elseif ($rootObject instanceof Validation) {
+            throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        }
+    }
+
+    /**
+     * @param FormObject $formObject
+     */
+    public function attachFormObject(FormObject $formObject)
+    {
+        $this->formObject = $formObject;
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     */
+    public function attachActivation(ActivationInterface $activation)
+    {
+        $this->activation = $activation;
+    }
+
+    /**
+     * @param ConditionNode $conditionNode
+     */
+    public function attachConditionNode(ConditionNode $conditionNode)
+    {
+        $this->conditionNode = $conditionNode;
     }
 
     /**

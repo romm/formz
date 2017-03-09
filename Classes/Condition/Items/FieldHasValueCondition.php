@@ -61,12 +61,10 @@ class FieldHasValueCondition extends AbstractConditionItem
      */
     public function getJavaScriptResult()
     {
-        return $this->getDefaultJavaScriptCall(
-            [
-                'fieldName'  => $this->fieldName,
-                'fieldValue' => $this->fieldValue
-            ]
-        );
+        return $this->getDefaultJavaScriptCall([
+            'fieldName'  => $this->fieldName,
+            'fieldValue' => $this->fieldValue
+        ]);
     }
 
     /**
@@ -95,37 +93,5 @@ class FieldHasValueCondition extends AbstractConditionItem
         }
 
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @param string $fieldName
-     */
-    public function setFieldName($fieldName)
-    {
-        $this->fieldName = $fieldName;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFieldValue()
-    {
-        return $this->fieldValue;
-    }
-
-    /**
-     * @param string $fieldValue
-     */
-    public function setFieldValue($fieldValue)
-    {
-        $this->fieldValue = $fieldValue;
     }
 }

@@ -197,7 +197,7 @@ class ConditionProcessorTest extends AbstractUnitTest
         /** @var ConditionParserFactory|ObjectProphecy $conditionParserFactoryProphecy */
         $conditionParserFactoryProphecy = $this->prophesize(ConditionParserFactory::class);
 
-        $getConditionTreeProphecy = function() {
+        $getConditionTreeProphecy = function () {
             /** @var ConditionTree|ObjectProphecy $conditionTreeProphecy */
             $conditionTreeProphecy = $this->prophesize(ConditionTree::class);
 

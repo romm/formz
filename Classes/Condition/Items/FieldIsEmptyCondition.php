@@ -81,12 +81,4 @@ class FieldIsEmptyCondition extends AbstractConditionItem
 
         return true;
     }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
 }

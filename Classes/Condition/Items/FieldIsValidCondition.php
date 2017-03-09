@@ -86,23 +86,4 @@ class FieldIsValidCondition extends AbstractConditionItem
 
         return true;
     }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @param string $fieldName
-     * @return $this
-     */
-    public function setFieldName($fieldName)
-    {
-        $this->fieldName = $fieldName;
-
-        return $this;
-    }
 }

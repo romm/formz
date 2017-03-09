@@ -70,13 +70,11 @@ class FieldHasErrorCondition extends AbstractConditionItem
      */
     public function getJavaScriptResult()
     {
-        return $this->getDefaultJavaScriptCall(
-            [
-                'fieldName'      => $this->fieldName,
-                'validationName' => $this->validationName,
-                'errorName'      => $this->errorName
-            ]
-        );
+        return $this->getDefaultJavaScriptCall([
+            'fieldName'      => $this->fieldName,
+            'validationName' => $this->validationName,
+            'errorName'      => $this->errorName
+        ]);
     }
 
     /**
@@ -86,9 +84,7 @@ class FieldHasErrorCondition extends AbstractConditionItem
     {
         $flag = false;
         $formValidator = $dataObject->getFormValidator();
-        $field = $this->formObject
-            ->getConfiguration()
-            ->getField($this->fieldName);
+        $field = $this->formObject->getConfiguration()->getField($this->fieldName);
         $formValidator->validateField($field);
         $result = $formValidator->getResult()->forProperty($this->fieldName);
 
@@ -103,30 +99,6 @@ class FieldHasErrorCondition extends AbstractConditionItem
         }
 
         return $flag;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getValidationName()
-    {
-        return $this->validationName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getErrorName()
-    {
-        return $this->errorName;
     }
 
     /**
