@@ -16,7 +16,7 @@ To fetch a form, you have to use a code similar to this one:
 
 .. code-block:: javascript
 
-    Formz.Form.get('myFormName', function(form) {
+    Fz.Form.get('myFormName', function(form) {
         // Whatever...
     });
 

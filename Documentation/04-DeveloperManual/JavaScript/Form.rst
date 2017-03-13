@@ -84,7 +84,7 @@ Get a given field
     Function
         ``getFieldByName(name)``
     Return
-        ``Formz.FullField``
+        ``Fz.FullField``
     Parameters
         - ``name``: name of the field.
     Description
@@ -108,7 +108,7 @@ Get all fields
     Function
         ``getFields()``
     Return
-        ``Object<Formz.FullField>``
+        ``Object<Fz.FullField>``
     Description
         Returns all the fields of this form.
 

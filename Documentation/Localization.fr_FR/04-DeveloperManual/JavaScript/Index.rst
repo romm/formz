@@ -16,7 +16,7 @@ Pour récupérer un formulaire, vous devrez utiliser un code similaire à celui-
 
 .. code-block:: javascript
 
-    Formz.Form.get('myFormName', function(form) {
+    Fz.Form.get('myFormName', function(form) {
         // Whatever...
     });
 
