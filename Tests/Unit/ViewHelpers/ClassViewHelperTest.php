@@ -78,7 +78,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
              * JavaScript API.
              */
             [
-                'expects'      => 'formz-errors-foo',
+                'expects'      => 'fz-errors-foo',
                 'classes'      => [
                     'errors' => ['foo' => 'foo'],
                     'valid'  => []
@@ -148,7 +148,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
              * run correctly and return a correct result.
              */
             [
-                'expects'      => 'formz-errors-foo',
+                'expects'      => 'fz-errors-foo',
                 'classes'      => [
                     'errors' => ['foo' => 'foo'],
                     'valid'  => []
@@ -165,7 +165,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
              * property.
              */
             [
-                'expects'      => 'formz-errors-foo foo',
+                'expects'      => 'fz-errors-foo foo',
                 'classes'      => [
                     'errors' => ['foo' => 'foo'],
                     'valid'  => []
@@ -182,7 +182,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
              * submitted and the result has no error for the given property.
              */
             [
-                'expects'      => 'formz-valid-bar bar',
+                'expects'      => 'fz-valid-bar bar',
                 'classes'      => [
                     'errors' => [],
                     'valid'  => ['bar' => 'bar']

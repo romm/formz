@@ -182,7 +182,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $conditionItem->setValidationName('bar');
         $conditionItem->setErrorName('baz');
 
-        $this->assertEquals('[formz-error-foo-bar-baz="1"]', $conditionItem->getCssResult());
+        $this->assertEquals('[fz-error-foo-bar-baz="1"]', $conditionItem->getCssResult());
     }
 
     /**

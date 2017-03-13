@@ -94,7 +94,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
         $conditionItem = new FieldIsEmptyCondition;
         $conditionItem->setFieldName('foo');
 
-        $this->assertEquals('[formz-value-foo=""]', $conditionItem->getCssResult());
+        $this->assertEquals('[fz-value-foo=""]', $conditionItem->getCssResult());
     }
 
     /**

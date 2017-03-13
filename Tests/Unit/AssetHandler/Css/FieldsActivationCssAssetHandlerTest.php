@@ -17,7 +17,7 @@ class FieldsActivationCssAssetHandlerTest extends AbstractUnitTest
      */
     public function fieldsActivationCssIsValid()
     {
-        $expectedCss = 'form[name="foo"][formz-field-container="foo"]{display:none;}form[name="foo"]CSS-CONDITION[formz-field-container="foo"]{display:block;}';
+        $expectedCss = 'form[name="foo"][fz-field-container="foo"]{display:none;}form[name="foo"]CSS-CONDITION[fz-field-container="foo"]{display:block;}';
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 

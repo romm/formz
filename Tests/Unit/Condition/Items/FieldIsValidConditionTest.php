@@ -116,7 +116,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
         $conditionItem = new FieldIsValidCondition;
         $conditionItem->setFieldName('foo');
 
-        $this->assertEquals('[formz-valid-foo="1"]', $conditionItem->getCssResult());
+        $this->assertEquals('[fz-valid-foo="1"]', $conditionItem->getCssResult());
     }
 
     /**
