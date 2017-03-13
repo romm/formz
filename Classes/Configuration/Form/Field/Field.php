@@ -105,7 +105,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
-     * @param $validationName
+     * @param string $validationName
      * @return Validation
      * @throws EntryNotFoundException
      */

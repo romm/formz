@@ -95,7 +95,7 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getPriority()
     {

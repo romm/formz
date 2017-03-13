@@ -14,6 +14,7 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\ArrayService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -98,29 +99,37 @@ JS;
         if ($formObject->formWasSubmitted()
             && $formObject->hasFormResult()
         ) {
-            $formResult = $this->getFormObject()->getFormResult();
-
-            foreach ($this->getFormObject()->getProperties() as $fieldName) {
-                $result = $formResult->forProperty($fieldName);
-                $messages = [];
-
-                if ($result->hasErrors()) {
-                    $messages['errors'] = $this->formatMessages($result->getErrors());
-                }
-
-                if ($result->hasWarnings()) {
-                    $messages['warnings'] = $this->formatMessages($result->getWarnings());
-                }
-
-                if ($result->hasNotices()) {
-                    $messages['notices'] = $this->formatMessages($result->getNotices());
-                }
-
-                $fieldsMessages[$fieldName] = $messages;
+            foreach ($this->getFormObject()->getConfiguration()->getFields() as $field) {
+                $fieldsMessages[$field->getFieldName()] = $this->getSingleFieldExistingMessages($field);
             }
         }
 
         return $fieldsMessages;
+    }
+
+    /**
+     * @param Field $field
+     * @return array
+     */
+    protected function getSingleFieldExistingMessages(Field $field)
+    {
+        $formResult = $this->getFormObject()->getFormResult();
+        $result = $formResult->forProperty($field->getFieldName());
+        $messages = [];
+
+        if ($result->hasErrors()) {
+            $messages['errors'] = $this->formatMessages($result->getErrors());
+        }
+
+        if ($result->hasWarnings()) {
+            $messages['warnings'] = $this->formatMessages($result->getWarnings());
+        }
+
+        if ($result->hasNotices()) {
+            $messages['notices'] = $this->formatMessages($result->getNotices());
+        }
+
+        return $messages;
     }
 
     /**

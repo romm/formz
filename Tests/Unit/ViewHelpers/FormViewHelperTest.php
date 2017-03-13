@@ -192,7 +192,6 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
 
         $viewHelper = $this->getFormViewHelperMock(
             [
-                'applyBehavioursOnSubmittedForm',
                 'handleDataAttributes',
                 'handleAssets',
                 'getFormClassName'
@@ -240,7 +239,6 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper = $this->getFormViewHelperMock(
             [
                 'addDefaultClass',
-                'applyBehavioursOnSubmittedForm',
                 'handleAssets',
                 'getDataAttributesAssetHandler',
                 'getFormClassName'
@@ -313,7 +311,6 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper = $this->getFormViewHelperMock(
             [
                 'addDefaultClass',
-                'applyBehavioursOnSubmittedForm',
                 'handleAssets',
                 'getDataAttributesAssetHandler',
                 'getFormClassName'
@@ -375,7 +372,6 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper = $this->getFormViewHelperMock(
             [
                 'addDefaultClass',
-                'applyBehavioursOnSubmittedForm',
                 'handleAssets',
                 'getDataAttributesAssetHandler',
                 'getFormClassName',

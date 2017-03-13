@@ -109,6 +109,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
      */
     protected function getMessage()
     {
+        /** @var Message $message */
         $message = $this->arguments['message'];
 
         if (false === $message instanceof FormzMessageInterface) {

@@ -16,7 +16,6 @@ namespace Romm\Formz\AssetHandler\Html;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Error\FormzMessageInterface;
-use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\StringService;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -50,14 +49,12 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     {
         $result = [];
         $formObject = $this->getFormObject();
-        $formConfiguration = $formObject->getConfiguration();
         $formInstance = $formObject->getForm();
 
-        foreach ($formObject->getProperties() as $fieldName) {
-            if (true === $formConfiguration->hasField($fieldName)
-                && false === $formResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
-                && $this->isPropertyGettable($formInstance, $fieldName)
-            ) {
+        foreach ($formObject->getConfiguration()->getFields() as $field) {
+            $fieldName = $field->getFieldName();
+
+            if (false === $formResult->fieldIsDeactivated($field)) {
                 $value = ObjectAccess::getProperty($formInstance, $fieldName);
                 $value = (is_array($value))
                     ? implode(' ', $value)
@@ -70,32 +67,6 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         }
 
         return $result;
-    }
-
-    /**
-     * Checks if the given field name can be accessed within the form instance,
-     * whether it is an object or an array.
-     *
-     * @param FormInterface|array $formInstance
-     * @param string              $fieldName
-     * @return bool
-     */
-    protected function isPropertyGettable($formInstance, $fieldName)
-    {
-        $objectPropertyIsGettable = (
-            is_object($formInstance)
-            && (
-                in_array($fieldName, get_object_vars($formInstance))
-                || ObjectAccess::isPropertyGettable($formInstance, $fieldName)
-            )
-        );
-
-        $arrayPropertyGettable = (
-            is_array($formInstance)
-            && true === isset($formInstance[$fieldName])
-        );
-
-        return $objectPropertyIsGettable || $arrayPropertyGettable;
     }
 
     /**

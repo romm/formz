@@ -13,9 +13,12 @@
 
 namespace Romm\Formz\Service\ViewHelper;
 
+use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 /**
  * This class contains methods that help view helpers to manipulate data and
@@ -61,6 +64,37 @@ class FormViewHelperService implements SingletonInterface
         $this->formContext = true;
 
         return $this;
+    }
+
+    /**
+     * Will loop on the submitted form fields and apply behaviours if their
+     * configuration contains.
+     *
+     * @param ControllerContext $controllerContext
+     */
+    public function applyBehavioursOnSubmittedForm(ControllerContext $controllerContext)
+    {
+        if ($this->formObject->formWasSubmitted()) {
+            $request = $controllerContext->getRequest()->getOriginalRequest();
+            $formName = $this->formObject->getName();
+
+            if ($request
+                && $request->hasArgument($formName)
+            ) {
+                /** @var BehavioursManager $behavioursManager */
+                $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
+
+                /** @var array $originalForm */
+                $originalForm = $request->getArgument($formName);
+
+                $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
+                    $originalForm,
+                    $this->formObject->getConfiguration()
+                );
+
+                $request->setArgument($formName, $formProperties);
+            }
+        }
     }
 
     /**

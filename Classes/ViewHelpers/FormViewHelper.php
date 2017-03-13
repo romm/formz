@@ -16,7 +16,6 @@ namespace Romm\Formz\ViewHelpers;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
@@ -216,15 +215,15 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->formService->activateFormContext();
 
         /*
+         * If the form was submitted, applying custom behaviours on its fields.
+         */
+        $this->formService->applyBehavioursOnSubmittedForm($this->controllerContext);
+
+        /*
          * Adding the default class configured in TypoScript configuration to
          * the form HTML tag.
          */
         $this->addDefaultClass();
-
-        /*
-         * If the form was submitted, applying custom behaviours on its fields.
-         */
-        $this->applyBehavioursOnSubmittedForm();
 
         /*
          * Handling data attributes that are added to the form HTML tag,
@@ -253,34 +252,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             ->includeLanguageJavaScriptFiles();
 
         return $result;
-    }
-
-    /**
-     * Will loop on the submitted form fields and apply behaviours if their
-     * configuration contains.
-     */
-    protected function applyBehavioursOnSubmittedForm()
-    {
-        if ($this->formObject->formWasSubmitted()) {
-            $request = $this->controllerContext->getRequest()->getOriginalRequest();
-
-            if ($request
-                && $request->hasArgument($this->getFormObjectName())
-            ) {
-                /** @var BehavioursManager $behavioursManager */
-                $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
-
-                /** @var array $originalForm */
-                $originalForm = $request->getArgument($this->getFormObjectName());
-
-                $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
-                    $originalForm,
-                    $this->formObject->getConfiguration()
-                );
-
-                $request->setArgument($this->getFormObjectName(), $formProperties);
-            }
-        }
     }
 
     /**
