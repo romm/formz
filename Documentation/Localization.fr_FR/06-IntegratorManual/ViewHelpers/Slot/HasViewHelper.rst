@@ -38,29 +38,29 @@ Exemples
     :linenos:
     :emphasize-lines: 4,8
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <div class="container">
-        <formz:slot.has slot="Image">
+        <fz:slot.has slot="Image">
             <div class="image">
-                <formz:slot.render slot="Image" />
+                <fz:slot.render slot="Image" />
             </div>
-        </formz:slot.has>
+        </fz:slot.has>
     </div>
 
 .. code-block:: html
     :linenos:
     :emphasize-lines: 4,5,7,8,10,11
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <div class="container">
-        <formz:slot.has slot="Image">
+        <fz:slot.has slot="Image">
             <f:then>
-                <formz:slot.render slot="Image" />
+                <fz:slot.render slot="Image" />
             </f:then>
             <f:else>
                 <img src="default-image.jpg" />
             </f:else>
-        </formz:slot.has>
+        </fz:slot.has>
     </div>

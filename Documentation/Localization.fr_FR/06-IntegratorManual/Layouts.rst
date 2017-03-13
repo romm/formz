@@ -95,7 +95,7 @@ Les variables suivantes sont utilisables directement dans votre template :
 
     <f:layout name="{layout}" />
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <f:section name="Label">
         <label class="{f:if(condition: '{required}', then: 'required')}" for="{fieldId}">{label}</label>
@@ -103,7 +103,7 @@ Les variables suivantes sont utilisables directement dans votre template :
 
     <f:section name="Field">
         <div fz-field-container="{fieldName}">
-            <formz:slot.render slot="Field" />
+            <fz:slot.render slot="Field" />
         </div>
     </f:section>
 
@@ -111,7 +111,7 @@ Les variables suivantes sont utilisables directement dans votre template :
         <div fz-field-feedback-container="{fieldName}">
             <div fz-field-feedback-list="{fieldName}">
                 <f:for each="{validationResults.errors}" iteration="iteration" as="error">
-                    <formz:formatMessage message="{error}" />
+                    <fz:formatMessage message="{error}" />
                 </f:for>
             </div>
         </div>
@@ -158,16 +158,16 @@ Pour en savoir plus, consultez le chapitre : « :ref:`integratorManual-viewHelpe
     :linenos:
     :emphasize-lines: 5
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
 
-        <formz:field name="email" layout="my-project.one-column">
-            <formz:option name="required" value="1" />
+        <fz:field name="email" layout="my-project.one-column">
+            <fz:option name="required" value="1" />
 
-            <formz:slot name="Field">
+            <fz:slot name="Field">
                 <f:form.textfield property="{fieldName}" id="{fieldId}" placeholder="email" />
-            </formz:slot>
-        </formz:field>
+            </fz:slot>
+        </fz:field>
 
-    </formz:form>
+    </fz:form>

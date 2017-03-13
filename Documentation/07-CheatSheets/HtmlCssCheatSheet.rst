@@ -22,14 +22,14 @@ You can find a guide on integrating XSD files in your IDE here: https://github.c
 .. code-block:: html
 
     <html xmlns="http://www.w3.org/1999/xhtml"
-          xmlns:formz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
+          xmlns:fz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
 
         <f:layout name="MyLayout" />
 
         <f:section name="MySection">
-            <formz:form name="myForm">
+            <fz:form name="myForm">
                 ...
-            </formz:form>
+            </fz:form>
         </f:section>
 
     </html>
@@ -67,23 +67,23 @@ In the example below, the block ``info-customer`` is hidden as long as the butto
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form name="myForm" action="submitForm">
-        <formz:field name="isCustomer" layout="default">
-            <formz:slot name="Field">
+    <fz:form name="myForm" action="submitForm">
+        <fz:field name="isCustomer" layout="default">
+            <fz:slot name="Field">
                 Are you a customer?
                 <br />
                 <f:form.radio property="isCustomer" value="1" />&nbsp;Yes
                 <br />
                 <f:form.radio property="isCustomer" value="0" />&nbsp;No
-            </formz:slot>
-        </formz:field>
+            </fz:slot>
+        </fz:field>
 
         <div class="info-customer">
             You can subscribe easily to our service <a href="...">by clicking here</a>.
         </div>
-    </formz:form>
+    </fz:form>
 
 Loading behaviour
 -----------------

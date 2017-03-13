@@ -35,11 +35,11 @@ Exemple
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
         ...
-    </formz:form>
+    </fz:form>
 
 Le formulaire ci-dessus pointe vers l'action ``submitForm``. Si on va voir l'action dans la classe PHP du contrôleur :
 

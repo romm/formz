@@ -141,7 +141,7 @@ Ci-dessous un exemple simple d'intégration de formulaire.
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <h1>Lorem Ipsum</h1>
 
@@ -149,24 +149,24 @@ Ci-dessous un exemple simple d'intégration de formulaire.
     lacus efficitur, sed feugiat turpis tincidunt. Sed sed tellus ornare, pellentesque
     orci mollis, consequat eros.</p>
 
-    <formz:form action="submitForm" name="exampleForm">
+    <fz:form action="submitForm" name="exampleForm">
         <fieldset>
-            <formz:field name="someField" layout="default">
-                <formz:option name="label" value="Some Field" />
+            <fz:field name="someField" layout="default">
+                <fz:option name="label" value="Some Field" />
 
-                <formz:slot name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:slot>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
 
-            <formz:field name="someOtherField" layout="default">
-                <formz:option name="label" value="Some other Field" />
+            <fz:field name="someOtherField" layout="default">
+                <fz:option name="label" value="Some other Field" />
 
-                <formz:slot name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:slot>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
         </fieldset>
-    </formz:form>
+    </fz:form>

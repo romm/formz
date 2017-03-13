@@ -36,17 +36,17 @@ Example
     :linenos:
     :emphasize-lines: 9-11
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
 
-        <formz:field name="email" layout="default">
+        <fz:field name="email" layout="default">
 
             This slot appears just before the list of validation messages.
-            <formz:slot name="Feedback.Out.Before">
+            <fz:slot name="Feedback.Out.Before">
                 <div class="info">Hello world!</div>
-            </formz:slot>
+            </fz:slot>
 
-        </formz:field>
+        </fz:field>
 
-    </formz:form>
+    </fz:form>

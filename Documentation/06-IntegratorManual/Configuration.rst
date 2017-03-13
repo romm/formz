@@ -52,7 +52,7 @@ This container is divided into two parts: a global container, and a container fo
             <div fz-field-feedback-list="email">
                 <f:form.validationResults for="exForm.email">
                     <f:for each="{validationResults.errors}" as="error">
-                        <formz:formatMessage message="{error}" />
+                        <fz:formatMessage message="{error}" />
                     </f:for>
                 </f:form.validationResults>
             </div>
