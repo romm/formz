@@ -121,8 +121,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->typoScriptIncluded = ContextService::get()->isTypoScriptIncluded();
 
         if (true === $this->typoScriptIncluded) {
+            $this->timeTracker = TimeTrackerService::getAndStart();
             $this->formObjectClassName = $this->getFormClassName();
             $this->formObject = $this->getFormObject();
+            $this->timeTracker->logTime('post-config');
             $this->formService->setFormObject($this->formObject);
             $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
 
@@ -170,8 +172,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function renderViewHelper()
     {
-        $this->timeTracker = TimeTrackerService::getAndStart();
-
         if (false === $this->typoScriptIncluded) {
             return (ExtensionService::get()->isInDebugMode())
                 ? ContextService::get()->translate('form.typoscript_not_included.error_message')
@@ -179,7 +179,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         }
 
         $formzValidationResult = $this->formObject->getConfigurationValidationResult();
-        $this->timeTracker->logTime('post-config');
 
         $result = ($formzValidationResult->hasErrors())
             // If the form configuration is not valid, we display the errors list.
