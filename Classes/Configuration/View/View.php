@@ -27,7 +27,7 @@ class View extends AbstractFormzConfiguration
     protected $classes;
 
     /**
-     * @var \ArrayObject<\Romm\Formz\Configuration\View\Layouts\LayoutGroup>
+     * @var \Romm\Formz\Configuration\View\Layouts\LayoutGroup[]
      */
     protected $layouts = [];
 

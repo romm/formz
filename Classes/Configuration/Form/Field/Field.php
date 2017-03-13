@@ -31,17 +31,18 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     use ParentsTrait;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Validation\Validation>
+     * @var \Romm\Formz\Configuration\Form\Field\Validation\Validation[]
      */
     protected $validation = [];
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour>
+     * @var \Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour[]
      */
     protected $behaviours = [];
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
+     * @var ActivationInterface
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;

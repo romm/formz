@@ -16,7 +16,7 @@ namespace Romm\Formz\Configuration\Form\Condition\Activation;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesResolver;
 
-class ActivationResolver extends AbstractActivation implements MixedTypesInterface
+class ActivationResolver implements MixedTypesInterface
 {
     /**
      * Because this class implements `MixedTypeInterface`, this function needs

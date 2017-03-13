@@ -21,7 +21,7 @@ class LayoutGroup extends AbstractFormzConfiguration
     use StoreArrayIndexTrait;
 
     /**
-     * @var \ArrayObject<\Romm\Formz\Configuration\View\Layouts\Layout>
+     * @var \Romm\Formz\Configuration\View\Layouts\Layout[]
      */
     protected $items = [];
 
