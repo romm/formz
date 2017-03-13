@@ -77,10 +77,7 @@ class AssetHandlerConnectorManager
         $hash = sha1(spl_object_hash($pageRenderer) . spl_object_hash($assetHandlerFactory));
 
         if (false === isset(self::$instances[$hash])) {
-            /** @noinspection PhpMethodParametersCountMismatchInspection */
-            self::$instances[$hash] = Core::get()
-                ->getObjectManager()
-                ->get(self::class, $pageRenderer, $assetHandlerFactory);
+            self::$instances[$hash] = Core::instantiate(self::class, $pageRenderer, $assetHandlerFactory);
         }
 
         return self::$instances[$hash];
