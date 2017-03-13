@@ -41,7 +41,7 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  *
  * Please be aware that this view helper is useful only when used at the same
  * level or under the HTML element containing the field selector (usually the
- * one with the data attribute `formz-field-container`). You may encounter
+ * one with the data attribute `fz-field-container`). You may encounter
  * strange behaviours if you do not respect this requirement.
  */
 class ClassViewHelper extends AbstractViewHelper
@@ -103,7 +103,7 @@ class ClassViewHelper extends AbstractViewHelper
         $this->initializeFieldName();
 
         $result = vsprintf(
-            'formz-%s-%s',
+            'fz-%s-%s',
             [
                 $this->classNameSpace,
                 str_replace(' ', '-', $this->classValue)

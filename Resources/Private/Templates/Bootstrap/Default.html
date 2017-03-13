@@ -19,10 +19,10 @@
 <f:section name="Feedback">
     <formz:slot.render slot="Feedback.Out.Before" />
 
-    <span class="help-block" formz-field-feedback-container="{fieldName}">
+    <span class="help-block" fz-field-feedback-container="{fieldName}">
 		<formz:slot.render slot="Feedback.In.Before" />
 
-		<span formz-field-feedback-list="{fieldName}">
+		<span fz-field-feedback-list="{fieldName}">
 			<f:form.validationResults for="{formName}.{fieldName}">
 				<f:if condition="{validationResults.errors}">
 					<div class="text-error">

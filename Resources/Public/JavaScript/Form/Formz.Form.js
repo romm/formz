@@ -234,7 +234,7 @@ Fz.Form = (function () {
         /**
          * When a field is validated, the form is entirely checked to see if all
          * fields are valid, in which case an attribute is added to the form DOM
-         * element: `formz-valid`.
+         * element: `fz-valid`.
          *
          * Several usages can be found for this: for instance, the submission
          * button can be shown only when the form is valid (logical behaviour
@@ -254,9 +254,9 @@ Fz.Form = (function () {
                 var checkAllFieldsWereProcessed = function () {
                     if (fieldsNumber === fieldsChecked) {
                         if (true === globalFlag) {
-                            field.getForm().getElement().setAttribute('formz-valid', '1');
+                            field.getForm().getElement().setAttribute('fz-valid', '1');
                         } else {
-                            field.getForm().getElement().removeAttribute('formz-valid');
+                            field.getForm().getElement().removeAttribute('fz-valid');
                         }
                     }
                 };

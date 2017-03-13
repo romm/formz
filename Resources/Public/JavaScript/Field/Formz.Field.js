@@ -98,7 +98,7 @@ Fz.Field = (function () {
                                     if (messages[validationRuleName].hasOwnProperty(name)) {
                                         feedbackListContainerElement.innerHTML += messageTemplate
                                             .replace('#FIELD#', this.getName())
-                                            .replace('#FIELD_ID#', Fz.camelCaseToDashed('formz-' + this.getForm().getName() + '-' + this.getName()))
+                                            .replace('#FIELD_ID#', Fz.camelCaseToDashed('fz-' + this.getForm().getName() + '-' + this.getName()))
                                             .replace('#VALIDATOR#', Fz.camelCaseToDashed(validationRuleName))
                                             .replace('#TYPE#', type)
                                             .replace('#KEY#', name)
@@ -117,8 +117,8 @@ Fz.Field = (function () {
              * "messageTemplate"): it is the default value. Then, two
              * possibilities:
              * - If a container for the field is declared
-             *   ("formz-field-container"), a query is made to search for an
-             *   element containing the attribute "formz-message-template"
+             *   ("fz-field-container"), a query is made to search for an
+             *   element containing the attribute "fz-message-template"
              *   inside the field container.
              * - If no container is declared, the same query is made, but inside
              *   the whole form element.
@@ -136,13 +136,13 @@ Fz.Field = (function () {
 
                 // First: try to fetch for an element inside the field container.
                 if (null !== fieldContainer) {
-                    errorTemplateContainer = fieldContainer.querySelector('[formz-message-template="1"]');
+                    errorTemplateContainer = fieldContainer.querySelector('[fz-message-template="1"]');
                 }
 
                 // If the query above returned nothing, we try the same one inside the whole form.
                 if (null === errorTemplateContainer) {
                     var flag = {};
-                    var allErrorTemplateContainer = this.getForm().getElement().querySelectorAll('[formz-message-template="1"]');
+                    var allErrorTemplateContainer = this.getForm().getElement().querySelectorAll('[fz-message-template="1"]');
                     var allFieldsErrorTemplateContainer = [];
                     var fields = this.getForm().getFields();
 
@@ -150,7 +150,7 @@ Fz.Field = (function () {
                         if (fields.hasOwnProperty(field)) {
                             var tmpFieldContainer = fields[field].getFieldContainer();
                             if (null !== tmpFieldContainer) {
-                                var tmpMessageTemplatesContainer = tmpFieldContainer.querySelectorAll('[formz-message-template="1"]');
+                                var tmpMessageTemplatesContainer = tmpFieldContainer.querySelectorAll('[fz-message-template="1"]');
 
                                 for (var k = 0; k < tmpMessageTemplatesContainer.length; k++) {
                                     allFieldsErrorTemplateContainer.push(tmpMessageTemplatesContainer[k]);
@@ -183,7 +183,7 @@ Fz.Field = (function () {
             },
 
             /**
-             * Used to handle the "formz-loading" data attribute of the field
+             * Used to handle the "fz-loading" data attribute of the field
              * container, which can be used with CSS to show loading images next
              * the field (for instance).
              *
@@ -193,9 +193,9 @@ Fz.Field = (function () {
                 var element = this.getFieldContainer();
                 if (null !== element) {
                     if (true === run) {
-                        element.setAttribute('formz-loading', '1');
+                        element.setAttribute('fz-loading', '1');
                     } else {
-                        element.removeAttribute('formz-loading');
+                        element.removeAttribute('fz-loading');
                     }
                 }
             },
@@ -463,7 +463,7 @@ Fz.Field = (function () {
             var loopOnClasses = function (type, callback) {
                 for (var classKey in classes[type]['items']) {
                     if (classes[type]['items'].hasOwnProperty(classKey)) {
-                        var classToFind = 'formz-' + type + '-' + classes[type]['items'][classKey];
+                        var classToFind = 'fz-' + type + '-' + classes[type]['items'][classKey];
                         var classToHandle = classes[type]['items'][classKey];
 
                         if (Fz.hasClass(fieldContainer, classToFind)) {

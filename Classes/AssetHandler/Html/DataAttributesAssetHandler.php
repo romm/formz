@@ -27,11 +27,11 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  *
  * Example of data attributes:
  *  - Fields values: when a field changes, its new value will be indicated in
- *    the form with the attribute: `formz-value-{field name}="value"`.
+ *    the form with the attribute: `fz-value-{field name}="value"`.
  *  - Fields validation: when a field is considered as valid (it passed all its
- *    validation rules), the form gets the attribute: `formz-valid-{field name}`.
+ *    validation rules), the form gets the attribute: `fz-valid-{field name}`.
  *  - Fields errors: when a field validation fails with an error, the form gets
- *    the attribute: `formz-error-{field name}-{name of the error}`.
+ *    the attribute: `fz-error-{field name}-{name of the error}`.
  *  - Fields warnings and notices: same as errors.
  */
 class DataAttributesAssetHandler extends AbstractAssetHandler
@@ -40,7 +40,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     /**
      * Handles the data attributes containing the values of the form fields.
      *
-     * Example: `formz-value-color="blue"`
+     * Example: `fz-value-color="blue"`
      *
      * @param FormResult $formResult
      * @return array
@@ -74,8 +74,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      * notices.
      *
      * Examples:
-     * - `formz-error-email="1"`
-     * - `formz-error-email-rule-default="1"`
+     * - `fz-error-email="1"`
+     * - `fz-error-email-rule-default="1"`
      *
      * @return array
      */
@@ -157,7 +157,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     /**
      * Handles the data attributes for the fields which are valid.
      *
-     * Example: `formz-valid-email="1"`
+     * Example: `fz-valid-email="1"`
      *
      * @return array
      */
@@ -188,7 +188,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValueKey($fieldName)
     {
-        return 'formz-value-' . StringService::get()->sanitizeString($fieldName);
+        return 'fz-value-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -199,7 +199,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataValidKey($fieldName)
     {
-        return 'formz-valid-' . StringService::get()->sanitizeString($fieldName);
+        return 'fz-valid-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -211,7 +211,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldDataMessageKey($fieldName, $type = 'error')
     {
-        return 'formz-' . $type . '-' . StringService::get()->sanitizeString($fieldName);
+        return 'fz-' . $type . '-' . StringService::get()->sanitizeString($fieldName);
     }
 
     /**
@@ -219,7 +219,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     public static function getFieldSubmissionDone()
     {
-        return 'formz-submission-done';
+        return 'fz-submission-done';
     }
 
     /**
@@ -237,7 +237,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         $stringService = StringService::get();
 
         return vsprintf(
-            'formz-%s-%s-%s-%s',
+            'fz-%s-%s-%s-%s',
             [
                 $type,
                 $stringService->sanitizeString($fieldName),

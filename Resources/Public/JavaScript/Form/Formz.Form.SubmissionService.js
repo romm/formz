@@ -83,8 +83,8 @@ Fz.Form.SubmissionService = (function () {
                         fieldsCheckedWithErrors = {};
                         fieldsCheckedNumber = 0;
 
-                        form.getElement().setAttribute('formz-submission-done', '1');
-                        form.getElement().setAttribute('formz-loading', '1');
+                        form.getElement().setAttribute('fz-submission-done', '1');
+                        form.getElement().setAttribute('fz-loading', '1');
 
                         checkAllFieldsAreValid();
                     }
@@ -113,7 +113,7 @@ Fz.Form.SubmissionService = (function () {
                 var endProcess = function () {
                     if (fieldsCheckedNumber === fieldsCheckedTotal) {
                         submissionBeingChecked = false;
-                        form.getElement().removeAttribute('formz-loading');
+                        form.getElement().removeAttribute('fz-loading');
 
                         if (false === formCanBeSubmitted) {
                             Fz.debug('Submission cancelled because the following fields are not valid: ' + Fz.objectKeys(fieldsCheckedWithErrors).join(', ') + '.', Fz.TYPE_NOTICE);
@@ -137,7 +137,7 @@ Fz.Form.SubmissionService = (function () {
                             }
 
                             if (true === submitFlag) {
-                                form.getElement().setAttribute('formz-submitted', '1');
+                                form.getElement().setAttribute('fz-submitted', '1');
 
                                 // Everything ran perfectly for the form: the real submission is launched.
                                 form.getElement().submit();

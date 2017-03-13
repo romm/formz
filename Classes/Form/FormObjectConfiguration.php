@@ -106,7 +106,7 @@ class FormObjectConfiguration
     }
 
     /**
-     * Resets the validation result and merges it with the global formz
+     * Resets the validation result and merges it with the global FormZ
      * configuration.
      *
      * @param ConfigurationObjectInstance $configurationObject

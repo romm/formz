@@ -10,11 +10,11 @@ Fz.Field.DataAttributesService = (function () {
         var field = states.field;
 
         var dataAttributesNames = {
-            valid: 'formz-valid-' + Fz.camelCaseToDashed(field.getName()),
-            value: 'formz-value-' + Fz.camelCaseToDashed(field.getName()),
-            error: 'formz-error-' + Fz.camelCaseToDashed(field.getName()),
-            warning: 'formz-warning-' + Fz.camelCaseToDashed(field.getName()),
-            notice: 'formz-notice-' + Fz.camelCaseToDashed(field.getName()),
+            valid: 'fz-valid-' + Fz.camelCaseToDashed(field.getName()),
+            value: 'fz-value-' + Fz.camelCaseToDashed(field.getName()),
+            error: 'fz-error-' + Fz.camelCaseToDashed(field.getName()),
+            warning: 'fz-warning-' + Fz.camelCaseToDashed(field.getName()),
+            notice: 'fz-notice-' + Fz.camelCaseToDashed(field.getName()),
             errors: [],
             warnings: [],
             notices: [],
@@ -137,7 +137,7 @@ Fz.Field.DataAttributesService = (function () {
         },
 
         getFieldMessageDataName: function(field, type, validationName, errorName) {
-            return 'formz-' + type + '-' + Fz.camelCaseToDashed(field.getName())
+            return 'fz-' + type + '-' + Fz.camelCaseToDashed(field.getName())
                 + '-' + Fz.camelCaseToDashed(validationName)
                 + '-' + Fz.camelCaseToDashed(errorName);
         }

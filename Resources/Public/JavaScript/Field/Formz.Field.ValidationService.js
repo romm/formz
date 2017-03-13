@@ -248,12 +248,12 @@ Fz.Field.ValidationService = (function () {
          *
          * It will also handle and refresh the several data attributes of
          * the form element:
-         *  - formz-valid-{name} : is added to the form element if the
+         *  - fz-valid-{name} : is added to the form element if the
          *     current field had no errors during its previous validation.
-         *     Example : formz-valid-email="1"
-         *  - formz-error-{name}-{validationName}-{errorMessage} : is used
+         *     Example : fz-valid-email="1"
+         *  - fz-error-{name}-{validationName}-{errorMessage} : is used
          *     for each error of the current field.
-         *     Example : formz-error-email-required-default="1"
+         *     Example : fz-error-email-required-default="1"
          *
          * @param {string}               validationRuleName Last validation rule name.
          * @param {Formz.ResultInstance} result             Result of the last validation.

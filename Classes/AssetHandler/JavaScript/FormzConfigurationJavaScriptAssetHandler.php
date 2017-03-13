@@ -63,7 +63,7 @@ JS;
     }
 
     /**
-     * Returns a JSON array containing the formz configuration.
+     * Returns a JSON array containing the FormZ configuration.
      *
      * @return string
      */

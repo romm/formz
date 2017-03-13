@@ -62,7 +62,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  *   To help integrators customize every aspect they need in CSS, every useful
  *   information is put in data attributes in the form DOM element. For example,
  *   you can know in real time if the field "email" is valid if the form has the
- *   attribute "formz-valid-email"
+ *   attribute "fz-valid-email"
  *
  * - CSS
  *   A block of CSS is built from scratch, which will handle the fields display,
