@@ -35,17 +35,17 @@ Vous pouvez retrouvez tous les détails des propriétés au chapitre « :ref:`us
             # Liste des paramètres donnés par défaut aux champs des formulaires.
             defaultFieldSettings {
                 # Sélecteur du conteneur HTML du champ.
-                fieldContainerSelector = .formz-field-#FIELD#
+                fieldContainerSelector = .fz-field-#FIELD#
 
                 # Sélecteur du conteneur HTML des messages.
-                feedbackContainerSelector = .formz-messages-#FIELD#
+                feedbackContainerSelector = .fz-messages-#FIELD#
 
                 # Sélecteur du conteneur HTML de la liste des messages.
-                feedbackListSelector = .formz-messages-list-#FIELD#
+                feedbackListSelector = .fz-messages-list-#FIELD#
 
                 # Modèle HTML utilisé pour les messages renvoyé par la
                 # validation d'un champ.
-                messageTemplate = <span class="formz-message-#TYPE#">#MESSAGE#</span>
+                messageTemplate = <span class="fz-message-#TYPE#">#MESSAGE#</span>
             }
         }
 

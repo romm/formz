@@ -81,7 +81,7 @@ The following variables can be used in your template:
 
 * ``fieldName``: name of the current field (the value of the property ``name`` used in the ViewHelper :ref:`integratorManual-viewHelpers-field`).
 
-* ``fieldId``: if this argument was not declared before, it will be automatically filled with an identifier generated with the name of the form and the name of the field. Example for the field ``email`` of the form ``myForm``: ``formz-my-form-email``.
+* ``fieldId``: if this argument was not declared before, it will be automatically filled with an identifier generated with the name of the form and the name of the field. Example for the field ``email`` of the form ``myForm``: ``fz-my-form-email``.
 
 .. important::
 
@@ -102,14 +102,14 @@ The following variables can be used in your template:
     </f:section>
 
     <f:section name="Field">
-        <div formz-field-container="{fieldName}">
+        <div fz-field-container="{fieldName}">
             <formz:slot.render slot="Field" />
         </div>
     </f:section>
 
     <f:section name="Feedback">
-        <div formz-field-feedback-container="{fieldName}">
-            <div formz-field-feedback-list="{fieldName}">
+        <div fz-field-feedback-container="{fieldName}">
+            <div fz-field-feedback-list="{fieldName}">
                 <f:for each="{validationResults.errors}" iteration="iteration" as="error">
                     <formz:formatMessage message="{error}" />
                 </f:for>

@@ -178,7 +178,7 @@ Field container selector
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-container="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-container="#FIELD#"]``.
 
         **Example:**
 
@@ -188,7 +188,7 @@ Field container selector
                 fields {
                     email {
                         settings {
-                            fieldContainerSelector = [formz-field-container="#FIELD#"]
+                            fieldContainerSelector = [fz-field-container="#FIELD#"]
                         }
                     }
 
@@ -226,7 +226,7 @@ Feedback container selector
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-feedback-container="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-feedback-container="#FIELD#"]``.
 
         **Example:**
 
@@ -258,7 +258,7 @@ Feedback list selector
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-feedback-list="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-feedback-list="#FIELD#"]``.
 
         If an empty value is set, then the feedback container will be used.
 

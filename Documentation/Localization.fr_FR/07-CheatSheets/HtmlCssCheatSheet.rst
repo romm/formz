@@ -40,19 +40,19 @@ Attributs « data »
 
 Liste des attributs utilisés sur la balise ``<form>`` et pouvant être utilisés en CSS :
 
-* ``formz-valid`` : lorsque tous les champs sont valides ;
+* ``fz-valid`` : lorsque tous les champs sont valides ;
 
-* ``formz-value-{field-name}="value"`` : valeur actuelle du champ ;
+* ``fz-value-{field-name}="value"`` : valeur actuelle du champ ;
 
-* ``formz-valid-{field-name}="1"`` : le champ est valide (aucune erreur de validation) ;
+* ``fz-valid-{field-name}="1"`` : le champ est valide (aucune erreur de validation) ;
 
-* ``formz-error-{field-name}="1"`` : le champ contient au moins une erreur ;
+* ``fz-error-{field-name}="1"`` : le champ contient au moins une erreur ;
 
-* ``formz-error-{field-name}-{rule-name}-{message-key}`` : le champ contient l'erreur ``{rule-name}`` avec le message ``{message-key}`` ;
+* ``fz-error-{field-name}-{rule-name}-{message-key}`` : le champ contient l'erreur ``{rule-name}`` avec le message ``{message-key}`` ;
 
-* ``formz-submission-done`` : le formulaire a été soumis ;
+* ``fz-submission-done`` : le formulaire a été soumis ;
 
-* ``formz-submitted`` : le formulaire est en train d'être soumis.
+* ``fz-submitted`` : le formulaire est en train d'être soumis.
 
 **Exemple de code CSS correspondant :**
 
@@ -60,7 +60,7 @@ Dans l'exemple ci-dessous, le bloc ``info-customer`` sera masqué tant que le bo
 
 .. code-block:: css
 
-    form[name="myForm"]:not([formz-value-is-customer="0"]) .info-customer {
+    form[name="myForm"]:not([fz-value-is-customer="0"]) .info-customer {
         display: none;
     }
 
@@ -87,7 +87,7 @@ Dans l'exemple ci-dessous, le bloc ``info-customer`` sera masqué tant que le bo
 Comportement de chargement
 --------------------------
 
-* L'attribut ``formz-loading`` est rajouté :
+* L'attribut ``fz-loading`` est rajouté :
 
   1. À la balise ``<form>`` lorsque le formulaire est en train d'être **vérifié**. Cela peut être utilisé par exemple pour désactiver le bouton de soumission, le temps que les champs soient validés.
 
@@ -99,10 +99,10 @@ Comportement de chargement
 
      .. code-block:: css
 
-         .formz[formz-loading] input[type="submit"] {
+         .formz[fz-loading] input[type="submit"] {
              display: none;
          }
 
   2. Au conteneur d'un champ lorsqu'il est en train d'être validé. Cela peut être utilisé par exemple pour afficher un cercle de chargement lorsqu'une requête Ajax est en cours.
 
-* L'attribut ``formz-submitted`` est rajouté à la balise ``<form>`` lorsque le formulaire est en train d'être soumis (lorsque tous les champs ont été validés).
+* L'attribut ``fz-submitted`` est rajouté à la balise ``<form>`` lorsque le formulaire est en train d'être soumis (lorsque tous les champs ont été validés).

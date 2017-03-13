@@ -41,19 +41,19 @@ You can find a guide on integrating XSD files in your IDE here: https://github.c
 List of attributes used on the tag ``<form>`` and which can be used with CSS:
 
 
-* ``formz-valid``: when all fields are valid.
+* ``fz-valid``: when all fields are valid.
 
-* ``formz-value-{field-name}="value"``: current value of the field;
+* ``fz-value-{field-name}="value"``: current value of the field;
 
-* ``formz-valid-{field-name}="1"``: the field is valid (no validation error);
+* ``fz-valid-{field-name}="1"``: the field is valid (no validation error);
 
-* ``formz-error-{field-name}="1"``: the field has at least one error;
+* ``fz-error-{field-name}="1"``: the field has at least one error;
 
-* ``formz-error-{field-name}-{rule-name}-{message-key}``: the field has the error ``{rule-name}`` with the message ``{message-key}`` ;
+* ``fz-error-{field-name}-{rule-name}-{message-key}``: the field has the error ``{rule-name}`` with the message ``{message-key}`` ;
 
-* ``formz-submission-done``: the form has been submitted;
+* ``fz-submission-done``: the form has been submitted;
 
-* ``formz-submitted``: the form is being submitted.
+* ``fz-submitted``: the form is being submitted.
 
 **Example of CSS:**
 
@@ -61,7 +61,7 @@ In the example below, the block ``info-customer`` is hidden as long as the butto
 
 .. code-block:: css
 
-    form[name="myForm"]:not([formz-value-is-customer="0"]) .info-customer {
+    form[name="myForm"]:not([fz-value-is-customer="0"]) .info-customer {
         display: none;
     }
 
@@ -88,7 +88,7 @@ In the example below, the block ``info-customer`` is hidden as long as the butto
 Loading behaviour
 -----------------
 
-* The attribute ``formz-loading`` is added:
+* The attribute ``fz-loading`` is added:
 
   1. To the tag ``<form>`` when the form is being **validated**. It can be used for instance to deactivate the submission button, to wait for the fields to be validated.
 
@@ -100,10 +100,10 @@ Loading behaviour
 
      .. code-block:: css
 
-         .formz[formz-loading] input[type="submit"] {
+         .formz[fz-loading] input[type="submit"] {
              display: none;
          }
 
   2. To the field container when it is being validated. It can be used for instance to display a loading circle when an Ajax request is running.
 
-* The attribute ``formz-submitted`` is added to the tag ``<form>`` when the form is being **submitted** (when all fields were validated).
+* The attribute ``fz-submitted`` is added to the tag ``<form>`` when the form is being **submitted** (when all fields were validated).
