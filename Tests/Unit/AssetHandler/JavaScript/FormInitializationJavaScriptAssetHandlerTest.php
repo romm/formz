@@ -18,7 +18,7 @@ class FormInitializationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.Form.register('foo',#CONFIGURATION#);})();
+(function(){Fz.Form.register('foo',#CONFIGURATION#);})();
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);

@@ -56,7 +56,7 @@ class FieldsValidationActivationJavaScriptAssetHandler extends AbstractAssetHand
 
         return <<<JS
 (function() {
-    Formz.Form.get(
+    Fz.Form.get(
         $formName,
         function(form) {
             var field = null;

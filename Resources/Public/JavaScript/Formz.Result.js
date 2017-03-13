@@ -1,4 +1,4 @@
-Formz.Result = (function () {
+Fz.Result = (function () {
     /**
      * @param {Object} states
      * @param {String} states.defaultErrorMessage
@@ -62,7 +62,7 @@ Formz.Result = (function () {
                 message = defaultErrorMessage;
             }
 
-            message = Formz.Localization.getLocalization(message);
+            message = Fz.Localization.getLocalization(message);
 
             for (var i = 0; i < arguments.length; i++) {
                 message = message.replace('{' + i + '}', arguments[i].toString());
@@ -108,7 +108,7 @@ Formz.Result = (function () {
              * @returns {boolean}
              */
             hasErrors: function () {
-                return Formz.objectSize(errorMessages) > 0;
+                return Fz.objectSize(errorMessages) > 0;
             },
 
             /**
@@ -139,9 +139,9 @@ Formz.Result = (function () {
              * @returns {boolean}
              */
             hasWarnings: function () {
-                return Formz.objectSize(warningMessages) > 0;
+                return Fz.objectSize(warningMessages) > 0;
             },
-            
+
             /**
              * Adds a notice to the result.
              *
@@ -170,7 +170,7 @@ Formz.Result = (function () {
              * @returns {boolean}
              */
             hasNotices: function () {
-                return Formz.objectSize(noticeMessages) > 0;
+                return Fz.objectSize(noticeMessages) > 0;
             },
 
             /**

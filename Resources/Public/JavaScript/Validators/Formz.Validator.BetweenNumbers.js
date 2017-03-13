@@ -1,4 +1,4 @@
-Formz.Validation.registerValidator(
+Fz.Validation.registerValidator(
     'Romm\\Formz\\Validation\\Validator\\BetweenNumbersValidator',
     /**
      * @param {string}                   value

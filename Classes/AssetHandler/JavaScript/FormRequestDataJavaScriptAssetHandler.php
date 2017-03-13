@@ -53,7 +53,7 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
 
         $javaScriptCode = <<<JS
 (function() {
-    Formz.Form.beforeInitialization($formName, function(form) {
+    Fz.Form.beforeInitialization($formName, function(form) {
         form.injectRequestData($submittedFormValues, $fieldsExistingMessages, $formWasSubmitted, $deactivatedFields)
     });
 })();

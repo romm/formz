@@ -1,5 +1,5 @@
 // http://youmightnotneedjquery.com/#deep_extend
-Formz.extend = function(out) {
+Fz.extend = function(out) {
     out = out || {};
 
     for (var i = 1; i < arguments.length; i++) {
@@ -22,8 +22,8 @@ Formz.extend = function(out) {
     return out;
 };
 
-Formz.extend(
-    Formz,
+Fz.extend(
+    Fz,
     /** @namespace Formz */
     {
         camelCaseToDashed: function (string) {

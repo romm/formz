@@ -124,7 +124,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
      */
     public function getJavaScriptResult()
     {
-        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsValidCondition\', form, {"fieldName":"foo"})';
+        $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsValidCondition\', form, {"fieldName":"foo"})';
 
         $conditionItem = new FieldIsValidCondition;
         $conditionItem->setFieldName('foo');

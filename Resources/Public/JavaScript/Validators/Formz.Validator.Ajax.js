@@ -28,7 +28,7 @@
         }
     };
 
-    Formz.Validation.registerValidator(
+    Fz.Validation.registerValidator(
         'AjaxValidator',
         /**
          * @param {string}                   value
@@ -58,7 +58,7 @@
                 };
 
                 var request = new XMLHttpRequest();
-                request.open('POST', Formz.getAjaxUrl(), true);
+                request.open('POST', Fz.getAjaxUrl(), true);
                 request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                 request.onerror = errorCallBack;
                 request.onload = function() {
@@ -93,7 +93,7 @@
                 data += '&formName=' + encodeURIComponent(field.getForm().getName());
                 data += '&validatorName=' + encodeURIComponent(states['validatorName']);
                 data += '&fieldName=' + encodeURIComponent(field.getName());
-                data += '&' + Formz.buildQueryForm(field.getForm().getElement(), 'form');
+                data += '&' + Fz.buildQueryForm(field.getForm().getElement(), 'form');
 
                 request.send(data);
             } else {

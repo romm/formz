@@ -1,4 +1,4 @@
-Formz.Field.ValidationService = (function () {
+Fz.Field.ValidationService = (function () {
     /**
      * @param {Object}                             states
      * @param {Function}                           states.valueCallback
@@ -52,7 +52,7 @@ Formz.Field.ValidationService = (function () {
         /**
          * @type {Formz.EventsManagerInstance}
          */
-        var eventsManager = states.eventsManager || Formz.EventsManager.get();
+        var eventsManager = states.eventsManager || Fz.EventsManager.get();
 
         /**
          * Default error message used if no valid message is found for an error.
@@ -144,7 +144,7 @@ Formz.Field.ValidationService = (function () {
         var launchValidation = function (validationRules, validationRulesKeys) {
             var validatorName = validationRulesKeys[0];
             var validationRule = validationRules[validatorName];
-            var result = Formz.Result.get({defaultErrorMessage: defaultErrorMessage});
+            var result = Fz.Result.get({defaultErrorMessage: defaultErrorMessage});
             var finalValidationCallback = function () {
                 handleValidationResult(validatorName, result);
             };
@@ -307,8 +307,8 @@ Formz.Field.ValidationService = (function () {
                 if (errors.hasOwnProperty(validationName)) {
                     for (var errorName in errors[validationName]) {
                         if (errors[validationName].hasOwnProperty(errorName)) {
-                            eventsManager.dispatch('validationError.' + Formz.camelCaseToDashed(validationName));
-                            eventsManager.dispatch('validationError.' + Formz.camelCaseToDashed(validationName) + '.' + Formz.camelCaseToDashed(errorName));
+                            eventsManager.dispatch('validationError.' + Fz.camelCaseToDashed(validationName));
+                            eventsManager.dispatch('validationError.' + Fz.camelCaseToDashed(validationName) + '.' + Fz.camelCaseToDashed(errorName));
                         }
                     }
                 }
@@ -400,7 +400,7 @@ Formz.Field.ValidationService = (function () {
              */
             isValid: function () {
                 return (
-                    0 === Formz.objectSize(errors)
+                    0 === Fz.objectSize(errors)
                     && false === validationRunning
                     && true === this.wasValidated()
                 );
@@ -487,7 +487,7 @@ Formz.Field.ValidationService = (function () {
              */
             getActivatedValidationRules: function (callback) {
                 var activatedValidations = {};
-                var maxValidationRules = Formz.objectSize(validationRules);
+                var maxValidationRules = Fz.objectSize(validationRules);
                 var checkedValidationRules = 0;
 
                 var incrementCheckedValidationRules = function () {
@@ -527,12 +527,12 @@ Formz.Field.ValidationService = (function () {
              * @param {Object} validationConfiguration
              */
             addValidation: function (validationName, validatorName, validationConfiguration) {
-                var validatorInstance = Formz.Validation.getValidator(validatorName);
+                var validatorInstance = Fz.Validation.getValidator(validatorName);
 
                 if (null === validatorInstance
                     && true === validationConfiguration['settings']['useAjax']
                 ) {
-                    validatorInstance = Formz.Validation.getValidator('AjaxValidator');
+                    validatorInstance = Fz.Validation.getValidator('AjaxValidator');
                 }
 
                 if (null !== validatorInstance) {
@@ -563,7 +563,7 @@ Formz.Field.ValidationService = (function () {
                         validationRules[sortedRules[i][1][0]] = sortedRules[i][1][1];
                     }
                 } else {
-                    Formz.debug('The validator "' + validatorName + '" will not be used in JavaScript.', Formz.TYPE_NOTICE);
+                    Fz.debug('The validator "' + validatorName + '" will not be used in JavaScript.', Fz.TYPE_NOTICE);
                 }
             },
 
@@ -638,8 +638,8 @@ Formz.Field.ValidationService = (function () {
              */
             onError: function (validationName, errorName, callback) {
                 var eventName = (null === errorName)
-                    ? 'validationError.' + Formz.camelCaseToDashed(validationName)
-                    : 'validationError.' + Formz.camelCaseToDashed(validationName) + '.' + Formz.camelCaseToDashed(errorName);
+                    ? 'validationError.' + Fz.camelCaseToDashed(validationName)
+                    : 'validationError.' + Fz.camelCaseToDashed(validationName) + '.' + Fz.camelCaseToDashed(errorName);
 
                 eventsManager.on(eventName, callback);
             },
@@ -780,7 +780,7 @@ Formz.Field.ValidationService = (function () {
             checkCurrentActivatedValidators: function (defaultCallback, differencesCallback) {
                 this.getActivatedValidationRules(function (activatedValidations) {
                     var flag = true;
-                    var activatedValidationsNumber = Formz.objectSize(activatedValidations);
+                    var activatedValidationsNumber = Fz.objectSize(activatedValidations);
 
                     if ('*' !== validatorsCheckedDuringLastValidation
                         && activatedValidationsNumber === validatorsCheckedDuringLastValidation.length

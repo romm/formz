@@ -102,7 +102,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
      */
     public function getJavaScriptResult()
     {
-        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsEmptyCondition\', form, {"fieldName":"foo"})';
+        $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsEmptyCondition\', form, {"fieldName":"foo"})';
 
         $conditionItem = new FieldIsEmptyCondition;
         $conditionItem->setFieldName('foo');

@@ -1,7 +1,7 @@
 /**
  * @typedef {(Formz.FieldInstance|Formz.Field.ValidationServiceInstance)} Formz.FullField
  */
-Formz.Field = (function () {
+Fz.Field = (function () {
     /**
      * This callbacks are called when a validation is running.
      *
@@ -55,7 +55,7 @@ Formz.Field = (function () {
         /**
          * @type {Formz.EventsManagerInstance}
          */
-        var eventsManager = states.eventsManager || Formz.EventsManager.get();
+        var eventsManager = states.eventsManager || Fz.EventsManager.get();
 
         /**
          * Real field instance returned by the factory.
@@ -89,7 +89,7 @@ Formz.Field = (function () {
                 var feedbackListContainerElement = this.getFeedbackListContainer();
 
                 if (feedbackListContainerElement != null) {
-                    if (Formz.objectSize(messages) > 0) {
+                    if (Fz.objectSize(messages) > 0) {
                         var messageTemplate = this.getMessageTemplate();
 
                         for (var validationRuleName in messages) {
@@ -98,8 +98,8 @@ Formz.Field = (function () {
                                     if (messages[validationRuleName].hasOwnProperty(name)) {
                                         feedbackListContainerElement.innerHTML += messageTemplate
                                             .replace('#FIELD#', this.getName())
-                                            .replace('#FIELD_ID#', Formz.camelCaseToDashed('formz-' + this.getForm().getName() + '-' + this.getName()))
-                                            .replace('#VALIDATOR#', Formz.camelCaseToDashed(validationRuleName))
+                                            .replace('#FIELD_ID#', Fz.camelCaseToDashed('formz-' + this.getForm().getName() + '-' + this.getName()))
+                                            .replace('#VALIDATOR#', Fz.camelCaseToDashed(validationRuleName))
                                             .replace('#TYPE#', type)
                                             .replace('#KEY#', name)
                                             .replace('#MESSAGE#', messages[validationRuleName][name]);
@@ -411,7 +411,7 @@ Formz.Field = (function () {
          * Managing data-attributes for the field.
          */
         (function () {
-            var dataAttributesService = Formz.Field.DataAttributesService.get(states.field);
+            var dataAttributesService = Fz.Field.DataAttributesService.get(states.field);
 
             dataAttributesService.addMessagesDataAttributes(states.existingErrors, 'error');
             dataAttributesService.addMessagesDataAttributes(states.existingWarnings, 'warning');
@@ -458,7 +458,7 @@ Formz.Field = (function () {
          * depending on the field validation result.
          */
         (function () {
-            var classes = Formz.getConfiguration()['view']['classes'];
+            var classes = Fz.getConfiguration()['view']['classes'];
             var fieldContainer = states.field.getFieldContainer();
             var loopOnClasses = function (type, callback) {
                 for (var classKey in classes[type]['items']) {
@@ -466,7 +466,7 @@ Formz.Field = (function () {
                         var classToFind = 'formz-' + type + '-' + classes[type]['items'][classKey];
                         var classToHandle = classes[type]['items'][classKey];
 
-                        if (Formz.hasClass(fieldContainer, classToFind)) {
+                        if (Fz.hasClass(fieldContainer, classToFind)) {
                             callback(fieldContainer, classToHandle);
                         }
 
@@ -481,28 +481,28 @@ Formz.Field = (function () {
             if (null !== fieldContainer) {
                 states.field.onValidationBegins(function () {
                     loopOnClasses('errors', function (element, className) {
-                        Formz.removeClass(element, className);
+                        Fz.removeClass(element, className);
                     });
                     loopOnClasses('valid', function (element, className) {
-                        Formz.removeClass(element, className);
+                        Fz.removeClass(element, className);
                     });
                 });
 
                 states.field.onValidationDone(function (result) {
                     if (result.hasErrors()) {
                         loopOnClasses('errors', function (element, className) {
-                            Formz.addClass(element, className);
+                            Fz.addClass(element, className);
                         });
                     } else {
                         loopOnClasses('valid', function (element, className) {
-                            Formz.addClass(element, className);
+                            Fz.addClass(element, className);
                         });
                     }
                 });
 
                 states.eventsManager.on('refreshFeedback', function () {
                     loopOnClasses('errors', function (element, className) {
-                        Formz.removeClass(element, className);
+                        Fz.removeClass(element, className);
                     });
                 });
             }
@@ -541,12 +541,12 @@ Formz.Field = (function () {
                 wasValidated: wasValidated,
                 isDeactivated: isDeactivated,
                 form: form,
-                eventsManager: Formz.EventsManager.get()
+                eventsManager: Fz.EventsManager.get()
             };
 
             var fieldProto = states.field = fieldPrototype(states);
-            var validationServicePrototype = Formz.Field.ValidationService.getFieldValidationService(states);
-            var fieldInstance = Formz.extend(fieldProto, validationServicePrototype);
+            var validationServicePrototype = Fz.Field.ValidationService.getFieldValidationService(states);
+            var fieldInstance = Fz.extend(fieldProto, validationServicePrototype);
 
             manageFieldEvents({
                 field: fieldInstance,

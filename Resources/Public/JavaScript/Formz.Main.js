@@ -1,5 +1,5 @@
 // Declaring namespace.
-var Formz = (function() {
+var Fz = (function() {
     /**
      * Contains the general configuration of FormZ.
      *
@@ -54,9 +54,11 @@ var Formz = (function() {
          * @param {string} type
          */
         debug: function(value, type) {
-            if (typeof Formz.Debug !== 'undefined') {
-                Formz.Debug.debug(value, type);
+            if (typeof Fz.Debug !== 'undefined') {
+                Fz.Debug.debug(value, type);
             }
         }
     };
 })();
+
+var Formz = Fz;

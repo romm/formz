@@ -116,7 +116,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
      */
     public function getJavaScriptResult()
     {
-        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasValueCondition\', form, {"fieldName":"foo","fieldValue":"bar"})';
+        $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasValueCondition\', form, {"fieldName":"foo","fieldValue":"bar"})';
 
         $conditionItem = new FieldHasValueCondition;
         $conditionItem->setFieldName('foo');

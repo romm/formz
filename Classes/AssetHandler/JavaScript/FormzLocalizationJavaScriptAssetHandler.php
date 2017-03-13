@@ -73,7 +73,7 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractAssetHandler
         $jsonTranslationsBinding = $this->handleTranslationsBinding(ArrayService::get()->arrayToJavaScriptJson($translationsBinding));
 
         return <<<JS
-Formz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);
+Fz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);
 JS;
     }
 

@@ -17,7 +17,7 @@ class FormzConfigurationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.setConfiguration(#CONFIGURATION#);})();
+(function(){Fz.setConfiguration(#CONFIGURATION#);})();
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();

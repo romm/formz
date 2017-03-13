@@ -21,7 +21,7 @@ class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.Form.beforeInitialization('foo',function(form){form.injectRequestData({"foo":"foo"},{"foo":{"errors":{"foo":{"bar":"error"}}}},true,["foo"])});})();
+(function(){Fz.Form.beforeInitialization('foo',function(form){form.injectRequestData({"foo":"foo"},{"foo":{"errors":{"foo":{"bar":"error"}}}},true,["foo"])});})();
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();

@@ -36,7 +36,7 @@ class FormInitializationJavaScriptAssetHandler extends AbstractAssetHandler
 
         $javaScriptCode = <<<JS
 (function() {
-    Formz.Form.register($formName, $formConfigurationJson);
+    Fz.Form.register($formName, $formConfigurationJson);
 })();
 JS;
 
