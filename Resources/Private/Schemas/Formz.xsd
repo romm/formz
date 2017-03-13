@@ -205,22 +205,22 @@ readable, as you can see below:
 Without the Option view helper:
 
 ```
- <formz:field layout="..."
+ <fz:field layout="..."
               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
 
      ...
- </formz:field>
+ </fz:field>
 ```
 
 With it:
 
 ```
- <formz:field layout="...">
-     <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
-     <formz:option name="foo" value="bar" />
+ <fz:field layout="...">
+     <fz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
+     <fz:option name="foo" value="bar" />
 
      ...
- </formz:field>
+ </fz:field>
 ```]]></xsd:documentation></xsd:annotation><xsd:complexType mixed="true"><xsd:sequence><xsd:any minOccurs="0" maxOccurs="1"/></xsd:sequence><xsd:attribute type="xsd:string" name="name" use="required"><xsd:annotation><xsd:documentation><![CDATA[Name of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute><xsd:attribute type="xsd:string" name="value" use="required"><xsd:annotation><xsd:documentation><![CDATA[Value of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute></xsd:complexType></xsd:element><xsd:element name="option"><xsd:annotation><xsd:documentation><![CDATA[Use this view helper at the first level inside the Field view helper. It will
 be added to the arguments list, which can then be used inside the field
 template.
@@ -231,22 +231,22 @@ readable, as you can see below:
 Without the Option view helper:
 
 ```
- <formz:field layout="..."
+ <fz:field layout="..."
               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
 
      ...
- </formz:field>
+ </fz:field>
 ```
 
 With it:
 
 ```
- <formz:field layout="...">
-     <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
-     <formz:option name="foo" value="bar" />
+ <fz:field layout="...">
+     <fz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
+     <fz:option name="foo" value="bar" />
 
      ...
- </formz:field>
+ </fz:field>
 ```]]></xsd:documentation></xsd:annotation><xsd:complexType mixed="true"><xsd:sequence><xsd:any minOccurs="0" maxOccurs="1"/></xsd:sequence><xsd:attribute type="xsd:string" name="name" use="required"><xsd:annotation><xsd:documentation><![CDATA[Name of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute><xsd:attribute type="xsd:string" name="value" use="required"><xsd:annotation><xsd:documentation><![CDATA[Value of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute></xsd:complexType></xsd:element><xsd:element name="slot"><xsd:annotation><xsd:documentation><![CDATA[This view helper registers a slot which will not be rendered directly, but
 with the usage of the `slot.render` view helper.
 

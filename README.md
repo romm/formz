@@ -135,59 +135,59 @@ class ExampleForm implements FormInterface
 **Fluid template:**
 
 ```html
-<formz:form action="submitForm" name="exampleForm">
+<fz:form action="submitForm" name="exampleForm">
     <div class="row">
         <div class="col-md-6 form-group">
-            <formz:field name="firstName" layout="bootstrap3">
-                <formz:option name="label" value="First name" />
-                <formz:option name="required" value="1" />
+            <fz:field name="firstName" layout="bootstrap3">
+                <fz:option name="label" value="First name" />
+                <fz:option name="required" value="1" />
 
-                <formz:slot name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="First name" />
-                </formz:slot>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
         </div>
 
         <div class="col-md-6 form-group">
-            <formz:field name="name" layout="bootstrap3">
-                <formz:option name="label" value="Name" />
-                <formz:option name="required" value="1" />
+            <fz:field name="name" layout="bootstrap3">
+                <fz:option name="label" value="Name" />
+                <fz:option name="required" value="1" />
 
-                <formz:slot name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="Name" />
-                </formz:slot>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 form-group">
-            <formz:field name="email" layout="bootstrap3">
-                <formz:option name="label" value="Email" />
-                <formz:option name="required" value="1" />
+            <fz:field name="email" layout="bootstrap3">
+                <fz:option name="label" value="Email" />
+                <fz:option name="required" value="1" />
 
-                <formz:slot name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield class="{inputClass}" property="{fieldName}" id="{fieldId}" placeholder="Email" />
-                </formz:slot>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
         </div>
 
         <div class="col-md-6 form-group">
-            <formz:field name="gender" layout="bootstrap3">
-                <formz:option name="label" value="Gender" />
-                <formz:option name="required" value="1" />
+            <fz:field name="gender" layout="bootstrap3">
+                <fz:option name="label" value="Gender" />
+                <fz:option name="required" value="1" />
 
-                <formz:slot name="Field">
+                <fz:slot name="Field">
                     <label for="{fieldId}-female">Female</label>
                     <f:form.radio property="{fieldName}" id="{fieldId}-female" value="female" />
 
                     <label for="{fieldId}-male">Male</label>
                     <f:form.radio property="{fieldName}" id="{fieldId}-male" value="male" />
-                </formz:slot>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
         </div>
     </div>
 
     <f:form.submit value="Send" class="btn btn-primary" />
-</formz:form>
+</fz:form>
 ```
