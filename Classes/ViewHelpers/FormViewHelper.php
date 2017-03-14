@@ -24,6 +24,7 @@ use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\ControllerService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
@@ -32,7 +33,6 @@ use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -109,6 +109,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * @var bool
      */
     protected $typoScriptIncluded = false;
+
+    /**
+     * @var ControllerService
+     */
+    protected $controllerService;
 
     /**
      * @inheritdoc
@@ -387,18 +392,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function getFormClassNameFromControllerAction()
     {
-        $controllerObjectName = $this->getControllerName();
-        $actionName = $this->getControllerActionName();
-
-        /** @var ReflectionService $reflectionService */
-        $reflectionService = Core::instantiate(ReflectionService::class);
-        $methodParameters = $reflectionService->getMethodParameters($controllerObjectName, $actionName);
-
-        if (false === isset($methodParameters[$this->getFormObjectName()])) {
-            throw EntryNotFoundException::formViewHelperControllerActionArgumentMissing($controllerObjectName, $actionName, $this->getFormObjectName());
-        }
-
-        return $methodParameters[$this->getFormObjectName()]['type'];
+        return $this->controllerService->getFormClassNameFromControllerAction(
+            $this->getControllerName(),
+            $this->getControllerActionName(),
+            $this->getFormObjectName()
+        );
     }
 
     /**
@@ -417,9 +415,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function getControllerName()
     {
-        return $this->controllerContext
-            ->getRequest()
-            ->getControllerObjectName();
+        return ($this->arguments['controller'])
+            ?: $this->controllerContext
+                ->getRequest()
+                ->getControllerObjectName();
     }
 
     /**
@@ -427,12 +426,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function getControllerActionName()
     {
-        $actionName = ($this->arguments['action'])
+        return ($this->arguments['action'])
             ?: $this->controllerContext
                 ->getRequest()
                 ->getControllerActionName();
-
-        return $actionName . 'Action';
     }
 
     /**
@@ -483,5 +480,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
+    }
+
+    /**
+     * @param ControllerService $controllerService
+     */
+    public function injectControllerService(ControllerService $controllerService)
+    {
+        $this->controllerService = $controllerService;
     }
 }

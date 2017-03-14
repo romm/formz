@@ -5,11 +5,13 @@ use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Connector\CssAssetHandlerConnector;
 use Romm\Formz\AssetHandler\Connector\JavaScriptAssetHandlerConnector;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\ControllerService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper;
 use Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper;
@@ -543,6 +545,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $this->inject($viewHelper, 'tag', $tagBuilder);
 
         $viewHelper->injectFormService(new FormViewHelperService);
+        $viewHelper->injectControllerService(Core::instantiate(ControllerService::class));
 
         return $viewHelper;
     }
