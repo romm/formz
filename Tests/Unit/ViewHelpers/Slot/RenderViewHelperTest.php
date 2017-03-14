@@ -45,14 +45,17 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $slotService->expects($this->once())
             ->method('getSlotArguments')
             ->with($slotArgument)
-            ->willReturn(['foo' => 'bar']);
+            ->willReturn([]);
 
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
-        $viewHelper->setArguments(['slot' => $slotArgument]);
+        $viewHelper->setArguments([
+            'slot'      => $slotArgument,
+            'arguments' => []
+        ]);
         $viewHelper->initializeArguments();
 
         $this->assertEquals(
@@ -94,7 +97,59 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
 
         $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->setArguments(['slot' => 'foo']);
+        $viewHelper->setArguments([
+            'slot'      => 'foo',
+            'arguments' => []
+        ]);
+        $viewHelper->initializeArguments();
+
+        $fieldService = new FieldViewHelperService;
+        $fieldService->setCurrentField(new Field);
+        $viewHelper->injectFieldService($fieldService);
+
+        $viewHelper->render();
+    }
+
+    /**
+     * Arguments defined in the `SlotViewHelper` should override the ones
+     * defined in this view helper.
+     *
+     * @test
+     */
+    public function argumentsAreOverriddenBySlot()
+    {
+        $this->renderingContext = $this->getMockBuilder(RenderingContext::class)
+            ->setMethods(['getTemplateVariableContainer'])
+            ->getMock();
+
+        $templateVariableContainerMock = $this->getMockBuilder(TemplateVariableContainer::class)
+            ->setMethods(['add', 'remove'])
+            ->getMock();
+
+        $templateVariableContainerMock->expects($this->once())
+            ->method('add')
+            ->with('foo', 'baz');
+        $templateVariableContainerMock->expects($this->once())
+            ->method('remove')
+            ->with('foo');
+
+        $this->renderingContext
+            ->method('getTemplateVariableContainer')
+            ->willReturn($templateVariableContainerMock);
+
+        $slotService = new SlotViewHelperService;
+        $emptyClosure = function () {
+        };
+        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'baz']);
+
+        UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
+
+        $viewHelper = new RenderViewHelper;
+        $this->injectDependenciesIntoViewHelper($viewHelper);
+        $viewHelper->setArguments([
+            'slot'      => 'foo',
+            'arguments' => ['foo' => 'bar']
+        ]);
         $viewHelper->initializeArguments();
 
         $fieldService = new FieldViewHelperService;
