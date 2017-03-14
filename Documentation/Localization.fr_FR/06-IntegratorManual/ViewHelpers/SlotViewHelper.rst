@@ -27,7 +27,10 @@ Argument                Description
 \* ``name``             Nom du slot.
 
                         Notez que si vous utilisez le nom d'un slot qui n'est pas utilisé dans la layout du champ, ce slot ne sera donc
-                        pas rendue.
+                        pas rendu.
+
+``arguments``           Tableau d'arguments arbitraires qui seront passés au slot et où ils pourront être utilisés comme des variables
+                        Fluid.
 ======================= ================================================================================================================
 
 Exemple
@@ -35,7 +38,7 @@ Exemple
 
 .. code-block:: html
     :linenos:
-    :emphasize-lines: 9-11
+    :emphasize-lines: 10-12
 
     {namespace fz=Romm\Formz\ViewHelpers}
 
@@ -43,10 +46,11 @@ Exemple
 
         <fz:field name="email" layout="default">
 
-            Ce slot apparaît juste avant l'affichage de la liste des messages
-            de validation.
-            <fz:slot name="Feedback.Out.Before">
-                <div class="info">Hello world!</div>
+            <!-- Ce slot apparaît juste avant l'affichage de la liste des messages
+                 de validation. -->
+
+            <fz:slot name="Feedback.Out.Before" arguments="{myClass: 'info'}">
+                <div class="{myClass}">Hello world!</div>
             </fz:slot>
 
         </fz:field>

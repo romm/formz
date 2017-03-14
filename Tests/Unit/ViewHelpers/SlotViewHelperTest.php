@@ -24,10 +24,10 @@ class SlotViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
-            ->setMethods(['addSlotClosure'])
+            ->setMethods(['addSlot'])
             ->getMock();
         $slotService->expects($this->once())
-            ->method('addSlotClosure');
+            ->method('addSlot');
 
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
@@ -35,6 +35,7 @@ class SlotViewHelperTest extends AbstractViewHelperUnitTest
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
         $viewHelper->initializeArguments();
+        $viewHelper->setArguments(['arguments' => []]);
 
         $viewHelper->render();
     }

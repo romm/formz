@@ -64,7 +64,7 @@ class HasViewHelper extends AbstractConditionViewHelper implements CompilableInt
         $slotService = Core::instantiate(SlotViewHelperService::class);
         $slotName = $arguments['slot'];
 
-        return $slotService->hasSlotClosure($slotName);
+        return $slotService->hasSlot($slotName);
     }
 
     /**

@@ -25,7 +25,12 @@ class SlotViewHelperService implements SingletonInterface
      *
      * @var Closure[]
      */
-    private $slots = [];
+    private $closures = [];
+
+    /**
+     * @var array[]
+     */
+    private $arguments = [];
 
     /**
      * Adds a closure - which will render the slot with the given name - to the
@@ -33,10 +38,12 @@ class SlotViewHelperService implements SingletonInterface
      *
      * @param string  $name
      * @param Closure $closure
+     * @param array   $arguments
      */
-    public function addSlotClosure($name, Closure $closure)
+    public function addSlot($name, Closure $closure, array $arguments)
     {
-        $this->slots[$name] = $closure;
+        $this->closures[$name] = $closure;
+        $this->arguments[$name] = $arguments;
     }
 
     /**
@@ -48,20 +55,36 @@ class SlotViewHelperService implements SingletonInterface
      */
     public function getSlotClosure($name)
     {
-        if (false === $this->hasSlotClosure($name)) {
-            throw EntryNotFoundException::conditionNotFound($name);
+        if (false === $this->hasSlot($name)) {
+            throw EntryNotFoundException::slotClosureSlotNotFound($name);
         }
 
-        return $this->slots[$name];
+        return $this->closures[$name];
+    }
+
+    /**
+     * Returns the closure which will render the slot with the given name.
+     *
+     * @param string $name
+     * @return array
+     * @throws EntryNotFoundException
+     */
+    public function getSlotArguments($name)
+    {
+        if (false === $this->hasSlot($name)) {
+            throw EntryNotFoundException::slotArgumentsSlotNotFound($name);
+        }
+
+        return $this->arguments[$name];
     }
 
     /**
      * @param string $name
      * @return bool
      */
-    public function hasSlotClosure($name)
+    public function hasSlot($name)
     {
-        return true === isset($this->slots[$name]);
+        return true === isset($this->closures[$name]);
     }
 
     /**
@@ -69,6 +92,7 @@ class SlotViewHelperService implements SingletonInterface
      */
     public function resetState()
     {
-        $this->slots = [];
+        $this->closures = [];
+        $this->arguments = [];
     }
 }

@@ -69,7 +69,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_VIEW_HELPER_CLASS_NOT_FOUND,
-            [$formClassName, $formName, $controller, $action]
+            [$formClassName, $formName, $controller, $action . 'Action']
         );
 
         return $exception;

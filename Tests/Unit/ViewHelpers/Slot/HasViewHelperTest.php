@@ -40,10 +40,10 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
-            ->setMethods(['getSlotClosure', 'hasSlotClosure'])
+            ->setMethods(['getSlotClosure', 'hasSlot'])
             ->getMock();
         $slotService->expects($this->once())
-            ->method('hasSlotClosure')
+            ->method('hasSlot')
             ->with($slotArgument)
             ->willReturn(true);
 
@@ -87,10 +87,10 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
-            ->setMethods(['getSlotClosure', 'hasSlotClosure'])
+            ->setMethods(['getSlotClosure', 'hasSlot'])
             ->getMock();
         $slotService->expects($this->once())
-            ->method('hasSlotClosure')
+            ->method('hasSlot')
             ->with($slotArgument)
             ->willReturn(false);
 

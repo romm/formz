@@ -15,7 +15,6 @@ namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
@@ -28,7 +27,6 @@ use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * This view helper is used to automatize the rendering of a field layout. It
@@ -162,16 +160,15 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = ($templateArguments['fieldId']) ?: StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
-        /** @var StandaloneView $view */
-        $view = Core::instantiate(StandaloneView::class);
-        $view->setTemplatePathAndFilename($layout->getTemplateFile());
-        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
-        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
+        $view = $this->fieldService->getView();
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
         } else {
+            $view->setControllerContext($this->controllerContext);
+
             $variableProvider = $this->getVariableProvider();
+
             foreach ($templateArguments as $key => $value) {
                 if ($variableProvider->exists($key)) {
                     $variableProvider->remove($key);
@@ -181,6 +178,9 @@ class FieldViewHelper extends AbstractViewHelper
             }
         }
 
+        $view->setTemplatePathAndFilename($layout->getTemplateFile());
+        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
+        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
         $view->assignMultiple($templateArguments);
 
         return $view->render();

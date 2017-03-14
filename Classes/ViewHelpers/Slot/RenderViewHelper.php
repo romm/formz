@@ -19,6 +19,7 @@ use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\ViewHelpers\AbstractViewHelper;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -45,6 +46,7 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
     public function initializeArguments()
     {
         $this->registerArgument('slot', 'string', 'Instance of the slot which will be rendered.', true);
+        $this->registerArgument('arguments', 'array', 'Arguments sent to the slot.', false, []);
     }
 
     /**
@@ -71,9 +73,21 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
         $slotName = $arguments['slot'];
         $result = '';
 
-        if ($slotService->hasSlotClosure($slotName)) {
-            $closure = $slotService->getSlotClosure($slotName);
-            $result = $closure();
+        if ($slotService->hasSlot($slotName)) {
+            $slotClosure = $slotService->getSlotClosure($slotName);
+            $slotArguments = $slotService->getSlotArguments($slotName);
+            $mergedArguments = $arguments['arguments'];
+            ArrayUtility::mergeRecursiveWithOverrule($mergedArguments, $slotArguments);
+
+            foreach ($mergedArguments as $key => $value) {
+                $renderingContext->getTemplateVariableContainer()->add($key, $value);
+            }
+
+            $result = $slotClosure();
+
+            foreach (array_keys($mergedArguments) as $key) {
+                $renderingContext->getTemplateVariableContainer()->remove($key);
+            }
         }
 
         return $result;

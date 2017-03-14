@@ -25,6 +25,14 @@ Arguments
 Argument                Description
 ======================= ================================================================================================================
 \* ``slot``             Name of the rendered slot.
+
+``arguments``           Array of arbitrary arguments that will be passed to the slot and can be used within it as Fluid variables.
+
+                        .. note::
+
+                            If an argument defined in this list is also filled in the ``arguments`` of the slot (see
+                            “:ref:`integratorManual-viewHelpers-slot`”), it will be overridden with the value defined in the slot
+                            definition.
 ======================= ================================================================================================================
 
 Example
@@ -36,8 +44,8 @@ Example
 
     {namespace fz=Romm\Formz\ViewHelpers}
 
-    <fz:slot.render slot="Label.Before" />
+    <fz:slot.render slot="Label.Before" arguments="{class: 'label-before'}" />
 
     <label for="{fieldId}">{label}</label>
 
-    <fz:slot.render slot="Label.After" />
+    <fz:slot.render slot="Label.After" arguments="{class: 'label-after'}" />

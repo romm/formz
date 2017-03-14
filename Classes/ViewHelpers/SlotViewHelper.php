@@ -41,6 +41,7 @@ class SlotViewHelper extends AbstractViewHelper implements CompilableInterface
     public function initializeArguments()
     {
         $this->registerArgument('name', 'string', 'Name of the slot.', true);
+        $this->registerArgument('arguments', 'array', 'Arguments sent to the slot.', false, []);
     }
 
     /**
@@ -63,7 +64,7 @@ class SlotViewHelper extends AbstractViewHelper implements CompilableInterface
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
 
-        $slotService->addSlotClosure($arguments['name'], $renderChildrenClosure);
+        $slotService->addSlot($arguments['name'], $renderChildrenClosure, $arguments['arguments']);
     }
 
     /**

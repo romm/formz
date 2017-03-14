@@ -38,7 +38,7 @@ class EntryNotFoundException extends FormzException
 
     const FIELD_VIEW_HELPER_LAYOUT_ITEM_NOT_FOUND = 'The layout "%s" does not have an item "%s".';
 
-    const FORM_VIEW_HELPER_CONTROLLER_ACTION_ARGUMENT_MISSING = 'The method `%s::%s()` must have a parameter `$%s`. Note that you can also change the parameter `name` of the form view helper.';
+    const CONTROLLER_SERVICE_ACTION_FORM_ARGUMENT_MISSING = 'The method `%s::%s()` must have a parameter `$%s`. Note that you can also change the parameter `name` of the form view helper.';
 
     const SLOT_NOT_FOUND = 'No slot "%s" was found.';
 
@@ -243,12 +243,12 @@ class EntryNotFoundException extends FormzException
      * @param string $formName
      * @return EntryNotFoundException
      */
-    final public static function formViewHelperControllerActionArgumentMissing($controllerObjectName, $actionName, $formName)
+    final public static function controllerServiceActionFormArgumentMissing($controllerObjectName, $actionName, $formName)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
-            self::FORM_VIEW_HELPER_CONTROLLER_ACTION_ARGUMENT_MISSING,
-            [$controllerObjectName, $actionName, $formName]
+            self::CONTROLLER_SERVICE_ACTION_FORM_ARGUMENT_MISSING,
+            [$controllerObjectName, $actionName . 'Action', $formName]
         );
 
         return $exception;
@@ -260,7 +260,24 @@ class EntryNotFoundException extends FormzException
      * @param string $name
      * @return self
      */
-    final public static function slotNotFound($name)
+    final public static function slotClosureSlotNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::SLOT_NOT_FOUND,
+            [$name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1489497046
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function slotArgumentsSlotNotFound($name)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(

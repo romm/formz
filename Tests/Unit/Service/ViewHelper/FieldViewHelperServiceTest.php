@@ -70,4 +70,16 @@ class FieldViewHelperServiceTest extends AbstractUnitTest
         $this->assertNull($fieldService->getCurrentField());
         $this->assertEmpty($fieldService->getFieldOptions());
     }
+
+    /**
+     * @test
+     */
+    public function viewIsInstantiatedOnce()
+    {
+        $fieldService = new FieldViewHelperService;
+        $view1 = $fieldService->getView();
+        $view2 = $fieldService->getView();
+
+        $this->assertSame($view1, $view2);
+    }
 }
