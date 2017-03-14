@@ -8,7 +8,7 @@
 /**
  * @typedef {Formz.FormInstance|Formz.Form.SubmissionServiceInstance} Formz.FullForm
  */
-Formz.Form = (function () {
+Fz.Form = (function () {
     /**
      * @param {Object}          states
      * @param {HTMLFormElement} states.element
@@ -111,7 +111,7 @@ Formz.Form = (function () {
 
                     var isDeactivated = -1 !== deactivatedFields.indexOf(fieldName);
 
-                    var field = Formz.Field.get(
+                    var field = Fz.Field.get(
                         fieldName,
                         configurationFields[fieldName],
                         formInstance,
@@ -150,9 +150,9 @@ Formz.Form = (function () {
                 var formElements = window.document.getElementsByName(name);
 
                 if (formElements.length === 0) {
-                    Formz.debug(
+                    Fz.debug(
                         'Could not get the DOM element for the form "' + name + '"!',
-                        Formz.TYPE_ERROR
+                        Fz.TYPE_ERROR
                     )
                 }
 
@@ -234,16 +234,16 @@ Formz.Form = (function () {
         /**
          * When a field is validated, the form is entirely checked to see if all
          * fields are valid, in which case an attribute is added to the form DOM
-         * element: `formz-valid`.
+         * element: `fz-valid`.
          *
          * Several usages can be found for this: for instance, the submission
          * button can be shown only when the form is valid (logical behaviour
          * since the submission is canceled whenever an error is found).
          */
-        Formz.Form.get(name, function () {
+        Fz.Form.get(name, function () {
             var checkFormIsValid = function () {
                 var globalFlag = true;
-                var fieldsNumber = Formz.objectSize(fields);
+                var fieldsNumber = Fz.objectSize(fields);
                 var fieldsChecked = 0;
 
                 /**
@@ -254,9 +254,9 @@ Formz.Form = (function () {
                 var checkAllFieldsWereProcessed = function () {
                     if (fieldsNumber === fieldsChecked) {
                         if (true === globalFlag) {
-                            field.getForm().getElement().setAttribute('formz-valid', '1');
+                            field.getForm().getElement().setAttribute('fz-valid', '1');
                         } else {
-                            field.getForm().getElement().removeAttribute('formz-valid');
+                            field.getForm().getElement().removeAttribute('fz-valid');
                         }
                     }
                 };
@@ -273,7 +273,7 @@ Formz.Form = (function () {
                     fieldsChecked++;
 
                     field.getActivatedValidationRules(function (validationRules) {
-                        if (0 === Formz.objectSize(validationRules)) {
+                        if (0 === Fz.objectSize(validationRules)) {
                             // If the field does not have any validation rule, it is obviously considered valid.
                             flag = true;
                         } else {
@@ -389,9 +389,9 @@ Formz.Form = (function () {
                 configuration: configuration
             });
 
-            formsRepository[name] = Formz.extend(
+            formsRepository[name] = Fz.extend(
                 form,
-                Formz.Form.SubmissionService.get(name)
+                Fz.Form.SubmissionService.get(name)
             );
         },
 

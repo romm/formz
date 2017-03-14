@@ -46,7 +46,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
 
         return <<<JS
 (function() {
-    Formz.setConfiguration($jsonFormzConfiguration);
+    Fz.setConfiguration($jsonFormzConfiguration);
 })();
 JS;
     }
@@ -63,7 +63,7 @@ JS;
     }
 
     /**
-     * Returns a JSON array containing the formz configuration.
+     * Returns a JSON array containing the FormZ configuration.
      *
      * @return string
      */

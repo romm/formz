@@ -211,7 +211,9 @@ class JavaScriptAssetHandlerConnector
         $uri = $this->getAjaxUrl();
 
         $javaScriptCode .= LF;
-        $javaScriptCode .= "Formz.setAjaxUrl('$uri');";
+        $javaScriptCode .= <<<JS
+Fz.setAjaxUrl('$uri');
+JS;
 
         $this->addInlineJs('FormZ - Initialization ' . $formName, $javaScriptCode);
 
@@ -318,7 +320,7 @@ class JavaScriptAssetHandlerConnector
      */
     protected function getDebugActivationCode()
     {
-        return 'Formz.Debug.activate();';
+        return 'Fz.Debug.activate();';
     }
 
     /**

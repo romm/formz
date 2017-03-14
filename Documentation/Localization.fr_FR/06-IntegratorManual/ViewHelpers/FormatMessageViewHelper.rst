@@ -35,10 +35,10 @@ Exemple
     :linenos:
     :emphasize-lines: 5
 
-        {namespace formz=Romm\Formz\ViewHelpers}
+        {namespace fz=Romm\Formz\ViewHelpers}
 
         <f:form.validationResults for="{formName}.{fieldName}">
             <f:for each="{validationResults.errors}" iteration="iteration" as="error">
-                <formz:formatMessage message="{error}" />
+                <fz:formatMessage message="{error}" />
             </f:for>
         </f:form.validationResults>

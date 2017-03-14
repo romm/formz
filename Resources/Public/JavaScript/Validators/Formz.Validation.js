@@ -1,4 +1,4 @@
-Formz.Validation = (function () {
+Fz.Validation = (function () {
     /**
      * @callback Formz.Validation.ValidatorCallback
      * @param {string}                   value

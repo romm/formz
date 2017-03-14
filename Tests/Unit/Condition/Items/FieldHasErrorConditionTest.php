@@ -182,7 +182,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $conditionItem->setValidationName('bar');
         $conditionItem->setErrorName('baz');
 
-        $this->assertEquals('[formz-error-foo-bar-baz="1"]', $conditionItem->getCssResult());
+        $this->assertEquals('[fz-error-foo-bar-baz="1"]', $conditionItem->getCssResult());
     }
 
     /**
@@ -190,7 +190,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
      */
     public function getJavaScriptResult()
     {
-        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasErrorCondition\', form, {"fieldName":"foo","validationName":"bar","errorName":"baz"})';
+        $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasErrorCondition\', form, {"fieldName":"foo","validationName":"bar","errorName":"baz"})';
 
         $conditionItem = new FieldHasErrorCondition;
         $conditionItem->setFieldName('foo');

@@ -20,7 +20,7 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('validation-name','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-validation-name-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"expression":null,"conditions":[]},"useAjax":false,"validationName":"validation-name"},"acceptsEmptyValues":false});}});})();
+(function(){Fz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('validation-name','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-validation-name-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"expression":null,"conditions":[]},"useAjax":false,"validationName":"validation-name"},"acceptsEmptyValues":false});}});})();
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();

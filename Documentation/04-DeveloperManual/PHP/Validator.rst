@@ -197,7 +197,7 @@ Bind a JavaScript file
     Description
         Contains the JavaScript files list which will emulate this validator in the client web browser. Just fill this array, FormZ will import the files automatically.
 
-        These files will have to contain the registration declaration of the validator JavaScript version, by using the function :ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
+        These files will have to contain the registration declaration of the validator JavaScript version, by using the function :ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
 
         **Example:**
 

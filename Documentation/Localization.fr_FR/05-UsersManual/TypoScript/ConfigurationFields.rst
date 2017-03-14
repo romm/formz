@@ -178,7 +178,7 @@ Sélecteur du conteneur du champ
 
         Notez que le marqueur ``#FIELD#`` sera dynamiquement remplacé par le nom du champ.
 
-        La valeur par défaut de ce paramètre est : ``[formz-field-container="#FIELD#"]``.
+        La valeur par défaut de ce paramètre est : ``[fz-field-container="#FIELD#"]``.
 
         **Exemple :**
 
@@ -188,7 +188,7 @@ Sélecteur du conteneur du champ
                 fields {
                     email {
                         settings {
-                            fieldContainerSelector = [formz-field-container="#FIELD#"]
+                            fieldContainerSelector = [fz-field-container="#FIELD#"]
                         }
                     }
 
@@ -226,7 +226,7 @@ Sélecteur du conteneur des messages
 
         Notez que le marqueur ``#FIELD#`` sera dynamiquement remplacé par le nom du champ.
 
-        La valeur par défaut de ce paramètre est : ``[formz-field-feedback-container="#FIELD#"]``.
+        La valeur par défaut de ce paramètre est : ``[fz-field-feedback-container="#FIELD#"]``.
 
         **Exemple :**
 
@@ -258,7 +258,7 @@ Sélecteur de la liste des messages
 
         Notez que le marqueur ``#FIELD#`` sera dynamiquement remplacé par le nom du champ.
 
-        La valeur par défaut de ce paramètre est : ``[formz-field-feedback-list="#FIELD#"]``.
+        La valeur par défaut de ce paramètre est : ``[fz-field-feedback-list="#FIELD#"]``.
 
         Si une valeur vide est indiquée, alors le conteneur des erreurs sera utilisé.
 

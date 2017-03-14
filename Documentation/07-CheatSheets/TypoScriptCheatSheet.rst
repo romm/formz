@@ -35,17 +35,17 @@ You can find details of the properties at the chapter “:ref:`usersManual-typoS
             # List of parameters given by default to the form fields.
             defaultFieldSettings {
                 # Selector of the field HTML container.
-                fieldContainerSelector = .formz-field-#FIELD#
+                fieldContainerSelector = .fz-field-#FIELD#
 
                 # Selector of the messages HTML container.
-                feedbackContainerSelector = .formz-messages-#FIELD#
+                feedbackContainerSelector = .fz-messages-#FIELD#
 
                 # Selector of the messages list HTML container.
-                feedbackListSelector = .formz-messages-list-#FIELD#
+                feedbackListSelector = .fz-messages-list-#FIELD#
 
                 # HTML template used by the messages returned by the field
                 # validation.
-                messageTemplate = <span class="formz-message-#TYPE#">#MESSAGE#</span>
+                messageTemplate = <span class="fz-message-#TYPE#">#MESSAGE#</span>
             }
         }
 

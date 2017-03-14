@@ -125,7 +125,7 @@ abstract class AbstractConditionItem implements ConditionItemInterface
         $data = ArrayService::get()->arrayToJavaScriptJson($data);
 
         return <<<JS
-Formz.Condition.validateCondition('$conditionName', form, $data)
+Fz.Condition.validateCondition('$conditionName', form, $data)
 JS;
     }
 

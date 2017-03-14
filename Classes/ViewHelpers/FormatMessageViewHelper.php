@@ -78,7 +78,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
         $fieldId = ($variableProvider->exists('fieldId'))
             ? $variableProvider->get('fieldId')
-            : StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
+            : StringService::get()->sanitizeString('fz-' . $formObject->getName() . '-' . $fieldName);
 
         $result = str_replace(
             [

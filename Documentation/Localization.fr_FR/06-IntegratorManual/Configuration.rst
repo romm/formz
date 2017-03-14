@@ -23,7 +23,7 @@ Un champ devra toujours avoir un **conteneur**, qui notamment utilisé par FormZ
     :linenos:
     :emphasize-lines: 1
 
-    <div formz-field-container="email">
+    <div fz-field-container="email">
         <label for="email">Email :</label>
 
         <f:form.textfield property="email" id="email" />
@@ -31,7 +31,7 @@ Un champ devra toujours avoir un **conteneur**, qui notamment utilisé par FormZ
 
 Dans cet exemple, le premier élément ``<div>`` est considéré par FormZ comme le conteneur du champ ``email``.
 
-Par défaut, l'attribut à utiliser est ``formz-field-container``, qui doit contenir le nom du champ. Il est possible de personnaliser l'attribut utilisé, cf. « :ref:`Sélecteur du conteneur du champ<fieldsSettings-fieldContainerSelector>` ».
+Par défaut, l'attribut à utiliser est ``fz-field-container``, qui doit contenir le nom du champ. Il est possible de personnaliser l'attribut utilisé, cf. « :ref:`Sélecteur du conteneur du champ<fieldsSettings-fieldContainerSelector>` ».
 
 -----
 
@@ -46,19 +46,19 @@ Ce conteneur est divisé en deux parties : un conteneur global, et un conteneur 
     :linenos:
     :emphasize-lines: 1,4
 
-    <div formz-field-feedback-container="email">
+    <div fz-field-feedback-container="email">
         Ce champs contient au moins une erreur :
 
-        <div formz-field-feedback-list="email">
+        <div fz-field-feedback-list="email">
             <f:form.validationResults for="exForm.email">
                 <f:for each="{validationResults.errors}" as="error">
-                    <formz:formatMessage message="{error}" />
+                    <fz:formatMessage message="{error}" />
                 </f:for>
             </f:form.validationResults>
         </div>
     </div>
 
-Dans cet exemple, le conteneur de messages est identifié par ``formz-field-feedback-container="email"``, et le conteneur de la liste des messages par ``formz-field-feedback-list="email"``. Si le champ ``email`` ne contient aucun message, le premier conteneur sera masqué.
+Dans cet exemple, le conteneur de messages est identifié par ``fz-field-feedback-container="email"``, et le conteneur de la liste des messages par ``fz-field-feedback-list="email"``. Si le champ ``email`` ne contient aucun message, le premier conteneur sera masqué.
 
 Les attributs utilisés dans cet exemple sont ceux par défaut. Il est possible de les personnaliser, cf. « :ref:`Sélecteur du conteneur des messages <fieldsSettings-feedbackContainerSelector>` » et « :ref:`Sélecteur de la liste des messages <fieldsSettings-feedbackListSelector>` ».
 
@@ -103,7 +103,7 @@ Notez que vous pouvez également modifier la valeur par défaut pour tous les ch
 Bloc HTML
 ^^^^^^^^^
 
-Vous pouvez insérer, directement dans votre template, un bloc HTML qui contiendra le modèle. Le conteneur du bloc devra posséder l'attribut ``formz-message-template="1"``.
+Vous pouvez insérer, directement dans votre template, un bloc HTML qui contiendra le modèle. Le conteneur du bloc devra posséder l'attribut ``fz-message-template="1"``.
 
 Par convention, il est conseillé que ce conteneur soit une balise ``<script>`` de type ``text/template``.
 
@@ -111,7 +111,7 @@ Par convention, il est conseillé que ce conteneur soit une balise ``<script>`` 
 
 .. code-block:: html
 
-    <script type="text/template" formz-message-template="1">
+    <script type="text/template" fz-message-template="1">
         <li class="#TYPE#">#MESSAGE#</li>
     </script>
 

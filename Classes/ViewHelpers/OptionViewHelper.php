@@ -30,22 +30,22 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  * Without the Option view helper:
  *
  * ```
- *  <formz:field layout="..."
+ *  <fz:field layout="..."
  *               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
  *
  *      ...
- *  </formz:field>
+ *  </fz:field>
  * ```
  *
  * With it:
  *
  * ```
- *  <formz:field layout="...">
- *      <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
- *      <formz:option name="foo" value="bar" />
+ *  <fz:field layout="...">
+ *      <fz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
+ *      <fz:option name="foo" value="bar" />
  *
  *      ...
- *  </formz:field>
+ *  </fz:field>
  * ```
  */
 class OptionViewHelper extends AbstractViewHelper implements CompilableInterface

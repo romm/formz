@@ -1,4 +1,4 @@
-Formz.Condition.registerCondition(
+Fz.Condition.registerCondition(
 	'Romm\\Formz\\Condition\\Items\\FieldHasErrorCondition',
 	/**
 	 * @param {Formz.FormInstance} form

@@ -116,7 +116,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
         $conditionItem = new FieldIsValidCondition;
         $conditionItem->setFieldName('foo');
 
-        $this->assertEquals('[formz-valid-foo="1"]', $conditionItem->getCssResult());
+        $this->assertEquals('[fz-valid-foo="1"]', $conditionItem->getCssResult());
     }
 
     /**
@@ -124,7 +124,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
      */
     public function getJavaScriptResult()
     {
-        $assert = 'Formz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsValidCondition\', form, {"fieldName":"foo"})';
+        $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsValidCondition\', form, {"fieldName":"foo"})';
 
         $conditionItem = new FieldIsValidCondition;
         $conditionItem->setFieldName('foo');

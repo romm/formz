@@ -19,7 +19,7 @@ class FormzLocalizationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkLocalizationIsInitializedCorrectly()
     {
         $expectedJavaScriptCode = <<<TXT
-Formz.Localization.addLocalization(#REAL_TRANSLATIONS#, #TRANSLATIONS_BINDING#);
+Fz.Localization.addLocalization(#REAL_TRANSLATIONS#, #TRANSLATIONS_BINDING#);
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();

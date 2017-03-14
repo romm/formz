@@ -19,7 +19,7 @@ class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitT
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addActivationConditionForValidator('__auto','validation-name',function(field,continueValidation){varflag=false;flag=flag||(JAVASCRIPT-CONDITION);continueValidation(flag);});}form.refreshAllFields();});})();
+(function(){Fz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addActivationConditionForValidator('__auto','validation-name',function(field,continueValidation){varflag=false;flag=flag||(JAVASCRIPT-CONDITION);continueValidation(flag);});}form.refreshAllFields();});})();
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();

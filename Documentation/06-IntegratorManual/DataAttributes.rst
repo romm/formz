@@ -20,26 +20,26 @@ This way, you can set up CSS selectors that follow your needs.
 
 .. code-block:: html
 
-    <form name="exForm" class="formz" formz-value-has-animal="1"
-          formz-valid-has-animal="1" formz-error-animal-name-required-default="1">
+    <form name="exForm" class="formz" fz-value-has-animal="1"
+          fzvalid-has-animal="1" fzerror-animal-name-required-default="1">
         ...
     </form>
 
 In this example, there are three attributes:
 
-* **formz-value-has-animal="1"**
+* **fz-value-has-animal="1"**
 
   Contains the value of the field ``hasAnimal``, it must be a checkbox, and the value ``1`` means it is checked.
 
-* **formz-valid-has-animal="1"**
+* **fz-valid-has-animal="1"**
 
   The field ``hasAnimal`` did pass its validation rules.
 
-* **formz-error-animal-name="1"**
+* **fz-error-animal-name="1"**
 
   The field ``animalName`` contains at least one error.
 
-* **formz-error-animal-name-required-default="1"**
+* **fz-error-animal-name-required-default="1"**
 
   The field ``animalName`` contains an error, whose identifier is ``required`` and the message key is ``default``.
 
@@ -54,44 +54,44 @@ The core of FormZ uses these selectors to show or hide the containers of the fie
 
 Currently, FormZ automatically handle the following attributes:
 
-* ``formz-valid``
+* ``fz-valid``
 
   Attribute added when **all fields** have been tested and validated.
 
-* ``formz-value-{field-name}``
+* ``fz-value-{field-name}``
 
   Where ``{field-name}`` is the name of the field, in dashed lower case.
 
   It will be updated when the current value of the field.
 
-* ``formz-valid-{field-name}``
+* ``fz-valid-{field-name}``
 
   Where ``{field-name}`` is the name of the field, in dashed lower case.
 
   Will be added when the field contains a valid value (its validation rules did not return any error).
 
-* ``formz-error-{field-name}``
+* ``fz-error-{field-name}``
 
   Where ``{field-name}`` is the name of the field, in dashed lower case.
 
   Will be added when the field contains at least one error.
 
-* ``formz-error-{field-name}-{validation-name}-{message-key}``
+* ``fz-error-{field-name}-{validation-name}-{message-key}``
 
   Where ``{field-name}`` is the name of the field, ``{validation-name}`` the name of the validation rule and ``{message-key}`` the key of the message returned by the validation rule, all in dashed lower case.
 
   Will be added when a validation rule returns an error for the field.
 
-* ``formz-loading``
+* ``fz-loading``
 
   Attribute added to the container of a field when it's being validated. It is mainly useful to display a loading circle during an Ajax request.
 
   The same attribute is added to the form tag when the form is being submitted.
 
-* ``formz-submission-done``
+* ``fz-submission-done``
 
   When the form has been submitted, this attribute is added.
 
-* ``formz-submitted``
+* ``fz-submitted``
 
   When the form is being processed (the page is loading), this attribute is added.

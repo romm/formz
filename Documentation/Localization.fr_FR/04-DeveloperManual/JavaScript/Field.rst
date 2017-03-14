@@ -195,7 +195,7 @@ Rajouter une règle de validation
         /
     Paramètres
         - ``validationName`` (String) : le nom de la règle (son index), doit être unique pour ce champ.
-        - ``validatorName`` (String) : le nom du validateur utilisé pour cette règle. Cela doit être un validateur existant, rajouté via :ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
+        - ``validatorName`` (String) : le nom du validateur utilisé pour cette règle. Cela doit être un validateur existant, rajouté via :ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
         - ``validationConfiguration`` (Object) : la configuration du validateur, qui lui sera transmise lorsque la validation sera lancée.
     Description
         Rajoute une règle de validation au champ.
@@ -436,7 +436,7 @@ Récupérer le formulaire parent
     Fonction
         ``getForm()``
     Retour
-        ``Formz.FullForm``
+        ``Fz.FullForm``
     Description
         Retourne l'instance du formulaire dont fait partie ce champ.
 

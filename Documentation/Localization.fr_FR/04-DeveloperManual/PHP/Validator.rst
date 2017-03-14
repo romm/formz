@@ -197,7 +197,7 @@ Lier un fichier JavaScript
     Description
         Contient la liste des fichiers JavaScript qui émuleront ce validateur dans le navigateur du client. Remplissez juste ce tableau, FormZ s'occupera de les importer automatiquement.
 
-        Ces fichiers devront contenir la déclaration de la version JavaScript du validateur en question, en utilisant la fonction :ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
+        Ces fichiers devront contenir la déclaration de la version JavaScript du validateur en question, en utilisant la fonction :ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
 
         **Exemple :**
 

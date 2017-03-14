@@ -5,7 +5,7 @@
  * see if they are valid. If at least one field is not, the form submission is
  * cancelled.
  */
-Formz.Form.SubmissionService = (function () {
+Fz.Form.SubmissionService = (function () {
     /**
      * @param {string} formName
      */
@@ -40,7 +40,7 @@ Formz.Form.SubmissionService = (function () {
          */
         var onSubmitCallBacks = [];
 
-        Formz.Form.get(formName, function(form) {
+        Fz.Form.get(formName, function(form) {
             // Detecting the form submission.
             form.getElement().addEventListener(
                 'submit',
@@ -83,13 +83,13 @@ Formz.Form.SubmissionService = (function () {
                         fieldsCheckedWithErrors = {};
                         fieldsCheckedNumber = 0;
 
-                        form.getElement().setAttribute('formz-submission-done', '1');
-                        form.getElement().setAttribute('formz-loading', '1');
+                        form.getElement().setAttribute('fz-submission-done', '1');
+                        form.getElement().setAttribute('fz-loading', '1');
 
                         checkAllFieldsAreValid();
                     }
                 } catch (e) {
-                    Formz.debug('Error during submission: "' + e + '".', Formz.TYPE_ERROR);
+                    Fz.debug('Error during submission: "' + e + '".', Fz.TYPE_ERROR);
 
                     form.getElement().submit();
                 }
@@ -113,10 +113,10 @@ Formz.Form.SubmissionService = (function () {
                 var endProcess = function () {
                     if (fieldsCheckedNumber === fieldsCheckedTotal) {
                         submissionBeingChecked = false;
-                        form.getElement().removeAttribute('formz-loading');
+                        form.getElement().removeAttribute('fz-loading');
 
                         if (false === formCanBeSubmitted) {
-                            Formz.debug('Submission cancelled because the following fields are not valid: ' + Formz.objectKeys(fieldsCheckedWithErrors).join(', ') + '.', Formz.TYPE_NOTICE);
+                            Fz.debug('Submission cancelled because the following fields are not valid: ' + Fz.objectKeys(fieldsCheckedWithErrors).join(', ') + '.', Fz.TYPE_NOTICE);
 
                             scrollToFirstNotValidElement();
                         } else {
@@ -137,7 +137,7 @@ Formz.Form.SubmissionService = (function () {
                             }
 
                             if (true === submitFlag) {
-                                form.getElement().setAttribute('formz-submitted', '1');
+                                form.getElement().setAttribute('fz-submitted', '1');
 
                                 // Everything ran perfectly for the form: the real submission is launched.
                                 form.getElement().submit();

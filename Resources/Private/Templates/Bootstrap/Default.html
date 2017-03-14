@@ -1,57 +1,57 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="http://xsd.helmut-hummel.de/ns/TYPO3/CMS/Fluid/ViewHelpers"
-      xmlns:formz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
+      xmlns:fz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
 
 <f:layout name="{layout}" />
 
 <f:section name="Label">
-    <formz:slot.render slot="Label.Before" />
+    <fz:slot.render slot="Label.Before" />
 
     <label class="control-label" for="{fieldId}">{label}</label>
 
-    <formz:slot.render slot="Label.After" />
+    <fz:slot.render slot="Label.After" />
 </f:section>
 
 <f:section name="Field">
-    <formz:slot.render slot="Field" />
+    <fz:slot.render slot="Field" />
 </f:section>
 
 <f:section name="Feedback">
-    <formz:slot.render slot="Feedback.Out.Before" />
+    <fz:slot.render slot="Feedback.Out.Before" />
 
-    <span class="help-block" formz-field-feedback-container="{fieldName}">
-		<formz:slot.render slot="Feedback.In.Before" />
+    <span class="help-block" fz-field-feedback-container="{fieldName}">
+		<fz:slot.render slot="Feedback.In.Before" />
 
-		<span formz-field-feedback-list="{fieldName}">
+		<span fz-field-feedback-list="{fieldName}">
 			<f:form.validationResults for="{formName}.{fieldName}">
 				<f:if condition="{validationResults.errors}">
 					<div class="text-error">
 						<f:for each="{validationResults.errors}" as="error">
-							<formz:formatMessage message="{error}" />
+							<fz:formatMessage message="{error}" />
 						</f:for>
 					</div>
 				</f:if>
 				<f:if condition="{validationResults.warnings}">
 					<div class="text-warning">
 						<f:for each="{validationResults.warnings}" as="warning">
-							<formz:formatMessage message="{warning}" />
+							<fz:formatMessage message="{warning}" />
 						</f:for>
 					</div>
 				</f:if>
 				<f:if condition="{validationResults.notices}">
 					<div class="text-info">
 						<f:for each="{validationResults.notices}" as="notice">
-							<formz:formatMessage message="{notice}" />
+							<fz:formatMessage message="{notice}" />
 						</f:for>
 					</div>
 				</f:if>
             </f:form.validationResults>
 		</span>
 
-		<formz:slot.render slot="Feedback.In.After" />
+		<fz:slot.render slot="Feedback.In.After" />
 	</span>
 
-    <formz:slot.render slot="Feedback.Out.After" />
+    <fz:slot.render slot="Feedback.Out.After" />
 </f:section>
 
 </html>

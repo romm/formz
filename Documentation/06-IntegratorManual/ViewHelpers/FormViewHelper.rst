@@ -35,11 +35,11 @@ Example
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
         ...
-    </formz:form>
+    </fz:form>
 
 The form below is bound to the action ``submitForm``. If we check the action in the controller PHP class:
 

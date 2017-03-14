@@ -42,10 +42,10 @@ Example
     :linenos:
     :emphasize-lines: 3,7
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:slot.render slot="Label.Before" arguments="{class: 'label-before'}" />
+    <fz:slot.render slot="Label.Before" arguments="{class: 'label-before'}" />
 
     <label for="{fieldId}">{label}</label>
 
-    <formz:slot.render slot="Label.After" arguments="{class: 'label-after'}" />
+    <fz:slot.render slot="Label.After" arguments="{class: 'label-after'}" />

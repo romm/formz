@@ -101,22 +101,22 @@ A bunch of unit tests are also embedded in this version, making a step forward t
 
 - **[[#26](https://github.com/romm/configuration_object/pull/26)] [BUGFIX] Fix persistent option in field ViewHelper**
 
-  When using the ViewHelper `<formz:option>` inside `<formz:field>`, the option would not be deleted after the whole field is processed, resulting in unwanted options in later fields, which could cause pretty ugly behaviours.
+  When using the ViewHelper `<fz:option>` inside `<fz:field>`, the option would not be deleted after the whole field is processed, resulting in unwanted options in later fields, which could cause pretty ugly behaviours.
 
   For instance, a field could be flagged as required even if it is not.
 
   In the following example, the option `required` would have been present for the field `bar` (it is now fixed by this commit).
 
   ```
-  <formz:field name="foo">
-      <formz:option name="required" value="1" />
+  <fz:field name="foo">
+      <fz:option name="required" value="1" />
 
       [...]
-  </formz:field>
+  </fz:field>
 
-  <formz:field name="bar">
+  <fz:field name="bar">
       [...]
-  </formz:field>
+  </fz:field>
   ```
 
 0.1.1 - 2016-10-10

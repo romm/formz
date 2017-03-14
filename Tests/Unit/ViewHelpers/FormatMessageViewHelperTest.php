@@ -96,7 +96,7 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
             ],
             [
                 'message'         => new Error('foo', 1337, 'bar', 'baz'),
-                'expected'        => 'foo - formz-foo-foo - error - bar - baz - foo',
+                'expected'        => 'foo - fz-foo-foo - error - bar - baz - foo',
                 'messageTemplate' => '#FIELD# - #FIELD_ID# - #TYPE# - #VALIDATOR# - #KEY# - #MESSAGE#'
             ],
             [

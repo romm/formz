@@ -16,7 +16,7 @@ the option `field`, which should then contain the name of the field.
 
 Please be aware that this view helper is useful only when used at the same
 level or under the HTML element containing the field selector (usually the
-one with the data attribute `formz-field-container`). You may encounter
+one with the data attribute `fz-field-container`). You may encounter
 strange behaviours if you do not respect this requirement.]]></xsd:documentation></xsd:annotation><xsd:complexType mixed="true"><xsd:sequence><xsd:any minOccurs="0" maxOccurs="1"/></xsd:sequence><xsd:attribute type="xsd:string" name="name" use="required"><xsd:annotation><xsd:documentation><![CDATA[Name of the class which will be managed.]]></xsd:documentation></xsd:annotation></xsd:attribute><xsd:attribute type="xsd:string" name="field" use="optional" default="NULL"><xsd:annotation><xsd:documentation><![CDATA[Name of the field which will be managed. By default, it is the field from the current `FieldViewHelper`.]]></xsd:documentation></xsd:annotation></xsd:attribute></xsd:complexType></xsd:element><xsd:element name="class"><xsd:annotation><xsd:documentation><![CDATA[This view helper is used to manage the properties set in TypoScript at the
 path `config.tx_formz.view.classes`.
 
@@ -34,7 +34,7 @@ the option `field`, which should then contain the name of the field.
 
 Please be aware that this view helper is useful only when used at the same
 level or under the HTML element containing the field selector (usually the
-one with the data attribute `formz-field-container`). You may encounter
+one with the data attribute `fz-field-container`). You may encounter
 strange behaviours if you do not respect this requirement.]]></xsd:documentation></xsd:annotation><xsd:complexType mixed="true"><xsd:sequence><xsd:any minOccurs="0" maxOccurs="1"/></xsd:sequence><xsd:attribute type="xsd:string" name="name" use="required"><xsd:annotation><xsd:documentation><![CDATA[Name of the class which will be managed.]]></xsd:documentation></xsd:annotation></xsd:attribute><xsd:attribute type="xsd:string" name="field" use="optional" default="NULL"><xsd:annotation><xsd:documentation><![CDATA[Name of the field which will be managed. By default, it is the field from the current `FieldViewHelper`.]]></xsd:documentation></xsd:annotation></xsd:attribute></xsd:complexType></xsd:element><xsd:element name="field"><xsd:annotation><xsd:documentation><![CDATA[This view helper is used to automatize the rendering of a field layout. It
 will use the TypoScript properties at the path `config.tx_formz.view.layout`.
 
@@ -81,7 +81,7 @@ handled in this view helper:
   To help integrators customize every aspect they need in CSS, every useful
   information is put in data attributes in the form DOM element. For example,
   you can know in real time if the field "email" is valid if the form has the
-  attribute "formz-valid-email"
+  attribute "fz-valid-email"
 
 - CSS
   A block of CSS is built from scratch, which will handle the fields display,
@@ -111,7 +111,7 @@ handled in this view helper:
   To help integrators customize every aspect they need in CSS, every useful
   information is put in data attributes in the form DOM element. For example,
   you can know in real time if the field "email" is valid if the form has the
-  attribute "formz-valid-email"
+  attribute "fz-valid-email"
 
 - CSS
   A block of CSS is built from scratch, which will handle the fields display,
@@ -141,7 +141,7 @@ handled in this view helper:
   To help integrators customize every aspect they need in CSS, every useful
   information is put in data attributes in the form DOM element. For example,
   you can know in real time if the field "email" is valid if the form has the
-  attribute "formz-valid-email"
+  attribute "fz-valid-email"
 
 - CSS
   A block of CSS is built from scratch, which will handle the fields display,
@@ -171,7 +171,7 @@ handled in this view helper:
   To help integrators customize every aspect they need in CSS, every useful
   information is put in data attributes in the form DOM element. For example,
   you can know in real time if the field "email" is valid if the form has the
-  attribute "formz-valid-email"
+  attribute "fz-valid-email"
 
 - CSS
   A block of CSS is built from scratch, which will handle the fields display,
@@ -205,22 +205,22 @@ readable, as you can see below:
 Without the Option view helper:
 
 ```
- <formz:field layout="..."
+ <fz:field layout="..."
               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
 
      ...
- </formz:field>
+ </fz:field>
 ```
 
 With it:
 
 ```
- <formz:field layout="...">
-     <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
-     <formz:option name="foo" value="bar" />
+ <fz:field layout="...">
+     <fz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
+     <fz:option name="foo" value="bar" />
 
      ...
- </formz:field>
+ </fz:field>
 ```]]></xsd:documentation></xsd:annotation><xsd:complexType mixed="true"><xsd:sequence><xsd:any minOccurs="0" maxOccurs="1"/></xsd:sequence><xsd:attribute type="xsd:string" name="name" use="required"><xsd:annotation><xsd:documentation><![CDATA[Name of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute><xsd:attribute type="xsd:string" name="value" use="required"><xsd:annotation><xsd:documentation><![CDATA[Value of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute></xsd:complexType></xsd:element><xsd:element name="option"><xsd:annotation><xsd:documentation><![CDATA[Use this view helper at the first level inside the Field view helper. It will
 be added to the arguments list, which can then be used inside the field
 template.
@@ -231,22 +231,22 @@ readable, as you can see below:
 Without the Option view helper:
 
 ```
- <formz:field layout="..."
+ <fz:field layout="..."
               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
 
      ...
- </formz:field>
+ </fz:field>
 ```
 
 With it:
 
 ```
- <formz:field layout="...">
-     <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
-     <formz:option name="foo" value="bar" />
+ <fz:field layout="...">
+     <fz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
+     <fz:option name="foo" value="bar" />
 
      ...
- </formz:field>
+ </fz:field>
 ```]]></xsd:documentation></xsd:annotation><xsd:complexType mixed="true"><xsd:sequence><xsd:any minOccurs="0" maxOccurs="1"/></xsd:sequence><xsd:attribute type="xsd:string" name="name" use="required"><xsd:annotation><xsd:documentation><![CDATA[Name of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute><xsd:attribute type="xsd:string" name="value" use="required"><xsd:annotation><xsd:documentation><![CDATA[Value of the option.]]></xsd:documentation></xsd:annotation></xsd:attribute></xsd:complexType></xsd:element><xsd:element name="slot"><xsd:annotation><xsd:documentation><![CDATA[This view helper registers a slot which will not be rendered directly, but
 with the usage of the `slot.render` view helper.
 
