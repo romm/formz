@@ -59,8 +59,14 @@ class Core implements SingletonInterface
     public static function instantiate($className)
     {
         $objectManager = self::get()->getObjectManager();
+        
+        $args = func_get_args();
+        
+        if (1 === count($args)) {
+            return $objectManager->get($className);
+        }
 
-        return call_user_func_array([$objectManager, 'get'], func_get_args());
+        return call_user_func_array([$objectManager, 'get'], $args);
     }
 
     /**
