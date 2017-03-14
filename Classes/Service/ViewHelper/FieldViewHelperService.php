@@ -14,7 +14,9 @@
 namespace Romm\Formz\Service\ViewHelper;
 
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Contains methods to help view helpers to manipulate data concerning the
@@ -31,6 +33,11 @@ class FieldViewHelperService implements SingletonInterface
      * @var array
      */
     protected $fieldOptions = [];
+
+    /**
+     * @var StandaloneView
+     */
+    protected $view;
 
     /**
      * Reset every state that can be used by this service.
@@ -87,5 +94,17 @@ class FieldViewHelperService implements SingletonInterface
     public function getFieldOptions()
     {
         return $this->fieldOptions;
+    }
+
+    /**
+     * @return StandaloneView
+     */
+    public function getView()
+    {
+        if (null === $this->view) {
+            $this->view = Core::instantiate(StandaloneView::class);
+        }
+
+        return $this->view;
     }
 }
