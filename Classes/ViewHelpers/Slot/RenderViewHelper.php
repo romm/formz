@@ -71,9 +71,19 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
         $slotName = $arguments['slot'];
         $result = '';
 
-        if ($slotService->hasSlotClosure($slotName)) {
-            $closure = $slotService->getSlotClosure($slotName);
-            $result = $closure();
+        if ($slotService->hasSlot($slotName)) {
+            $slotClosure = $slotService->getSlotClosure($slotName);
+            $slotArguments = $slotService->getSlotArguments($slotName);
+
+            foreach ($slotArguments as $key => $value) {
+                $renderingContext->getTemplateVariableContainer()->add($key, $value);
+            }
+
+            $result = $slotClosure();
+
+            foreach (array_keys($slotArguments) as $key) {
+                $renderingContext->getTemplateVariableContainer()->remove($key);
+            }
         }
 
         return $result;

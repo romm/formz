@@ -260,7 +260,24 @@ class EntryNotFoundException extends FormzException
      * @param string $name
      * @return self
      */
-    final public static function slotNotFound($name)
+    final public static function slotClosureSlotNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::SLOT_NOT_FOUND,
+            [$name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1489497046
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function slotArgumentsSlotNotFound($name)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
