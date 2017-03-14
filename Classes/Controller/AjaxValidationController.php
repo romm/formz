@@ -370,7 +370,9 @@ class AjaxValidationController extends ActionController
         unset($values['__referrer']);
         unset($values['__trustedProperties']);
 
-        return reset($values);
+        return isset($values[$this->formName])
+            ? $values[$this->formName]
+            : [];
     }
 
     /**
