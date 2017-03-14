@@ -164,14 +164,14 @@ class FieldViewHelper extends AbstractViewHelper
 
         /** @var StandaloneView $view */
         $view = Core::instantiate(StandaloneView::class);
-        $view->setTemplatePathAndFilename($layout->getTemplateFile());
-        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
-        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
         } else {
+            $view->setControllerContext($this->controllerContext);
+
             $variableProvider = $this->getVariableProvider();
+
             foreach ($templateArguments as $key => $value) {
                 if ($variableProvider->exists($key)) {
                     $variableProvider->remove($key);
@@ -181,6 +181,9 @@ class FieldViewHelper extends AbstractViewHelper
             }
         }
 
+        $view->setTemplatePathAndFilename($layout->getTemplateFile());
+        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
+        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
         $view->assignMultiple($templateArguments);
 
         return $view->render();
