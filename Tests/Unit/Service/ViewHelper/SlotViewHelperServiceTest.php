@@ -16,19 +16,23 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
         $fooClosure = function () {
             return 'foo';
         };
+        $fooArguments = ['foo' => 'bar'];
         $barClosure = function () {
             return 'bar';
         };
+        $barArguments = ['bar' => 'baz'];
 
-        $this->assertFalse($slotService->hasSlotClosure('foo'));
-        $slotService->addSlotClosure('foo', $fooClosure);
-        $this->assertTrue($slotService->hasSlotClosure('foo'));
+        $this->assertFalse($slotService->hasSlot('foo'));
+        $slotService->addSlot('foo', $fooClosure, $fooArguments);
+        $this->assertTrue($slotService->hasSlot('foo'));
         $this->assertSame($fooClosure, $slotService->getSlotClosure('foo'));
+        $this->assertEquals($fooArguments, $slotService->getSlotArguments('foo'));
 
-        $this->assertFalse($slotService->hasSlotClosure('bar'));
-        $slotService->addSlotClosure('bar', $barClosure);
-        $this->assertTrue($slotService->hasSlotClosure('bar'));
+        $this->assertFalse($slotService->hasSlot('bar'));
+        $slotService->addSlot('bar', $barClosure, $barArguments);
+        $this->assertTrue($slotService->hasSlot('bar'));
         $this->assertSame($barClosure, $slotService->getSlotClosure('bar'));
+        $this->assertEquals($barArguments, $slotService->getSlotArguments('bar'));
     }
 
     /**
@@ -41,10 +45,10 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
             return 'foo';
         };
 
-        $slotService->addSlotClosure('foo', $fooClosure);
+        $slotService->addSlot('foo', $fooClosure, []);
         $slotService->resetState();
 
-        $this->assertFalse($slotService->hasSlotClosure('foo'));
+        $this->assertFalse($slotService->hasSlot('foo'));
     }
 
     /**

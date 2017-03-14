@@ -27,10 +27,10 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
-            ->setMethods(['getSlotClosure', 'hasSlotClosure'])
+            ->setMethods(['getSlotClosure', 'getSlotArguments', 'hasSlot'])
             ->getMock();
         $slotService->expects($this->once())
-            ->method('hasSlotClosure')
+            ->method('hasSlot')
             ->with($slotArgument)
             ->willReturn(true);
         $slotService->expects($this->once())
@@ -39,6 +39,10 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
             ->willReturn(function () {
                 return 'foo';
             });
+        $slotService->expects($this->once())
+            ->method('getSlotArguments')
+            ->with($slotArgument)
+            ->willReturn([]);
 
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
