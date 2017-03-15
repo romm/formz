@@ -16,6 +16,8 @@ namespace Romm\Formz\Service\ViewHelper;
 use Closure;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 
 class SlotViewHelperService implements SingletonInterface
 {
@@ -31,6 +33,16 @@ class SlotViewHelperService implements SingletonInterface
      * @var array[]
      */
     private $arguments = [];
+
+    /**
+     * @var array[]
+     */
+    private $injectedVariables = [];
+
+    /**
+     * @var array[]
+     */
+    private $savedVariables = [];
 
     /**
      * Adds a closure - which will render the slot with the given name - to the
@@ -88,11 +100,69 @@ class SlotViewHelperService implements SingletonInterface
     }
 
     /**
-     * Resets the list of closures.
+     * Will merge the given arguments with the ones registered by the given
+     * slot, and inject them in the template variable container.
+     *
+     * Note that the variables that are already defined are first saved before
+     * being overridden, so they can be restored later.
+     *
+     * @param string                    $slotName
+     * @param array                     $arguments
+     * @param RenderingContextInterface $renderingContext
+     */
+    public function addTemplateVariables($slotName, array $arguments, RenderingContextInterface $renderingContext)
+    {
+        $templateVariableContainer = $renderingContext->getTemplateVariableContainer();
+        $savedArguments = [];
+
+        ArrayUtility::mergeRecursiveWithOverrule(
+            $arguments,
+            $this->getSlotArguments($slotName)
+        );
+
+        foreach ($arguments as $key => $value) {
+            if ($templateVariableContainer->exists($key)) {
+                $savedArguments[$key] = $templateVariableContainer->get($key);
+                $templateVariableContainer->remove($key);
+            }
+
+            $templateVariableContainer->add($key, $value);
+        }
+
+        $this->injectedVariables[$slotName] = $arguments;
+        $this->savedVariables[$slotName] = $savedArguments;
+    }
+
+    /**
+     * Will remove all variables previously injected in the template variable
+     * container, and restore the ones that were saved before being overridden.
+     *
+     * @param string                    $slotName
+     * @param RenderingContextInterface $renderingContext
+     */
+    public function restoreTemplateVariables($slotName, RenderingContextInterface $renderingContext)
+    {
+        $templateVariableContainer = $renderingContext->getTemplateVariableContainer();
+        $mergedArguments = (isset($this->injectedVariables[$slotName])) ? $this->injectedVariables[$slotName] : [];
+        $savedArguments = (isset($this->savedVariables[$slotName])) ? $this->savedVariables[$slotName] : [];
+
+        foreach (array_keys($mergedArguments) as $key) {
+            $templateVariableContainer->remove($key);
+        }
+
+        foreach ($savedArguments as $key => $value) {
+            $templateVariableContainer->add($key, $value);
+        }
+    }
+
+    /**
+     * Resets the service variables.
      */
     public function resetState()
     {
         $this->closures = [];
         $this->arguments = [];
+        $this->injectedVariables = [];
+        $this->savedVariables = [];
     }
 }
