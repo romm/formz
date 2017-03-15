@@ -18,6 +18,7 @@ use Romm\Formz\Condition\Items\FieldHasErrorCondition;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
 use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Service\Traits\FacadeInstanceTrait;
@@ -62,30 +63,27 @@ class ConditionFactory implements SingletonInterface
      * The condition class must implement the interface
      * `ConditionItemInterface`.
      *
-     * @param string $conditionName  The name of the condition, which will then be available for TypoScript conditions.
-     * @param string $conditionClass Class which will process the condition.
+     * @param string $name      The name of the condition, which will then be available for TypoScript conditions.
+     * @param string $className Class which will process the condition.
      * @return $this
+     * @throws ClassNotFoundException
      * @throws InvalidArgumentTypeException
      */
-    public function registerCondition($conditionName, $conditionClass)
+    public function registerCondition($name, $className)
     {
-        if (false === is_string($conditionName)) {
-            throw new InvalidArgumentTypeException(
-                'The name of the condition must be a correct string (current type: "' . gettype($conditionName) . '".',
-                1466588489
-            );
+        if (false === is_string($name)) {
+            throw InvalidArgumentTypeException::conditionNameNotString($name);
         }
 
-        if (false === class_exists($conditionClass)
-            || false === in_array(ConditionItemInterface::class, class_implements($conditionClass))
-        ) {
-            throw new InvalidArgumentTypeException(
-                'The condition class must implement "' . ConditionItemInterface::class . '" (given class is "' . $conditionClass . '").',
-                1466588495
-            );
+        if (false === class_exists($className)) {
+            throw ClassNotFoundException::conditionClassNameNotFound($name, $className);
         }
 
-        $this->conditions[$conditionName] = $conditionClass;
+        if (false === in_array(ConditionItemInterface::class, class_implements($className))) {
+            throw InvalidArgumentTypeException::conditionClassNameNotValid($className);
+        }
+
+        $this->conditions[$name] = $className;
 
         return $this;
     }
@@ -110,10 +108,7 @@ class ConditionFactory implements SingletonInterface
     public function getCondition($conditionName)
     {
         if (false === $this->hasCondition($conditionName)) {
-            throw new EntryNotFoundException(
-                'Trying to access a condition which is not registered: "' . $conditionName . '". Here is a list of all currently registered conditions: "' . implode('" ,"', array_keys($this->conditions)) . '".',
-                1472650209
-            );
+            throw EntryNotFoundException::conditionNotFound($conditionName, $this->conditions);
         }
 
         return $this->conditions[$conditionName];

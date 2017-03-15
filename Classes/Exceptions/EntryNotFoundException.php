@@ -24,7 +24,9 @@ class EntryNotFoundException extends FormzException
 {
     const FIELD_NOT_FOUND = 'The field "%s" was not found in the form "%s" with class "%s".';
 
-    const CONDITION_NOT_FOUND = 'No condition "%s" was found.';
+    const CONDITION_NOT_FOUND = 'Trying to access a condition which is not registered: "%s". Here is a list of all currently registered conditions: "%s".';
+
+    const ACTIVATION_CONDITION_NOT_FOUND = 'No condition "%s" was found.';
 
     const VALIDATION_NOT_FOUND = 'The validation "%s" was not found. Please use the function `%s::hasValidation()` before.';
 
@@ -43,16 +45,37 @@ class EntryNotFoundException extends FormzException
     const SLOT_NOT_FOUND = 'No slot "%s" was found.';
 
     /**
+     * @code 1472650209
+     *
+     * @param string $name
+     * @param array  $list
+     * @return EntryNotFoundException
+     */
+    final public static function conditionNotFound($name, array $list)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONDITION_NOT_FOUND,
+            [
+                $name,
+                implode('" ,"', array_keys($list))
+            ]
+        );
+
+        return $exception;
+    }
+
+    /**
      * @code 1488482191
      *
      * @param string $name
      * @return self
      */
-    final public static function conditionNotFound($name)
+    final public static function activationConditionNotFound($name)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
-            self::CONDITION_NOT_FOUND,
+            self::ACTIVATION_CONDITION_NOT_FOUND,
             [$name]
         );
 

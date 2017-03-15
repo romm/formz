@@ -46,7 +46,8 @@ class CacheService implements SingletonInterface
      * `settings.defaultBackendCache`.
      *
      * @return string
-     * @throws \Exception
+     * @throws ClassNotFoundException
+     * @throws InvalidOptionValueException
      */
     public function getBackendCache()
     {

@@ -23,6 +23,26 @@ class ClassNotFoundException extends FormzException
 
     const BACKEND_CACHE_CLASS_NAME_NOT_FOUND = 'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" was not found (current value: "%s")';
 
+    const CONDITION_CLASS_NAME_NOT_FOUND = 'The class name for the condition "%s" was not found (given value: "%s").';
+
+    /**
+     * @code 1489602455
+     *
+     * @param string $name
+     * @param string $className
+     * @return self
+     */
+    final public static function conditionClassNameNotFound($name, $className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONDITION_CLASS_NAME_NOT_FOUND,
+            [$name, $className]
+        );
+
+        return $exception;
+    }
+
     /**
      * @code 1477468381
      *
