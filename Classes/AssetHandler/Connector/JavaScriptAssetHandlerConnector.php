@@ -112,7 +112,7 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeLanguageJavaScriptFiles()
     {
-        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('local-' . ContextService::get()->getLanguageKey()) . '.js';
+        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('locale-' . ContextService::get()->getLanguageKey()) . '.js';
 
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,

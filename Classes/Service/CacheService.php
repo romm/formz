@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
@@ -40,6 +39,11 @@ class CacheService implements SingletonInterface
      * @var FrontendInterface
      */
     protected $cacheInstance;
+
+    /**
+     * @var CacheManager
+     */
+    protected $cacheManager;
 
     /**
      * Returns the type of backend cache defined in TypoScript at the path:
@@ -72,10 +76,7 @@ class CacheService implements SingletonInterface
     public function getCacheInstance()
     {
         if (null === $this->cacheInstance) {
-            /** @var $cacheManager CacheManager */
-            $cacheManager = Core::instantiate(CacheManager::class);
-
-            $this->cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
+            $this->cacheInstance = $this->cacheManager->getCache(self::CACHE_IDENTIFIER);
         }
 
         return $this->cacheInstance;
@@ -89,13 +90,13 @@ class CacheService implements SingletonInterface
      * @param int    $maxLength
      * @return string
      */
-    public function getCacheIdentifier($string, $formClassName, $maxLength = 55)
+    public function getFormCacheIdentifier($string, $formClassName, $maxLength = 55)
     {
-        $explodedClassName = explode('\\', $formClassName);
+        $shortClassName = end(explode('\\', $formClassName));
 
         $identifier = strtolower(
             $string .
-            end($explodedClassName) .
+            $shortClassName .
             '-' .
             sha1($formClassName)
         );
@@ -111,19 +112,42 @@ class CacheService implements SingletonInterface
      */
     public function clearCacheCommand($parameters)
     {
-        if (false === in_array($parameters['cacheCmd'], ['all', 'system'])) {
-            return;
-        }
+        if (in_array($parameters['cacheCmd'], ['all', 'system'])) {
+            $files = $this->getFilesInPath(self::GENERATED_FILES_PATH . '*');
 
-        $files = glob(GeneralUtility::getFileAbsFileName(self::GENERATED_FILES_PATH . '*'));
-
-        if (false === $files) {
-            return;
+            foreach ($files as $file) {
+                $this->clearFile($file);
+            }
         }
+    }
 
-        foreach ($files as $file) {
-            touch($file, 0);
-        }
+    /**
+     * @param string $path
+     * @return array
+     */
+    protected function getFilesInPath($path)
+    {
+        $files = glob(GeneralUtility::getFileAbsFileName($path));
+
+        return (false === $files)
+            ? []
+            : $files;
+    }
+
+    /**
+     * @param string $file
+     */
+    protected function clearFile($file)
+    {
+        touch($file, 0);
+    }
+
+    /**
+     * @param CacheManager $cacheManager
+     */
+    public function injectCacheManager(CacheManager $cacheManager)
+    {
+        $this->cacheManager = $cacheManager;
     }
 
     /**
