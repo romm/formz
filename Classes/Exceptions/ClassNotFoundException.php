@@ -21,6 +21,8 @@ class ClassNotFoundException extends FormzException
 
     const FORM_VIEW_HELPER_CLASS_NOT_FOUND = 'Invalid value for the form class name (current value: "%s"). You need to either fill the parameter `formClassName` in the view helper, or specify the type of the parameter `$%s` for the method "%s::%s()".';
 
+    const BACKEND_CACHE_CLASS_NAME_NOT_FOUND = 'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" was not found (current value: "%s")';
+
     /**
      * @code 1477468381
      *
@@ -70,6 +72,23 @@ class ClassNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_VIEW_HELPER_CLASS_NOT_FOUND,
             [$formClassName, $formName, $controller, $action . 'Action']
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1488475103
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function backendCacheClassNameNotFound($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::BACKEND_CACHE_CLASS_NAME_NOT_FOUND,
+            [$className]
         );
 
         return $exception;

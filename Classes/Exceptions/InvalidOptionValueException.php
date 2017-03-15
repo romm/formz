@@ -14,10 +14,13 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Form\FormInterface;
+use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 
 class InvalidOptionValueException extends FormzException
 {
     const WRONG_FORM_TYPE = 'The form class must be an instance of "%s", given value: "%s".';
+
+    const WRONG_BACKEND_CACHE_TYPE = 'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "%s" (current value: "%s")';
 
     /**
      * @code 1457442462
@@ -31,6 +34,23 @@ class InvalidOptionValueException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
             [FormInterface::class, $name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1459251263
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function wrongBackendCacheType($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_BACKEND_CACHE_TYPE,
+            [AbstractBackend::class, $className]
         );
 
         return $exception;

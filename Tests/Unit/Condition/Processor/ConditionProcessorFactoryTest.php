@@ -81,7 +81,7 @@ class ConditionProcessorFactoryTest extends AbstractUnitTest
 
         $transientMemoryProphecy->setCache(Argument::type(AbstractFrontend::class))->shouldBeCalled();
         $cacheInstance = new VariableFrontend('ConditionProcessorFactoryTest', $transientMemoryProphecy->reveal());
-        CacheService::get()->setCacheInstance($cacheInstance);
+        $this->inject(CacheService::get(), 'cacheInstance', $cacheInstance);
 
         // Actually executing the tests...
         $formObject = $this->getDefaultFormObject();

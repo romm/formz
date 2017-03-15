@@ -15,8 +15,8 @@ namespace Romm\Formz\Service;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
-use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Cache\Backend\BackendInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -53,24 +53,18 @@ class CacheService implements SingletonInterface
         $backendCache = $this->typoScriptService->getExtensionConfigurationFromPath('settings.defaultBackendCache');
 
         if (false === class_exists($backendCache)) {
-            throw new ClassNotFoundException(
-                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" was not found (current value: "' . (string)$backendCache . '")',
-                1488475103
-            );
+            throw ClassNotFoundException::backendCacheClassNameNotFound($backendCache);
         }
 
         if (false === in_array(BackendInterface::class, class_implements($backendCache))) {
-            throw new \Exception(
-                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
-                1459251263
-            );
+            throw InvalidOptionValueException::wrongBackendCacheType($backendCache);
         }
 
         return $backendCache;
     }
 
     /**
-     * Returns the cache instance for this extension.
+     * Returns the cache instance used by this extension.
      *
      * @return FrontendInterface
      */
@@ -80,9 +74,7 @@ class CacheService implements SingletonInterface
             /** @var $cacheManager CacheManager */
             $cacheManager = Core::instantiate(CacheManager::class);
 
-            if ($cacheManager->hasCache(self::CACHE_IDENTIFIER)) {
-                $this->cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
-            }
+            $this->cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
         }
 
         return $this->cacheInstance;
@@ -111,14 +103,6 @@ class CacheService implements SingletonInterface
     }
 
     /**
-     * @param TypoScriptService $typoScriptService
-     */
-    public function injectTypoScriptService(TypoScriptService $typoScriptService)
-    {
-        $this->typoScriptService = $typoScriptService;
-    }
-
-    /**
      * Function called when clearing TYPO3 caches. It will remove the temporary
      * asset files created by FormZ.
      *
@@ -139,5 +123,13 @@ class CacheService implements SingletonInterface
         foreach ($files as $file) {
             touch($file, 0);
         }
+    }
+
+    /**
+     * @param TypoScriptService $typoScriptService
+     */
+    public function injectTypoScriptService(TypoScriptService $typoScriptService)
+    {
+        $this->typoScriptService = $typoScriptService;
     }
 }
