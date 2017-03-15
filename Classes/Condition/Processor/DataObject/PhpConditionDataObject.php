@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -47,10 +47,26 @@ class PhpConditionDataObject
     }
 
     /**
+     * @param FormInterface $form
+     */
+    public function setForm(FormInterface $form)
+    {
+        $this->form = $form;
+    }
+
+    /**
      * @return FormValidatorExecutor
      */
     public function getFormValidator()
     {
         return $this->formValidator;
+    }
+
+    /**
+     * @param FormValidatorExecutor $formValidator
+     */
+    public function setFormValidator(FormValidatorExecutor $formValidator)
+    {
+        $this->formValidator = $formValidator;
     }
 }

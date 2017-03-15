@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Configuration\Form\Condition\Activation;
 
-use Romm\Formz\Condition\Items\AbstractConditionItem;
+use Romm\Formz\Condition\Items\ConditionItemInterface;
 
 /**
  * Interface which must be implemented by the activation classes which will be
@@ -27,30 +27,36 @@ interface ActivationInterface
      *
      * @return string
      */
-    public function getCondition();
+    public function getExpression();
+
+    /**
+     * @param string $expression
+     * @return void
+     */
+    public function setExpression($expression);
 
     /**
      * Returns the condition items.
      *
-     * @return AbstractConditionItem[]
+     * @return ConditionItemInterface[]
      */
-    public function getItems();
+    public function getConditions();
 
     /**
      * Returns true if the given item exists.
      *
-     * @param string $itemName Name of the item.
+     * @param string $name Name of the item.
      * @return bool
      */
-    public function hasItem($itemName);
+    public function hasCondition($name);
 
     /**
      * Return the item with the given name.
      *
-     * @param string $itemName Name of the item.
-     * @return AbstractConditionItem
+     * @param string $name Name of the item.
+     * @return ConditionItemInterface
      */
-    public function getItem($itemName);
+    public function getCondition($name);
 
     /**
      * @return ActivationUsageInterface
@@ -59,6 +65,7 @@ interface ActivationInterface
 
     /**
      * @param ActivationUsageInterface $rootObject
+     * @return void
      */
     public function setRootObject(ActivationUsageInterface $rootObject);
 }

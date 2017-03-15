@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -17,6 +17,7 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
+use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject;
@@ -60,14 +61,15 @@ class ConditionProcessor
      */
     public function getActivationConditionTreeForField(Field $field)
     {
-        if (false === array_key_exists($field->getFieldName(), $this->fieldsTrees)) {
-            $this->fieldsTrees[$field->getFieldName()] = ConditionParserFactory::get()
-                ->parse($field->getActivation());
+        $key = $field->getFieldName();
+
+        if (false === array_key_exists($key, $this->fieldsTrees)) {
+            $this->fieldsTrees[$key] = $this->getConditionTree($field->getActivation());
         }
 
-        $this->fieldsTrees[$field->getFieldName()]->injectDependencies($this, $field->getActivation());
+        $this->fieldsTrees[$key]->injectDependencies($this, $field->getActivation());
 
-        return $this->fieldsTrees[$field->getFieldName()];
+        return $this->fieldsTrees[$key];
     }
 
     /**
@@ -82,8 +84,7 @@ class ConditionProcessor
         $key = $validation->getParentField()->getFieldName() . '->' . $validation->getValidationName();
 
         if (false === array_key_exists($key, $this->validationsTrees)) {
-            $this->validationsTrees[$key] = ConditionParserFactory::get()
-                ->parse($validation->getActivation());
+            $this->validationsTrees[$key] = $this->getConditionTree($validation->getActivation());
         }
 
         $this->validationsTrees[$key]->injectDependencies($this, $validation->getActivation());
@@ -102,18 +103,36 @@ class ConditionProcessor
         $fields = $this->formObject->getConfiguration()->getFields();
 
         foreach ($fields as $field) {
-            $this->getActivationConditionTreeForField($field)
-                ->alongNodes(function (NodeInterface $node) {
-                    $this->attachNodeJavaScriptFiles($node);
-                });
+            $this->getActivationConditionTreeForField($field);
 
             foreach ($field->getValidation() as $validation) {
-                $this->getActivationConditionTreeForValidation($validation)
-                    ->alongNodes(function (NodeInterface $node) {
-                        $this->attachNodeJavaScriptFiles($node);
-                    });
+                $this->getActivationConditionTreeForValidation($validation);
             }
         }
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     * @return ConditionTree
+     */
+    protected function getConditionTree(ActivationInterface $activation)
+    {
+        $tree = $this->getNewConditionTreeFromActivation($activation);
+        $tree->alongNodes(function (NodeInterface $node) {
+            $this->attachNodeJavaScriptFiles($node);
+        });
+
+        return $tree;
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     * @return ConditionTree
+     */
+    protected function getNewConditionTreeFromActivation(ActivationInterface $activation)
+    {
+        return ConditionParserFactory::get()
+            ->parse($activation);
     }
 
     /**

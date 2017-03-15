@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -82,23 +82,67 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected $result;
 
     /**
+     * @var FormInterface
+     */
+    protected $form;
+
+    /**
+     * @var FormValidatorExecutor
+     */
+    private $formValidatorExecutor;
+
+    /**
+     * Initializes all class variables.
+     *
+     * @param FormInterface $form
+     * @throws InvalidArgumentTypeException
+     */
+    private function initializeValidator($form)
+    {
+        if (false === $form instanceof FormInterface) {
+            throw InvalidArgumentTypeException::validatingWrongFormType(get_class($form));
+        }
+
+        $this->form = $form;
+        $this->result = new FormResult;
+        $this->formValidatorExecutor = $this->getFormValidatorExecutor($form);
+    }
+
+    /**
      * Checks the given form instance, and launches the validation if it is a
      * correct form.
      *
      * @param FormInterface $form The form instance to be validated.
      * @return FormResult
-     * @throws InvalidArgumentTypeException
      */
     final public function validate($form)
     {
-        if (false === $form instanceof FormInterface) {
-            throw new InvalidArgumentTypeException(
-                'Trying to validate a form that does not implement the interface "' . FormInterface::class . '". Given class: "' . get_class($form) . '"',
-                1487865158
-            );
-        }
+        $this->initializeValidator($form);
 
-        $this->result = new FormResult;
+        $formObject = $this->formValidatorExecutor->getFormObject();
+        $formObject->markFormAsSubmitted();
+        $formObject->setForm($form);
+
+        $this->validateGhost($form, false);
+
+        $formObject->setFormResult($this->result);
+
+        return $this->result;
+    }
+
+    /**
+     * Validates the form, but wont save form data in the form object.
+     *
+     * @param FormInterface $form
+     * @param bool          $initialize
+     * @return FormResult
+     * @internal
+     */
+    public function validateGhost($form, $initialize = true)
+    {
+        if ($initialize) {
+            $this->initializeValidator($form);
+        }
 
         $this->isValid($form);
 
@@ -112,13 +156,12 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      */
     final public function isValid($form)
     {
-        $formValidatorExecutor = $this->getFormValidatorExecutor($form);
-        $formValidatorExecutor->applyBehaviours();
-        $formValidatorExecutor->checkFieldsActivation();
+        $this->formValidatorExecutor->applyBehaviours();
+        $this->formValidatorExecutor->checkFieldsActivation();
 
         $this->beforeValidationProcess();
 
-        $formValidatorExecutor->validateFields(function (Field $field) {
+        $this->formValidatorExecutor->validateFields(function (Field $field) {
             $this->callAfterFieldValidationMethod($field);
         });
 
@@ -128,19 +171,19 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
             // Storing the form for possible third party further usage.
             FormService::addFormWithErrors($form);
         }
-
-        $formValidatorExecutor->saveValidationResult();
     }
 
     /**
-     * Use this function to (de)activate the validation for some given fields.
+     * Override this function in your child class to handle some pre-validation
+     * process.
      */
     protected function beforeValidationProcess()
     {
     }
 
     /**
-     * Use this function to run your own processes after the validation ran.
+     * Override this function in your child class to handle some post-validation
+     * process.
      */
     protected function afterValidationProcess()
     {

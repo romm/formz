@@ -27,7 +27,7 @@ Mais enfin, et surtout, la **maintenabilité devient plus compliquée**. En effe
 Solution
 ^^^^^^^^
 
-Pour répondre à cette problématique, Formz permet de **mutualiser les gabarits de champs dans des vues indépendantes**. Le code requis pour intégrer un champ est ainsi **beaucoup moins dense et plus compréhensible, mais également plus facilement maintenable** : lorsqu'une modification est effectuée dans le gabarit d'un champ, elle sera répercutée automatiquement sur tous les champs.
+Pour répondre à cette problématique, FormZ permet de **mutualiser les gabarits de champs dans des vues indépendantes**. Le code requis pour intégrer un champ est ainsi **beaucoup moins dense et plus compréhensible, mais également plus facilement maintenable** : lorsqu'une modification est effectuée dans le gabarit d'un champ, elle sera répercutée automatiquement sur tous les champs.
 
 -----
 
@@ -44,7 +44,7 @@ Vous serez ensuite en mesure d'utiliser votre nouveau layout avec n'importe quel
 Configuration TypoScript
 """"""""""""""""""""""""
 
-La configuration TypoScript de votre layout devra faire partie d'un **groupe de layout**. Formz propose par défaut le groupe ``default``.
+La configuration TypoScript de votre layout devra faire partie d'un **groupe de layout**. FormZ propose par défaut le groupe ``default``.
 
 .. tip::
 
@@ -81,11 +81,11 @@ Les variables suivantes sont utilisables directement dans votre template :
 
 * ``fieldName`` : le nom du champ actuel (la valeur de la propriété ``name`` utilisée dans le ViewHelper :ref:`integratorManual-viewHelpers-field`).
 
-* ``fieldId`` : si cet argument n'a pas été déclaré précédemment, il sera automatiquement rempli par un identifiant généré en fonction du nom du formulaire et du nom du champ. Exemple pour le champ ``email`` du formulaire ``monFormulaire`` : ``formz-mon-formulaire-email``.
+* ``fieldId`` : si cet argument n'a pas été déclaré précédemment, il sera automatiquement rempli par un identifiant généré en fonction du nom du formulaire et du nom du champ. Exemple pour le champ ``email`` du formulaire ``monFormulaire`` : ``fz-mon-formulaire-email``.
 
 .. important::
 
-    Afin d'être entièrement fonctionnel avec Formz, votre template devra respecter toutes les règles décrites dans le chapitre « :ref:`integratorManual-configuration` ».
+    Afin d'être entièrement fonctionnel avec FormZ, votre template devra respecter toutes les règles décrites dans le chapitre « :ref:`integratorManual-configuration` ».
 
 **Exemple :**
 
@@ -95,23 +95,23 @@ Les variables suivantes sont utilisables directement dans votre template :
 
     <f:layout name="{layout}" />
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <f:section name="Label">
         <label class="{f:if(condition: '{required}', then: 'required')}" for="{fieldId}">{label}</label>
     </f:section>
 
     <f:section name="Field">
-        <div formz-field-container="{fieldName}">
-            <formz:renderSection section="Field" />
+        <div fz-field-container="{fieldName}">
+            <fz:slot.render slot="Field" />
         </div>
     </f:section>
 
     <f:section name="Feedback">
-        <div formz-field-feedback-container="{fieldName}">
-            <div formz-field-feedback-list="{fieldName}">
+        <div fz-field-feedback-container="{fieldName}">
+            <div fz-field-feedback-list="{fieldName}">
                 <f:for each="{validationResults.errors}" iteration="iteration" as="error">
-                    <formz:formatMessage message="{error}" />
+                    <fz:formatMessage message="{error}" />
                 </f:for>
             </div>
         </div>
@@ -158,16 +158,16 @@ Pour en savoir plus, consultez le chapitre : « :ref:`integratorManual-viewHelpe
     :linenos:
     :emphasize-lines: 5
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
 
-        <formz:field name="email" layout="my-project.one-column">
-            <formz:option name="required" value="1" />
+        <fz:field name="email" layout="my-project.one-column">
+            <fz:option name="required" value="1" />
 
-            <formz:section name="Field">
+            <fz:slot name="Field">
                 <f:form.textfield property="{fieldName}" id="{fieldId}" placeholder="email" />
-            </formz:section>
-        </formz:field>
+            </fz:slot>
+        </fz:field>
 
-    </formz:form>
+    </fz:form>

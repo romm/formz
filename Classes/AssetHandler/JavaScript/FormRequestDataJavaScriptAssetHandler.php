@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,6 +14,7 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\ArrayService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -35,21 +36,24 @@ class FormRequestDataJavaScriptAssetHandler extends AbstractAssetHandler
         $submittedFormValues = [];
         $fieldsExistingMessages = [];
         $deactivatedFields = [];
-        $formWasSubmitted = $this->getFormObject()->hasLastValidationResult()
-            ? 'true'
-            : 'false';
+        $formWasSubmitted = 'false';
 
-        if ($formWasSubmitted) {
-            $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($this->getSubmittedFormValues());
-            $fieldsExistingMessages = ArrayService::get()->arrayToJavaScriptJson($this->getFieldsExistingMessages());
-            $deactivatedFields = ArrayService::get()->arrayToJavaScriptJson($this->getDeactivatedFields());
+        if ($this->getFormObject()->formWasSubmitted()) {
+            $formWasSubmitted = 'true';
+            $submittedFormValues = $this->getSubmittedFormValues();
+            $fieldsExistingMessages = $this->getFieldsExistingMessages();
+            $deactivatedFields = $this->getDeactivatedFields();
         }
+
+        $submittedFormValues = ArrayService::get()->arrayToJavaScriptJson($submittedFormValues);
+        $fieldsExistingMessages = ArrayService::get()->arrayToJavaScriptJson($fieldsExistingMessages);
+        $deactivatedFields = ArrayService::get()->arrayToJavaScriptJson($deactivatedFields);
 
         $formName = GeneralUtility::quoteJSvalue($this->getFormObject()->getName());
 
         $javaScriptCode = <<<JS
 (function() {
-    Formz.Form.beforeInitialization($formName, function(form) {
+    Fz.Form.beforeInitialization($formName, function(form) {
         form.injectRequestData($submittedFormValues, $fieldsExistingMessages, $formWasSubmitted, $deactivatedFields)
     });
 })();
@@ -90,31 +94,42 @@ JS;
     protected function getFieldsExistingMessages()
     {
         $fieldsMessages = [];
+        $formObject = $this->getFormObject();
 
-        if ($this->getFormObject()->hasLastValidationResult()) {
-            $lastValidationResult = $this->getFormObject()->getLastValidationResult();
-
-            foreach ($this->getFormObject()->getProperties() as $fieldName) {
-                $result = $lastValidationResult->forProperty($fieldName);
-                $messages = [];
-
-                if ($result->hasErrors()) {
-                    $messages['errors'] = $this->formatMessages($result->getErrors());
-                }
-
-                if ($result->hasWarnings()) {
-                    $messages['warnings'] = $this->formatMessages($result->getWarnings());
-                }
-
-                if ($result->hasNotices()) {
-                    $messages['notices'] = $this->formatMessages($result->getNotices());
-                }
-
-                $fieldsMessages[$fieldName] = $messages;
+        if ($formObject->formWasSubmitted()
+            && $formObject->hasFormResult()
+        ) {
+            foreach ($this->getFormObject()->getConfiguration()->getFields() as $field) {
+                $fieldsMessages[$field->getFieldName()] = $this->getSingleFieldExistingMessages($field);
             }
         }
 
         return $fieldsMessages;
+    }
+
+    /**
+     * @param Field $field
+     * @return array
+     */
+    protected function getSingleFieldExistingMessages(Field $field)
+    {
+        $formResult = $this->getFormObject()->getFormResult();
+        $result = $formResult->forProperty($field->getFieldName());
+        $messages = [];
+
+        if ($result->hasErrors()) {
+            $messages['errors'] = $this->formatMessages($result->getErrors());
+        }
+
+        if ($result->hasWarnings()) {
+            $messages['warnings'] = $this->formatMessages($result->getWarnings());
+        }
+
+        if ($result->hasNotices()) {
+            $messages['notices'] = $this->formatMessages($result->getNotices());
+        }
+
+        return $messages;
     }
 
     /**
@@ -144,8 +159,8 @@ JS;
      */
     protected function getDeactivatedFields()
     {
-        return ($this->getFormObject()->hasLastValidationResult())
-            ? array_keys($this->getFormObject()->getLastValidationResult()->getDeactivatedFields())
+        return ($this->getFormObject()->hasFormResult())
+            ? array_keys($this->getFormObject()->getFormResult()->getDeactivatedFields())
             : [];
     }
 }

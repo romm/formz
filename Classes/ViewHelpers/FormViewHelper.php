@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -16,20 +16,23 @@ namespace Romm\Formz\ViewHelpers;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\ControllerService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
-use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -59,7 +62,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  *   To help integrators customize every aspect they need in CSS, every useful
  *   information is put in data attributes in the form DOM element. For example,
  *   you can know in real time if the field "email" is valid if the form has the
- *   attribute "formz-valid-email"
+ *   attribute "fz-valid-email"
  *
  * - CSS
  *   A block of CSS is built from scratch, which will handle the fields display,
@@ -78,12 +81,12 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $pageRenderer;
 
     /**
-     * @var FormObjectFactory
+     * @var FormObject
      */
-    protected $formObjectFactory;
+    protected $formObject;
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
@@ -103,11 +106,44 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $timeTracker;
 
     /**
+     * @var bool
+     */
+    protected $typoScriptIncluded = false;
+
+    /**
+     * @var ControllerService
+     */
+    protected $controllerService;
+
+    /**
      * @inheritdoc
      */
     public function initialize()
     {
         parent::initialize();
+
+        $this->typoScriptIncluded = ContextService::get()->isTypoScriptIncluded();
+
+        if (true === $this->typoScriptIncluded) {
+            $this->timeTracker = TimeTrackerService::getAndStart();
+            $this->formObjectClassName = $this->getFormClassName();
+            $this->formObject = $this->getFormObject();
+            $this->timeTracker->logTime('post-config');
+            $this->formService->setFormObject($this->formObject);
+            $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
+
+            /*
+             * If the argument `object` was filled with an instance of Form, it
+             * is added to the `FormObject`.
+             */
+            $objectArgument = $this->arguments['object'];
+
+            if ($objectArgument instanceof FormInterface
+                && false === $this->formObject->formWasSubmitted()
+            ) {
+                $this->formObject->setForm($objectArgument);
+            }
+        }
 
         /*
          * Important: we need to instantiate the page renderer with this instead
@@ -131,7 +167,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         parent::initializeArguments();
 
         // The name attribute becomes mandatory.
-        $this->overrideArgument('name', 'string', 'Name of the form', true);
+        $this->overrideArgument('name', 'string', 'Name of the form.', true);
         $this->registerArgument('formClassName', 'string', 'Class name of the form.', false);
     }
 
@@ -140,38 +176,31 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function renderViewHelper()
     {
-        $this->timeTracker = TimeTrackerService::getAndStart();
-        $result = '';
-
-        if (false === ContextService::get()->isTypoScriptIncluded()) {
-            if (ExtensionService::get()->isInDebugMode()) {
-                $result = ContextService::get()->translate('form.typoscript_not_included.error_message');
-            }
-        } else {
-            $formObject = $this->formObjectFactory->getInstanceFromClassName($this->getFormObjectClassName(), $this->getFormObjectName());
-
-            $this->formService->setFormObject($formObject);
-            $formzValidationResult = $formObject->getConfigurationValidationResult();
-
-            if ($formzValidationResult->hasErrors()) {
-                // If the form configuration is not valid, we display the errors list.
-                $result = $this->getErrorText($formzValidationResult);
-            } else {
-                // Everything is ok, we render the form.
-                $result = $this->renderForm(func_get_args());
-            }
-
-            unset($formzValidationResult);
+        if (false === $this->typoScriptIncluded) {
+            return (ExtensionService::get()->isInDebugMode())
+                ? ContextService::get()->translate('form.typoscript_not_included.error_message')
+                : '';
         }
 
+        $formzValidationResult = $this->formObject->getConfigurationValidationResult();
+
+        $result = ($formzValidationResult->hasErrors())
+            // If the form configuration is not valid, we display the errors list.
+            ? $this->getErrorText($formzValidationResult)
+            // Everything is ok, we render the form.
+            : $this->renderForm(func_get_args());
+
         $this->timeTracker->logTime('final');
-        $result = $this->timeTracker->getHTMLCommentLogs() . LF . $result;
-        unset($this->timeTracker);
+
+        if (ExtensionService::get()->isInDebugMode()) {
+            $result = $this->timeTracker->getHTMLCommentLogs() . LF . $result;
+        }
 
         $this->formService->resetState();
 
         return $result;
     }
+
     /**
      * Will render the whole form and return the HTML result.
      *
@@ -180,105 +209,54 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     final protected function renderForm(array $arguments)
     {
-        $this->timeTracker->logTime('post-config');
+        /*
+         * We begin by setting up the form service: request results and form
+         * instance are inserted in the service, and are used afterwards.
+         *
+         * There are only two ways to be sure the values injected are correct:
+         * when the form was actually submitted by the user, or when the
+         * argument `object` of the view helper is filled with a form instance.
+         */
+        $this->formService->activateFormContext();
 
-        $this->assetHandlerFactory = AssetHandlerFactory::get($this->formService->getFormObject(), $this->controllerContext);
+        /*
+         * If the form was submitted, applying custom behaviours on its fields.
+         */
+        $this->formService->applyBehavioursOnSubmittedForm($this->controllerContext);
 
-        $this->setObjectAndRequestResult()
-            ->applyBehavioursOnSubmittedForm()
-            ->addDefaultClass()
-            ->handleDataAttributes();
+        /*
+         * Adding the default class configured in TypoScript configuration to
+         * the form HTML tag.
+         */
+        $this->addDefaultClass();
 
-        $assetHandlerConnectorManager = AssetHandlerConnectorManager::get($this->pageRenderer, $this->assetHandlerFactory);
-        $assetHandlerConnectorManager->includeDefaultAssets();
-        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()
-            ->generateAndIncludeFormzConfigurationJavaScript()
-            ->generateAndIncludeJavaScript()
-            ->generateAndIncludeInlineJavaScript()
-            ->includeJavaScriptValidationAndConditionFiles();
-        $assetHandlerConnectorManager->getCssAssetHandlerConnector()->includeGeneratedCss();
+        /*
+         * Handling data attributes that are added to the form HTML tag,
+         * depending on several parameters.
+         */
+        $this->handleDataAttributes();
+
+        /*
+         * Including JavaScript and CSS assets in the page renderer.
+         */
+        $this->handleAssets();
 
         $this->timeTracker->logTime('pre-render');
 
-        // Renders the whole Fluid template.
-        $result = call_user_func_array([get_parent_class(), 'render'], $arguments);
+        /*
+         * Getting the result of the original Fluid `FormViewHelper` rendering.
+         */
+        $result = $this->getParentRenderResult($arguments);
 
-        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()->includeLanguageJavaScriptFiles();
+        /*
+         * Language files need to be included at the end, because they depend on
+         * what was used by previous assets.
+         */
+        $this->getAssetHandlerConnectorManager()
+            ->getJavaScriptAssetHandlerConnector()
+            ->includeLanguageJavaScriptFiles();
 
         return $result;
-    }
-
-    /**
-     * This function will inject in the variable container the instance of form
-     * and its submission result. There are only two ways to be sure the values
-     * injected are correct: when the form has actually been submitted by the
-     * user, or when the view helper argument `object` is filled.
-     *
-     * @return $this
-     */
-    protected function setObjectAndRequestResult()
-    {
-        $this->formService->activateFormContext();
-
-        $originalRequest = $this->controllerContext
-            ->getRequest()
-            ->getOriginalRequest();
-
-        if (null !== $originalRequest
-            && $originalRequest->hasArgument($this->getFormObjectName())
-        ) {
-            /** @var array $formInstance */
-            $formInstance = $originalRequest->getArgument($this->getFormObjectName());
-
-            $this->formService->setFormInstance($formInstance);
-            $this->formService->setFormResult($this->formService->getFormObject()->getLastValidationResult());
-            $this->formService->markFormAsSubmitted();
-        } elseif (null !== $this->arguments['object']) {
-            $formInstance = $this->arguments['object'];
-
-            /*
-             * @todo: pas forcément un DefaultFormValidator: comment je gère ça?
-             * + ça prend quand même un peu de temps cette manière. Peut-on faire autrement ?
-             */
-            /** @var DefaultFormValidator $formValidator */
-            $formValidator = Core::instantiate(
-                DefaultFormValidator::class,
-                ['name' => $this->getFormObjectName()]
-            );
-            $formRequestResult = $formValidator->validate($formInstance);
-
-            $this->formService->setFormInstance($formInstance);
-            $this->formService->setFormResult($formRequestResult);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Will loop on the submitted form fields and apply behaviours if their
-     * configuration contains.
-     *
-     * @return $this
-     */
-    protected function applyBehavioursOnSubmittedForm()
-    {
-        $originalRequest = $this->controllerContext
-            ->getRequest()
-            ->getOriginalRequest();
-
-        if ($this->formService->formWasSubmitted()) {
-            /** @var BehavioursManager $behavioursManager */
-            $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
-
-            $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
-                $this->formService->getFormInstance(),
-                $this->formService->getFormObject()->getConfiguration()
-            );
-
-            $originalRequest->setArgument($this->getFormObjectName(), $formProperties);
-        }
-
-        return $this;
     }
 
     /**
@@ -286,13 +264,10 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      *
      * To customize the class, take a look at `settings.defaultClass` in the
      * form TypoScript configuration.
-     *
-     * @return $this
      */
     protected function addDefaultClass()
     {
-        $formDefaultClass = $this->formService
-            ->getFormObject()
+        $formDefaultClass = $this->formObject
             ->getConfiguration()
             ->getSettings()
             ->getDefaultClass();
@@ -300,47 +275,62 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $class = $this->tag->getAttribute('class');
 
         if (false === empty($formDefaultClass)) {
-            $class = ((!empty($class)) ? $class . ' ' : '') . $formDefaultClass;
+            $class = (!empty($class) ? $class . ' ' : '') . $formDefaultClass;
+            $this->tag->addAttribute('class', $class);
         }
-
-        $this->tag->addAttribute('class', $class);
-
-        return $this;
     }
 
     /**
      * Adds custom data attributes to the form element, based on the
      * submitted form values and results.
-     *
-     * @return $this
      */
     protected function handleDataAttributes()
     {
-        $object = $this->formService->getFormInstance();
-        $formResult = $this->formService->getFormResult();
-
-        /** @var DataAttributesAssetHandler $dataAttributesAssetHandler */
-        $dataAttributesAssetHandler =  $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
-
         $dataAttributes = [];
-        if ($object) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($object, $formResult);
-        }
 
-        if ($formResult) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes($formResult);
+        $dataAttributesAssetHandler = $this->getDataAttributesAssetHandler();
 
-            if (true === $this->formService->formWasSubmitted()) {
-                $dataAttributes += ['formz-submission-done' => '1'];
-                $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes($formResult);
+        if ($this->formObject->hasForm()) {
+            if (false === $this->formObject->hasFormResult()) {
+                $form = $this->formObject->getForm();
+                $formValidator = $this->getFormValidator($this->getFormObjectName());
+                $formResult = $formValidator->validateGhost($form);
+            } else {
+                $formResult = $this->formObject->getFormResult();
             }
+
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($formResult);
         }
 
-        foreach ($dataAttributes as $attributeName => $attributeValue) {
-            $this->tag->addAttribute($attributeName, $attributeValue);
+        if (true === $this->formObject->formWasSubmitted()) {
+            $dataAttributes += [DataAttributesAssetHandler::getFieldSubmissionDone() => '1'];
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes();
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
         }
 
-        return $this;
+        $this->tag->addAttributes($dataAttributes);
+    }
+
+    /**
+     * Will include all JavaScript and CSS assets needed for this form.
+     */
+    protected function handleAssets()
+    {
+        $assetHandlerConnectorManager = $this->getAssetHandlerConnectorManager();
+
+        // Default FormZ assets.
+        $assetHandlerConnectorManager->includeDefaultAssets();
+
+        // JavaScript assets.
+        $assetHandlerConnectorManager->getJavaScriptAssetHandlerConnector()
+            ->generateAndIncludeFormzConfigurationJavaScript()
+            ->generateAndIncludeJavaScript()
+            ->generateAndIncludeInlineJavaScript()
+            ->includeJavaScriptValidationAndConditionFiles();
+
+        // CSS assets.
+        $assetHandlerConnectorManager->getCssAssetHandlerConnector()
+            ->includeGeneratedCss();
     }
 
     /**
@@ -351,8 +341,8 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function getErrorText(Result $result)
     {
-        /** @var $view \TYPO3\CMS\Fluid\View\StandaloneView */
-        $view = $this->objectManager->get(StandaloneView::class);
+        /** @var $view StandaloneView */
+        $view = Core::instantiate(StandaloneView::class);
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
         $layoutRootPath = StringService::get()->getExtensionRelativePath('Resources/Private/Layouts');
         $view->setLayoutRootPaths([$layoutRootPath]);
@@ -369,78 +359,134 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * of the controller which will be called when submitting this form. It
      * means two things:
      * - The action must have a parameter which has the exact same name as the
-     *   form.
+     *   form;
      * - The parameter must indicate its type.
      *
-     * @return null|string
-     * @throws \Exception
+     * @return string
+     * @throws ClassNotFoundException
+     * @throws InvalidOptionValueException
      */
-    protected function getFormObjectClassName()
+    protected function getFormClassName()
     {
-        if (null === $this->formObjectClassName) {
-            $request = $this->controllerContext->getRequest();
-            $controllerObjectName = $request->getControllerObjectName();
-            $actionName = ($this->arguments['action']) ?: $request->getControllerActionName();
-            $actionName = $actionName . 'Action';
+        $formClassName = ($this->hasArgument('formClassName'))
+            ? $this->arguments['formClassName']
+            : $this->getFormClassNameFromControllerAction();
 
-            if ($this->hasArgument('formClassName')) {
-                $formClassName = $this->arguments['formClassName'];
-            } else {
-                /** @var ReflectionService $reflectionService */
-                $reflectionService = $this->objectManager->get(ReflectionService::class);
-                $methodParameters = $reflectionService->getMethodParameters($controllerObjectName, $actionName);
-
-                if (false === isset($methodParameters[$this->getFormObjectName()])) {
-                    throw new \Exception(
-                        'The method "' . $controllerObjectName . '::' . $actionName . '()" must have a parameter "$' . $this->getFormObjectName() . '". Note that you can also change the parameter "name" of the form view helper.',
-                        1457441846
-                    );
-                }
-
-                $formClassName = $methodParameters[$this->getFormObjectName()]['type'];
-            }
-
-            if (false === class_exists($formClassName)) {
-                throw new \Exception(
-                    'Invalid value for the form class name (current value: "' . $formClassName . '"). You need to either fill the parameter "formClassName" in the view helper, or specify the type of the parameter "$' . $this->getFormObjectName() . '" for the method "' . $controllerObjectName . '::' . $actionName . '()".',
-                    1457442014
-                );
-            }
-
-            if (false === in_array(FormInterface::class, class_implements($formClassName))) {
-                throw new \Exception(
-                    'Invalid value for the form class name (current value: "' . $formClassName . '"); it must be an instance of "' . FormInterface::class . '".',
-                    1457442462
-                );
-            }
-
-            $this->formObjectClassName = $formClassName;
+        if (false === class_exists($formClassName)) {
+            throw ClassNotFoundException::formViewHelperClassNotFound($formClassName, $this->getFormObjectName(), $this->getControllerName(), $this->getControllerActionName());
         }
 
-        return $this->formObjectClassName;
+        if (false === in_array(FormInterface::class, class_implements($formClassName))) {
+            throw InvalidOptionValueException::formViewHelperWrongFormType($formClassName);
+        }
+
+        return $formClassName;
     }
 
     /**
-     * @param PageRenderer $pageRenderer
+     * Will fetch the name of the controller action argument bound to this
+     * request.
+     *
+     * @return string
+     * @throws EntryNotFoundException
      */
-    public function injectPageRenderer(PageRenderer $pageRenderer)
+    protected function getFormClassNameFromControllerAction()
     {
-        $this->pageRenderer = $pageRenderer;
+        return $this->controllerService->getFormClassNameFromControllerAction(
+            $this->getControllerName(),
+            $this->getControllerActionName(),
+            $this->getFormObjectName()
+        );
     }
 
     /**
-     * @param FormObjectFactory $formObjectFactory
+     * Renders the whole Fluid template.
+     *
+     * @param array $arguments
+     * @return string
      */
-    public function injectFormObjectFactory(FormObjectFactory $formObjectFactory)
+    protected function getParentRenderResult(array $arguments)
     {
-        $this->formObjectFactory = $formObjectFactory;
+        return call_user_func_array([get_parent_class(), 'render'], $arguments);
     }
 
     /**
-     * @param FormService $service
+     * @return string
      */
-    public function injectFormService(FormService $service)
+    protected function getControllerName()
+    {
+        return ($this->arguments['controller'])
+            ?: $this->controllerContext
+                ->getRequest()
+                ->getControllerObjectName();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getControllerActionName()
+    {
+        return ($this->arguments['action'])
+            ?: $this->controllerContext
+                ->getRequest()
+                ->getControllerActionName();
+    }
+
+    /**
+     * @param string $formName
+     * @return DefaultFormValidator
+     */
+    protected function getFormValidator($formName)
+    {
+        /** @var DefaultFormValidator $validation */
+        $validation = Core::instantiate(DefaultFormValidator::class, ['name' => $formName]);
+
+        return $validation;
+    }
+
+    /**
+     * @return AssetHandlerConnectorManager
+     */
+    protected function getAssetHandlerConnectorManager()
+    {
+        return AssetHandlerConnectorManager::get($this->pageRenderer, $this->assetHandlerFactory);
+    }
+
+    /**
+     * @return DataAttributesAssetHandler
+     */
+    protected function getDataAttributesAssetHandler()
+    {
+        /** @var DataAttributesAssetHandler $assetHandler */
+        $assetHandler = $this->assetHandlerFactory->getAssetHandler(DataAttributesAssetHandler::class);
+
+        return $assetHandler;
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getFormObject()
+    {
+        /** @var FormObjectFactory $formObjectFactory */
+        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
+
+        return $formObjectFactory->getInstanceFromClassName($this->formObjectClassName, $this->getFormObjectName());
+    }
+
+    /**
+     * @param FormViewHelperService $service
+     */
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
+    }
+
+    /**
+     * @param ControllerService $controllerService
+     */
+    public function injectControllerService(ControllerService $controllerService)
+    {
+        $this->controllerService = $controllerService;
     }
 }

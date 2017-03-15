@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -16,7 +16,7 @@ namespace Romm\Formz\Configuration\Form\Condition\Activation;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesResolver;
 
-class ActivationResolver extends AbstractActivation implements MixedTypesInterface
+class ActivationResolver implements MixedTypesInterface
 {
     /**
      * Because this class implements `MixedTypeInterface`, this function needs
@@ -30,7 +30,7 @@ class ActivationResolver extends AbstractActivation implements MixedTypesInterfa
     final public static function getInstanceClassName(MixedTypesResolver $resolver)
     {
         $data = $resolver->getData();
-        $objectType = (empty(trim($data['condition'])))
+        $objectType = (empty(trim($data['expression'])))
             ? EmptyActivation::class
             : Activation::class;
 

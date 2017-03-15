@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -28,7 +28,8 @@ class CacheService implements SingletonInterface
     use ExtendedFacadeInstanceTrait;
 
     const CACHE_IDENTIFIER = 'cache_formz';
-    const GENERATED_FILES_PATH = 'typo3temp/Formz/';
+    const CONFIGURATION_OBJECT_CACHE_IDENTIFIER = 'cache_formz_configuration_object';
+    const GENERATED_FILES_PATH = 'typo3temp/FormZ/';
 
     /**
      * @var TypoScriptService
@@ -119,7 +120,7 @@ class CacheService implements SingletonInterface
 
     /**
      * Function called when clearing TYPO3 caches. It will remove the temporary
-     * asset files created by Formz.
+     * asset files created by FormZ.
      *
      * @param array $parameters
      */
@@ -135,8 +136,8 @@ class CacheService implements SingletonInterface
             return;
         }
 
-        foreach ($files as $assetCacheFile) {
-            unlink($assetCacheFile);
+        foreach ($files as $file) {
+            touch($file, 0);
         }
     }
 }

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -31,17 +31,18 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     use ParentsTrait;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Validation\Validation>
+     * @var \Romm\Formz\Configuration\Form\Field\Validation\Validation[]
      */
     protected $validation = [];
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour>
+     * @var \Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour[]
      */
     protected $behaviours = [];
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
+     * @var ActivationInterface
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;
@@ -79,6 +80,14 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
+     * @return Validation[]
+     */
+    public function getValidation()
+    {
+        return $this->validation;
+    }
+
+    /**
      * @param string $validationName
      * @return bool
      */
@@ -88,33 +97,23 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
-     * @return Validation[]
-     */
-    public function getValidation()
-    {
-        return $this->validation;
-    }
-
-    /**
      * @param Validation $validation
      */
     public function addValidation(Validation $validation)
     {
         $this->validation[$validation->getValidationName()] = $validation;
+        $validation->setParents([$this]);
     }
 
     /**
-     * @param $validationName
+     * @param string $validationName
      * @return Validation
      * @throws EntryNotFoundException
      */
     public function getValidationByName($validationName)
     {
         if (false === $this->hasValidation($validationName)) {
-            throw new EntryNotFoundException(
-                'The validation "' . $validationName . '" was not found. Please use the function "hasValidation()" befo',
-                1487672276
-            );
+            throw EntryNotFoundException::validationNotFound($validationName);
         }
 
         return $this->validation[$validationName];

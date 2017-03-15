@@ -19,7 +19,7 @@ You have the possibility to create your own validators depending on your needs; 
 API
 ^^^
 
-The validators of Formz give you access to the following variables/functions:
+The validators of FormZ give you access to the following variables/functions:
 
 - :ref:`$form <validator-form>`
 - :ref:`$fieldName <validator-fieldName>`
@@ -82,7 +82,7 @@ Supported messages list
     Type
         :php:`array`
     Description
-        In Formz, validators use **pre-configured messages**. Indeed, a validator may return different messages; it should then define in advance what messages can be used: a key for the message, and its configuration.
+        In FormZ, validators use **pre-configured messages**. Indeed, a validator may return different messages; it should then define in advance what messages can be used: a key for the message, and its configuration.
 
         Use the variable ``$supportedMessages`` to define the list of messages used by the validator. You can check the following example to respect the structure:
 
@@ -98,7 +98,7 @@ Supported messages list
 
                   // "extension" contains the name of the extension used to
                   // fetch the LLL key of the message.
-                  // If empty, "Formz" extension is used.
+                  // If empty, "FormZ" extension is used.
                   'extension'    => null
                ],
                'test'    => [
@@ -195,9 +195,9 @@ Bind a JavaScript file
     Type
         :php:`array`
     Description
-        Contains the JavaScript files list which will emulate this validator in the client web browser. Just fill this array, Formz will import the files automatically.
+        Contains the JavaScript files list which will emulate this validator in the client web browser. Just fill this array, FormZ will import the files automatically.
 
-        These files will have to contain the registration declaration of the validator JavaScript version, by using the function :ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
+        These files will have to contain the registration declaration of the validator JavaScript version, by using the function :ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
 
         **Example:**
 

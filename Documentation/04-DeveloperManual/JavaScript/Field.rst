@@ -126,7 +126,7 @@ Add an activation condition
 
         .. note::
 
-            This function is used by Formz core, in code automatically generated from values written in the TypoScript configuration of the :ref:`fields activation conditions <fieldsActivation-condition>`.
+            This function is used by FormZ core, in code automatically generated from values written in the TypoScript configuration of the :ref:`fields activation conditions <fieldsActivation-expression>`.
 
 .. _developerManual-javaScript-field-addActivationConditionForValidator:
 
@@ -178,7 +178,7 @@ Add an activation condition to a validation rule
 
         .. note::
 
-            This function is used by Formz core, in code automatically generated from values written in the TypoScript configuration of the :ref:`validation rules activation conditions <validatorsActivation>`.
+            This function is used by FormZ core, in code automatically generated from values written in the TypoScript configuration of the :ref:`validation rules activation conditions <validatorsActivation>`.
 
 -----
 
@@ -195,7 +195,7 @@ Add a validation rule
         /
     Parameters
         - ``validationName`` (String): name of the rule (its index), must be unique for this field.
-        - ``validatorName`` (String): name of the validator used for this rule. It must be an existing validator, registered with :ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
+        - ``validatorName`` (String): name of the validator used for this rule. It must be an existing validator, registered with :ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
         - ``validationConfiguration`` (Object): configuration of the validator, which will be sent when validation begins.
     Description
         Adds a validation rule to the field.
@@ -436,7 +436,7 @@ Get the parent form
     Function
         ``getForm()``
     Return
-        ``Formz.FullForm``
+        ``Fz.FullForm``
     Description
         Returns the form instance from which this field comes.
 

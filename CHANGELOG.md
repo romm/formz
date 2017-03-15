@@ -1,4 +1,4 @@
-# ![Formz](Documentation/Images/formz-icon@medium.png) Formz - Changelog
+# ![FormZ](Documentation/Images/formz-icon@medium.png) Formz - Changelog
 
 0.4.1 - 2017-02-15
 ------------------
@@ -8,7 +8,7 @@ TYPO3 version requirement changed from 8.5 to 8.6 (mistake from last version).
 0.4.0 - 2017-02-15
 ------------------
 
-Support for TYPO3 8.6 has been added. It means you should now be able to use Formz with TYPO3 6.2/7.6/8.6! 
+Support for TYPO3 8.6 has been added. It means you should now be able to use FormZ with TYPO3 6.2/7.6/8.6!
 
 ----
 
@@ -17,7 +17,7 @@ Support for TYPO3 8.6 has been added. It means you should now be able to use For
 0.3.3 - 2017-01-25
 ------------------
 
-This release fixes a PHP warning (which could be thrown as an exception) when working on TYPO3 >= 7.6.13. 
+This release fixes a PHP warning (which could be thrown as an exception) when working on TYPO3 >= 7.6.13.
 
 ----
 
@@ -26,7 +26,7 @@ This release fixes a PHP warning (which could be thrown as an exception) when wo
 0.3.2 - 2017-01-24
 ------------------
 
-This release introduces partial backend support for Formz, meaning you can use Formz in any backend module.
+This release introduces partial backend support for FormZ, meaning you can use FormZ in any backend module.
 
 The last remaining known issue is ajax calls, which wont work for now.
 
@@ -97,26 +97,26 @@ A bunch of unit tests are also embedded in this version, making a step forward t
 
   A JavaScript debug statement was using the `Debug` library directly, instead of the low-level `debug` function.
 
-  It could cause an error when the `Debug` library was not loaded (when the debug mode is not enabled in Formz configuration).
+  It could cause an error when the `Debug` library was not loaded (when the debug mode is not enabled in FormZ configuration).
 
 - **[[#26](https://github.com/romm/configuration_object/pull/26)] [BUGFIX] Fix persistent option in field ViewHelper**
 
-  When using the ViewHelper `<formz:option>` inside `<formz:field>`, the option would not be deleted after the whole field is processed, resulting in unwanted options in later fields, which could cause pretty ugly behaviours.
+  When using the ViewHelper `<fz:option>` inside `<fz:field>`, the option would not be deleted after the whole field is processed, resulting in unwanted options in later fields, which could cause pretty ugly behaviours.
 
   For instance, a field could be flagged as required even if it is not.
 
   In the following example, the option `required` would have been present for the field `bar` (it is now fixed by this commit).
 
   ```
-  <formz:field name="foo">
-      <formz:option name="required" value="1" />
-  
+  <fz:field name="foo">
+      <fz:option name="required" value="1" />
+
       [...]
-  </formz:field>
-  
-  <formz:field name="bar">
+  </fz:field>
+
+  <fz:field name="bar">
       [...]
-  </formz:field>
+  </fz:field>
   ```
 
 0.1.1 - 2016-10-10

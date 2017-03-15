@@ -28,9 +28,9 @@ Property                                                                        
 
 :ref:`behaviours <fieldsBehaviours>`                                                    Field behaviours
 
-:ref:`activation.items <fieldsActivation-items>`                                        Activation conditions
+:ref:`activation.conditions <fieldsActivation-conditions>`                              Activation conditions
 
-:ref:`activation.condition <fieldsActivation-condition>`                                Field activation expression
+:ref:`activation.expression <fieldsActivation-expression>`                              Field activation expression
 
 :ref:`settings.fieldContainerSelector <fieldsSettings-fieldContainerSelector>`          Field container selector
 
@@ -110,7 +110,7 @@ Field behaviours
 
             Note that the validators configurations are fetched directly from ``config.tx_formz.behaviours``. It prevents a configuration duplication when the behaviours are used at several places.
 
-.. _fieldsActivation-items:
+.. _fieldsActivation-conditions:
 
 Activation conditions
 ---------------------
@@ -118,7 +118,7 @@ Activation conditions
 .. container:: table-row
 
     Property
-        ``activation.items``
+        ``activation.conditions``
     Required?
         No
     Description
@@ -138,7 +138,7 @@ Activation conditions
                 }
             }
 
-.. _fieldsActivation-condition:
+.. _fieldsActivation-expression:
 
 Field activation
 ----------------
@@ -146,7 +146,7 @@ Field activation
 .. container:: table-row
 
     Property
-        ``activation.condition``
+        ``activation.expression``
     Required?
         No
     Description
@@ -178,7 +178,7 @@ Field container selector
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-container="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-container="#FIELD#"]``.
 
         **Example:**
 
@@ -188,7 +188,7 @@ Field container selector
                 fields {
                     email {
                         settings {
-                            fieldContainerSelector = [formz-field-container="#FIELD#"]
+                            fieldContainerSelector = [fz-field-container="#FIELD#"]
                         }
                     }
 
@@ -226,7 +226,7 @@ Feedback container selector
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-feedback-container="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-feedback-container="#FIELD#"]``.
 
         **Example:**
 
@@ -258,7 +258,7 @@ Feedback list selector
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-feedback-list="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-feedback-list="#FIELD#"]``.
 
         If an empty value is set, then the feedback container will be used.
 

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -82,6 +82,79 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     protected $conditionNode;
 
     /**
+     * Will launch the condition validation: the child class should implement
+     * the function `checkConditionConfiguration()` and check if the condition
+     * can be considered as valid.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    final public function validateConditionConfiguration()
+    {
+        try {
+            $this->checkConditionConfiguration();
+        } catch (InvalidConditionException $exception) {
+            $this->throwInvalidConditionException($exception);
+        }
+
+        return true;
+    }
+
+    /**
+     * @see validateConditionConfiguration()
+     *
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    abstract protected function checkConditionConfiguration();
+
+    /**
+     * Returns a generic JavaScript code which uses FormZ API to validate a
+     * condition which was registered in a single JavaScript file (which is
+     * filled in the `$javaScriptFiles` attribute of the PHP condition class).
+     *
+     * @param array $data
+     * @return string
+     */
+    protected function getDefaultJavaScriptCall(array $data)
+    {
+        $conditionName = addslashes(get_class($this));
+        $data = ArrayService::get()->arrayToJavaScriptJson($data);
+
+        return <<<JS
+Fz.Condition.validateCondition('$conditionName', form, $data)
+JS;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJavaScriptFiles()
+    {
+        return static::$javaScriptFiles;
+    }
+
+    /**
+     * @param InvalidConditionException $exception
+     * @throws InvalidConditionException
+     */
+    protected function throwInvalidConditionException(InvalidConditionException $exception)
+    {
+        $rootObject = $this->activation->getRootObject();
+        $conditionName = $this->conditionNode->getConditionName();
+        $formClassName = $this->formObject->getClassName();
+
+        if ($rootObject instanceof Field) {
+            throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        } elseif ($rootObject instanceof Validation) {
+            throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        }
+    }
+
+    /**
      * @param FormObject $formObject
      */
     public function attachFormObject(FormObject $formObject)
@@ -104,77 +177,6 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     {
         $this->conditionNode = $conditionNode;
     }
-
-    /**
-     * Returns a generic JavaScript code which uses Formz API to validate a
-     * condition which was registered in a single JavaScript file (which is
-     * filled in the `$javaScriptFiles` attribute of the PHP condition class).
-     *
-     * @param array $data
-     * @return string
-     */
-    protected function getDefaultJavaScriptCall(array $data)
-    {
-        $conditionName = addslashes(get_class($this));
-        $data = ArrayService::get()->arrayToJavaScriptJson($data);
-
-        return <<<JS
-Formz.Condition.validateCondition('$conditionName', form, $data)
-JS;
-    }
-
-    /**
-     * @return array
-     */
-    public function getJavaScriptFiles()
-    {
-        return static::$javaScriptFiles;
-    }
-
-    /**
-     * Will launch the condition validation: the child class should implement
-     * the function `checkConditionConfiguration()` and check if the condition
-     * can be considered as valid.
-     *
-     * If any syntax/configuration error is found, an exception of type
-     * `InvalidConditionException` must be thrown.
-     *
-     * @throws InvalidConditionException
-     * @return bool
-     */
-    final public function validateConditionConfiguration()
-    {
-        try {
-            $this->checkConditionConfiguration();
-        } catch (InvalidConditionException $exception) {
-            /** @var Field|Validation $rootObject */
-            $rootObject = $this->activation->getRootObject();
-
-            throw new InvalidConditionException(
-                vsprintf(
-                    'Invalid configuration for the condition "%s", used on %s of the form "%s"; error message is « %s ».',
-                    [
-                        $this->conditionNode->getConditionName(),
-                        ($rootObject instanceof Field)
-                            ? 'the field "' . $rootObject->getFieldName() . '"'
-                            : 'the validation "' . $rootObject->getValidationName() . '" of the field "' . $rootObject->getParentField()->getFieldName() . '"',
-                        $this->formObject->getClassName(),
-                        $exception->getMessage()
-                    ]
-                ),
-                $exception->getCode()
-            );
-        }
-
-        return true;
-    }
-
-    /**
-     * @see validateConditionConfiguration()
-     * @throws InvalidConditionException
-     * @return bool
-     */
-    abstract protected function checkConditionConfiguration();
 
     /**
      * @return array

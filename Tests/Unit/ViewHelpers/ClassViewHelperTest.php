@@ -1,19 +1,15 @@
 <?php
 namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
-use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
-use Romm\Formz\Form\FormObjectFactory;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
-use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Extbase\Validation\Error;
 
 class ClassViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -24,18 +20,19 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      * @test
      * @dataProvider renderViewHelperDataProvider
      *
-     * @param string      $expects   The expected result returned by the view helper.
-     * @param array       $classes   Array of classes which will be injected in the Formz configuration object.
-     * @param array       $arguments Arguments sent to the view helper.
-     * @param FormService $formService
-     * @param string      $expectedException
+     * @param string                 $expects   The expected result returned by the view helper.
+     * @param array                  $classes   Array of classes which will be injected in the FormZ configuration object.
+     * @param array                  $arguments Arguments sent to the view helper.
+     * @param FormViewHelperService  $formService
+     * @param FieldViewHelperService $fieldService
+     * @param string                 $expectedException
      */
     public function renderViewHelper(
         $expects,
         array $classes,
         array $arguments,
-        FormService $formService,
-        FieldService $fieldService,
+        FormViewHelperService $formService,
+        FieldViewHelperService $fieldService,
         $expectedException = null
     ) {
         if (null !== $expectedException) {
@@ -47,15 +44,6 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
         $classViewHelper->injectFormService($formService);
         $classViewHelper->injectFieldService($fieldService);
         $classViewHelper->setArguments($arguments);
-
-        $formObjectFactory = new FormObjectFactory;
-        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
-        $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $formService->method('getFormObject')
-            ->willReturn($formObject);
 
         $classesObject = $formService->getFormObject()
             ->getConfiguration()
@@ -81,14 +69,16 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelperDataProvider()
     {
+        $this->formzSetUp();
+
         return [
             /*
              * Basic configuration: everything is configured correctly, but
-             * no actual class is returned: only the one that is used by Formz
+             * no actual class is returned: only the one that is used by FormZ
              * JavaScript API.
              */
             [
-                'expects'      => 'formz-errors-foo',
+                'expects'      => 'fz-errors-foo',
                 'classes'      => [
                     'errors' => ['foo' => 'foo'],
                     'valid'  => []
@@ -158,7 +148,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
              * run correctly and return a correct result.
              */
             [
-                'expects'      => 'formz-errors-foo',
+                'expects'      => 'fz-errors-foo',
                 'classes'      => [
                     'errors' => ['foo' => 'foo'],
                     'valid'  => []
@@ -175,7 +165,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
              * property.
              */
             [
-                'expects'      => 'formz-errors-foo foo',
+                'expects'      => 'fz-errors-foo foo',
                 'classes'      => [
                     'errors' => ['foo' => 'foo'],
                     'valid'  => []
@@ -192,7 +182,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
              * submitted and the result has no error for the given property.
              */
             [
-                'expects'      => 'formz-valid-bar bar',
+                'expects'      => 'fz-valid-bar bar',
                 'classes'      => [
                     'errors' => [],
                     'valid'  => ['bar' => 'bar']
@@ -208,25 +198,30 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
-     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDefaultFormService()
     {
-        return $this->getMockBuilder(FormService::class)
+        $service = $this->getMockBuilder(FormViewHelperService::class)
             ->setMethods(['getFormObject'])
             ->getMock();
+
+        $service->method('getFormObject')
+            ->willReturn($this->getDefaultFormObject());
+
+        return $service;
     }
 
     /**
-     * @return FieldService
+     * @return FieldViewHelperService
      */
     protected function getDefaultFieldService()
     {
-        return new FieldService;
+        return new FieldViewHelperService;
     }
 
     /**
-     * @return FieldService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getFieldServiceWithField()
     {
@@ -240,24 +235,25 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
-     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getServiceWithNoErrorResult()
     {
         $service = $this->getDefaultFormService();
-        $service->markFormAsSubmitted();
-        $service->setFormResult(new FormResult);
+        $service->getFormObject()->markFormAsSubmitted();
+        $service->getFormObject()->setFormResult(new FormResult);
 
         return $service;
     }
 
     /**
-     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getServiceWithErrorResult()
     {
         $service = $this->getServiceWithNoErrorResult();
-        $service->getFormResult()
+        $service->getFormObject()
+            ->getFormResult()
             ->forProperty('foo')
             ->addError(new Error('foo', 1337));
 

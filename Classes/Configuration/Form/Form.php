@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -19,9 +19,9 @@ use Romm\ConfigurationObject\Service\ServiceFactory;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\DefaultConfigurationObjectTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
+use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
-use Romm\Formz\Configuration\Form\Condition\ConditionItemResolver;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Settings\FormSettings;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -34,13 +34,14 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     use ArrayConversionTrait;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Field>
+     * @var \Romm\Formz\Configuration\Form\Field\Field[]
      * @validate NotEmpty
      */
     protected $fields = [];
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Condition\ConditionItemResolver>
+     * @var ConditionItemInterface[]
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\ConditionItemResolver
      */
     protected $activationCondition = [];
 
@@ -68,7 +69,7 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     }
 
     /**
-     * Returns the root configuration object of Formz.
+     * Returns the root configuration object of FormZ.
      *
      * @return Configuration
      */
@@ -118,7 +119,7 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     }
 
     /**
-     * @return ConditionItemResolver[]
+     * @return ConditionItemInterface[]
      */
     public function getActivationCondition()
     {

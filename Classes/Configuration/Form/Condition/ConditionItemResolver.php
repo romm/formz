@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -16,10 +16,9 @@ namespace Romm\Formz\Configuration\Form\Condition;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesResolver;
 use Romm\Formz\Condition\ConditionFactory;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use TYPO3\CMS\Extbase\Error\Error;
 
-abstract class ConditionItemResolver extends AbstractFormzConfiguration implements MixedTypesInterface
+class ConditionItemResolver implements MixedTypesInterface
 {
 
     /**

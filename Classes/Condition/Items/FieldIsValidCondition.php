@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -61,9 +61,7 @@ class FieldIsValidCondition extends AbstractConditionItem
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
         $formValidator = $dataObject->getFormValidator();
-        $field = $this->formObject
-            ->getConfiguration()
-            ->getField($this->fieldName);
+        $field = $this->formObject->getConfiguration()->getField($this->fieldName);
         $formValidator->validateField($field);
         $result = $formValidator->getResult();
 
@@ -81,31 +79,9 @@ class FieldIsValidCondition extends AbstractConditionItem
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw new InvalidConditionException(
-                'The field "' . $this->fieldName . '" does not exist.',
-                1488183577
-            );
+            throw InvalidConditionException::conditionFieldIsValidFieldNotFound($this->fieldName);
         }
 
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @param string $fieldName
-     * @return $this
-     */
-    public function setFieldName($fieldName)
-    {
-        $this->fieldName = $fieldName;
-
-        return $this;
     }
 }

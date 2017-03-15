@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -192,8 +192,9 @@ class AjaxValidationController extends ActionController
         $this->checkConfigurationValidationResult();
         $validation = $this->getFieldValidation();
         $form = $this->buildFormObject();
+        $this->formObject->setForm($form);
         $fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
-        $validatorDataObject = new ValidatorDataObject($this->formObject, $form, $validation);
+        $validatorDataObject = new ValidatorDataObject($this->formObject, $validation);
 
         /** @var ValidatorInterface $validator */
         $validator = GeneralUtility::makeInstance(
@@ -227,22 +228,8 @@ class AjaxValidationController extends ActionController
         }
 
         if (false === empty($argumentsMissing)) {
-            throw new MissingArgumentException(
-                'One or more arguments are missing in the request: "' . implode('", "', $argumentsMissing) . '".',
-                1487673983
-            );
+            throw MissingArgumentException::ajaxControllerMissingArguments($argumentsMissing);
         }
-    }
-
-    /**
-     * @return FormObject
-     */
-    protected function getFormObject()
-    {
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-
-        return $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
     }
 
     /**
@@ -253,10 +240,7 @@ class AjaxValidationController extends ActionController
         $validationResult = $this->formObject->getConfigurationValidationResult();
 
         if (true === $validationResult->hasErrors()) {
-            throw new InvalidConfigurationException(
-                'The form configuration contains errors.',
-                1487671395
-            );
+            throw InvalidConfigurationException::ajaxControllerInvalidFormConfiguration();
         }
     }
 
@@ -271,19 +255,13 @@ class AjaxValidationController extends ActionController
         $field = $formConfiguration->getField($this->fieldName);
 
         if (false === $field->hasValidation($this->validatorName)) {
-            throw new EntryNotFoundException(
-                'The field "' . $this->fieldName . '" does not have a rule "' . $this->validatorName . '".',
-                1487672956
-            );
+            throw EntryNotFoundException::ajaxControllerValidationNotFoundForField($this->validatorName, $this->fieldName);
         }
 
         $fieldValidationConfiguration = $field->getValidationByName($this->validatorName);
 
         if (false === $fieldValidationConfiguration->doesUseAjax()) {
-            throw new InvalidConfigurationException(
-                'The validation "' . $this->validatorName . '" of the field "' . $this->fieldName . '" is not configured to work with Ajax. Please add the option "useAjax".',
-                1487673434
-            );
+            throw InvalidConfigurationException::ajaxControllerAjaxValidationNotActivated($this->validatorName, $this->fieldName);
         }
 
         return $fieldValidationConfiguration;
@@ -299,10 +277,7 @@ class AjaxValidationController extends ActionController
         $formConfiguration = $formObject->getConfiguration();
 
         if (false === $formConfiguration->hasField($this->fieldName)) {
-            throw new EntryNotFoundException(
-                'The field "' . $this->fieldName . '" was not found in the form "' . $this->formName . '" with class "' . $this->formClassName . '".',
-                1487671603
-            );
+            throw EntryNotFoundException::ajaxControllerFieldNotFound($this->fieldName, $formObject);
         }
 
         return $formConfiguration;
@@ -395,7 +370,20 @@ class AjaxValidationController extends ActionController
         unset($values['__referrer']);
         unset($values['__trustedProperties']);
 
-        return reset($values);
+        return isset($values[$this->formName])
+            ? $values[$this->formName]
+            : [];
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getFormObject()
+    {
+        /** @var FormObjectFactory $formObjectFactory */
+        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
+
+        return $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
     }
 
     /**

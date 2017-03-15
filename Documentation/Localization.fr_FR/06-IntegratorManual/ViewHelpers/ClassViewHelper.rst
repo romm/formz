@@ -18,7 +18,7 @@ Référez-vous à l'exemple plus bas pour comprendre plus facilement le fonction
 
 .. note::
 
-    Le comportement est géré à la fois en PHP et en JavaScript. Vous n'avez qu'à utiliser ce ViewHelper, Formz se charge du reste.
+    Le comportement est géré à la fois en PHP et en JavaScript. Vous n'avez qu'à utiliser ce ViewHelper, FormZ se charge du reste.
 
 Arguments
 ---------
@@ -61,14 +61,14 @@ On est ensuite en mesure de l'utiliser dans le template :
     :linenos:
     :emphasize-lines: 7
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
 
-        <formz:field name="email" layout="default">
+        <fz:field name="email" layout="default">
             <f:form.textfield property="{fieldName}" id="{fieldId}"
-                              class="{formz:class(name: 'valid.has-success')}"
+                              class="{fz:class(name: 'valid.has-success')}"
                               placeholder="Email" />
-        </formz:field>
+        </fz:field>
 
-    </formz:form>
+    </fz:form>

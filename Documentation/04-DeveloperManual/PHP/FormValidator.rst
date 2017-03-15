@@ -12,11 +12,11 @@ Form validator
 
 A form validator is called after the **submission** of the form: it allows managing all its specific validation rules, and any additional process which could depend on its data.
 
-The goal of Formz is to automatize a maximum of processes, especially the validation ones. However, it is likely that complex forms require **more advanced mechanism**, which fit their **specific needs**. In this case, it is possible to very easily hook into the core of the validation process, and customize its behaviour by using the functions listed below.
+The goal of FormZ is to automatize a maximum of processes, especially the validation ones. However, it is likely that complex forms require **more advanced mechanism**, which fit their **specific needs**. In this case, it is possible to very easily hook into the core of the validation process, and customize its behaviour by using the functions listed below.
 
 .. tip::
 
-    If you do not need any additional process for your form, you can use the default validator provided by Formz: :php:`\Romm\Formz\Validation\Validator\Form\DefaultFormValidator`.
+    If you do not need any additional process for your form, you can use the default validator provided by FormZ: :php:`\Romm\Formz\Validation\Validator\Form\DefaultFormValidator`.
 
 API
 ^^^

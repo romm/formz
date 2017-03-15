@@ -15,7 +15,7 @@ Configuration TypoScript
 
     Vous pouvez retrouver un résumé de la configuration TypoScript dans le chapitre « :ref:`cheatSheets-typoScript` ».
 
-La configuration TypoScript de Formz se fait au chemin ``config.tx_formz``.
+La configuration TypoScript de FormZ se fait au chemin ``config.tx_formz``.
 
 Retrouvez ci-dessous la liste des paramètres utilisables :
 

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -95,7 +95,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
         parent::__construct($options);
 
         $this->dataObject = $dataObject;
-        $this->form = $dataObject->getForm();
+        $this->form = $dataObject->getFormObject()->getForm();
         $this->messages = MessageService::get()->filterMessages(
             $this->dataObject->getValidation()->getMessages(),
             $this->supportedMessages,
@@ -184,15 +184,12 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      * @param array  $arguments
      * @param string $title
      * @return mixed
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     private function addMessage($type, $key, $code, array $arguments, $title)
     {
         if (!isset($this->messages[$key])) {
-            throw new EntryNotFoundException(
-                'The error key "' . $key . '" does not exist for the validator "' . get_class($this) . '".',
-                1455272659
-            );
+            throw EntryNotFoundException::errorKeyNotFoundForValidator($key, $this);
         }
 
         return new $type(

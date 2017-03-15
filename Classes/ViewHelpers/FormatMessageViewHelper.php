@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -17,10 +17,9 @@ use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -47,12 +46,12 @@ class FormatMessageViewHelper extends AbstractViewHelper
     protected $escapeOutput = false;
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -79,7 +78,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
         $fieldId = ($variableProvider->exists('fieldId'))
             ? $variableProvider->get('fieldId')
-            : StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
+            : StringService::get()->sanitizeString('fz-' . $formObject->getName() . '-' . $fieldName);
 
         $result = str_replace(
             [
@@ -106,17 +105,15 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return Message|FormzMessageInterface
-     * @throws \Exception
+     * @throws InvalidArgumentTypeException
      */
     protected function getMessage()
     {
+        /** @var Message $message */
         $message = $this->arguments['message'];
 
         if (false === $message instanceof FormzMessageInterface) {
-            throw new InvalidArgumentTypeException(
-                'The argument "message" for the view helper "' . __CLASS__ . '" must be an instance of "' . FormzMessageInterface::class . '".',
-                1467021406
-            );
+            throw InvalidArgumentTypeException::formatMessageViewHelperMessageInvalidType($message);
         }
 
         return $message;
@@ -143,7 +140,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     protected function getFieldName()
     {
@@ -157,10 +154,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
         }
 
         if (null === $fieldName) {
-            throw new InvalidEntryException(
-                'The field could not be fetched, please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
-                1467624152
-            );
+            throw EntryNotFoundException::formatMessageViewHelperFieldNotFound($fieldName);
         }
 
         return $fieldName;
@@ -168,7 +162,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
 
     /**
      * @return Field
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     protected function getField()
     {
@@ -176,30 +170,24 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $fieldName = $this->getFieldName();
 
         if (false === $formObject->getConfiguration()->hasField($fieldName)) {
-            throw new EntryNotFoundException(
-                vsprintf(
-                    'The Form "%s" does not have a field "%s"',
-                    [$formObject->getName(), $fieldName]
-                ),
-                1473084335
-            );
+            throw EntryNotFoundException::formatMessageViewHelperFieldNotFoundInForm($fieldName, $formObject);
         }
 
         return $formObject->getConfiguration()->getField($fieldName);
     }
 
     /**
-     * @param FormService $service
+     * @param FormViewHelperService $service
      */
-    public function injectFormService(FormService $service)
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

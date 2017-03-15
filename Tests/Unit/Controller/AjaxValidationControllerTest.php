@@ -38,7 +38,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
             ->method('throwStatus');
 
         /** @var Request|ObjectProphecy $requestProphecy */
-        $requestProphecy = $this->prophet->prophesize(Request::class);
+        $requestProphecy = $this->prophesize(Request::class);
 
         $requestProphecy->getMethod()
             ->shouldBeCalled()
@@ -63,7 +63,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
             ->method('throwStatus');
 
         /** @var Request|ObjectProphecy $requestProphecy */
-        $requestProphecy = $this->prophet->prophesize(Request::class);
+        $requestProphecy = $this->prophesize(Request::class);
 
         $requestProphecy->getMethod()
             ->shouldBeCalled()
@@ -147,7 +147,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     }
 
     /**
-     * If an exception is catch during the request, and if Formz debug mode is
+     * If an exception is catch during the request, and if FormZ debug mode is
      * activated, the result message must be customized to contain information
      * about the exception.
      *

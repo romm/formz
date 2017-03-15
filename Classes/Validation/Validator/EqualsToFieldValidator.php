@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-use Romm\Formz\Exceptions\InvalidOptionValueException;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 class EqualsToFieldValidator extends AbstractValidator
@@ -53,10 +53,7 @@ class EqualsToFieldValidator extends AbstractValidator
         $formObject = $this->dataObject->getFormObject();
 
         if (false === $formObject->hasProperty($fieldName)) {
-            throw new InvalidOptionValueException(
-                'The field "' . $fieldName . '" does not exist in the form "' . $formObject->getName() . '" with class "' . $formObject->getClassName() . '".',
-                1487947224
-            );
+            throw EntryNotFoundException::equalsToFieldValidatorFieldNotFound($fieldName, $formObject);
         }
 
         $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);

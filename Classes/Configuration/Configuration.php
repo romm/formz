@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -24,6 +24,7 @@ use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\CacheService as InternalCacheService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
@@ -64,14 +65,14 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      * Will initialize correctly the configuration object settings.
      *
      * @return ServiceFactory
-     * @throws \Exception
      */
     public static function getConfigurationObjectServices()
     {
         return ServiceFactory::getInstance()
             ->attach(ServiceInterface::SERVICE_CACHE)
             ->with(ServiceInterface::SERVICE_CACHE)
-            ->setOption(CacheService::OPTION_CACHE_BACKEND, \Romm\Formz\Service\CacheService::get()->getBackendCache())
+            ->setOption(CacheService::OPTION_CACHE_NAME, InternalCacheService::CONFIGURATION_OBJECT_CACHE_IDENTIFIER)
+            ->setOption(CacheService::OPTION_CACHE_BACKEND, InternalCacheService::get()->getBackendCache())
             ->attach(ServiceInterface::SERVICE_PARENTS)
             ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
             ->attach(ServiceInterface::SERVICE_MIXED_TYPES);
@@ -86,7 +87,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     }
 
     /**
-     * Adds a form to the forms list of this Formz configuration. Note that this
+     * Adds a form to the forms list of this FormZ configuration. Note that this
      * function will also handle the parent service from the
      * `configuration_object` extension.
      *
@@ -96,10 +97,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     public function addForm(FormObject $form)
     {
         if (true === $this->hasForm($form->getClassName(), $form->getName())) {
-            throw new DuplicateEntryException(
-                'The form "' . $form->getName() . '" of class "' . $form->getClassName() . '" was already registered. You can only register a form once. Check the function `hasForm()`.',
-                1477255145
-            );
+            throw DuplicateEntryException::formWasAlreadyRegistered($form);
         }
 
         $form->getConfiguration()->setParents([$this]);

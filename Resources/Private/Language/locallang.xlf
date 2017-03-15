@@ -9,7 +9,7 @@
 			</trans-unit>
 
 			<trans-unit id="form.typoscript_not_included.error_message">
-				<source>Formz TypoScript configuration seems not to be included. Please include the "formz" static TypoScript on this page.</source>
+				<source>FormZ TypoScript configuration seems not to be included. Please include the "formz" static TypoScript on this page.</source>
 			</trans-unit>
 			<trans-unit id="form.wrong_configuration.error_message">
 				<source>The configuration for this form contains at least one error:</source>

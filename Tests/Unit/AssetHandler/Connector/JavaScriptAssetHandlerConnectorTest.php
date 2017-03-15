@@ -81,7 +81,7 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
     }
 
     /**
-     * Checks that the Formz JavaScript configuration is correctly included with
+     * Checks that the FormZ JavaScript configuration is correctly included with
      * the page renderer.
      *
      * @test

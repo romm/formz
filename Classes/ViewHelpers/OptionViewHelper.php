@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,7 +14,8 @@
 namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\ViewHelpers\Service\FieldService;
+use Romm\Formz\Exceptions\ContextNotFoundException;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -29,28 +30,28 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
  * Without the Option view helper:
  *
  * ```
- *  <formz:field layout="..."
+ *  <fz:field layout="..."
  *               arguments="{label: '{f:translate(key: \'my_lll_key\')}', foo: 'bar'}">
  *
  *      ...
- *  </formz:field>
+ *  </fz:field>
  * ```
  *
  * With it:
  *
  * ```
- *  <formz:field layout="...">
- *      <formz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
- *      <formz:option name="foo" value="bar" />
+ *  <fz:field layout="...">
+ *      <fz:option name="label" value="{f:translate(key: 'my_lll_key')}" />
+ *      <fz:option name="foo" value="bar" />
  *
  *      ...
- *  </formz:field>
+ *  </fz:field>
  * ```
  */
 class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -73,7 +74,9 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        $this->fieldService->checkIsInsideFieldViewHelper();
+        if (false === $this->fieldService->fieldContextExists()) {
+            throw ContextNotFoundException::optionViewHelperFieldContextNotFound();
+        }
 
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
@@ -83,16 +86,16 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
-        /** @var FieldService $service */
-        $service = Core::instantiate(FieldService::class);
+        /** @var FieldViewHelperService $service */
+        $service = Core::instantiate(FieldViewHelperService::class);
 
         $service->setFieldOption($arguments['name'], $arguments['value']);
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

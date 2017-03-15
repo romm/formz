@@ -16,7 +16,7 @@ It works the same way as the basic ViewHelper, expect that the argument ``name``
 
 .. important::
 
-    You **must use** this ViewHelper when integrating a form using Formz.
+    You **must use** this ViewHelper when integrating a form using FormZ.
 
 Arguments
 ---------
@@ -35,11 +35,11 @@ Example
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
         ...
-    </formz:form>
+    </fz:form>
 
 The form below is bound to the action ``submitForm``. If we check the action in the controller PHP class:
 

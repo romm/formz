@@ -36,14 +36,14 @@ Example
     :linenos:
     :emphasize-lines: 6
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
 
-        <formz:field name="email" layout="default">
-            <formz:option name="required" value="1">
+        <fz:field name="email" layout="default">
+            <fz:option name="required" value="1">
 
             ...
-        </formz:field>
+        </fz:field>
 
-    </formz:form>
+    </fz:form>

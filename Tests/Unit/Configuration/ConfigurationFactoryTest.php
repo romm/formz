@@ -12,7 +12,7 @@ class ConfigurationFactoryTest extends AbstractUnitTest
 {
 
     /**
-     * Checks that the factory can build and return the main Formz configuration
+     * Checks that the factory can build and return the main FormZ configuration
      * instance.
      *
      * @test

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -47,10 +47,26 @@ class Classes extends AbstractFormzConfiguration
     }
 
     /**
+     * @param ViewClass $errors
+     */
+    public function setErrors($errors)
+    {
+        $this->errors = $errors;
+    }
+
+    /**
      * @return ViewClass
      */
     public function getValid()
     {
         return $this->valid;
+    }
+
+    /**
+     * @param ViewClass $valid
+     */
+    public function setValid($valid)
+    {
+        $this->valid = $valid;
     }
 }

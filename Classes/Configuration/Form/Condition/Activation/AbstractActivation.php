@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,25 +13,30 @@
 
 namespace Romm\Formz\Configuration\Form\Condition\Activation;
 
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
+use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Condition\ConditionItemResolver;
 use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
-abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface
+abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface, DataPreProcessorInterface
 {
     use ParentsTrait;
 
     /**
      * @var string
      */
-    protected $condition;
+    protected $expression;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Condition\ConditionItemResolver>
+     * @var ConditionItemInterface[]
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\ConditionItemResolver
      */
-    protected $items = [];
+    protected $conditions = [];
 
     /**
      * @var ActivationUsageInterface
@@ -39,20 +44,28 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     private $rootObject;
 
     /**
-     * @inheritdoc
+     * @return string
      */
-    public function getCondition()
+    public function getExpression()
     {
-        return $this->condition;
+        return $this->expression;
+    }
+
+    /**
+     * @param string $expression
+     */
+    public function setExpression($expression)
+    {
+        $this->expression = $expression;
     }
 
     /**
      * Will merge the items with the ones from the `$activationCondition`
      * property of the root form configuration.
      *
-     * @return ConditionItemResolver[]
+     * @return ConditionItemInterface[]
      */
-    public function getItems()
+    public function getConditions()
     {
         $activationCondition = $this->withFirstParent(
             Form::class,
@@ -62,31 +75,45 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
         );
         $activationCondition = ($activationCondition) ?: [];
 
-        return ArrayUtility::arrayMergeRecursiveOverrule($activationCondition, $this->items);
+        return ArrayUtility::arrayMergeRecursiveOverrule($activationCondition, $this->conditions);
     }
 
     /**
-     * @inheritdoc
+     * @param string $name Name of the item.
+     * @return bool
      */
-    public function hasItem($itemName)
+    public function hasCondition($name)
     {
-        $items = $this->getItems();
+        $conditions = $this->getConditions();
 
-        return true === isset($items[$itemName]);
+        return true === isset($conditions[$name]);
     }
 
     /**
-     * @inheritdoc
+     * Return the item with the given name.
+     *
+     * @param string $name Name of the item.
+     * @return ConditionItemInterface
+     * @throws EntryNotFoundException
      */
-    public function getItem($itemName)
+    public function getCondition($name)
     {
-        if (true === $this->hasItem($itemName)) {
-            $items = $this->getItems();
-
-            return $items[$itemName];
+        if (false === $this->hasCondition($name)) {
+            throw EntryNotFoundException::conditionNotFound($name);
         }
 
-        return null;
+        $items = $this->getConditions();
+
+        return $items[$name];
+    }
+
+    /**
+     * @param string                 $name
+     * @param ConditionItemInterface $condition
+     */
+    public function addCondition($name, ConditionItemInterface $condition)
+    {
+        $this->conditions[$name] = $condition;
     }
 
     /**
@@ -103,5 +130,28 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     public function setRootObject(ActivationUsageInterface $rootObject)
     {
         $this->rootObject = $rootObject;
+    }
+
+    /**
+     * @param DataPreProcessor $processor
+     */
+    public static function dataPreProcessor(DataPreProcessor $processor)
+    {
+        $data = $processor->getData();
+
+        if (isset($data['condition'])) {
+            $error = new Error(
+                'The property "condition" has been deprecated and renamed to "expression", please change your TypoScript configuration.',
+                1488483802
+            );
+            $processor->addError($error);
+        }
+        if (isset($data['items'])) {
+            $error = new Error(
+                'The property "items" has been deprecated and renamed to "conditions", please change your TypoScript configuration.',
+                1488531112
+            );
+            $processor->addError($error);
+        }
     }
 }

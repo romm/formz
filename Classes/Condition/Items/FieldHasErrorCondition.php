@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -70,13 +70,11 @@ class FieldHasErrorCondition extends AbstractConditionItem
      */
     public function getJavaScriptResult()
     {
-        return $this->getDefaultJavaScriptCall(
-            [
-                'fieldName'      => $this->fieldName,
-                'validationName' => $this->validationName,
-                'errorName'      => $this->errorName
-            ]
-        );
+        return $this->getDefaultJavaScriptCall([
+            'fieldName'      => $this->fieldName,
+            'validationName' => $this->validationName,
+            'errorName'      => $this->errorName
+        ]);
     }
 
     /**
@@ -86,9 +84,7 @@ class FieldHasErrorCondition extends AbstractConditionItem
     {
         $flag = false;
         $formValidator = $dataObject->getFormValidator();
-        $field = $this->formObject
-            ->getConfiguration()
-            ->getField($this->fieldName);
+        $field = $this->formObject->getConfiguration()->getField($this->fieldName);
         $formValidator->validateField($field);
         $result = $formValidator->getResult()->forProperty($this->fieldName);
 
@@ -106,30 +102,6 @@ class FieldHasErrorCondition extends AbstractConditionItem
     }
 
     /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getValidationName()
-    {
-        return $this->validationName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getErrorName()
-    {
-        return $this->errorName;
-    }
-
-    /**
      * @see validateConditionConfiguration()
      * @throws InvalidConditionException
      * @return bool
@@ -139,17 +111,11 @@ class FieldHasErrorCondition extends AbstractConditionItem
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw new InvalidConditionException(
-                'The field "' . $this->fieldName . '" does not exist.',
-                1488192037
-            );
+            throw InvalidConditionException::conditionFieldHasErrorFieldNotFound($this->fieldName);
         }
 
         if (false === $configuration->getField($this->fieldName)->hasValidation($this->validationName)) {
-            throw new InvalidConditionException(
-                'The validation "' . $this->validationName . '" does not exist for the field "' . $this->fieldName . '".',
-                1488192055
-            );
+            throw InvalidConditionException::conditionFieldHasErrorValidationNotFound($this->validationName, $this->fieldName);
         }
 
         return true;

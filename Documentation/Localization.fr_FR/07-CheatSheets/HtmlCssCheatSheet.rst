@@ -13,7 +13,7 @@ Anti-sèche HTML/CSS
 Auto-complétion PhpStorm
 ------------------------
 
-Formz propose un schéma permettant aux IDE comme PhpStorm de fournir une auto-complétion des ViewHelper dans les templates Fluid.
+FormZ propose un schéma permettant aux IDE comme PhpStorm de fournir une auto-complétion des ViewHelper dans les templates Fluid.
 
 Vous pouvez retrouver un guide sur l'implémentation des XSD dans les IDE ici : https://github.com/FluidTYPO3/schemaker/blob/development/README.md#how-to-use-xsd-in-ide
 
@@ -22,14 +22,14 @@ Vous pouvez retrouver un guide sur l'implémentation des XSD dans les IDE ici : 
 .. code-block:: html
 
     <html xmlns="http://www.w3.org/1999/xhtml"
-          xmlns:formz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
+          xmlns:fz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
 
         <f:layout name="MyLayout" />
 
         <f:section name="MySection">
-            <formz:form name="myForm">
+            <fz:form name="myForm">
                 ...
-            </formz:form>
+            </fz:form>
         </f:section>
 
     </html>
@@ -40,19 +40,19 @@ Attributs « data »
 
 Liste des attributs utilisés sur la balise ``<form>`` et pouvant être utilisés en CSS :
 
-* ``formz-valid`` : lorsque tous les champs sont valides ;
+* ``fz-valid`` : lorsque tous les champs sont valides ;
 
-* ``formz-value-{field-name}="value"`` : valeur actuelle du champ ;
+* ``fz-value-{field-name}="value"`` : valeur actuelle du champ ;
 
-* ``formz-valid-{field-name}="1"`` : le champ est valide (aucune erreur de validation) ;
+* ``fz-valid-{field-name}="1"`` : le champ est valide (aucune erreur de validation) ;
 
-* ``formz-error-{field-name}="1"`` : le champ contient au moins une erreur ;
+* ``fz-error-{field-name}="1"`` : le champ contient au moins une erreur ;
 
-* ``formz-error-{field-name}-{rule-name}-{message-key}`` : le champ contient l'erreur ``{rule-name}`` avec le message ``{message-key}`` ;
+* ``fz-error-{field-name}-{rule-name}-{message-key}`` : le champ contient l'erreur ``{rule-name}`` avec le message ``{message-key}`` ;
 
-* ``formz-submission-done`` : le formulaire a été soumis ;
+* ``fz-submission-done`` : le formulaire a été soumis ;
 
-* ``formz-submitted`` : le formulaire est en train d'être soumis.
+* ``fz-submitted`` : le formulaire est en train d'être soumis.
 
 **Exemple de code CSS correspondant :**
 
@@ -60,34 +60,34 @@ Dans l'exemple ci-dessous, le bloc ``info-customer`` sera masqué tant que le bo
 
 .. code-block:: css
 
-    form[name="myForm"]:not([formz-value-is-customer="0"]) .info-customer {
+    form[name="myForm"]:not([fz-value-is-customer="0"]) .info-customer {
         display: none;
     }
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form name="myForm" action="submitForm">
-        <formz:field name="isCustomer" layout="default">
-            <formz:section name="Field">
+    <fz:form name="myForm" action="submitForm">
+        <fz:field name="isCustomer" layout="default">
+            <fz:slot name="Field">
                 Are you a customer?
                 <br />
                 <f:form.radio property="isCustomer" value="1" />&nbsp;Yes
                 <br />
                 <f:form.radio property="isCustomer" value="0" />&nbsp;No
-            </formz:section>
-        </formz:field>
+            </fz:slot>
+        </fz:field>
 
         <div class="info-customer">
             You can subscribe easily to our service <a href="...">by clicking here</a>.
         </div>
-    </formz:form>
+    </fz:form>
 
 Comportement de chargement
 --------------------------
 
-* L'attribut ``formz-loading`` est rajouté :
+* L'attribut ``fz-loading`` est rajouté :
 
   1. À la balise ``<form>`` lorsque le formulaire est en train d'être **vérifié**. Cela peut être utilisé par exemple pour désactiver le bouton de soumission, le temps que les champs soient validés.
 
@@ -99,10 +99,10 @@ Comportement de chargement
 
      .. code-block:: css
 
-         .formz[formz-loading] input[type="submit"] {
+         .formz[fz-loading] input[type="submit"] {
              display: none;
          }
 
   2. Au conteneur d'un champ lorsqu'il est en train d'être validé. Cela peut être utilisé par exemple pour afficher un cercle de chargement lorsqu'une requête Ajax est en cours.
 
-* L'attribut ``formz-submitted`` est rajouté à la balise ``<form>`` lorsque le formulaire est en train d'être soumis (lorsque tous les champs ont été validés).
+* L'attribut ``fz-submitted`` est rajouté à la balise ``<form>`` lorsque le formulaire est en train d'être soumis (lorsque tous les champs ont été validés).

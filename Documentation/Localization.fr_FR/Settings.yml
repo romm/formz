@@ -5,7 +5,7 @@
 ---
 conf.py:
   copyright: 2016
-  project: Formz
+  project: FormZ
   version: 0.4.1
   release: 0.4.1
   language: fr
@@ -13,7 +13,7 @@ conf.py:
   latex_documents:
   - - Index
     - formz.tex
-    - Formz
+    - FormZ
     - Romain Canon
     - manual
   latex_elements:

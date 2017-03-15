@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -21,7 +21,7 @@ use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
- * This class is used to build and manage the whole Formz configuration: from a
+ * This class is used to build and manage the whole FormZ configuration: from a
  * plain configuration array, it builds an entire tree object which will give
  * all the features from the `configuration_object` extension (parent
  * inheritance, array keys save, etc.).
@@ -44,7 +44,7 @@ class ConfigurationFactory implements SingletonInterface
     protected $cacheIdentifiers = [];
 
     /**
-     * Returns the global Formz configuration.
+     * Returns the global FormZ configuration.
      *
      * Two cache layers are used:
      *

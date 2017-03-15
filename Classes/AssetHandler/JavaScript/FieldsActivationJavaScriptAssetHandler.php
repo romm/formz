@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,6 +14,8 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Condition\Parser\ConditionTree;
+use Romm\Formz\Configuration\Form\Field\Field;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -34,18 +36,16 @@ class FieldsActivationJavaScriptAssetHandler extends AbstractAssetHandler
         $javaScriptBlocks = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        foreach ($formConfiguration->getFields() as $fieldName => $field) {
+        foreach ($formConfiguration->getFields() as $field) {
             $fieldConditionExpression = [];
-            $javaScriptTree = $this->conditionProcessor
-                ->getActivationConditionTreeForField($field)
-                ->getJavaScriptConditions();
+            $javaScriptTree = $this->getConditionTreeForField($field)->getJavaScriptConditions();
 
             if (false === empty($javaScriptTree)) {
                 foreach ($javaScriptTree as $node) {
                     $fieldConditionExpression[] = 'flag = flag || (' . $node . ');';
                 }
 
-                $javaScriptBlocks[] = $this->getSingleFieldActivationConditionFunction($fieldName, $fieldConditionExpression);
+                $javaScriptBlocks[] = $this->getSingleFieldActivationConditionFunction($field, $fieldConditionExpression);
             }
         }
 
@@ -54,7 +54,7 @@ class FieldsActivationJavaScriptAssetHandler extends AbstractAssetHandler
 
         return <<<JS
 (function() {
-    Formz.Form.get(
+    Fz.Form.get(
         $formName,
         function(form) {
             var field = null;
@@ -69,13 +69,13 @@ JS;
     /**
      * This function is just here to make the class more readable.
      *
-     * @param string $fieldName                Name of the field.
-     * @param array  $fieldConditionExpression Array containing the JavaScript condition expression for the field.
+     * @param Field $field                    Field instance.
+     * @param array $fieldConditionExpression Array containing the JavaScript condition expression for the field.
      * @return string
      */
-    protected function getSingleFieldActivationConditionFunction($fieldName, $fieldConditionExpression)
+    protected function getSingleFieldActivationConditionFunction(Field $field, $fieldConditionExpression)
     {
-        $fieldName = GeneralUtility::quoteJSvalue($fieldName);
+        $fieldName = GeneralUtility::quoteJSvalue($field->getFieldName());
         $fieldConditionExpression = implode(CRLF . str_repeat(' ', 20), $fieldConditionExpression);
 
         return <<<JS
@@ -92,5 +92,14 @@ JS;
                 );
             }
 JS;
+    }
+
+    /**
+     * @param Field $field
+     * @return ConditionTree
+     */
+    protected function getConditionTreeForField(Field $field)
+    {
+        return $this->conditionProcessor->getActivationConditionTreeForField($field);
     }
 }

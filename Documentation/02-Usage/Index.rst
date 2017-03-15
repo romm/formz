@@ -26,9 +26,9 @@ You can find a schema below to easily understand the proceedings of a form usage
 Download
 --------
 
-To make Formz work properly, you must install:
+To make FormZ work properly, you must install:
 
-- **configuration_object** – this extension allows converting the Formz TypoScript configuration. Without detailing too much, its principal feature is to detect errors in configuration. It's mandatory.
+- **configuration_object** – this extension allows converting the FormZ TypoScript configuration. Without detailing too much, its principal feature is to detect errors in configuration. It's mandatory.
 
   You can install it:
 
@@ -40,7 +40,7 @@ To make Formz work properly, you must install:
   You can install it:
 
   - With Composer : ``composer require romm/formz:*``
-  - With the TER : `Formz <https://typo3.org/extensions/repository/view/formz>`_
+  - With the TER : `FormZ <https://typo3.org/extensions/repository/view/formz>`_
 
 -----
 
@@ -97,7 +97,7 @@ You can find below an example of a tree view of the needed files for a form set 
 
 A “Debug” mode is available and allows, if activated, to get additional information when a problem occurs.
 
-To activate it, go in the extension manager, inside the Formz options, and check the option “**debugMode**”.
+To activate it, go in the extension manager, inside the FormZ options, and check the option “**debugMode**”.
 
 .. warning::
 

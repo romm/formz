@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,7 +14,6 @@
 namespace Romm\Formz\Validation\DataObject;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
-use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 
 class ValidatorDataObject
@@ -25,24 +24,17 @@ class ValidatorDataObject
     protected $formObject;
 
     /**
-     * @var FormInterface
-     */
-    protected $form;
-
-    /**
      * @var Validation
      */
     protected $validation;
 
     /**
      * @param FormObject    $formObject
-     * @param FormInterface $form
      * @param Validation    $validation
      */
-    public function __construct(FormObject $formObject, FormInterface $form, Validation $validation)
+    public function __construct(FormObject $formObject, Validation $validation)
     {
         $this->formObject = $formObject;
-        $this->form = $form;
         $this->validation = $validation;
     }
 
@@ -52,14 +44,6 @@ class ValidatorDataObject
     public function getFormObject()
     {
         return $this->formObject;
-    }
-
-    /**
-     * @return FormInterface
-     */
-    public function getForm()
-    {
-        return $this->form;
     }
 
     /**

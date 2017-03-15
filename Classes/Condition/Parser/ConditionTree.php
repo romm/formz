@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Condition\Parser;
 
+use Romm\Formz\Condition\Parser\Node\ActivationDependencyAwareInterface;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
-use Romm\Formz\Condition\Parser\Node\ProcessorDependencyAwareInterface;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
@@ -39,11 +39,6 @@ class ConditionTree
     private $validationResult;
 
     /**
-     * @var ConditionProcessor
-     */
-    private $conditionProcessor;
-
-    /**
      * @var bool
      */
     private $dependenciesWereInjected = false;
@@ -61,29 +56,6 @@ class ConditionTree
     }
 
     /**
-     * @param ConditionProcessor  $conditionProcessor
-     * @param ActivationInterface $activation
-     * @return $this
-     */
-    public function injectDependencies(ConditionProcessor $conditionProcessor, ActivationInterface $activation)
-    {
-        if (false === $this->dependenciesWereInjected) {
-            $this->dependenciesWereInjected = true;
-
-            $this->conditionProcessor = $conditionProcessor;
-
-            // Looping on node to detect which ones have a dependency to the processor.
-            $this->alongNodes(function (NodeInterface $node) use ($activation) {
-                if ($node instanceof ProcessorDependencyAwareInterface) {
-                    $node->injectProcessorDependencies($this->conditionProcessor, $activation);
-                }
-            });
-        }
-
-        return $this;
-    }
-
-    /**
      * Allows to go through all the nodes and sub-nodes of the tree. The
      * callback is called for every node, with a unique argument: the node
      * instance.
@@ -93,6 +65,27 @@ class ConditionTree
     public function alongNodes(callable $callback)
     {
         $this->rootNode->along($callback);
+    }
+
+    /**
+     * @param ConditionProcessor  $conditionProcessor
+     * @param ActivationInterface $activation
+     * @return $this
+     */
+    public function injectDependencies(ConditionProcessor $conditionProcessor, ActivationInterface $activation)
+    {
+        if (false === $this->dependenciesWereInjected) {
+            $this->dependenciesWereInjected = true;
+
+            // Looping on nodes to detect which ones have a dependency to the activation.
+            $this->alongNodes(function (NodeInterface $node) use ($conditionProcessor, $activation) {
+                if ($node instanceof ActivationDependencyAwareInterface) {
+                    $node->injectDependencies($conditionProcessor, $activation);
+                }
+            });
+        }
+
+        return $this;
     }
 
     /**
@@ -126,14 +119,6 @@ class ConditionTree
     public function getValidationResult()
     {
         return $this->validationResult;
-    }
-
-    /**
-     * @return ConditionProcessor
-     */
-    public function getConditionProcessor()
-    {
-        return $this->conditionProcessor;
     }
 
     /**

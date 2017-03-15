@@ -10,11 +10,11 @@
 ViewHelpers
 ===========
 
-Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
+FormZ propose une panoplie de ViewHelpers pour faciliter l'intégration :
 
 - :ref:`formz:form <integratorManual-viewHelpers-form>`
 
-  Permet d'initialiser Formz. Il remplace le ViewHelper ``form`` fournit par Extbase, et devra impérativement être utilisé.
+  Permet d'initialiser FormZ. Il remplace le ViewHelper ``form`` fournit par Extbase, et devra impérativement être utilisé.
 
 - :ref:`formz:field <integratorManual-viewHelpers-field>`
 
@@ -24,13 +24,17 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
 
   Définit la valeur d'une option, qui pourra être utilisée dans le rendu d'un champ.
 
-- :ref:`formz:section <integratorManual-viewHelpers-section>`
+- :ref:`formz:slot <integratorManual-viewHelpers-slot>`
 
-  Définit une section dans le gabarit d'un champ.
+  Définit un slot dans le gabarit d'un champ.
 
-- :ref:`formz:renderSection <integratorManual-viewHelpers-renderSection>`
+- :ref:`formz:slot.render <integratorManual-viewHelpers-slot-render>`
 
-  Lance le rendu d'une section définie dans le gabarit d'un champ.
+  Lance le rendu d'un slot défini dans le gabarit d'un champ.
+
+- :ref:`formz:slot.has <integratorManual-viewHelpers-slot-has>`
+
+  Conditionne le rendu d'un bloc sur la présence d'un slot.
 
 - :ref:`formz:formatMessage <integratorManual-viewHelpers-formatMessage>`
 
@@ -48,7 +52,8 @@ Formz propose une panoplie de ViewHelpers pour faciliter l'intégration :
     FormViewHelper
     FieldViewHelper
     OptionViewHelper
-    SectionViewHelper
-    RenderSectionViewHelper
+    SlotViewHelper
+    Slot/RenderViewHelper
+    Slot/HasViewHelper
     FormatMessageViewHelper
     ClassViewHelper

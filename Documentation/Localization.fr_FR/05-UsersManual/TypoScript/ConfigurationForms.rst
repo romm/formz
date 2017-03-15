@@ -61,7 +61,7 @@ Conditions d'activation
     Requis ?
         Non
     Description
-        Contient la liste des conditions d'activation qui seront utilisables par tous les champs de ce formulaire. Ces différentes conditions pourront ensuite être utilisées dans les expressions logiques d'activation d'un champ (cf. « :ref:`fieldsActivation-condition` ») ou d'une validation de champ.
+        Contient la liste des conditions d'activation qui seront utilisables par tous les champs de ce formulaire. Ces différentes conditions pourront ensuite être utilisées dans les expressions logiques d'activation d'un champ (cf. « :ref:`fieldsActivation-expression` ») ou d'une validation de champ.
 
         Pour plus d'informations sur ce fonctionnement, consultez le chapitre « :ref:`usersManual-typoScript-configurationActivation` ».
 
@@ -85,7 +85,7 @@ Conditions d'activation
 
         .. note::
 
-            Il existe plusieurs types de conditions disponibles dans le cœur de Formz, cf. le chapitre « :ref:`usersManual-typoScript-configurationActivation` ».
+            Il existe plusieurs types de conditions disponibles dans le cœur de FormZ, cf. le chapitre « :ref:`usersManual-typoScript-configurationActivation` ».
 
 .. _formDefaultClass:
 

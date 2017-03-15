@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -17,6 +17,7 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -57,17 +58,17 @@ class FormObjectFactory implements SingletonInterface
      * @param string $className
      * @param string $name
      * @return FormObject
-     * @throws \Exception
+     * @throws ClassNotFoundException
+     * @throws InvalidArgumentTypeException
      */
     public function getInstanceFromClassName($className, $name)
     {
-        if (false === class_exists($className)
-            || false === in_array(FormInterface::class, class_implements($className))
-        ) {
-            throw new ClassNotFoundException(
-                'Invalid class name given: "' . $className . '"; the class must be an instance of "' . FormInterface::class . '".',
-                1467191011
-            );
+        if (false === class_exists($className)) {
+            throw ClassNotFoundException::wrongFormClassName($className);
+        }
+
+        if (false === in_array(FormInterface::class, class_implements($className))) {
+            throw InvalidArgumentTypeException::wrongFormType($className);
         }
 
         $cacheIdentifier = CacheService::get()->getCacheIdentifier('form-object-', $className . '-' . $name);
@@ -104,7 +105,9 @@ class FormObjectFactory implements SingletonInterface
      */
     public function getInstanceFromFormInstance(FormInterface $form, $name)
     {
-        return $this->getInstanceFromClassName(get_class($form), $name);
+        $formObject = $this->getInstanceFromClassName(get_class($form), $name);
+
+        return $formObject;
     }
 
     /**
@@ -116,13 +119,12 @@ class FormObjectFactory implements SingletonInterface
      */
     protected function createInstance($className, $name)
     {
+        $formConfiguration = $this->typoScriptService->getFormConfiguration($className);
+
         /** @var FormObject $instance */
-        $instance = Core::instantiate(FormObject::class, $className, $name);
+        $instance = Core::instantiate(FormObject::class, $className, $name, $formConfiguration);
 
         $this->insertObjectProperties($instance);
-
-        $formConfiguration = $this->typoScriptService->getFormConfiguration($className);
-        $instance->setConfigurationArray($formConfiguration);
 
         $instance->getHash();
 

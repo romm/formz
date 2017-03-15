@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -60,12 +60,13 @@ class BehavioursManager implements SingletonInterface
      * This is the same function as `applyBehaviourOnPropertiesArray`, but works
      * with an actual form object instance.
      *
-     * @param object     $formInstance
      * @param FormObject $formObject
      */
-    public function applyBehaviourOnFormInstance($formInstance, FormObject $formObject)
+    public function applyBehaviourOnFormInstance(FormObject $formObject)
     {
-        if (is_object($formInstance)) {
+        if ($formObject->hasForm()) {
+            $formInstance = $formObject->getForm();
+
             foreach ($formObject->getConfiguration()->getFields() as $fieldName => $field) {
                 if (ObjectAccess::isPropertyGettable($formInstance, $fieldName)
                     && ObjectAccess::isPropertySettable($formInstance, $fieldName)

@@ -1,4 +1,4 @@
-Formz.Condition = (function () {
+Fz.Condition = (function () {
     /**
      * @callback Formz.Condition.ConditionCallback
      * @param {Formz.FormInstance} form
@@ -64,7 +64,7 @@ Formz.Condition = (function () {
             if (this.hasCondition(name)) {
                 result = this.getCondition(name).validate(form, data);
             } else {
-                Formz.debug('Trying to validate a non-existing condition: "' + name + '".', Formz.TYPE_ERROR);
+                Fz.debug('Trying to validate a non-existing condition: "' + name + '".', Fz.TYPE_ERROR);
             }
 
             return result;

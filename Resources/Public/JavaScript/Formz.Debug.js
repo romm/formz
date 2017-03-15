@@ -1,4 +1,4 @@
-Formz.Debug = (function () {
+Fz.Debug = (function () {
     /**
      * The debug utilities will run only if this variable is set to true.
      *
@@ -33,10 +33,10 @@ Formz.Debug = (function () {
                 var color = '';
 
                 switch (type) {
-                    case Formz.TYPE_WARNING:
+                    case Fz.TYPE_WARNING:
                         color = 'color: yellow; font-weight:bold;';
                         break;
-                    case Formz.TYPE_ERROR:
+                    case Fz.TYPE_ERROR:
                         color = 'color: red; font-weight:bold;';
                         break;
                     default:
@@ -44,7 +44,7 @@ Formz.Debug = (function () {
                         break;
                 }
 
-                console.log('%c[Formz - ' + type + '] %c' + value, color, 'color: black;');
+                console.log('%c[FormZ - ' + type + '] %c' + value, color, 'color: black;');
             }
         }
     };

@@ -12,7 +12,7 @@ Comportements
 
 Un comportement est un processus lié à un champ, qui permettra de modifier dynamiquement la valeur de ce dernier. Il sera appelé avant la validation du champ, ce qui permet plus de souplesse dans les règles de gestion.
 
-Un bon exemple est disponible dans le cœur de Formz : ``toLowerCase`` est un comportement permettant de transformer en minuscule la valeur d'un champ. Par exemple, cela peut être utilisé sur un champ contenant une adresse email.
+Un bon exemple est disponible dans le cœur de FormZ : ``toLowerCase`` est un comportement permettant de transformer en minuscule la valeur d'un champ. Par exemple, cela peut être utilisé sur un champ contenant une adresse email.
 
 .. hint::
 

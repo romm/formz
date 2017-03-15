@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -47,12 +47,13 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     protected $options = [];
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Validation\Message>
+     * @var \Romm\Formz\Configuration\Form\Field\Validation\Message[]
      */
     protected $messages = [];
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
+     * @var ActivationInterface
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;
@@ -63,8 +64,8 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     protected $useAjax = false;
 
     /**
-     * Name of the validation. By default, it is the key of this validation in
-     * the array containing all validations for the parent field.
+     * Name of the validation. By default, it is the key of this instance in the
+     * array containing all the validation for the parent field.
      *
      * @var string
      */
@@ -95,7 +96,7 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getPriority()
     {
@@ -176,6 +177,14 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
+     * @param string $validationName
+     */
+    public function setValidationName($validationName)
+    {
+        $this->validationName = $validationName;
+    }
+
+    /**
      * @return bool
      */
     public function doesUseAjax()
@@ -189,14 +198,6 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     public function activateAjaxUsage($flag = true)
     {
         $this->useAjax = (bool)$flag;
-    }
-
-    /**
-     * @param string $validationName
-     */
-    public function setValidationName($validationName)
-    {
-        $this->validationName = $validationName;
     }
 
     /**

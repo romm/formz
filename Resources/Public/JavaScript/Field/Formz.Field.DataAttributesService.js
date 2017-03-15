@@ -1,4 +1,4 @@
-Formz.Field.DataAttributesService = (function () {
+Fz.Field.DataAttributesService = (function () {
     /**
      * @param {Object}              states
      * @param {Formz.FieldInstance} states.field
@@ -10,11 +10,11 @@ Formz.Field.DataAttributesService = (function () {
         var field = states.field;
 
         var dataAttributesNames = {
-            valid: 'formz-valid-' + Formz.camelCaseToDashed(field.getName()),
-            value: 'formz-value-' + Formz.camelCaseToDashed(field.getName()),
-            error: 'formz-error-' + Formz.camelCaseToDashed(field.getName()),
-            warning: 'formz-warning-' + Formz.camelCaseToDashed(field.getName()),
-            notice: 'formz-notice-' + Formz.camelCaseToDashed(field.getName()),
+            valid: 'fz-valid-' + Fz.camelCaseToDashed(field.getName()),
+            value: 'fz-value-' + Fz.camelCaseToDashed(field.getName()),
+            error: 'fz-error-' + Fz.camelCaseToDashed(field.getName()),
+            warning: 'fz-warning-' + Fz.camelCaseToDashed(field.getName()),
+            notice: 'fz-notice-' + Fz.camelCaseToDashed(field.getName()),
             errors: [],
             warnings: [],
             notices: [],
@@ -74,7 +74,7 @@ Formz.Field.DataAttributesService = (function () {
                     if (messages.hasOwnProperty(name)) {
                         for (var key in messages[name]) {
                             if (messages[name].hasOwnProperty(key)) {
-                                var dataMessageName = Formz.Field.DataAttributesService.getFieldMessageDataName(field, type, name, key);
+                                var dataMessageName = Fz.Field.DataAttributesService.getFieldMessageDataName(field, type, name, key);
                                 dataAttributesNames[listKey].push(dataMessageName);
                             }
                         }
@@ -137,9 +137,9 @@ Formz.Field.DataAttributesService = (function () {
         },
 
         getFieldMessageDataName: function(field, type, validationName, errorName) {
-            return 'formz-' + type + '-' + Formz.camelCaseToDashed(field.getName())
-                + '-' + Formz.camelCaseToDashed(validationName)
-                + '-' + Formz.camelCaseToDashed(errorName);
+            return 'fz-' + type + '-' + Fz.camelCaseToDashed(field.getName())
+                + '-' + Fz.camelCaseToDashed(validationName)
+                + '-' + Fz.camelCaseToDashed(errorName);
         }
     }
 })();

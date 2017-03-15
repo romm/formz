@@ -147,6 +147,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     public function errorIsAddedToFieldValidation()
     {
         $formObject = $this->getDefaultFormObject();
+
         $field = $formObject->getConfiguration()->getField('foo');
 
         $validation = new Validation;
@@ -155,12 +156,15 @@ class FormValidatorExecutorTest extends AbstractUnitTest
         $validation->setClassName(RequiredValidator::class);
         $validation->setParents([$field]);
 
+        $form = new DefaultForm;
+        $form->setFoo('');
+
         $result = new FormResult;
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formzValidatorExecutor */
         $formzValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['getFormObject'])
-            ->setConstructorArgs([new DefaultForm, 'foo', $result])
+            ->setConstructorArgs([$form, 'foo', $result])
             ->getMock();
 
         $formzValidatorExecutor->method('getFormObject')

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -21,7 +21,7 @@ use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 /**
  * A condition node, which contains an instance of `ConditionItemInterface`.
  */
-class ConditionNode extends AbstractNode implements ProcessorDependencyAwareInterface
+class ConditionNode extends AbstractNode implements ActivationDependencyAwareInterface
 {
     /**
      * @var string
@@ -50,7 +50,7 @@ class ConditionNode extends AbstractNode implements ProcessorDependencyAwareInte
      * @param ConditionProcessor  $processor
      * @param ActivationInterface $activation
      */
-    public function injectProcessorDependencies(ConditionProcessor $processor, ActivationInterface $activation)
+    public function injectDependencies(ConditionProcessor $processor, ActivationInterface $activation)
     {
         $this->condition->attachFormObject($processor->getFormObject());
         $this->condition->attachActivation($activation);

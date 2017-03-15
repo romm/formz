@@ -2,8 +2,7 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
-use Romm\Formz\Condition\Items\FieldIsValidCondition;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use Romm\Formz\Validation\Validator\RequiredValidator;
@@ -21,38 +20,20 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('required','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-required-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"condition":null,"items":{"test":{"javaScriptFiles":["EXT:formz\/Resources\/Public\/JavaScript\/Conditions\/Formz.Condition.FieldIsValid.js"],"fieldName":"foo"}}},"useAjax":false,"validationName":"required"},"acceptsEmptyValues":false});}});})();
+(function(){Fz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('validation-name','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-validation-name-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"expression":null,"conditions":[]},"useAjax":false,"validationName":"validation-name"},"acceptsEmptyValues":false});}});})();
 TXT;
 
-        $defaultFormConfiguration = [
-            'activationCondition' => [
-                'test' => [
-                    'type'      => FieldIsValidCondition::CONDITION_NAME,
-                    'fieldName' => 'foo'
-                ]
-            ],
-            'fields'              => [
-                'foo' => [
-                    'validation' => [
-                        'required' => [
-                            'className' => RequiredValidator::class
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        $this->setFormConfigurationFromClassName(DefaultForm::class, $defaultFormConfiguration);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
-
-        /** @var FieldsValidationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $fieldsValidationJavaScriptAssetHandler */
-        $fieldsValidationJavaScriptAssetHandler = $this->getMockBuilder(FieldsValidationJavaScriptAssetHandler::class)
+        /** @var FieldsValidationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        $assetHandler = $this->getMockBuilder(FieldsValidationJavaScriptAssetHandler::class)
             ->setMethods(['handleValidationConfiguration'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
 
         $jsonValidationConfiguration = '';
-        $fieldsValidationJavaScriptAssetHandler->method('handleValidationConfiguration')
+        $assetHandler->expects($this->once())
+            ->method('handleValidationConfiguration')
             ->willReturnCallback(
                 function ($validationConfiguration) use (&$jsonValidationConfiguration) {
                     $jsonValidationConfiguration = $validationConfiguration;
@@ -61,11 +42,20 @@ TXT;
                 }
             );
 
+        $field = $assetHandlerFactory->getFormObject()->getConfiguration()->getField('foo');
+        $validation = new Validation;
+        $validation->setClassName(RequiredValidator::class);
+        $validation->setValidationName('validation-name');
+        $field->addValidation($validation);
+
+        $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $assetHandler->getJavaScriptValidationFiles());
+
+        $javaScriptCode = $assetHandler->getJavaScriptCode();
         $this->assertNotNull($jsonValidationConfiguration);
-        $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $fieldsValidationJavaScriptAssetHandler->getJavaScriptValidationFiles());
+
         $this->assertEquals(
             $this->trimString(str_replace('#CONFIGURATION#', $jsonValidationConfiguration, $expectedResult)),
-            $this->removeMultiLinesComments($this->trimString($fieldsValidationJavaScriptAssetHandler->getJavaScriptCode()))
+            $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
         unset($assetHandlerFactory);

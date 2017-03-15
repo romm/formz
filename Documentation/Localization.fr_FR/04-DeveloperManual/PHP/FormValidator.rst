@@ -12,11 +12,11 @@ Validateur de formulaire
 
 Un validateur de formulaire est appelé lors de la **soumission** dudit formulaire : il permet de gérer toutes les règles de validations qui lui sont propres, et n'importe quel processus annexe qui dépendrait de ses données.
 
-Le but de Formz est d'automatiser un maximum de processus, notamment ceux de validation. Néanmoins il est probable que des formulaires complexes requièrent des **mécanismes plus poussés**, adaptés à leurs **besoins spécifiques**. Dans ce cas, il est possible de se brancher très facilement en plein cœur du processus de validation, et personnaliser son comportement en utilisant les fonctions listées ci-dessous.
+Le but de FormZ est d'automatiser un maximum de processus, notamment ceux de validation. Néanmoins il est probable que des formulaires complexes requièrent des **mécanismes plus poussés**, adaptés à leurs **besoins spécifiques**. Dans ce cas, il est possible de se brancher très facilement en plein cœur du processus de validation, et personnaliser son comportement en utilisant les fonctions listées ci-dessous.
 
 .. tip::
 
-    Si vous n'avez besoin d'aucun processus supplémentaire pour votre formulaire, vous pouvez utiliser le validateur par défaut fourni par Formz : :php:`\Romm\Formz\Validation\Validator\Form\DefaultFormValidator`.
+    Si vous n'avez besoin d'aucun processus supplémentaire pour votre formulaire, vous pouvez utiliser le validateur par défaut fourni par FormZ : :php:`\Romm\Formz\Validation\Validator\Form\DefaultFormValidator`.
 
 API
 ^^^

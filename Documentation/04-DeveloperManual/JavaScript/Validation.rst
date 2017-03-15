@@ -14,7 +14,7 @@ Validation
 ======================================================================================================== ==========================================================
 Function                                                                                                 Description
 ======================================================================================================== ==========================================================
-:ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`    Registers a new validator.
+:ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`       Registers a new validator.
 ======================================================================================================== ==========================================================
 
 .. _developerManual-javaScript-validation-registerValidator:
@@ -25,7 +25,7 @@ Register a validator
 .. container:: table-row
 
     Function
-        ``Formz.Validation.registerValidator(name, callback)``
+        ``Fz.Validation.registerValidator(name, callback)``
     Return
         /
     Parameters
@@ -49,7 +49,7 @@ Register a validator
              - ``data``: a list of properties which may be used during the validation.
              - ``validatorName``: name of the used validator.
 
-        2. The validator must **in every case** call ``callback();``, because this is the way Formz detects the end of the validation process. **Not calling it may break the entire Formz process.**
+        2. The validator must **in every case** call ``callback();``, because this is the way FormZ detects the end of the validation process. **Not calling it may break the entire FormZ process.**
 
         3. To add an error, you must use the result instance in ``states['result']``, see the example below.
 
@@ -57,7 +57,7 @@ Register a validator
 
         .. code-block:: javascript
 
-             Formz.Validation.registerValidator(
+             Fz.Validation.registerValidator(
                  'Vendor\\Extension\\Validation\\Validator\\MyCustomValidator',
                  function (value, callback, states) {
                      if (value !== 'foo') {

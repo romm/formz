@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -55,7 +55,6 @@ class AssetHandlerFactory
     /**
      * @param FormObject        $formObject Name of the form class.
      * @param ControllerContext $controllerContext
-     * @throws \Exception
      */
     protected function __construct(FormObject $formObject, ControllerContext $controllerContext)
     {
@@ -94,19 +93,13 @@ class AssetHandlerFactory
     {
         if (false === array_key_exists($className, $this->instances)) {
             if (false === class_exists($className)) {
-                throw new ClassNotFoundException(
-                    'Trying to get an asset handler with a wrong class name: "' . $className . '".',
-                    1477468381
-                );
+                throw ClassNotFoundException::wrongAssetHandlerClassName($className);
             }
 
             $instance = GeneralUtility::makeInstance($className, $this);
 
             if (false === $instance instanceof AbstractAssetHandler) {
-                throw new InvalidArgumentTypeException(
-                    'The asset handler object must be an instance of "' . AbstractAssetHandler::class . '", current type: "' . get_class($instance) . '".',
-                    1477468571
-                );
+                throw InvalidArgumentTypeException::wrongAssetHandlerType(get_class($instance));
             }
 
             $this->instances[$className] = $instance;

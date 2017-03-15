@@ -2,7 +2,6 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\Css\FeedbackContainerDisplayCssAssetHandler;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 
@@ -17,13 +16,12 @@ class FeedbackContainerDisplayCssAssetHandlerTest extends AbstractUnitTest
      */
     public function errorContainerDisplayCssIsValid()
     {
-        $expectedCss = 'form[name="foo"]:not([formz-error-foo="1"]):not([formz-warning-foo="1"]):not([formz-notice-foo="1"])[formz-field-feedback-container="foo"]{display:none!important;}';
+        $expectedCss = 'form[name="foo"]:not([fz-error-foo="1"]):not([fz-warning-foo="1"]):not([fz-notice-foo="1"])[fz-field-feedback-container="foo"]{display:none!important;}';
 
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
-        /** @var FeedbackContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
-        $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(FeedbackContainerDisplayCssAssetHandler::class);
-        $errorContainerDisplayCss = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss();
+        $assetHandler = new FeedbackContainerDisplayCssAssetHandler($assetHandlerFactory);
+        $errorContainerDisplayCss = $assetHandler->getErrorContainerDisplayCss();
 
         $this->assertEquals($expectedCss, $this->trimString($errorContainerDisplayCss));
 

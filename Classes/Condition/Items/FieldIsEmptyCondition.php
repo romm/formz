@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -45,7 +45,7 @@ class FieldIsEmptyCondition extends AbstractConditionItem
      */
     public function getCssResult()
     {
-        return '[' . DataAttributesAssetHandler::getFieldDataValidKey($this->fieldName) . '=""]';
+        return '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '=""]';
     }
 
     /**
@@ -76,20 +76,9 @@ class FieldIsEmptyCondition extends AbstractConditionItem
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw new InvalidConditionException(
-                'The field "' . $this->fieldName . '" does not exist.',
-                1488191994
-            );
+            throw InvalidConditionException::conditionFieldIsEmptyFieldNotFound($this->fieldName);
         }
 
         return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
     }
 }

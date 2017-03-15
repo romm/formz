@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -20,7 +20,7 @@ use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\ValidatorService;
 
 /**
- * This asset handler will manage the translations which will be sent to Formz
+ * This asset handler will manage the translations which will be sent to FormZ
  * in JavaScript (`Formz.Localization`).
  *
  * The validation messages of the fields are handled in this class.
@@ -73,7 +73,7 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractAssetHandler
         $jsonTranslationsBinding = $this->handleTranslationsBinding(ArrayService::get()->arrayToJavaScriptJson($translationsBinding));
 
         return <<<JS
-Formz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);
+Fz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);
 JS;
     }
 
@@ -151,7 +151,7 @@ JS;
     }
 
     /**
-     * Adds a global translation value which will be added to the Formz
+     * Adds a global translation value which will be added to the FormZ
      * JavaScript localization service.
      *
      * @param string $key

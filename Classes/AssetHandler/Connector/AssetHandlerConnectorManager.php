@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -77,17 +77,14 @@ class AssetHandlerConnectorManager
         $hash = sha1(spl_object_hash($pageRenderer) . spl_object_hash($assetHandlerFactory));
 
         if (false === isset(self::$instances[$hash])) {
-            /** @noinspection PhpMethodParametersCountMismatchInspection */
-            self::$instances[$hash] = Core::get()
-                ->getObjectManager()
-                ->get(self::class, $pageRenderer, $assetHandlerFactory);
+            self::$instances[$hash] = Core::instantiate(self::class, $pageRenderer, $assetHandlerFactory);
         }
 
         return self::$instances[$hash];
     }
 
     /**
-     * Will take care of including internal Formz JavaScript and CSS files. They
+     * Will take care of including internal FormZ JavaScript and CSS files. They
      * will be included only once, even if the view helper is used several times
      * in the same page.
      *
@@ -155,7 +152,8 @@ class AssetHandlerConnectorManager
      */
     protected function fileExists($absolutePath)
     {
-        return file_exists($absolutePath);
+        return file_exists($absolutePath)
+            && 0 !== filemtime($absolutePath);
     }
 
     /**

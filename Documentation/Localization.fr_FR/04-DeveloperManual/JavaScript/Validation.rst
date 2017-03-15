@@ -14,7 +14,7 @@ Validation
 ======================================================================================================== ==========================================================
 Function                                                                                                 Description
 ======================================================================================================== ==========================================================
-:ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`    Registers a new validator.
+:ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`       Registers a new validator.
 ======================================================================================================== ==========================================================
 
 .. _developerManual-javaScript-validation-registerValidator:
@@ -25,7 +25,7 @@ Register a validator
 .. container:: table-row
 
     Function
-        ``Formz.Validation.registerValidator(name, callback)``
+        ``Fz.Validation.registerValidator(name, callback)``
     Return
         /
     Parameters
@@ -49,7 +49,7 @@ Register a validator
              - ``data`` : une liste de propriétés pouvant servir dans la validation.
              - ``validatorName`` : le nom du validateur utilisé.
 
-        2. Le validateur devra **dans tous les cas** appeler ``callback();``, car c'est de cette manière que Formz détectera la fin du processus du validateur. **Ne pas l'appeler pourra faire planter tout le fonctionnement de Formz.**
+        2. Le validateur devra **dans tous les cas** appeler ``callback();``, car c'est de cette manière que FormZ détectera la fin du processus du validateur. **Ne pas l'appeler pourra faire planter tout le fonctionnement de FormZ.**
 
         3. Pour rajouter une erreur, il faudra passer par l'instance de résultat contenue dans ``states['result']``, cf. l'exemple plus bas.
 
@@ -57,7 +57,7 @@ Register a validator
 
         .. code-block:: javascript
 
-             Formz.Validation.registerValidator(
+             Fz.Validation.registerValidator(
                  'Vendor\\Extension\\Validation\\Validator\\MyCustomValidator',
                  function (value, callback, states) {
                      if (value !== 'foo') {
