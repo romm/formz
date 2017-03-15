@@ -95,7 +95,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
                 $this->getMessageType($message),
                 $message->getValidationName(),
                 $message->getMessageKey(),
-                $message->getMessage()
+                $message->render()
             ],
             $field->getSettings()->getMessageTemplate()
         );
