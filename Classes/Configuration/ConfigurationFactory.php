@@ -17,6 +17,7 @@ use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\ContextService;
+use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -119,7 +120,7 @@ class ConfigurationFactory implements SingletonInterface
         if (false === array_key_exists($contextHash, $this->cacheIdentifiers)) {
             $configuration = $this->typoScriptService->getFormzConfiguration();
 
-            $this->cacheIdentifiers[$contextHash] = 'formz-configuration-' . sha1(serialize($configuration));
+            $this->cacheIdentifiers[$contextHash] = 'formz-configuration-' . HashService::get()->getHash(serialize($configuration));
         }
 
         return $this->cacheIdentifiers[$contextHash];

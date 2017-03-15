@@ -15,6 +15,7 @@ namespace Romm\Formz\Condition\Parser;
 
 use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
 use Romm\Formz\Service\CacheService;
+use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\Traits\FacadeInstanceTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -42,7 +43,7 @@ class ConditionParserFactory implements SingletonInterface
     public function parse(ActivationInterface $activation)
     {
         $hash = 'condition-tree-' .
-            sha1(serialize([
+            HashService::get()->getHash(serialize([
                 $activation->getExpression(),
                 $activation->getConditions()
             ]));
