@@ -15,8 +15,6 @@ namespace Romm\Formz\Service;
 
 use Romm\Formz\Form\FormInterface;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
-use TYPO3\CMS\Extbase\Mvc\Request;
 
 /**
  * Contains features which can be useful in third party extensions.
@@ -37,48 +35,6 @@ class FormService implements SingletonInterface
      * @var FormInterface[]
      */
     private static $formWithErrors = [];
-
-    /**
-     * Use this function to check if an action's required argument is missing.
-     *
-     * Basically, this can be used to prevent user from refreshing a page where
-     * a form has been submitted, but without sending the form again: the
-     * request calls the form submission controller action with an empty form
-     * object, which can result in a fatal error. You can use this function to
-     * prevent this kind of behaviour. Example:
-     *
-     * A controller has an action like:
-     *  public function submitFormAction(MyForm $myForm) { ... }
-     *
-     * Add a new function:
-     *  public function initializeSubmitFormAction()
-     *  {
-     *      FormUtility::onRequiredArgumentIsMissing(
-     *          $this->arguments,
-     *          $this->request,
-     *          function($missingArgumentName) {
-     *              $this->redirect('myIndex');
-     *          }
-     *      );
-     *  }
-     *
-     * @param Arguments $arguments Arguments of the method arguments.
-     * @param Request   $request   Request.
-     * @param callable  $callback  Callback function which is called if a required argument is missing.
-     */
-    public static function onRequiredArgumentIsMissing($arguments, $request, $callback)
-    {
-        foreach ($arguments as $argument) {
-            $argumentName = $argument->getName();
-            if (false === $request->hasArgument($argumentName)
-                && true === $argument->isRequired()
-            ) {
-                if (is_callable($callback)) {
-                    $callback($argument->getName());
-                }
-            }
-        }
-    }
 
     /**
      * If a form has been submitted with errors, use this function to get it
