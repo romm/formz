@@ -17,6 +17,7 @@ use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -141,8 +142,8 @@ JS;
         $sortedMessages = [];
 
         foreach ($messages as $message) {
-            $validationName = $message->getValidationName();
-            $messageKey = $message->getMessageKey();
+            $validationName = MessageService::get()->getMessageValidationName($message);
+            $messageKey = MessageService::get()->getMessageKey($message);
 
             if (false === isset($sortedMessages[$validationName])) {
                 $sortedMessages[$validationName] = [];

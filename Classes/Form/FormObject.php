@@ -16,6 +16,7 @@ namespace Romm\Formz\Form;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Service\HashService;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -251,7 +252,7 @@ class FormObject
      */
     protected function calculateHash()
     {
-        return sha1(serialize($this));
+        return HashService::get()->getHash(serialize($this));
     }
 
     /**

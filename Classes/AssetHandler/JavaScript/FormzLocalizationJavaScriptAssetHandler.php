@@ -16,6 +16,7 @@ namespace Romm\Formz\AssetHandler\JavaScript;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\ValidatorService;
 
@@ -64,7 +65,7 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractAssetHandler
         $translationsBinding = [];
 
         foreach ($this->translations as $key => $value) {
-            $hash = sha1($value);
+            $hash = HashService::get()->getHash($value);
             $realTranslations[$hash] = $value;
             $translationsBinding[$key] = $hash;
         }

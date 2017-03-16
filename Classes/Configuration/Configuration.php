@@ -25,6 +25,7 @@ use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService as InternalCacheService;
+use Romm\Formz\Service\HashService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
@@ -149,7 +150,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
             'settings' => $fullArray['settings']
         ];
 
-        $this->hash = sha1(serialize($configurationArray));
+        $this->hash = HashService::get()->getHash(serialize($configurationArray));
     }
 
     /**

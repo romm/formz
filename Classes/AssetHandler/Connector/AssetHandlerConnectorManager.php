@@ -74,7 +74,7 @@ class AssetHandlerConnectorManager
      */
     public static function get(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory)
     {
-        $hash = sha1(spl_object_hash($pageRenderer) . spl_object_hash($assetHandlerFactory));
+        $hash = spl_object_hash($pageRenderer) . spl_object_hash($assetHandlerFactory);
 
         if (false === isset(self::$instances[$hash])) {
             self::$instances[$hash] = Core::instantiate(self::class, $pageRenderer, $assetHandlerFactory);

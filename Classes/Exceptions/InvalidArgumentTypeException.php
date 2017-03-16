@@ -15,10 +15,10 @@ namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
-use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
+use TYPO3\CMS\Extbase\Error\Message;
 
 class InvalidArgumentTypeException extends FormzException
 {
@@ -32,7 +32,7 @@ class InvalidArgumentTypeException extends FormzException
 
     const FIELD_VIEW_HELPER_LAYOUT_NOT_STRING = 'The argument `layout` must be a string (%s given).';
 
-    const FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE = 'The argument `message` for the view helper "%s" must be an instance of "%s" (%s given).';
+    const FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE = 'The argument `message` for the view helper "%s" must be an instance of "%s" (`%s` given).';
 
     const CONDITION_NAME_NOT_STRING = 'The name of the condition must be a correct string (given type: "%s").';
 
@@ -134,8 +134,8 @@ class InvalidArgumentTypeException extends FormzException
         $exception = self::getNewExceptionInstance(self::FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE,
             [
                 FormatMessageViewHelper::class,
-                FormzMessageInterface::class,
-                gettype($value)
+                Message::class,
+                is_object($value) ? get_class($value) : gettype($value)
             ]
         );
 

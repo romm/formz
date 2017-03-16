@@ -98,7 +98,7 @@ class CacheService implements SingletonInterface
             $string .
             $shortClassName .
             '-' .
-            sha1($formClassName)
+            HashService::get()->getHash($formClassName)
         );
 
         return substr($identifier, 0, $maxLength);

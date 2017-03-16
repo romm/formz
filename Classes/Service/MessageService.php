@@ -33,6 +33,28 @@ class MessageService implements SingletonInterface
     protected $signalSlotDispatcher;
 
     /**
+     * @param Message $message
+     * @return string
+     */
+    public function getMessageValidationName(Message $message)
+    {
+        return $message instanceof FormzMessageInterface
+            ? $message->getValidationName()
+            : 'unknown';
+    }
+
+    /**
+     * @param Message $message
+     * @return string
+     */
+    public function getMessageKey(Message $message)
+    {
+        return $message instanceof FormzMessageInterface
+            ? $message->getMessageKey()
+            : 'unknown';
+    }
+
+    /**
      * This function will go through all errors, warnings and notices and check
      * if they are instances of `FormzMessageInterface`. If not, they are
      * converted in order to have more informations that are needed later.
