@@ -15,6 +15,7 @@ namespace Romm\Formz\Service;
 
 use Romm\Formz\Form\FormInterface;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Contains features which can be useful in third party extensions.
@@ -42,11 +43,17 @@ class FormService implements SingletonInterface
      * This is useful because an action is forwarded if the submitted argument
      * has errors.
      *
+     * @deprecated This method is deprecated, please try not to use it if you
+     *             can. It will be removed in FormZ v2, where you will have a
+     *             whole new way to get a validated form.
+     *
      * @param string $formClassName The class name of the form.
      * @return FormInterface|null
      */
     public static function getFormWithErrors($formClassName)
     {
+        GeneralUtility::logDeprecatedFunction();
+
         return (isset(self::$formWithErrors[$formClassName]))
             ? self::$formWithErrors[$formClassName]
             : null;
