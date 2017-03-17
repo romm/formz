@@ -4,7 +4,7 @@ namespace Romm\Formz\Tests\Unit\Condition\Items;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Items\AbstractConditionItem;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
-use Romm\Formz\Configuration\Form\Condition\Activation\Activation;
+use Romm\Formz\Configuration\Form\Field\Activation\Activation;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 

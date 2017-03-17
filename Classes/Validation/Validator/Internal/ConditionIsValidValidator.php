@@ -14,7 +14,7 @@
 namespace Romm\Formz\Validation\Validator\Internal;
 
 use Romm\Formz\Condition\Parser\ConditionParser;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class ConditionIsValidValidator extends AbstractValidator

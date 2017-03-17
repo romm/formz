@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Configuration\Form\Condition\Activation;
+namespace Romm\Formz\Configuration\Form\Field\Activation;
 
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesResolver;

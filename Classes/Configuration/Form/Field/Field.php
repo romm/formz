@@ -16,9 +16,9 @@ namespace Romm\Formz\Configuration\Form\Field;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour;
 use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
@@ -42,7 +42,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
 
     /**
      * @var ActivationInterface
-     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Field\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;

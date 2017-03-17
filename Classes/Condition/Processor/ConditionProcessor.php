@@ -17,7 +17,7 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject;

@@ -16,7 +16,7 @@ namespace Romm\Formz\Condition\Items;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
 use Romm\Formz\Form\FormObject;
 
 interface ConditionItemInterface

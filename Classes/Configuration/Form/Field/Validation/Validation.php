@@ -17,9 +17,9 @@ use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Field;
 
 class Validation extends AbstractFormzConfiguration implements ActivationUsageInterface

@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Validation\Validator\Form;
 
-use Romm\Formz\Configuration\Form\Condition\Activation\Activation;
+use Romm\Formz\Configuration\Form\Field\Activation\Activation;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;

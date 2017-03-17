@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Configuration\Form\Condition\Activation\AbstractActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\AbstractActivation;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Configuration\View\View;
