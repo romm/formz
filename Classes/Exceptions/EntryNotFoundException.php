@@ -14,6 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Configuration\Form\Condition\Activation\AbstractActivation;
+use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -30,6 +31,8 @@ class EntryNotFoundException extends FormzException
     const VALIDATION_NOT_FOUND = 'The validation "%s" was not found. Please use the function `%s::hasValidation()` before.';
 
     const VIEW_LAYOUT_NOT_FOUND = 'The layout "%s" was not found. Please use the function `%s::hasLayout()` before.';
+
+    const VIEW_CLASS_NOT_FOUND = 'The class "%s" was not found. Please use the function `%s::hasItem()` before.';
 
     const VALIDATION_NOT_FOUND_FOR_FIELD = 'The field "%s" does not have a rule "%s".';
 
@@ -91,6 +94,23 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::VIEW_LAYOUT_NOT_FOUND,
             [$name, View::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1489754909
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function viewClassNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::VIEW_CLASS_NOT_FOUND,
+            [$name, ViewClass::class]
         );
 
         return $exception;

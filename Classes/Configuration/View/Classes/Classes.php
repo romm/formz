@@ -18,7 +18,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Classes extends AbstractFormzConfiguration
 {
-
     /**
      * @var \Romm\Formz\Configuration\View\Classes\ViewClass
      */
@@ -47,26 +46,10 @@ class Classes extends AbstractFormzConfiguration
     }
 
     /**
-     * @param ViewClass $errors
-     */
-    public function setErrors($errors)
-    {
-        $this->errors = $errors;
-    }
-
-    /**
      * @return ViewClass
      */
     public function getValid()
     {
         return $this->valid;
-    }
-
-    /**
-     * @param ViewClass $valid
-     */
-    public function setValid($valid)
-    {
-        $this->valid = $valid;
     }
 }

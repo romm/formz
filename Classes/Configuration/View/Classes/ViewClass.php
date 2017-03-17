@@ -16,6 +16,7 @@ namespace Romm\Formz\Configuration\View\Classes;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 
 class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorInterface
 {
@@ -53,31 +54,34 @@ class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorIn
     }
 
     /**
-     * @param string $itemName
+     * @param string $name
      * @return bool
      */
-    public function hasItem($itemName)
+    public function hasItem($name)
     {
-        return true === isset($this->items[$itemName]);
+        return true === isset($this->items[$name]);
     }
 
     /**
-     * @param string $itemName
-     * @return array|null
+     * @param string $name
+     * @return array
+     * @throws EntryNotFoundException
      */
-    public function getItem($itemName)
+    public function getItem($name)
     {
-        return (true === isset($this->items[$itemName]))
-            ? $this->items[$itemName]
-            : null;
+        if (false === $this->hasItem($name)) {
+            throw EntryNotFoundException::viewClassNotFound($name);
+        }
+
+        return $this->items[$name];
     }
 
     /**
-     * @param string $itemName
+     * @param string $name
      * @param string $value
      */
-    public function addItem($itemName, $value)
+    public function setItem($name, $value)
     {
-        $this->items[$itemName] = $value;
+        $this->items[$name] = $value;
     }
 }
