@@ -69,7 +69,7 @@ class InvalidConditionException extends FormzException
             self::INVALID_VALIDATION_CONDITION_CONFIGURATION,
             [
                 $conditionName,
-                $validation->getValidationName(),
+                $validation->getName(),
                 $validation->getParentField()->getName(),
                 $formClassName,
                 $exception->getMessage(),

@@ -70,10 +70,10 @@ class ConditionProcessorTest extends AbstractUnitTest
         $field->setName('foo');
 
         $validation1 = new Validation;
-        $validation1->setValidationName('foo');
+        $validation1->setName('foo');
         $validation1->setParents([$field]);
         $validation2 = new Validation;
-        $validation2->setValidationName('bar');
+        $validation2->setName('bar');
         $validation2->setParents([$field]);
         $this->inject($validation2, 'activation', new EmptyActivation);
 
@@ -131,9 +131,9 @@ class ConditionProcessorTest extends AbstractUnitTest
                     ->method('getFields')
                     ->willReturnCallback(function () use ($conditionProcessor) {
                         $validation1 = new Validation;
-                        $validation1->setValidationName('foo');
+                        $validation1->setName('foo');
                         $validation2 = new Validation;
-                        $validation2->setValidationName('bar');
+                        $validation2->setName('bar');
 
                         $field1 = new Field;
                         $field1->setName('foo');

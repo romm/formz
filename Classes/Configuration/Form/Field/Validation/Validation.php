@@ -69,7 +69,7 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
      *
      * @var string
      */
-    private $validationName;
+    private $name;
 
     /**
      * Constructor.
@@ -167,21 +167,21 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     /**
      * @return string
      */
-    public function getValidationName()
+    public function getName()
     {
-        if (null === $this->validationName) {
-            $this->validationName = $this->getArrayIndex();
+        if (null === $this->name) {
+            $this->name = $this->getArrayIndex();
         }
 
-        return $this->validationName;
+        return $this->name;
     }
 
     /**
-     * @param string $validationName
+     * @param string $name
      */
-    public function setValidationName($validationName)
+    public function setName($name)
     {
-        $this->validationName = $validationName;
+        $this->name = $name;
     }
 
     /**

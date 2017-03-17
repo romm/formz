@@ -76,7 +76,7 @@ class FormResult extends Result
             $this->deactivatedFieldsValidation[$fieldName] = [];
         }
 
-        $this->deactivatedFieldsValidation[$fieldName][$validation->getValidationName()] = $validation;
+        $this->deactivatedFieldsValidation[$fieldName][$validation->getName()] = $validation;
     }
 
     /**
@@ -88,7 +88,7 @@ class FormResult extends Result
         $fieldName = $validation->getParentField()->getName();
 
         return array_key_exists($fieldName, $this->deactivatedFieldsValidation)
-            && array_key_exists($validation->getValidationName(), $this->deactivatedFieldsValidation[$fieldName]);
+            && array_key_exists($validation->getName(), $this->deactivatedFieldsValidation[$fieldName]);
     }
 
     /**

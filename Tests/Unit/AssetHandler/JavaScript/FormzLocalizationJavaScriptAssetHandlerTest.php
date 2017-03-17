@@ -26,7 +26,7 @@ TXT;
 
         $field = $assetHandlerFactory->getFormObject()->getConfiguration()->getField('foo');
         $validation = new Validation;
-        $validation->setValidationName('validation-name');
+        $validation->setName('validation-name');
         $validation->setClassName(RequiredValidator::class);
         $field->addValidation($validation);
 

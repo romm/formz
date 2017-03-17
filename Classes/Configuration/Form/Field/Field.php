@@ -65,7 +65,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      */
     public function __construct()
     {
-        $this->settings = new FieldSettings();
+        $this->settings = new FieldSettings;
         $this->settings->setParents([$this]);
 
         $this->activation = EmptyActivation::get();
@@ -76,7 +76,10 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      */
     public function getForm()
     {
-        return $this->getFirstParent(Form::class);
+        /** @var Form $form */
+        $form = $this->getFirstParent(Form::class);
+
+        return $form;
     }
 
     /**
@@ -101,7 +104,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      */
     public function addValidation(Validation $validation)
     {
-        $this->validation[$validation->getValidationName()] = $validation;
+        $this->validation[$validation->getName()] = $validation;
         $validation->setParents([$this]);
     }
 

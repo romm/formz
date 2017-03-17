@@ -81,7 +81,7 @@ class ConditionProcessor
      */
     public function getActivationConditionTreeForValidation(Validation $validation)
     {
-        $key = $validation->getParentField()->getName() . '->' . $validation->getValidationName();
+        $key = $validation->getParentField()->getName() . '->' . $validation->getName();
 
         if (false === array_key_exists($key, $this->validationsTrees)) {
             $this->validationsTrees[$key] = $this->getConditionTree($validation->getActivation());

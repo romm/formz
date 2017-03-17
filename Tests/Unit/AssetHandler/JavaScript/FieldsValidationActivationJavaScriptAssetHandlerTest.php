@@ -26,7 +26,7 @@ TXT;
 
         $field = $assetHandlerFactory->getFormObject()->getConfiguration()->getField('foo');
         $validation = new Validation;
-        $validation->setValidationName('validation-name');
+        $validation->setName('validation-name');
         $field->addValidation($validation);
 
         /** @var FieldsValidationActivationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
