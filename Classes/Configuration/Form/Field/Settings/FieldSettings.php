@@ -142,7 +142,7 @@ class FieldSettings extends AbstractFormzConfiguration
     {
         $result = $this->$propertyName;
 
-        if (null === $result) {
+        if (empty($result)) {
             $result = $this->withFirstParent(
                 Configuration::class,
                 function (Configuration $configuration) use ($propertyName) {

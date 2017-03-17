@@ -23,6 +23,8 @@ class FormSettings extends AbstractFormzConfiguration
 {
     use ParentsTrait;
 
+    const DEFAULT_ERROR_MESSAGE_KEY = 'default_error_message';
+
     /**
      * @var string
      */
@@ -32,14 +34,6 @@ class FormSettings extends AbstractFormzConfiguration
      * @var string
      */
     protected $defaultErrorMessage;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->defaultErrorMessage = 'default_error_message';
-    }
 
     /**
      * @return string
@@ -62,7 +56,17 @@ class FormSettings extends AbstractFormzConfiguration
      */
     public function getDefaultErrorMessage()
     {
-        return ContextService::get()->translate($this->getSettingsProperty('defaultErrorMessage'));
+        $message = $this->getSettingsProperty('defaultErrorMessage') ?: self::DEFAULT_ERROR_MESSAGE_KEY;
+
+        return ContextService::get()->translate($message);
+    }
+
+    /**
+     * @param string $defaultErrorMessage
+     */
+    public function setDefaultErrorMessage($defaultErrorMessage)
+    {
+        $this->defaultErrorMessage = $defaultErrorMessage;
     }
 
     /**
@@ -83,7 +87,9 @@ class FormSettings extends AbstractFormzConfiguration
         $result = $this->$propertyName;
 
         if (empty($result)) {
-            if ($this->hasParent(Form::class)) {
+            if ($this->hasParent(Form::class)
+                && $this->hasParent(Configuration::class)
+            ) {
                 $result = $this->withFirstParent(
                     Configuration::class,
                     function (Configuration $configuration) use ($propertyName) {
