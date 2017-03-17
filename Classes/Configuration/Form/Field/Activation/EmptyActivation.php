@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\Configuration\Form\Field\Activation;
 
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 
 class EmptyActivation extends AbstractActivation
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 }

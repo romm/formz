@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit;
 
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Extbase\Object\Container\ClassInfo;
 use TYPO3\CMS\Extbase\Object\Container\Container;
 
@@ -11,7 +11,7 @@ use TYPO3\CMS\Extbase\Object\Container\Container;
  */
 class UnitTestContainer extends Container
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 
     /**
      * @var array

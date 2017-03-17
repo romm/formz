@@ -13,21 +13,21 @@
 
 namespace Romm\Formz\Service\Traits;
 
-use Romm\Formz\Service\FacadeService;
+use Romm\Formz\Service\InstanceService;
 
 /**
- * Same as `FacadeInstanceTrait`, but the instance is created with Extbase
- * object manager.
+ * This trait provides a static function to help getting a singleton instance of
+ * a service.
  *
  * @internal This trait is for FormZ internal usage only: it may change at any moment, so do not use it in your own scripts!
  */
-trait ExtendedFacadeInstanceTrait
+trait SelfInstantiateTrait
 {
     /**
      * @return self
      */
     public static function get()
     {
-        return FacadeService::get()->getInstance(self::class, true);
+        return InstanceService::get()->getInstance(self::class);
     }
 }

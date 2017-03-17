@@ -14,7 +14,7 @@ use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
-use Romm\Formz\Service\FacadeService;
+use Romm\Formz\Service\InstanceService;
 use Romm\Formz\Service\TypoScriptService;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
@@ -84,7 +84,7 @@ trait FormzUnitTestUtility
         */
         $this->initializeConfigurationObjectTestServices();
 
-        FacadeService::get()->reset();
+        InstanceService::get()->reset();
 
         /*
          * Will return a configuration that can be manipulated during tests.
@@ -288,7 +288,7 @@ trait FormzUnitTestUtility
             ->setMethods(['getFullExtensionConfiguration', 'getExtensionRelativePath'])
             ->getMock();
 
-        FacadeService::get()->forceInstance(ExtensionService::class, $extensionServiceMock);
+        InstanceService::get()->forceInstance(ExtensionService::class, $extensionServiceMock);
 
         $extensionServiceMock->method('getFullExtensionConfiguration')
             ->willReturnCallback(function () {
@@ -323,7 +323,7 @@ trait FormzUnitTestUtility
             ->setMethods(['translate'])
             ->getMock();
 
-        FacadeService::get()->forceInstance(ContextService::class, $contextServiceMock);
+        InstanceService::get()->forceInstance(ContextService::class, $contextServiceMock);
 
         $contextServiceMock->injectEnvironmentService($this->getMockedEnvironmentService());
         $contextServiceMock->injectTypoScriptService($this->getMockedTypoScriptService());

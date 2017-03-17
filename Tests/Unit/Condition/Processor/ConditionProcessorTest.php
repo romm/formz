@@ -15,7 +15,7 @@ use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\Service\FacadeService;
+use Romm\Formz\Service\InstanceService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Result;
 
@@ -45,7 +45,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             $conditionProcessor
         );
 
-        FacadeService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
+        InstanceService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
 
         $tree1 = $conditionProcessor->getActivationConditionTreeForField($field1);
         $tree2 = $conditionProcessor->getActivationConditionTreeForField($field1);
@@ -85,7 +85,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             $conditionProcessor
         );
 
-        FacadeService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
+        InstanceService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
 
         $tree1 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);
         $tree2 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);

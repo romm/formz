@@ -20,7 +20,7 @@ use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Parser\Node\NullNode;
 use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
 use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
@@ -48,7 +48,7 @@ use TYPO3\CMS\Extbase\Error\Result;
  */
 class ConditionParser implements SingletonInterface
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 
     const LOGICAL_AND = '&&';
     const LOGICAL_OR = '||';

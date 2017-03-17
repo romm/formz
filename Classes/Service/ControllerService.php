@@ -14,13 +14,13 @@
 namespace Romm\Formz\Service;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 class ControllerService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use ExtendedSelfInstantiateTrait;
 
     /**
      * @var ReflectionService
