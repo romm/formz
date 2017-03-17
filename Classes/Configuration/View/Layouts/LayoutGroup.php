@@ -15,6 +15,7 @@ namespace Romm\Formz\Configuration\View\Layouts;
 
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 
 class LayoutGroup extends AbstractFormzConfiguration
 {
@@ -48,23 +49,35 @@ class LayoutGroup extends AbstractFormzConfiguration
     }
 
     /**
-     * @param string $itemName
+     * @param string $name
      * @return bool
      */
-    public function hasItem($itemName)
+    public function hasItem($name)
     {
-        return true === isset($this->items[$itemName]);
+        return true === isset($this->items[$name]);
     }
 
     /**
-     * @param string $itemName
-     * @return Layout|null
+     * @param string $name
+     * @return Layout
+     * @throws EntryNotFoundException
      */
-    public function getItem($itemName)
+    public function getItem($name)
     {
-        return (true === isset($this->items[$itemName]))
-            ? $this->items[$itemName]
-            : null;
+        if (false === $this->hasItem($name)) {
+            throw EntryNotFoundException::viewLayoutItemNotFound($name);
+        }
+
+        return $this->items[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param Layout $layout
+     */
+    public function setItem($name, Layout $layout)
+    {
+        $this->items[$name] = $layout;
     }
 
     /**
