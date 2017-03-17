@@ -17,20 +17,20 @@ use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class FacadeService implements SingletonInterface
+class InstanceService implements SingletonInterface
 {
     /**
-     * @var FacadeService
+     * @var InstanceService
      */
     private static $instance;
 
     /**
      * @var array
      */
-    protected $facadeInstances = [];
+    protected $objectInstances = [];
 
     /**
-     * @return FacadeService
+     * @return InstanceService
      */
     public static function get()
     {
@@ -48,12 +48,12 @@ class FacadeService implements SingletonInterface
      */
     public function getInstance($className, $useObjectManager = false)
     {
-        if (null === $this->facadeInstances[$className]) {
-            $this->facadeInstances[$className] = $useObjectManager
+        if (null === $this->objectInstances[$className]) {
+            $this->objectInstances[$className] = $useObjectManager
                 ? Core::instantiate($className)
                 : GeneralUtility::makeInstance($className);
         }
-        return $this->facadeInstances[$className];
+        return $this->objectInstances[$className];
     }
 
     /**
@@ -61,9 +61,9 @@ class FacadeService implements SingletonInterface
      */
     public function reset()
     {
-        foreach (array_keys($this->facadeInstances) as $className) {
+        foreach (array_keys($this->objectInstances) as $className) {
             if ($className !== self::class) {
-                unset($this->facadeInstances[$className]);
+                unset($this->objectInstances[$className]);
             }
         }
     }
@@ -76,6 +76,6 @@ class FacadeService implements SingletonInterface
      */
     public function forceInstance($className, $instance)
     {
-        $this->facadeInstances[$className] = $instance;
+        $this->objectInstances[$className] = $instance;
     }
 }

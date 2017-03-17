@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -21,7 +21,7 @@ use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 class StringService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use ExtendedSelfInstantiateTrait;
 
     /**
      * @var EnvironmentService

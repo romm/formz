@@ -14,7 +14,7 @@
 namespace Romm\Formz\Service;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -23,7 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CacheService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use ExtendedSelfInstantiateTrait;
 
     const CACHE_IDENTIFIER = 'cache_formz';
     const CONFIGURATION_OBJECT_CACHE_IDENTIFIER = 'cache_formz_configuration_object';

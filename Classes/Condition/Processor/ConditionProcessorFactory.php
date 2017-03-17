@@ -16,12 +16,12 @@ namespace Romm\Formz\Condition\Processor;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService;
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class ConditionProcessorFactory implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait {
+    use ExtendedSelfInstantiateTrait {
         get as getInstance;
     }
 
