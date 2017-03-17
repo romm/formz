@@ -74,4 +74,12 @@ class LayoutGroup extends AbstractFormzConfiguration
     {
         return $this->templateFile;
     }
+
+    /**
+     * @param string $templateFile
+     */
+    public function setTemplateFile($templateFile)
+    {
+        $this->templateFile = $templateFile;
+    }
 }

@@ -161,13 +161,4 @@ class View extends AbstractFormzConfiguration
 
         return $paths;
     }
-
-    /**
-     * @param string $path
-     * @return string
-     */
-    protected function getAbsolutePath($path)
-    {
-        return GeneralUtility::getFileAbsFileName($path);
-    }
 }
