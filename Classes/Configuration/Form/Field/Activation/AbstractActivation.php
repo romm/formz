@@ -20,8 +20,8 @@ use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Error\Error;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface, DataPreProcessorInterface
 {
@@ -60,8 +60,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     }
 
     /**
-     * Will merge the items with the ones from the `$activationCondition`
-     * property of the root form configuration.
+     * Will merge the conditions with the condition list of the parent form.
      *
      * @return ConditionItemInterface[]
      */
@@ -73,13 +72,15 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
                 return $formConfiguration->getConditionList();
             }
         );
-        $conditionList = ($conditionList) ?: [];
 
-        return ArrayUtility::arrayMergeRecursiveOverrule($conditionList, $this->conditions);
+        $conditionList = ($conditionList) ?: [];
+        ArrayUtility::mergeRecursiveWithOverrule($conditionList, $this->conditions);
+
+        return $conditionList;
     }
 
     /**
-     * @param string $name Name of the item.
+     * @param string $name Name of the condition.
      * @return bool
      */
     public function hasCondition($name)
@@ -90,7 +91,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     }
 
     /**
-     * Return the item with the given name.
+     * Return the condition with the given name.
      *
      * @param string $name Name of the item.
      * @return ConditionItemInterface

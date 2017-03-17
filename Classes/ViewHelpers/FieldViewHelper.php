@@ -24,9 +24,9 @@ use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 /**
  * This view helper is used to automatize the rendering of a field layout. It
@@ -122,7 +122,7 @@ class FieldViewHelper extends AbstractViewHelper
          * `OptionViewHelper`.
          */
         $templateArguments = $this->arguments['arguments'] ?: [];
-        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, $this->fieldService->getFieldOptions());
+        ArrayUtility::mergeRecursiveWithOverrule($templateArguments, $this->fieldService->getFieldOptions());
 
         $currentView = $viewHelperVariableContainer->getView();
 
