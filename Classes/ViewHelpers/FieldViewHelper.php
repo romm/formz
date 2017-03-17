@@ -179,8 +179,8 @@ class FieldViewHelper extends AbstractViewHelper
         }
 
         $view->setTemplatePathAndFilename($layout->getTemplateFile());
-        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
-        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
+        $view->setLayoutRootPaths($viewConfiguration->getAbsoluteLayoutRootPaths());
+        $view->setPartialRootPaths($viewConfiguration->getAbsolutePartialRootPaths());
         $view->assignMultiple($templateArguments);
 
         return $view->render();
