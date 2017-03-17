@@ -69,11 +69,11 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     }
 
     /**
-     * Returns the root configuration object of FormZ.
+     * Returns FormZ root configuration object.
      *
      * @return Configuration
      */
-    public function getFormzConfiguration()
+    public function getRootConfiguration()
     {
         return $this->getFirstParent(Configuration::class);
     }

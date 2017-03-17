@@ -47,7 +47,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
 
         $classesObject = $formService->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration()
+            ->getRootConfiguration()
             ->getView()
             ->getClasses();
 

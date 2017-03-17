@@ -152,7 +152,7 @@ class FieldViewHelper extends AbstractViewHelper
         $fieldName = $this->arguments['name'];
         $formObject = $this->formService->getFormObject();
         $formConfiguration = $formObject->getConfiguration();
-        $viewConfiguration = $formConfiguration->getFormzConfiguration()->getView();
+        $viewConfiguration = $formConfiguration->getRootConfiguration()->getView();
         $layout = $this->getLayout($viewConfiguration);
 
         $templateArguments['layout'] = $layout->getLayout();

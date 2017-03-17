@@ -46,12 +46,12 @@ TXT;
             $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
-        $formzConfiguration = $assetHandlerFactory
+        $rootConfiguration = $assetHandlerFactory
             ->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration();
-        $formzConfiguration->calculateHash();
-        $hash = $formzConfiguration->getHash();
+            ->getRootConfiguration();
+        $rootConfiguration->calculateHash();
+        $hash = $rootConfiguration->getHash();
 
         $this->assertNotFalse(strpos($assetHandler->getJavaScriptFileName(), $hash));
 

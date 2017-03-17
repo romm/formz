@@ -165,7 +165,7 @@ class ClassViewHelper extends AbstractViewHelper
         $classesConfiguration = $this->formService
             ->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration()
+            ->getRootConfiguration()
             ->getView()
             ->getClasses();
 
