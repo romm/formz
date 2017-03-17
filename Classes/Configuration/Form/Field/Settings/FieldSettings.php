@@ -143,11 +143,10 @@ class FieldSettings extends AbstractFormzConfiguration
         $result = $this->$propertyName;
 
         if (null === $result) {
-            $fieldName = $this->getFieldName();
-
             $result = $this->withFirstParent(
                 Configuration::class,
-                function (Configuration $configuration) use ($propertyName, $fieldName) {
+                function (Configuration $configuration) use ($propertyName) {
+                    $fieldName = $this->getFieldName();
                     $getter = 'get' . ucfirst($propertyName);
 
                     return $configuration->getSettings()->getDefaultFieldSettings()->$getter($fieldName);
