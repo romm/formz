@@ -14,6 +14,8 @@
 namespace Romm\Formz\Configuration\Form;
 
 use Romm\ConfigurationObject\ConfigurationObjectInterface;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Service\ServiceFactory;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
@@ -25,8 +27,9 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Settings\FormSettings;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Validation\Error;
 
-class Form extends AbstractFormzConfiguration implements ConfigurationObjectInterface
+class Form extends AbstractFormzConfiguration implements ConfigurationObjectInterface, DataPreProcessorInterface
 {
     use DefaultConfigurationObjectTrait;
     use StoreArrayIndexTrait;
@@ -43,7 +46,7 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
      * @var ConditionItemInterface[]
      * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\ConditionItemResolver
      */
-    protected $activationCondition = [];
+    protected $conditionList = [];
 
     /**
      * @var \Romm\Formz\Configuration\Form\Settings\FormSettings
@@ -121,9 +124,9 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     /**
      * @return ConditionItemInterface[]
      */
-    public function getActivationCondition()
+    public function getConditionList()
     {
-        return $this->activationCondition;
+        return $this->conditionList;
     }
 
     /**
@@ -132,5 +135,21 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @param DataPreProcessor $processor
+     */
+    public static function dataPreProcessor(DataPreProcessor $processor)
+    {
+        $data = $processor->getData();
+
+        if (isset($data['activationCondition'])) {
+            $error = new Error(
+                'The property "activationCondition" has been deprecated and renamed to "conditionList", please change your TypoScript configuration.',
+                1489763042
+            );
+            $processor->addError($error);
+        }
     }
 }

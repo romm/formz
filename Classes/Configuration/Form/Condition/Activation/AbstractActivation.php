@@ -70,7 +70,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
         $activationCondition = $this->withFirstParent(
             Form::class,
             function (Form $formConfiguration) {
-                return $formConfiguration->getActivationCondition();
+                return $formConfiguration->getConditionList();
             }
         );
         $activationCondition = ($activationCondition) ?: [];
