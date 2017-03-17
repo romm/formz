@@ -16,6 +16,7 @@ namespace Romm\Formz\Configuration\View;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\View\Classes\Classes;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class View extends AbstractFormzConfiguration
@@ -44,16 +45,6 @@ class View extends AbstractFormzConfiguration
     protected $partialRootPaths = [];
 
     /**
-     * @var bool
-     */
-    private $layoutRootPathsWereCleaned = false;
-
-    /**
-     * @var bool
-     */
-    private $partialRootPathsWereCleaned = false;
-
-    /**
      * Constructor.
      */
     public function __construct()
@@ -70,6 +61,15 @@ class View extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string      $name
+     * @param LayoutGroup $layout
+     */
+    public function setLayout($name, LayoutGroup $layout)
+    {
+        $this->layouts[$name] = $layout;
+    }
+
+    /**
      * @return LayoutGroup[]
      */
     public function getLayouts()
@@ -78,23 +78,35 @@ class View extends AbstractFormzConfiguration
     }
 
     /**
-     * @param string $layoutName
+     * @param string $name
      * @return bool
      */
-    public function hasLayout($layoutName)
+    public function hasLayout($name)
     {
-        return true === isset($this->layouts[$layoutName]);
+        return true === isset($this->layouts[$name]);
     }
 
     /**
-     * @param string $layoutName
-     * @return LayoutGroup|null
+     * @param string $name
+     * @return LayoutGroup
+     * @throws EntryNotFoundException
      */
-    public function getLayout($layoutName)
+    public function getLayout($name)
     {
-        return (true === isset($this->layouts[$layoutName]))
-            ? $this->layouts[$layoutName]
-            : null;
+        if (false === $this->hasLayout($name)) {
+            throw EntryNotFoundException::viewLayoutNotFound($name);
+        }
+
+        return $this->layouts[$name];
+    }
+
+    /**
+     * @param string $key
+     * @param string $path
+     */
+    public function setLayoutRootPath($key, $path)
+    {
+        $this->layoutRootPaths[$key] = $path;
     }
 
     /**
@@ -102,14 +114,30 @@ class View extends AbstractFormzConfiguration
      */
     public function getLayoutRootPaths()
     {
-        if (false === $this->layoutRootPathsWereCleaned) {
-            $this->layoutRootPathsWereCleaned = true;
-            foreach ($this->layoutRootPaths as $key => $layoutRootPath) {
-                $this->layoutRootPaths[$key] = GeneralUtility::getFileAbsFileName($layoutRootPath);
-            }
+        return $this->layoutRootPaths;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAbsoluteLayoutRootPaths()
+    {
+        $paths = $this->layoutRootPaths;
+
+        foreach ($paths as $key => $path) {
+            $paths[$key] = $this->getAbsolutePath($path);
         }
 
-        return $this->layoutRootPaths;
+        return $paths;
+    }
+
+    /**
+     * @param string $key
+     * @param string $path
+     */
+    public function setPartialRootPath($key, $path)
+    {
+        $this->partialRootPaths[$key] = $path;
     }
 
     /**
@@ -117,13 +145,29 @@ class View extends AbstractFormzConfiguration
      */
     public function getPartialRootPaths()
     {
-        if (false === $this->partialRootPathsWereCleaned) {
-            $this->partialRootPathsWereCleaned = true;
-            foreach ($this->partialRootPaths as $key => $partialRootPath) {
-                $this->partialRootPaths[$key] = GeneralUtility::getFileAbsFileName($partialRootPath);
-            }
+        return $this->partialRootPaths;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAbsolutePartialRootPaths()
+    {
+        $paths = $this->partialRootPaths;
+
+        foreach ($paths as $key => $path) {
+            $paths[$key] = $this->getAbsolutePath($path);
         }
 
-        return $this->partialRootPaths;
+        return $paths;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    protected function getAbsolutePath($path)
+    {
+        return GeneralUtility::getFileAbsFileName($path);
     }
 }
