@@ -160,7 +160,7 @@ trait FormzUnitTestUtility
 
         foreach ($fields as $fieldName) {
             $field = new Field;
-            $field->setFieldName($fieldName);
+            $field->setName($fieldName);
             $field->setParents([$formConfiguration]);
             $formConfiguration->addField($field);
 

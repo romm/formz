@@ -79,7 +79,7 @@ JS;
      */
     protected function getSingleFieldActivationConditionFunction(Validation $validation, $fieldConditionExpression)
     {
-        $fieldName = GeneralUtility::quoteJSvalue($validation->getParentField()->getFieldName());
+        $fieldName = GeneralUtility::quoteJSvalue($validation->getParentField()->getName());
         $validationName = GeneralUtility::quoteJSvalue($validation->getValidationName());
         $fieldConditionExpression = implode(CRLF . str_repeat(' ', 20), $fieldConditionExpression);
 

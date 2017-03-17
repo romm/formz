@@ -165,7 +165,7 @@ class FieldSettings extends AbstractFormzConfiguration
         return $this->withFirstParent(
             Field::class,
             function (Field $field) {
-                return $field->getFieldName();
+                return $field->getName();
             }
         );
     }

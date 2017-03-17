@@ -75,7 +75,7 @@ JS;
      */
     protected function getSingleFieldActivationConditionFunction(Field $field, $fieldConditionExpression)
     {
-        $fieldName = GeneralUtility::quoteJSvalue($field->getFieldName());
+        $fieldName = GeneralUtility::quoteJSvalue($field->getName());
         $fieldConditionExpression = implode(CRLF . str_repeat(' ', 20), $fieldConditionExpression);
 
         return <<<JS

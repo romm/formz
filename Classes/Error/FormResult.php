@@ -43,7 +43,7 @@ class FormResult extends Result
      */
     public function deactivateField(Field $field)
     {
-        $this->deactivatedFields[$field->getFieldName()] = $field;
+        $this->deactivatedFields[$field->getName()] = $field;
     }
 
     /**
@@ -54,7 +54,7 @@ class FormResult extends Result
      */
     public function fieldIsDeactivated(Field $field)
     {
-        return array_key_exists($field->getFieldName(), $this->deactivatedFields);
+        return array_key_exists($field->getName(), $this->deactivatedFields);
     }
 
     /**
@@ -70,7 +70,7 @@ class FormResult extends Result
      */
     public function deactivateValidation(Validation $validation)
     {
-        $fieldName = $validation->getParentField()->getFieldName();
+        $fieldName = $validation->getParentField()->getName();
 
         if (false === isset($this->deactivatedFieldsValidation[$fieldName])) {
             $this->deactivatedFieldsValidation[$fieldName] = [];
@@ -85,7 +85,7 @@ class FormResult extends Result
      */
     public function validationIsDeactivated(Validation $validation)
     {
-        $fieldName = $validation->getParentField()->getFieldName();
+        $fieldName = $validation->getParentField()->getName();
 
         return array_key_exists($fieldName, $this->deactivatedFieldsValidation)
             && array_key_exists($validation->getValidationName(), $this->deactivatedFieldsValidation[$fieldName]);

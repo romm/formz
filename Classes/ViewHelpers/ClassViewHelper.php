@@ -146,7 +146,7 @@ class ClassViewHelper extends AbstractViewHelper
         ) {
             $this->fieldName = $this->fieldService
                 ->getCurrentField()
-                ->getFieldName();
+                ->getName();
         }
 
         if (null === $this->fieldName) {

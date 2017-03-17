@@ -58,7 +58,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      *
      * @var string
      */
-    private $fieldName;
+    private $name;
 
     /**
      * Constructor.
@@ -164,20 +164,20 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     /**
      * @return string
      */
-    public function getFieldName()
+    public function getName()
     {
-        if (null === $this->fieldName) {
-            $this->fieldName = $this->getArrayIndex();
+        if (null === $this->name) {
+            $this->name = $this->getArrayIndex();
         }
 
-        return $this->fieldName;
+        return $this->name;
     }
 
     /**
-     * @param string $fieldName
+     * @param string $name
      */
-    public function setFieldName($fieldName)
+    public function setName($name)
     {
-        $this->fieldName = $fieldName;
+        $this->name = $name;
     }
 }

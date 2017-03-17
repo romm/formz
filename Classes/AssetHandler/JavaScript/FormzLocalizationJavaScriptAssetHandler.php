@@ -91,7 +91,7 @@ JS;
         $result = [];
 
         if (true === $field->hasValidation($validationName)) {
-            $key = $field->getFieldName() . '-' . $validationName;
+            $key = $field->getName() . '-' . $validationName;
 
             $this->storeTranslationsForFieldValidation($field);
 
@@ -128,7 +128,7 @@ JS;
     protected function storeTranslationsForFieldValidation(Field $field)
     {
         if (false === $this->translationsForFieldValidationWereInjected($field)) {
-            $fieldName = $field->getFieldName();
+            $fieldName = $field->getName();
 
             foreach ($field->getValidation() as $validationName => $validation) {
                 $messages = ValidatorService::get()->getValidatorMessages($validation->getClassName(), $validation->getMessages());
@@ -143,7 +143,7 @@ JS;
 
                 $this->translationKeysForFieldValidation[$fieldName . '-' . $validationName] = $messages;
 
-                $key = $this->getFormObject()->getClassName() . '-' . $field->getFieldName();
+                $key = $this->getFormObject()->getClassName() . '-' . $field->getName();
                 $this->injectedTranslationKeysForFieldValidation[$key] = true;
             }
         }
@@ -172,7 +172,7 @@ JS;
      */
     protected function translationsForFieldValidationWereInjected(Field $field)
     {
-        $key = $this->getFormObject()->getClassName() . '-' . $field->getFieldName();
+        $key = $this->getFormObject()->getClassName() . '-' . $field->getName();
 
         return true === isset($this->injectedTranslationKeysForFieldValidation[$key]);
     }
@@ -185,7 +185,7 @@ JS;
      */
     protected function getIdentifierForFieldValidationName(Field $field, $validationName, $messageKey)
     {
-        return str_replace(['\\', '_'], '', $this->getFormObject()->getClassName()) . '-' . $field->getFieldName() . '-' . $validationName . '-' . $messageKey;
+        return str_replace(['\\', '_'], '', $this->getFormObject()->getClassName()) . '-' . $field->getName() . '-' . $validationName . '-' . $messageKey;
     }
 
     /**

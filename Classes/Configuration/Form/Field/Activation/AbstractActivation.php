@@ -67,15 +67,15 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
      */
     public function getConditions()
     {
-        $activationCondition = $this->withFirstParent(
+        $conditionList = $this->withFirstParent(
             Form::class,
             function (Form $formConfiguration) {
                 return $formConfiguration->getConditionList();
             }
         );
-        $activationCondition = ($activationCondition) ?: [];
+        $conditionList = ($conditionList) ?: [];
 
-        return ArrayUtility::arrayMergeRecursiveOverrule($activationCondition, $this->conditions);
+        return ArrayUtility::arrayMergeRecursiveOverrule($conditionList, $this->conditions);
     }
 
     /**
