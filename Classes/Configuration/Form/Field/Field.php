@@ -131,6 +131,15 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
+     * @param string    $name
+     * @param Behaviour $behaviour
+     */
+    public function addBehaviour($name, Behaviour $behaviour)
+    {
+        $this->behaviours[$name] = $behaviour;
+    }
+
+    /**
      * @return ActivationInterface
      */
     public function getActivation()
