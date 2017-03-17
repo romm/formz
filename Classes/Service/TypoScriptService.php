@@ -130,11 +130,9 @@ class TypoScriptService implements SingletonInterface
         $contextHash = $this->getContextHash();
 
         if (false === array_key_exists($contextHash, $this->configuration)) {
-            if ($this->environmentService->isEnvironmentInFrontendMode()) {
-                $typoScriptArray = $this->getFrontendTypoScriptConfiguration();
-            } else {
-                $typoScriptArray = $this->getBackendTypoScriptConfiguration();
-            }
+            $typoScriptArray = ($this->environmentService->isEnvironmentInFrontendMode())
+                ? $this->getFrontendTypoScriptConfiguration()
+                : $this->getBackendTypoScriptConfiguration();
 
             $this->configuration[$contextHash] = $this->typoScriptService->convertTypoScriptArrayToPlainArray($typoScriptArray);
         }
