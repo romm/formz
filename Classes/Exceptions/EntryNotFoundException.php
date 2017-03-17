@@ -14,6 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Configuration\Form\Field\Activation\AbstractActivation;
+use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Configuration\View\View;
@@ -28,6 +29,8 @@ class EntryNotFoundException extends FormzException
     const FIELD_NOT_FOUND = 'The field "%s" was not found in the form "%s" with class "%s".';
 
     const CONDITION_NOT_FOUND = 'No condition "%s" was found.';
+
+    const CONFIGURATION_FIELD_NOT_FOUND = 'The field "%s" was not found. Please use the function `%s::hasField()` before.';
 
     const VALIDATION_NOT_FOUND = 'The validation "%s" was not found. Please use the function `%s::hasValidation()` before.';
 
@@ -63,6 +66,23 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::CONDITION_NOT_FOUND,
             [$name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1489765133
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function configurationFieldNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONFIGURATION_FIELD_NOT_FOUND,
+            [$name, Form::class]
         );
 
         return $exception;

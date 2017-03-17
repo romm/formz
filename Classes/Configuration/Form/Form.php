@@ -26,6 +26,7 @@ use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Settings\FormSettings;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Validation\Error;
 
@@ -90,27 +91,26 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     }
 
     /**
-     * @param string $fieldName
+     * @param string $name
      * @return bool
      */
-    public function hasField($fieldName)
+    public function hasField($name)
     {
-        return true === isset($this->fields[$fieldName]);
+        return true === isset($this->fields[$name]);
     }
 
     /**
-     * @param string $fieldName
-     * @return Field|null
+     * @param string $name
+     * @return Field
+     * @throws EntryNotFoundException
      */
-    public function getField($fieldName)
+    public function getField($name)
     {
-        $result = null;
-
-        if ($this->hasField($fieldName)) {
-            $result = $this->fields[$fieldName];
+        if (false === $this->hasField($name)) {
+            throw EntryNotFoundException::configurationFieldNotFound($name);
         }
 
-        return $result;
+        return $this->fields[$name];
     }
 
     /**
@@ -118,7 +118,7 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
      */
     public function addField(Field $field)
     {
-        $this->fields[$field->getFieldName()] = $field;
+        $this->fields[$field->getName()] = $field;
     }
 
     /**
@@ -127,6 +127,15 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     public function getConditionList()
     {
         return $this->conditionList;
+    }
+
+    /**
+     * @param string                 $name
+     * @param ConditionItemInterface $condition
+     */
+    public function addCondition($name, ConditionItemInterface $condition)
+    {
+        $this->conditionList[$name] = $condition;
     }
 
     /**
