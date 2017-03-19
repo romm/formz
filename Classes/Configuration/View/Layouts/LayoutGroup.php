@@ -77,6 +77,8 @@ class LayoutGroup extends AbstractFormzConfiguration
      */
     public function setItem($name, Layout $layout)
     {
+        $layout->setParents([$this]);
+
         $this->items[$name] = $layout;
     }
 

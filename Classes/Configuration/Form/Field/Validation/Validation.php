@@ -104,6 +104,14 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
+     * @param string $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    }
+
+    /**
      * @return array
      */
     public function getOptions()
@@ -112,14 +120,11 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
-     * @param string $optionName
-     * @return null|mixed
+     * @param array $options
      */
-    public function getOption($optionName)
+    public function setOptions(array $options)
     {
-        return (null !== $optionName && true === isset($this->options[$optionName]))
-            ? $this->options[$optionName]
-            : null;
+        $this->options = $options;
     }
 
     /**
@@ -205,6 +210,9 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
      */
     public function getParentField()
     {
-        return $this->getFirstParent(Field::class);
+        /** @var Field $field */
+        $field = $this->getFirstParent(Field::class);
+
+        return $field;
     }
 }

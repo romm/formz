@@ -79,7 +79,10 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
      */
     public function getRootConfiguration()
     {
-        return $this->getFirstParent(Configuration::class);
+        /** @var Configuration $configuration */
+        $configuration = $this->getFirstParent(Configuration::class);
+
+        return $configuration;
     }
 
     /**
@@ -118,6 +121,8 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
      */
     public function addField(Field $field)
     {
+        $field->setParents([$this]);
+
         $this->fields[$field->getName()] = $field;
     }
 

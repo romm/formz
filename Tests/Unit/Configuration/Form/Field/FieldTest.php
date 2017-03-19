@@ -51,6 +51,9 @@ class FieldTest extends AbstractUnitTest
         $this->assertEquals(['foo' => $validation], $field->getValidation());
     }
 
+    /**
+     * @test
+     */
     public function validationNotFoundThrowsException()
     {
         $this->setExpectedException(EntryNotFoundException::class);
