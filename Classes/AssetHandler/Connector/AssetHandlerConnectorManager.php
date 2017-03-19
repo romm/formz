@@ -15,6 +15,7 @@ namespace Romm\Formz\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\FileCreationFailedException;
 use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -133,6 +134,7 @@ class AssetHandlerConnectorManager
      * @param string   $relativePath
      * @param callable $callback
      * @return bool
+     * @throws FileCreationFailedException
      */
     public function createFileInTemporaryDirectory($relativePath, callable $callback)
     {
@@ -143,6 +145,10 @@ class AssetHandlerConnectorManager
             $content = call_user_func($callback);
 
             $result = $this->writeTemporaryFile($absolutePath, $content);
+
+            if (null !== $result) {
+                throw FileCreationFailedException::fileCreationFailed($absolutePath, $result);
+            }
         }
 
         return $result;
@@ -169,9 +175,7 @@ class AssetHandlerConnectorManager
      */
     protected function writeTemporaryFile($absolutePath, $content)
     {
-        $result = GeneralUtility::writeFileToTypo3tempDir($absolutePath, $content);
-
-        return null === $result;
+        return GeneralUtility::writeFileToTypo3tempDir($absolutePath, $content);
     }
 
     /**

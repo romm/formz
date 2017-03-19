@@ -74,8 +74,7 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
             });
 
         $assetHandlerConnectorManager->expects($this->once())
-            ->method('writeTemporaryFile')
-            ->willReturn(true);
+            ->method('writeTemporaryFile');
 
         $cssAssetHandlerConnector = new CssAssetHandlerConnector($assetHandlerConnectorManager);
 

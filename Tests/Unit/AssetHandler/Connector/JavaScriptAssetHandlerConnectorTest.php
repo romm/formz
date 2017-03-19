@@ -100,12 +100,16 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
         $pageRendererMock->expects($this->once())
             ->method('addJsFooterFile');
 
-        $assetHandlerConnectorManager = new AssetHandlerConnectorManager($pageRendererMock, $assetHandlerFactory);
+        /** @var AssetHandlerConnectorManager|\PHPUnit_Framework_MockObject_MockObject $assetHandlerConnectorManagerMock */
+        $assetHandlerConnectorManagerMock = $this->getMockBuilder(AssetHandlerConnectorManager::class)
+            ->setMethods(['writeTemporaryFile'])
+            ->setConstructorArgs([$pageRendererMock, $assetHandlerFactory])
+            ->getMock();
 
         /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
         $javaScriptAssetHandlerConnector = $this->getMockBuilder(JavaScriptAssetHandlerConnector::class)
             ->setMethods(['getFormzConfigurationJavaScriptAssetHandler'])
-            ->setConstructorArgs([$assetHandlerConnectorManager])
+            ->setConstructorArgs([$assetHandlerConnectorManagerMock])
             ->getMock();
 
         $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
@@ -161,10 +165,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
         $assetHandlerConnectorManagerMock
             ->method('fileExists')
             ->willReturn(false);
-
-        $assetHandlerConnectorManagerMock
-            ->method('writeTemporaryFile')
-            ->willReturn(true);
 
         /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
         $javaScriptAssetHandlerConnector = $this->getMockBuilder(JavaScriptAssetHandlerConnector::class)
@@ -344,10 +344,6 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
         $assetHandlerConnectorManagerMock
             ->method('fileExists')
             ->willReturn(false);
-
-        $assetHandlerConnectorManagerMock
-            ->method('writeTemporaryFile')
-            ->willReturn(true);
 
         /** @var JavaScriptAssetHandlerConnector|\PHPUnit_Framework_MockObject_MockObject $javaScriptAssetHandlerConnector */
         $javaScriptAssetHandlerConnector = $this->getMockBuilder(JavaScriptAssetHandlerConnector::class)
