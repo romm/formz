@@ -1,5 +1,5 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Configuration;
+namespace Romm\Formz\Tests\Unit\Configuration\Field;
 
 use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
 use Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour;

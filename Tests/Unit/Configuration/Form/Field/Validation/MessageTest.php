@@ -1,5 +1,5 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Configuration\Validation;
+namespace Romm\Formz\Tests\Unit\Configuration\Field\Validation;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Message;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
