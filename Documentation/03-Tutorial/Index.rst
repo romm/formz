@@ -22,7 +22,7 @@ As a reminder, you can download an example of a working form in the chapter “:
 Data model
 ----------
 
-A form is no more than a data model. You should begin by creating the model containing all the logic, namely all the properties it is composed of, as well as the “*getters*” and “*setters*”.
+A form is no more than a data model. You should begin by creating the model containing all the logic, name all the properties it is composed of, as well as the “*getters*” and “*setters*”.
 
 You can find an example of a form model here: “:ref:`developerManual-php-model`”.
 
