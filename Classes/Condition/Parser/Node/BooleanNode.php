@@ -116,7 +116,7 @@ class BooleanNode extends AbstractNode
      * @param callable $logicalAndFunction
      * @param callable $logicalOrFunction
      * @return null
-     * @throws \Exception
+     * @throws InvalidConfigurationException
      */
     protected function getLogicalResult(callable $logicalAndFunction, callable $logicalOrFunction)
     {

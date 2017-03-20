@@ -25,7 +25,7 @@ class MessageServiceTest extends AbstractUnitTest
     public function sanitizeValidatorResult()
     {
         $validator = new Validation;
-        $validator->setValidationName('foo');
+        $validator->setName('foo');
 
         $result = new Result;
 

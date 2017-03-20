@@ -14,7 +14,7 @@
 namespace Romm\Formz\Service;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
@@ -22,7 +22,7 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class ContextService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use ExtendedSelfInstantiateTrait;
 
     /**
      * @var EnvironmentService

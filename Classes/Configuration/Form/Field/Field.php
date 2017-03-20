@@ -16,9 +16,9 @@ namespace Romm\Formz\Configuration\Form\Field;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour;
 use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
@@ -42,7 +42,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
 
     /**
      * @var ActivationInterface
-     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Field\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;
@@ -58,14 +58,14 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      *
      * @var string
      */
-    private $fieldName;
+    private $name;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->settings = new FieldSettings();
+        $this->settings = new FieldSettings;
         $this->settings->setParents([$this]);
 
         $this->activation = EmptyActivation::get();
@@ -76,7 +76,10 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      */
     public function getForm()
     {
-        return $this->getFirstParent(Form::class);
+        /** @var Form $form */
+        $form = $this->getFirstParent(Form::class);
+
+        return $form;
     }
 
     /**
@@ -101,7 +104,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      */
     public function addValidation(Validation $validation)
     {
-        $this->validation[$validation->getValidationName()] = $validation;
+        $this->validation[$validation->getName()] = $validation;
         $validation->setParents([$this]);
     }
 
@@ -125,6 +128,15 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     public function getBehaviours()
     {
         return $this->behaviours;
+    }
+
+    /**
+     * @param string    $name
+     * @param Behaviour $behaviour
+     */
+    public function addBehaviour($name, Behaviour $behaviour)
+    {
+        $this->behaviours[$name] = $behaviour;
     }
 
     /**
@@ -164,20 +176,20 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     /**
      * @return string
      */
-    public function getFieldName()
+    public function getName()
     {
-        if (null === $this->fieldName) {
-            $this->fieldName = $this->getArrayIndex();
+        if (null === $this->name) {
+            $this->name = $this->getArrayIndex();
         }
 
-        return $this->fieldName;
+        return $this->name;
     }
 
     /**
-     * @param string $fieldName
+     * @param string $name
      */
-    public function setFieldName($fieldName)
+    public function setName($name)
     {
-        $this->fieldName = $fieldName;
+        $this->name = $name;
     }
 }

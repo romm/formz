@@ -20,7 +20,7 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Fz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('validation-name','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-validation-name-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"expression":null,"conditions":[]},"useAjax":false,"validationName":"validation-name"},"acceptsEmptyValues":false});}});})();
+(function(){Fz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('validation-name','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-validation-name-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"expression":null,"conditions":[]},"useAjax":false,"name":"validation-name"},"acceptsEmptyValues":false});}});})();
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
@@ -45,7 +45,7 @@ TXT;
         $field = $assetHandlerFactory->getFormObject()->getConfiguration()->getField('foo');
         $validation = new Validation;
         $validation->setClassName(RequiredValidator::class);
-        $validation->setValidationName('validation-name');
+        $validation->setName('validation-name');
         $field->addValidation($validation);
 
         $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $assetHandler->getJavaScriptValidationFiles());

@@ -149,7 +149,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
             && $this->fieldService->fieldContextExists()
         ) {
             $field = $this->fieldService->getCurrentField();
-            $fieldName = $field->getFieldName();
+            $fieldName = $field->getName();
         }
 
         if (null === $fieldName) {

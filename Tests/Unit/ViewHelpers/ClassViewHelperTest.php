@@ -47,7 +47,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
 
         $classesObject = $formService->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration()
+            ->getRootConfiguration()
             ->getView()
             ->getClasses();
 
@@ -226,7 +226,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     protected function getFieldServiceWithField()
     {
         $field = new Field;
-        $field->setFieldName('foo');
+        $field->setName('foo');
 
         $service = $this->getDefaultFieldService();
         $service->setCurrentField($field);

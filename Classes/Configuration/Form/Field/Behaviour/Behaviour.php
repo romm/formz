@@ -32,4 +32,12 @@ class Behaviour extends AbstractFormzConfiguration
     {
         return $this->className;
     }
+
+    /**
+     * @param string $className
+     */
+    public function setClassName($className)
+    {
+        $this->className = $className;
+    }
 }

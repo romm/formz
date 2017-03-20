@@ -52,6 +52,14 @@ class Settings extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string $defaultBackendCache
+     */
+    public function setDefaultBackendCache($defaultBackendCache)
+    {
+        $this->defaultBackendCache = $defaultBackendCache;
+    }
+
+    /**
      * @return FormSettings
      */
     public function getDefaultFormSettings()

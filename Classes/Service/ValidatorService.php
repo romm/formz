@@ -13,14 +13,14 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use Romm\Formz\Validation\Validator\AbstractValidator as FormzAbstractValidator;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class ValidatorService implements SingletonInterface
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 
     /**
      * Contains all the data (options, messages) of every validator which was

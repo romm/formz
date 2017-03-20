@@ -13,12 +13,12 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class ArrayService implements SingletonInterface
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 
     /**
      * Converts an array to a clean JSON string which can be used by JavaScript.

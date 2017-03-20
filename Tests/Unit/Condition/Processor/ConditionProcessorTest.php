@@ -9,13 +9,13 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
-use Romm\Formz\Configuration\Form\Condition\Activation\Activation;
-use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\Activation;
+use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Form\FormObject;
-use Romm\Formz\Service\FacadeService;
+use Romm\Formz\Service\InstanceService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Result;
 
@@ -32,9 +32,9 @@ class ConditionProcessorTest extends AbstractUnitTest
         $conditionProcessor = new ConditionProcessor($this->getDefaultFormObject());
 
         $field1 = new Field;
-        $field1->setFieldName('foo');
+        $field1->setName('foo');
         $field2 = new Field;
-        $field2->setFieldName('bar');
+        $field2->setName('bar');
         $field2->setActivation(new Activation);
 
         $conditionParserFactoryProphecy = $this->getConditionParserProphecy(
@@ -45,7 +45,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             $conditionProcessor
         );
 
-        FacadeService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
+        InstanceService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
 
         $tree1 = $conditionProcessor->getActivationConditionTreeForField($field1);
         $tree2 = $conditionProcessor->getActivationConditionTreeForField($field1);
@@ -67,13 +67,13 @@ class ConditionProcessorTest extends AbstractUnitTest
         $conditionProcessor = new ConditionProcessor($this->getDefaultFormObject());
 
         $field = new Field;
-        $field->setFieldName('foo');
+        $field->setName('foo');
 
         $validation1 = new Validation;
-        $validation1->setValidationName('foo');
+        $validation1->setName('foo');
         $validation1->setParents([$field]);
         $validation2 = new Validation;
-        $validation2->setValidationName('bar');
+        $validation2->setName('bar');
         $validation2->setParents([$field]);
         $this->inject($validation2, 'activation', new EmptyActivation);
 
@@ -85,7 +85,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             $conditionProcessor
         );
 
-        FacadeService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
+        InstanceService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
 
         $tree1 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);
         $tree2 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);
@@ -131,17 +131,17 @@ class ConditionProcessorTest extends AbstractUnitTest
                     ->method('getFields')
                     ->willReturnCallback(function () use ($conditionProcessor) {
                         $validation1 = new Validation;
-                        $validation1->setValidationName('foo');
+                        $validation1->setName('foo');
                         $validation2 = new Validation;
-                        $validation2->setValidationName('bar');
+                        $validation2->setName('bar');
 
                         $field1 = new Field;
-                        $field1->setFieldName('foo');
+                        $field1->setName('foo');
                         $field1->addValidation($validation1);
                         $field1->addValidation($validation2);
 
                         $field2 = new Field;
-                        $field2->setFieldName('bar');
+                        $field2->setName('bar');
                         $field2->addValidation($validation1);
                         $field2->addValidation($validation2);
 
@@ -176,7 +176,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             ->willReturn($tree);
 
         $field = new Field;
-        $field->setFieldName('bar');
+        $field->setName('bar');
         $this->inject($field, 'activation', new EmptyActivation);
 
         $conditionProcessor->getActivationConditionTreeForField($field);

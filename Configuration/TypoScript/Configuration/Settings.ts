@@ -33,15 +33,15 @@ config.tx_formz {
             # The marker `#FIELD#` is replaced with the name of the field.
             fieldContainerSelector = [fz-field-container="#FIELD#"]
 
-            # This is the CSS selector which is used to select the feedback container of a field.
+            # This is the CSS selector which is used to select the message container of a field.
             # This container is shown whenever an error is returned by the field validation.
             # The marker `#FIELD#` is replaced with the name of the field.
-            feedbackContainerSelector = [fz-field-feedback-container="#FIELD#"]
+            messageContainerSelector = [fz-field-message-container="#FIELD#"]
 
-            # This is the CSS selector which is used to select the feedback list container of a field.
+            # This is the CSS selector which is used to select the message list container of a field.
             # This container will be directly filled with the error messages, so it should not contain any static content as it would be erased eventually.
             # The marker `#FIELD#` is replaced with the name of the field.
-            feedbackListSelector = [fz-field-feedback-list="#FIELD#"]
+            messageListSelector = [fz-field-message-list="#FIELD#"]
 
             # This is the HTML template of an error message, which will be used for every message of the field.
             # The following markers can be used:

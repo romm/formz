@@ -195,7 +195,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
         return new $type(
             $this->getMessage($key, $arguments),
             $code,
-            $this->dataObject->getValidation()->getValidationName(),
+            $this->dataObject->getValidation()->getName(),
             $key,
             [],
             $title

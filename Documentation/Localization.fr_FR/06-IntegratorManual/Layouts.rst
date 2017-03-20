@@ -71,7 +71,7 @@ Création du fichier de template
 
 Le fichier de template déclaré dans la propriété ``templateFile`` de la configuration TypoScript doit être créé, s'il n'existe pas encore. Dans la mesure du possible, il faudra mutualiser ce template avec un maximum de layouts.
 
-Il est conseillé de découper votre template en plusieurs sections, contenant les blocs importants qui seront utilisés par votre layout. Par défaut, trois sections sont utilisées : ``Label``, ``Field`` et ``Feedback``.
+Il est conseillé de découper votre template en plusieurs sections, contenant les blocs importants qui seront utilisés par votre layout. Par défaut, trois sections sont utilisées : ``Label``, ``Field`` et ``Messages``.
 
 Les variables suivantes sont utilisables directement dans votre template :
 
@@ -107,9 +107,9 @@ Les variables suivantes sont utilisables directement dans votre template :
         </div>
     </f:section>
 
-    <f:section name="Feedback">
-        <div fz-field-feedback-container="{fieldName}">
-            <div fz-field-feedback-list="{fieldName}">
+    <f:section name="Messages">
+        <div fz-field-message-container="{fieldName}">
+            <div fz-field-message-list="{fieldName}">
                 <f:for each="{validationResults.errors}" iteration="iteration" as="error">
                     <fz:formatMessage message="{error}" />
                 </f:for>
@@ -139,7 +139,7 @@ Servez-vous du layout pour effectuer le découpage souhaité, qui pourra ensuite
             <f:render section="Field" arguments="{_all}" />
         </div>
         <div class="col-md-4">
-            <f:render section="Feedback" arguments="{_all}" />
+            <f:render section="Messages" arguments="{_all}" />
         </div>
     </div>
 

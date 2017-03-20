@@ -17,7 +17,7 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject;
@@ -61,7 +61,7 @@ class ConditionProcessor
      */
     public function getActivationConditionTreeForField(Field $field)
     {
-        $key = $field->getFieldName();
+        $key = $field->getName();
 
         if (false === array_key_exists($key, $this->fieldsTrees)) {
             $this->fieldsTrees[$key] = $this->getConditionTree($field->getActivation());
@@ -81,7 +81,7 @@ class ConditionProcessor
      */
     public function getActivationConditionTreeForValidation(Validation $validation)
     {
-        $key = $validation->getParentField()->getFieldName() . '->' . $validation->getValidationName();
+        $key = $validation->getParentField()->getName() . '->' . $validation->getName();
 
         if (false === array_key_exists($key, $this->validationsTrees)) {
             $this->validationsTrees[$key] = $this->getConditionTree($validation->getActivation());

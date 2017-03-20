@@ -22,9 +22,14 @@
 	<fz:slot.render slot="Field" />
 </f:section>
 
-<f:section name="Feedback">
-	<div fz-field-feedback-container="{fieldName}">
-		<div fz-field-feedback-list="{fieldName}">
+<f:section name="Messages">
+	<fz:slot.render slot="Messages.Out.Before" />
+
+	<div fz-field-message-container="{fieldName}">
+
+		<fz:slot.render slot="Messages.In.Before" />
+
+		<div fz-field-message-list="{fieldName}">
 			<f:form.validationResults for="{formName}.{fieldName}">
 				<f:if condition="{validationResults.errors}">
 					<div class="error">
@@ -50,10 +55,10 @@
 			</f:form.validationResults>
 		</div>
 
-		<fz:slot.render slot="Feedback.In.After" />
+		<fz:slot.render slot="Messages.In.After" />
 	</div>
 
-	<fz:slot.render slot="Feedback.Out.After" />
+	<fz:slot.render slot="Messages.Out.After" />
 </f:section>
 
 </html>

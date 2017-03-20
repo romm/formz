@@ -14,12 +14,12 @@
 namespace Romm\Formz\Condition\Parser\Node;
 
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class NullNode extends AbstractNode implements SingletonInterface
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 
     /**
      * @inheritdoc

@@ -201,7 +201,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      */
     private function callAfterFieldValidationMethod(Field $field)
     {
-        $functionName = lcfirst($field->getFieldName() . 'Validated');
+        $functionName = lcfirst($field->getName() . 'Validated');
 
         if (method_exists($this, $functionName)) {
             call_user_func([$this, $functionName]);

@@ -38,10 +38,10 @@ Vous pouvez retrouvez tous les détails des propriétés au chapitre « :ref:`us
                 fieldContainerSelector = .fz-field-#FIELD#
 
                 # Sélecteur du conteneur HTML des messages.
-                feedbackContainerSelector = .fz-messages-#FIELD#
+                messageContainerSelector = .fz-messages-#FIELD#
 
                 # Sélecteur du conteneur HTML de la liste des messages.
-                feedbackListSelector = .fz-messages-list-#FIELD#
+                messageListSelector = .fz-messages-list-#FIELD#
 
                 # Modèle HTML utilisé pour les messages renvoyé par la
                 # validation d'un champ.

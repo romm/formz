@@ -17,9 +17,9 @@ use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationUsageInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Field;
 
 class Validation extends AbstractFormzConfiguration implements ActivationUsageInterface
@@ -69,7 +69,7 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
      *
      * @var string
      */
-    private $validationName;
+    private $name;
 
     /**
      * Constructor.
@@ -104,6 +104,14 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
+     * @param string $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    }
+
+    /**
      * @return array
      */
     public function getOptions()
@@ -112,14 +120,11 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     }
 
     /**
-     * @param string $optionName
-     * @return null|mixed
+     * @param array $options
      */
-    public function getOption($optionName)
+    public function setOptions(array $options)
     {
-        return (null !== $optionName && true === isset($this->options[$optionName]))
-            ? $this->options[$optionName]
-            : null;
+        $this->options = $options;
     }
 
     /**
@@ -167,21 +172,21 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     /**
      * @return string
      */
-    public function getValidationName()
+    public function getName()
     {
-        if (null === $this->validationName) {
-            $this->validationName = $this->getArrayIndex();
+        if (null === $this->name) {
+            $this->name = $this->getArrayIndex();
         }
 
-        return $this->validationName;
+        return $this->name;
     }
 
     /**
-     * @param string $validationName
+     * @param string $name
      */
-    public function setValidationName($validationName)
+    public function setName($name)
     {
-        $this->validationName = $validationName;
+        $this->name = $name;
     }
 
     /**
@@ -205,6 +210,9 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
      */
     public function getParentField()
     {
-        return $this->getFirstParent(Field::class);
+        /** @var Field $field */
+        $field = $this->getFirstParent(Field::class);
+
+        return $field;
     }
 }

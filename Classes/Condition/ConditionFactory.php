@@ -21,7 +21,7 @@ use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -39,7 +39,7 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class ConditionFactory implements SingletonInterface
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 
     /**
      * @var array

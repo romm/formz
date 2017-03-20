@@ -22,6 +22,8 @@ class FieldSettings extends AbstractFormzConfiguration
 {
     use ParentsTrait;
 
+    const FIELD_MARKER = '#FIELD#';
+
     /**
      * CSS selector to get the container of the field.
      *
@@ -34,17 +36,17 @@ class FieldSettings extends AbstractFormzConfiguration
      *
      * @var string
      */
-    protected $feedbackContainerSelector;
+    protected $messageContainerSelector;
 
     /**
-     * CSS selector to get the block element which will contain all the error
-     * messages. It must be a child element of `$errorContainerSelector`. If
-     * the value is empty, then `$errorContainerSelector` is considered to be
+     * CSS selector to get the block element which will contain all the
+     * messages. It must be a child element of `$messageContainerSelector`. If
+     * the value is empty, then `$messageContainerSelector` is considered to be
      * both the container and the block element.
      *
      * @var string
      */
-    protected $feedbackListSelector;
+    protected $messageListSelector;
 
     /**
      * @var string
@@ -52,12 +54,11 @@ class FieldSettings extends AbstractFormzConfiguration
     protected $messageTemplate;
 
     /**
-     * @param string $fieldName
      * @return string
      */
-    public function getFieldContainerSelector($fieldName = null)
+    public function getFieldContainerSelector()
     {
-        return $this->formatSelector($this->getSettingsProperty('fieldContainerSelector'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('fieldContainerSelector'));
     }
 
     /**
@@ -69,38 +70,43 @@ class FieldSettings extends AbstractFormzConfiguration
     }
 
     /**
-     * @param null $fieldName
      * @return string
      */
-    public function getFeedbackContainerSelector($fieldName = null)
+    public function getMessageContainerSelector()
     {
-        return $this->formatSelector($this->getSettingsProperty('feedbackContainerSelector'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('messageContainerSelector'));
     }
 
     /**
      * @param string $selector
      */
-    public function setFeedbackContainerSelector($selector)
+    public function setMessageContainerSelector($selector)
     {
-        $this->feedbackContainerSelector = $selector;
+        $this->messageContainerSelector = $selector;
     }
 
     /**
-     * @param string $fieldName
      * @return string
      */
-    public function getFeedbackListSelector($fieldName = null)
+    public function getMessageListSelector()
     {
-        return $this->formatSelector($this->getSettingsProperty('feedbackListSelector'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('messageListSelector'));
     }
 
     /**
-     * @param string $fieldName
+     * @param string $messageListSelector
+     */
+    public function setMessageListSelector($messageListSelector)
+    {
+        $this->messageListSelector = $messageListSelector;
+    }
+
+    /**
      * @return string
      */
-    public function getMessageTemplate($fieldName = null)
+    public function getMessageTemplate()
     {
-        return $this->formatSelector($this->getSettingsProperty('messageTemplate'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('messageTemplate'));
     }
 
     /**
@@ -113,16 +119,17 @@ class FieldSettings extends AbstractFormzConfiguration
 
     /**
      * @param string $selector
-     * @param string $fieldName
      * @return string
      */
-    protected function formatSelector($selector, $fieldName = null)
+    protected function formatSelector($selector)
     {
-        if (null === $fieldName) {
-            $fieldName = $this->getFieldName();
+        $fieldName = $this->getFieldName();
+
+        if ($fieldName) {
+            $selector = str_replace(self::FIELD_MARKER, $fieldName, $selector);
         }
 
-        return str_replace('#FIELD#', $fieldName, $selector);
+        return $selector;
     }
 
     /**
@@ -142,12 +149,11 @@ class FieldSettings extends AbstractFormzConfiguration
     {
         $result = $this->$propertyName;
 
-        if (null === $result) {
-            $fieldName = $this->getFieldName();
-
+        if (empty($result)) {
             $result = $this->withFirstParent(
                 Configuration::class,
-                function (Configuration $configuration) use ($propertyName, $fieldName) {
+                function (Configuration $configuration) use ($propertyName) {
+                    $fieldName = $this->getFieldName();
                     $getter = 'get' . ucfirst($propertyName);
 
                     return $configuration->getSettings()->getDefaultFieldSettings()->$getter($fieldName);
@@ -166,7 +172,7 @@ class FieldSettings extends AbstractFormzConfiguration
         return $this->withFirstParent(
             Field::class,
             function (Field $field) {
-                return $field->getFieldName();
+                return $field->getName();
             }
         );
     }

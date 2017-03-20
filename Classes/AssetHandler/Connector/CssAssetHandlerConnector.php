@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\AssetHandler\Connector;
 
-use Romm\Formz\AssetHandler\Css\FeedbackContainerDisplayCssAssetHandler;
 use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
+use Romm\Formz\AssetHandler\Css\MessageContainerDisplayCssAssetHandler;
 use Romm\Formz\Service\StringService;
 
 class CssAssetHandlerConnector
@@ -77,10 +77,10 @@ class CssAssetHandlerConnector
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
             function () {
-                /** @var FeedbackContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
+                /** @var MessageContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
                 $errorContainerDisplayCssAssetHandler = $this->assetHandlerConnectorManager
                     ->getAssetHandlerFactory()
-                    ->getAssetHandler(FeedbackContainerDisplayCssAssetHandler::class);
+                    ->getAssetHandler(MessageContainerDisplayCssAssetHandler::class);
 
                 /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
                 $fieldsActivationCssAssetHandler = $this->assetHandlerConnectorManager

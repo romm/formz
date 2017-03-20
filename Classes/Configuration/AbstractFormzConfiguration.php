@@ -14,8 +14,18 @@
 namespace Romm\Formz\Configuration;
 
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class AbstractFormzConfiguration
 {
     use MagicMethodsTrait;
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    protected function getAbsolutePath($path)
+    {
+        return GeneralUtility::getFileAbsFileName($path);
+    }
 }

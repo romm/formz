@@ -158,7 +158,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $formObject = $this->getDefaultFormObject();
         $validation = new Validation;
         $validation->setClassName(ExceptionDummyValidator::class);
-        $validation->setValidationName('bar');
+        $validation->setName('bar');
         $validation->activateAjaxUsage();
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
 
@@ -236,7 +236,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
 
         $formObject = $this->getDefaultFormObject();
         $validation = new Validation;
-        $validation->setValidationName('bar');
+        $validation->setName('bar');
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
 
         $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
@@ -258,7 +258,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $formObject = $this->getDefaultFormObject();
         $validation = new Validation;
         $validation->setClassName(DummyValidator::class);
-        $validation->setValidationName('bar');
+        $validation->setName('bar');
         $validation->activateAjaxUsage();
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
 
@@ -291,7 +291,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
 
         $messagesValidator = new Validation;
         $messagesValidator->setClassName(MessagesValidator::class);
-        $messagesValidator->setValidationName('bar');
+        $messagesValidator->setName('bar');
         $messagesValidator->activateAjaxUsage();
         $formObject->getConfiguration()->getField('foo')->addValidation($messagesValidator);
 

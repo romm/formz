@@ -76,7 +76,7 @@ JS;
     protected function processField($field)
     {
         $javaScriptCode = [];
-        $fieldName = $field->getFieldName();
+        $fieldName = $field->getName();
 
         foreach ($field->getValidation() as $validationName => $validationConfiguration) {
             $validatorClassName = $validationConfiguration->getClassName();

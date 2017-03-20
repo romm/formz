@@ -71,7 +71,7 @@ Template file creation
 
 The template file declared in the property ``templateFile`` of the TypoScript configuration must be created, if it doesn't exist yet. You should try to use this template with as much layouts as you can.
 
-It's advised to divide your template in several sections, which contain the important blocks that are used by your layout. By default, three sections are used: ``Label``, ``Field`` and ``Feedback``.
+It's advised to divide your template in several sections, which contain the important blocks that are used by your layout. By default, three sections are used: ``Label``, ``Field`` and ``Message``.
 
 The following variables can be used in your template:
 
@@ -107,9 +107,9 @@ The following variables can be used in your template:
         </div>
     </f:section>
 
-    <f:section name="Feedback">
-        <div fz-field-feedback-container="{fieldName}">
-            <div fz-field-feedback-list="{fieldName}">
+    <f:section name="Messages">
+        <div fz-field-message-container="{fieldName}">
+            <div fz-field-message-list="{fieldName}">
                 <f:for each="{validationResults.errors}" iteration="iteration" as="error">
                     <fz:formatMessage message="{error}" />
                 </f:for>
@@ -139,7 +139,7 @@ Use the layout to get the wanted dividing, which may then be used by the form fi
             <f:render section="Field" arguments="{_all}" />
         </div>
         <div class="col-md-4">
-            <f:render section="Feedback" arguments="{_all}" />
+            <f:render section="Messages" arguments="{_all}" />
         </div>
     </div>
 

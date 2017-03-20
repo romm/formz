@@ -16,7 +16,6 @@ namespace Romm\Formz\Configuration\View\Layouts;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class Layout extends AbstractFormzConfiguration
 {
@@ -39,7 +38,9 @@ class Layout extends AbstractFormzConfiguration
      */
     public function getTemplateFile()
     {
-        if (null === $this->templateFile) {
+        if (null === $this->templateFile
+            && $this->hasParent(LayoutGroup::class)
+        ) {
             $this->templateFile = $this->withFirstParent(
                 LayoutGroup::class,
                 function (LayoutGroup $parent) {
@@ -48,7 +49,15 @@ class Layout extends AbstractFormzConfiguration
             );
         }
 
-        return GeneralUtility::getFileAbsFileName($this->templateFile);
+        return $this->getAbsolutePath($this->templateFile);
+    }
+
+    /**
+     * @param string $templateFile
+     */
+    public function setTemplateFile($templateFile)
+    {
+        $this->templateFile = $templateFile;
     }
 
     /**
@@ -57,5 +66,13 @@ class Layout extends AbstractFormzConfiguration
     public function getLayout()
     {
         return $this->layout;
+    }
+
+    /**
+     * @param string $layout
+     */
+    public function setLayout($layout)
+    {
+        $this->layout = $layout;
     }
 }

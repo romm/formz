@@ -11,22 +11,11 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Configuration\Form\Condition\Activation;
+namespace Romm\Formz\Configuration\Form\Field\Activation;
 
-interface ActivationUsageInterface
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
+
+class EmptyActivation extends AbstractActivation
 {
-    /**
-     * @return ActivationInterface
-     */
-    public function getActivation();
-
-    /**
-     * @return bool
-     */
-    public function hasActivation();
-
-    /**
-     * @param ActivationInterface $activation
-     */
-    public function setActivation(ActivationInterface $activation);
+    use SelfInstantiateTrait;
 }

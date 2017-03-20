@@ -16,7 +16,7 @@ namespace Romm\Formz\Service;
 use Romm\Formz\Configuration\Form\Field\Validation\Message as FormzMessage;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Error\FormzMessageInterface;
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Error\Message;
@@ -25,7 +25,7 @@ use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class MessageService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use ExtendedSelfInstantiateTrait;
 
     /**
      * @var Dispatcher
@@ -93,7 +93,7 @@ class MessageService implements SingletonInterface
                     $message = new $objectType(
                         $message->getMessage(),
                         $message->getCode(),
-                        $validation->getValidationName(),
+                        $validation->getName(),
                         'unknown-' . ++$unknownCounter,
                         $message->getArguments(),
                         $message->getTitle()
