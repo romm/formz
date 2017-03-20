@@ -17,7 +17,7 @@ class LayoutGroupTest extends AbstractUnitTest
 
         $layout = new Layout;
         $this->assertFalse($layoutGroup->hasItem('foo'));
-        $layoutGroup->setItem('foo', $layout);
+        $layoutGroup->addItem('foo', $layout);
         $this->assertTrue($layoutGroup->hasItem('foo'));
         $this->assertEquals($layout, $layoutGroup->getItem('foo'));
         $this->assertEquals(['foo' => $layout], $layoutGroup->getItems());

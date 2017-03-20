@@ -176,12 +176,12 @@ trait FormzUnitTestUtility
         $formzConfiguration->getSettings()->getDefaultFieldSettings()->setFieldContainerSelector('[fz-field-container="#FIELD#"]');
 
         $errors = new ViewClass;
-        $errors->setItem('foo', 'foo');
+        $errors->addItem('foo', 'foo');
         /** @noinspection PhpUndefinedMethodInspection */
         $formzConfiguration->getView()->getClasses()->setErrors($errors);
 
         $valid = new ViewClass;
-        $valid->setItem('bar', 'bar');
+        $valid->addItem('bar', 'bar');
         /** @noinspection PhpUndefinedMethodInspection */
         $formzConfiguration->getView()->getClasses()->setValid($valid);
 

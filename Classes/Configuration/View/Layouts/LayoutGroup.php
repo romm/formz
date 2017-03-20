@@ -75,7 +75,7 @@ class LayoutGroup extends AbstractFormzConfiguration
      * @param string $name
      * @param Layout $layout
      */
-    public function setItem($name, Layout $layout)
+    public function addItem($name, Layout $layout)
     {
         $layout->setParents([$this]);
 

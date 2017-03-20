@@ -43,7 +43,7 @@ class ViewClassesTest extends AbstractUnitTest
         $viewClass = new ViewClass;
 
         $this->assertFalse($viewClass->hasItem('foo'));
-        $viewClass->setItem('foo', 'bar');
+        $viewClass->addItem('foo', 'bar');
         $this->assertTrue($viewClass->hasItem('foo'));
         $this->assertEquals('bar', $viewClass->getItem('foo'));
         $this->assertEquals(['foo' => 'bar'], $viewClass->getItems());
