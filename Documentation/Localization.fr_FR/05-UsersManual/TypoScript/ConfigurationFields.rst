@@ -34,9 +34,9 @@ Propriété                                                                     
 
 :ref:`settings.fieldContainerSelector <fieldsSettings-fieldContainerSelector>`          Sélecteur du conteneur du champ
 
-:ref:`settings.feedbackContainerSelector <fieldsSettings-feedbackContainerSelector>`    Sélecteur du conteneur des messages
+:ref:`settings.messageContainerSelector <fieldsSettings-messageContainerSelector>`      Sélecteur du conteneur des messages
 
-:ref:`settings.feedbackListSelector <fieldsSettings-feedbackListSelector>`              Sélecteur de la liste des messages
+:ref:`settings.messageListSelector <fieldsSettings-messageListSelector>`                Sélecteur de la liste des messages
 
 :ref:`settings.messageTemplate <fieldsSettings-messageTemplate>`                        Modèle de message
 ======================================================================================= =====================================
@@ -210,7 +210,7 @@ Sélecteur du conteneur du champ
 
             Vous pouvez regrouper différents champs en leur donnant le même sélecteur de conteneur, c'est ce qui est fait dans l'exemple ci-dessus.
 
-.. _fieldsSettings-feedbackContainerSelector:
+.. _fieldsSettings-messageContainerSelector:
 
 Sélecteur du conteneur des messages
 -----------------------------------
@@ -218,7 +218,7 @@ Sélecteur du conteneur des messages
 .. container:: table-row
 
     Propriété
-        ``settings.feedbackContainerSelector``
+        ``settings.messageContainerSelector``
     Requis ?
         Non
     Description
@@ -226,7 +226,7 @@ Sélecteur du conteneur des messages
 
         Notez que le marqueur ``#FIELD#`` sera dynamiquement remplacé par le nom du champ.
 
-        La valeur par défaut de ce paramètre est : ``[fz-field-feedback-container="#FIELD#"]``.
+        La valeur par défaut de ce paramètre est : ``[fz-field-message-container="#FIELD#"]``.
 
         **Exemple :**
 
@@ -236,13 +236,13 @@ Sélecteur du conteneur des messages
                 fields {
                     email {
                         settings {
-                            feedbackContainerSelector = #errors-email
+                            messageContainerSelector = #errors-email
                         }
                     }
                 }
             }
 
-.. _fieldsSettings-feedbackListSelector:
+.. _fieldsSettings-messageListSelector:
 
 Sélecteur de la liste des messages
 ----------------------------------
@@ -250,15 +250,15 @@ Sélecteur de la liste des messages
 .. container:: table-row
 
     Propriété
-        ``settings.feedbackListSelector``
+        ``settings.messageListSelector``
     Requis ?
         Non
     Description
-        Représente le sélecteur CSS qui sera utilisé pour récupérer le bloc contenant les messages du champ. Il s'agit d'une seconde couche de sélection pour le conteneur des messages (``settings.feedbackContainerSelector``) : cela permet d'y rajouter des contenus HTML statiques qui ne seront pas nettoyés par JavaScript lors du rafraîchissement des messages.
+        Représente le sélecteur CSS qui sera utilisé pour récupérer le bloc contenant les messages du champ. Il s'agit d'une seconde couche de sélection pour le conteneur des messages (``settings.messageContainerSelector``) : cela permet d'y rajouter des contenus HTML statiques qui ne seront pas nettoyés par JavaScript lors du rafraîchissement des messages.
 
         Notez que le marqueur ``#FIELD#`` sera dynamiquement remplacé par le nom du champ.
 
-        La valeur par défaut de ce paramètre est : ``[fz-field-feedback-list="#FIELD#"]``.
+        La valeur par défaut de ce paramètre est : ``[fz-field-message-list="#FIELD#"]``.
 
         Si une valeur vide est indiquée, alors le conteneur des erreurs sera utilisé.
 
@@ -270,7 +270,7 @@ Sélecteur de la liste des messages
                 fields {
                     email {
                         settings {
-                            feedbackListSelector =
+                            messageListSelector =
                         }
                     }
                 }

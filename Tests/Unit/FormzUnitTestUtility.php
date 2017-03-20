@@ -172,7 +172,7 @@ trait FormzUnitTestUtility
 
         $formzConfiguration = new Configuration();
 
-        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setFeedbackContainerSelector('[fz-field-feedback-container="#FIELD#"]');
+        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setMessageContainerSelector('[fz-field-message-container="#FIELD#"]');
         $formzConfiguration->getSettings()->getDefaultFieldSettings()->setFieldContainerSelector('[fz-field-container="#FIELD#"]');
 
         $errors = new ViewClass;

@@ -34,7 +34,7 @@ Function                                                                        
 
 :ref:`getElements() <developerManual-javaScript-field-getElements>`                                                         Get the complete configuration.
 
-:ref:`getFeedbackListContainer() <developerManual-javaScript-field-getFeedbackListContainer>`                               Fetch the DOM element of the validation feedback container.
+:ref:`getMessageListContainer() <developerManual-javaScript-field-getMessageListContainer>`                                 Fetch the DOM element of the validation message container.
 
 :ref:`getErrors() <developerManual-javaScript-field-getErrors>`                                                             Get the errors.
 
@@ -66,7 +66,7 @@ Function                                                                        
 
 :ref:`onValidationDone() <developerManual-javaScript-field-onValidationDone>`                                               Hook at the validation end.
 
-:ref:`refreshFeedback() <developerManual-javaScript-field-refreshFeedback>`                                                 Empty the feedback container.
+:ref:`refreshMessages() <developerManual-javaScript-field-refreshMessage>`                                                  Empty the message container.
 
 :ref:`validate() <developerManual-javaScript-field-validate>`                                                               Launch the validation process.
 
@@ -364,25 +364,25 @@ Get the field DOM elements
 
 -----
 
-.. _developerManual-javaScript-field-getFeedbackListContainer:
+.. _developerManual-javaScript-field-getMessageListContainer:
 
-Get the DOM element of the feedback list container
---------------------------------------------------
+Get the DOM element of the message list container
+-------------------------------------------------
 
 .. container:: table-row
 
     Function
-        ``getFeedbackListContainer()``
+        ``getMessageListContainer()``
     Return
         ``Element``
     Description
-        The feedback container is a block which is automatically updated by JavaScript, which will insert the messages returned by the used validators.
+        The message container is a block which is automatically updated by JavaScript, which will insert the messages returned by the used validators.
 
         It's not recommended to interact directly with the content of this block, but you may proceed to other operations like add classes for instance.
 
         .. note::
 
-            The value of the TypoScript parameter :ref:`settings.feedbackListSelector <fieldsSettings-feedbackListSelector>` is used to select the element.
+            The value of the TypoScript parameter :ref:`settings.messageListSelector <fieldsSettings-messageListSelector>` is used to select the element.
 
 -----
 
@@ -470,7 +470,7 @@ Get the message template
     Return
         ``String``
     Description
-        Returns the message template which is used when a message is added in the :ref:`feedback list container <developerManual-javaScript-field-getFeedbackListContainer>`.
+        Returns the message template which is used when a message is added in the :ref:`message list container <developerManual-javaScript-field-getMessageListContainer>`.
 
         This template can be fetched using two ways:
 
@@ -566,9 +566,9 @@ Insert errors
     Return
         /
     Parameters
-        - ``errors`` (Object): list of errors to be inserted in the feedback container.
+        - ``errors`` (Object): list of errors to be inserted in the message container.
     Description
-        Insert errors in the feedback container. The error list is an object, for which each key is the name of a validation rule, the second key is the name of the error and the value is the error message.
+        Insert errors in the message container. The error list is an object, for which each key is the name of a validation rule, the second key is the name of the error and the value is the error message.
 
         **Example:**
 
@@ -672,19 +672,19 @@ Spot the validation ending
 
 -----
 
-.. _developerManual-javaScript-field-refreshFeedback:
+.. _developerManual-javaScript-field-refreshMessage:
 
-Empty feedback container
-------------------------
+Empty message container
+-----------------------
 
 .. container:: table-row
 
     Function
-        ``refreshFeedback()``
+        ``refreshMessages()``
     Return
         /
     Description
-        Completely empty the feedback container. You may insert new messages with the function “:ref:`insertErrors(errors) <developerManual-javaScript-field-insertErrors>`”.
+        Completely empty the message container. You may insert new messages with the function “:ref:`insertErrors(errors) <developerManual-javaScript-field-insertErrors>`”.
 
 -----
 

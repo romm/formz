@@ -65,30 +65,30 @@ Fz.Field = (function () {
          */
         return {
             /**
-             * Will empty the feedback container, which can be filled again with
+             * Will empty the message container, which can be filled again with
              * the function `insertMessages()`.
              */
-            refreshFeedback: function () {
-                var feedbackListContainerElement = this.getFeedbackListContainer();
+            refreshMessage: function () {
+                var messageListContainerElement = this.getMessageListContainer();
 
-                if (feedbackListContainerElement != null) {
-                    feedbackListContainerElement.innerHTML = '';
+                if (messageListContainerElement != null) {
+                    messageListContainerElement.innerHTML = '';
                 }
 
-                eventsManager.dispatch('refreshFeedback');
+                eventsManager.dispatch('refreshMessages');
             },
 
             /**
-             * Will refresh the messages displayed in the feedback container of
+             * Will refresh the messages displayed in the message container of
              * this field.
              *
              * @param {Object} messages
              * @param {string} type
              */
             insertMessages: function (messages, type) {
-                var feedbackListContainerElement = this.getFeedbackListContainer();
+                var messageListContainerElement = this.getMessageListContainer();
 
-                if (feedbackListContainerElement != null) {
+                if (messageListContainerElement != null) {
                     if (Fz.objectSize(messages) > 0) {
                         var messageTemplate = this.getMessageTemplate();
 
@@ -96,7 +96,7 @@ Fz.Field = (function () {
                             if (messages.hasOwnProperty(validationRuleName)) {
                                 for (var name in messages[validationRuleName]) {
                                     if (messages[validationRuleName].hasOwnProperty(name)) {
-                                        feedbackListContainerElement.innerHTML += messageTemplate
+                                        messageListContainerElement.innerHTML += messageTemplate
                                             .replace('#FIELD#', this.getName())
                                             .replace('#FIELD_ID#', Fz.camelCaseToDashed('fz-' + this.getForm().getName() + '-' + this.getName()))
                                             .replace('#VALIDATOR#', Fz.camelCaseToDashed(validationRuleName))
@@ -309,9 +309,9 @@ Fz.Field = (function () {
             /**
              * @returns {?Element}
              */
-            getFeedbackListContainer: function () {
-                var selector = configuration['settings']['feedbackContainerSelector'];
-                var errorBlockSelector = configuration['settings']['feedbackListSelector'];
+            getMessageListContainer: function () {
+                var selector = configuration['settings']['messageContainerSelector'];
+                var errorBlockSelector = configuration['settings']['messageListSelector'];
 
                 if (null !== errorBlockSelector && '' !== errorBlockSelector) {
                     selector += ' ' + errorBlockSelector;
@@ -373,8 +373,8 @@ Fz.Field = (function () {
                 // Turning the loading behaviour on.
                 states.field.handleLoadingBehaviour(true);
 
-                // Emptying the field feedback container.
-                states.field.refreshFeedback();
+                // Emptying the field message container.
+                states.field.refreshMessage();
             });
         })();
 
@@ -386,8 +386,8 @@ Fz.Field = (function () {
                 // Turning the loading behaviour off.
                 states.field.handleLoadingBehaviour(false);
 
-                // Emptying the field feedback container.
-                states.field.refreshFeedback();
+                // Emptying the field message container.
+                states.field.refreshMessage();
                 states.field.insertMessages(states.field.getErrors(), 'error');
                 states.field.insertMessages(states.field.getWarnings(), 'warning');
                 states.field.insertMessages(states.field.getNotices(), 'notice');
@@ -448,7 +448,7 @@ Fz.Field = (function () {
                 dataAttributesService.hideAllDataAttributes();
             });
 
-            states.eventsManager.on('refreshFeedback', function () {
+            states.eventsManager.on('refreshMessages', function () {
                 dataAttributesService.removeMessagesDataAttributes();
             });
         })();
@@ -500,7 +500,7 @@ Fz.Field = (function () {
                     }
                 });
 
-                states.eventsManager.on('refreshFeedback', function () {
+                states.eventsManager.on('refreshMessages', function () {
                     loopOnClasses('errors', function (element, className) {
                         Fz.removeClass(element, className);
                     });

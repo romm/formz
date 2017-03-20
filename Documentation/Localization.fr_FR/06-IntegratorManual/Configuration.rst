@@ -46,10 +46,10 @@ Ce conteneur est divisé en deux parties : un conteneur global, et un conteneur 
     :linenos:
     :emphasize-lines: 1,4
 
-    <div fz-field-feedback-container="email">
+    <div fz-field-message-container="email">
         Ce champs contient au moins une erreur :
 
-        <div fz-field-feedback-list="email">
+        <div fz-field-message-list="email">
             <f:form.validationResults for="exForm.email">
                 <f:for each="{validationResults.errors}" as="error">
                     <fz:formatMessage message="{error}" />
@@ -58,9 +58,9 @@ Ce conteneur est divisé en deux parties : un conteneur global, et un conteneur 
         </div>
     </div>
 
-Dans cet exemple, le conteneur de messages est identifié par ``fz-field-feedback-container="email"``, et le conteneur de la liste des messages par ``fz-field-feedback-list="email"``. Si le champ ``email`` ne contient aucun message, le premier conteneur sera masqué.
+Dans cet exemple, le conteneur de messages est identifié par ``fz-field-message-container="email"``, et le conteneur de la liste des messages par ``fz-field-message-list="email"``. Si le champ ``email`` ne contient aucun message, le premier conteneur sera masqué.
 
-Les attributs utilisés dans cet exemple sont ceux par défaut. Il est possible de les personnaliser, cf. « :ref:`Sélecteur du conteneur des messages <fieldsSettings-feedbackContainerSelector>` » et « :ref:`Sélecteur de la liste des messages <fieldsSettings-feedbackListSelector>` ».
+Les attributs utilisés dans cet exemple sont ceux par défaut. Il est possible de les personnaliser, cf. « :ref:`Sélecteur du conteneur des messages <fieldsSettings-messageContainerSelector>` » et « :ref:`Sélecteur de la liste des messages <fieldsSettings-messageListSelector>` ».
 
 -----
 

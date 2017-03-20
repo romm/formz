@@ -38,10 +38,10 @@ You can find details of the properties at the chapter “:ref:`usersManual-typoS
                 fieldContainerSelector = .fz-field-#FIELD#
 
                 # Selector of the messages HTML container.
-                feedbackContainerSelector = .fz-messages-#FIELD#
+                messageContainerSelector = .fz-messages-#FIELD#
 
                 # Selector of the messages list HTML container.
-                feedbackListSelector = .fz-messages-list-#FIELD#
+                messageListSelector = .fz-messages-list-#FIELD#
 
                 # HTML template used by the messages returned by the field
                 # validation.
