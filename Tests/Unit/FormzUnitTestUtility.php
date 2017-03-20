@@ -400,7 +400,7 @@ trait FormzUnitTestUtility
         $cacheFactory = new CacheFactory('foo', new CacheManager);
         $cacheInstance = $cacheFactory->create('foo', VariableFrontend::class, TransientMemoryBackend::class);
 
-        CacheService::get()->setCacheInstance($cacheInstance);
+        $this->inject(CacheService::get(), 'cacheInstance', $cacheInstance);
     }
 
     /**

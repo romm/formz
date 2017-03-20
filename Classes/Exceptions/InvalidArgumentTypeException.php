@@ -14,6 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
@@ -32,6 +33,10 @@ class InvalidArgumentTypeException extends FormzException
     const FIELD_VIEW_HELPER_LAYOUT_NOT_STRING = 'The argument `layout` must be a string (%s given).';
 
     const FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE = 'The argument `message` for the view helper "%s" must be an instance of "%s" (`%s` given).';
+
+    const CONDITION_NAME_NOT_STRING = 'The name of the condition must be a correct string (given type: "%s").';
+
+    const CONDITION_CLASS_NAME_NOT_VALID = 'The condition class must implement "%s" (given class is "%s").';
 
     /**
      * @code 1477468571
@@ -132,6 +137,40 @@ class InvalidArgumentTypeException extends FormzException
                 Message::class,
                 is_object($value) ? get_class($value) : gettype($value)
             ]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1466588489
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function conditionNameNotString($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONDITION_NAME_NOT_STRING,
+            [gettype($name)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1466588495
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function conditionClassNameNotValid($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONDITION_CLASS_NAME_NOT_VALID,
+            [ConditionItemInterface::class, $className]
         );
 
         return $exception;

@@ -3,6 +3,7 @@ namespace Romm\Formz\Tests\Unit\Condition;
 
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -19,6 +20,17 @@ class ConditionFactoryTest extends AbstractUnitTest
 
         $conditionFactory = new ConditionFactory;
         $conditionFactory->registerCondition(true, 'foo');
+    }
+
+    /**
+     * @test
+     */
+    public function registerConditionWithClassNameNotFoundThrowsException()
+    {
+        $this->setExpectedException(ClassNotFoundException::class, '', 1489602455);
+
+        $conditionFactory = new ConditionFactory;
+        $conditionFactory->registerCondition('foo', 'nope!');
     }
 
     /**

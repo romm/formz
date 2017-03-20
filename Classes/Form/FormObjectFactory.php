@@ -71,7 +71,7 @@ class FormObjectFactory implements SingletonInterface
             throw InvalidArgumentTypeException::wrongFormType($className);
         }
 
-        $cacheIdentifier = CacheService::get()->getCacheIdentifier('form-object-', $className . '-' . $name);
+        $cacheIdentifier = CacheService::get()->getFormCacheIdentifier('form-object-', $className . '-' . $name);
 
         if (false === isset($this->instances[$cacheIdentifier])) {
             $cacheInstance = CacheService::get()->getCacheInstance();
