@@ -46,7 +46,7 @@ class FormTest extends AbstractUnitTest
         $form->addField($field);
         $this->assertTrue($form->hasField('foo'));
         $this->assertSame($field, $form->getField('foo'));
-        $this->assertEquals(['foo' => $field], $form->getFields());
+        $this->assertSame(['foo' => $field], $form->getFields());
     }
 
     /**

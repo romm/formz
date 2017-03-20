@@ -48,7 +48,7 @@ class FieldTest extends AbstractUnitTest
         $field->addValidation($validation);
         $this->assertTrue($field->hasValidation('foo'));
         $this->assertSame($validation, $field->getValidationByName('foo'));
-        $this->assertEquals(['foo' => $validation], $field->getValidation());
+        $this->assertSame(['foo' => $validation], $field->getValidation());
     }
 
     /**
