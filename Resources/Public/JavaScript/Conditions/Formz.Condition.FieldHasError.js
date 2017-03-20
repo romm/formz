@@ -8,7 +8,7 @@ Fz.Condition.registerCondition(
 	function (form, data) {
 		var flag = false;
 		var field = form.getFieldByName(data['fieldName']);
-		var validationName = form.getFieldByName(data['validationName']);
+		var validationName = form.getFieldByName(data['name']);
 		var errorName = form.getFieldByName(data['errorName']);
 
 		if (null !== field) {

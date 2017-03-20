@@ -2,7 +2,7 @@
 namespace Romm\Formz\Tests\Unit\Condition\Parser;
 
 use Romm\Formz\Condition\Parser\ConditionParserFactory;
-use Romm\Formz\Configuration\Form\Condition\Activation\Activation;
+use Romm\Formz\Configuration\Form\Field\Activation\Activation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class ConditionParserFactoryTest extends AbstractUnitTest

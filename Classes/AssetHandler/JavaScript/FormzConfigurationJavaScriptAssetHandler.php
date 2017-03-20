@@ -31,7 +31,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
     {
         $hash = $this->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration()
+            ->getRootConfiguration()
             ->getHash();
 
         return CacheService::GENERATED_FILES_PATH . 'formz-config-' . $hash . '.js';
@@ -69,13 +69,13 @@ JS;
      */
     protected function getFormzConfiguration()
     {
-        $formzConfigurationArray = $this->getFormObject()
+        $rootConfigurationArray = $this->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration()
+            ->getRootConfiguration()
             ->toArray();
 
         $cleanFormzConfigurationArray = [
-            'view' => $formzConfigurationArray['view']
+            'view' => $rootConfigurationArray['view']
         ];
 
         return ArrayService::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);

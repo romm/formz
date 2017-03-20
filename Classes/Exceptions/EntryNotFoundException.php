@@ -13,7 +13,11 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Configuration\Form\Condition\Activation\AbstractActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\AbstractActivation;
+use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Configuration\View\Classes\ViewClass;
+use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
+use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
@@ -26,7 +30,15 @@ class EntryNotFoundException extends FormzException
 
     const CONDITION_NOT_FOUND = 'No condition "%s" was found.';
 
+    const CONFIGURATION_FIELD_NOT_FOUND = 'The field "%s" was not found. Please use the function `%s::hasField()` before.';
+
     const VALIDATION_NOT_FOUND = 'The validation "%s" was not found. Please use the function `%s::hasValidation()` before.';
+
+    const VIEW_LAYOUT_NOT_FOUND = 'The layout "%s" was not found. Please use the function `%s::hasLayout()` before.';
+
+    const VIEW_LAYOUT_ITEM_NOT_FOUND = 'The layout item "%s" was not found. Please use the function `%s::hasItem()` before.';
+
+    const VIEW_CLASS_NOT_FOUND = 'The class "%s" was not found. Please use the function `%s::hasItem()` before.';
 
     const VALIDATION_NOT_FOUND_FOR_FIELD = 'The field "%s" does not have a rule "%s".';
 
@@ -60,6 +72,23 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
+     * @code 1489765133
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function configurationFieldNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONFIGURATION_FIELD_NOT_FOUND,
+            [$name, Form::class]
+        );
+
+        return $exception;
+    }
+
+    /**
      * @code 1487672276
      *
      * @param string $name
@@ -71,6 +100,57 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::VALIDATION_NOT_FOUND,
             [$name, AbstractActivation::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1489753952
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function viewLayoutNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::VIEW_LAYOUT_NOT_FOUND,
+            [$name, View::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1489757511
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function viewLayoutItemNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::VIEW_LAYOUT_ITEM_NOT_FOUND,
+            [$name, LayoutGroup::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1489754909
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function viewClassNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::VIEW_CLASS_NOT_FOUND,
+            [$name, ViewClass::class]
         );
 
         return $exception;

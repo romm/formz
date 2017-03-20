@@ -226,7 +226,7 @@ class FormValidatorExecutor
      */
     protected function processFieldValidation(Field $field, Validation $validation)
     {
-        $fieldName = $field->getFieldName();
+        $fieldName = $field->getName();
         $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);
         $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validation);
 
@@ -294,7 +294,7 @@ class FormValidatorExecutor
      */
     protected function fieldActivationHasBeenChecked(Field $field)
     {
-        return in_array($field->getFieldName(), $this->fieldsActivationChecked);
+        return in_array($field->getName(), $this->fieldsActivationChecked);
     }
 
     /**
@@ -302,7 +302,7 @@ class FormValidatorExecutor
      */
     protected function markFieldActivationAsChecked(Field $field)
     {
-        $this->fieldsActivationChecked[] = $field->getFieldName();
+        $this->fieldsActivationChecked[] = $field->getName();
     }
 
     /**
@@ -311,7 +311,7 @@ class FormValidatorExecutor
      */
     protected function fieldActivationIsBeingChecked(Field $field)
     {
-        return isset($this->fieldsActivationChecking[$field->getFieldName()]);
+        return isset($this->fieldsActivationChecking[$field->getName()]);
     }
 
     /**
@@ -319,7 +319,7 @@ class FormValidatorExecutor
      */
     protected function markFieldActivationCheckBegin(Field $field)
     {
-        $this->fieldsActivationChecking[$field->getFieldName()] = true;
+        $this->fieldsActivationChecking[$field->getName()] = true;
     }
 
     /**
@@ -327,7 +327,7 @@ class FormValidatorExecutor
      */
     protected function markFieldActivationCheckEnd(Field $field)
     {
-        unset($this->fieldsActivationChecking[$field->getFieldName()]);
+        unset($this->fieldsActivationChecking[$field->getName()]);
     }
 
     /**
@@ -336,7 +336,7 @@ class FormValidatorExecutor
      */
     protected function fieldWasValidated(Field $field)
     {
-        return in_array($field->getFieldName(), $this->fieldsValidated);
+        return in_array($field->getName(), $this->fieldsValidated);
     }
 
     /**
@@ -344,7 +344,7 @@ class FormValidatorExecutor
      */
     protected function markFieldAsValidated(Field $field)
     {
-        $this->fieldsValidated[] = $field->getFieldName();
+        $this->fieldsValidated[] = $field->getName();
     }
 
     /**

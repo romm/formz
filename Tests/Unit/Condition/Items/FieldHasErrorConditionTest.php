@@ -40,7 +40,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
     public function validConfiguration()
     {
         $validation = new Validation;
-        $validation->setValidationName('bar');
+        $validation->setName('bar');
         $formObject = $this->getDefaultFormObject();
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
 

@@ -160,7 +160,7 @@ trait FormzUnitTestUtility
 
         foreach ($fields as $fieldName) {
             $field = new Field;
-            $field->setFieldName($fieldName);
+            $field->setName($fieldName);
             $field->setParents([$formConfiguration]);
             $formConfiguration->addField($field);
 
@@ -177,10 +177,12 @@ trait FormzUnitTestUtility
 
         $errors = new ViewClass;
         $errors->addItem('foo', 'foo');
+        /** @noinspection PhpUndefinedMethodInspection */
         $formzConfiguration->getView()->getClasses()->setErrors($errors);
 
         $valid = new ViewClass;
         $valid->addItem('bar', 'bar');
+        /** @noinspection PhpUndefinedMethodInspection */
         $formzConfiguration->getView()->getClasses()->setValid($valid);
 
         $formConfiguration->setParents([$formzConfiguration]);

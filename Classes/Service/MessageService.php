@@ -93,7 +93,7 @@ class MessageService implements SingletonInterface
                     $message = new $objectType(
                         $message->getMessage(),
                         $message->getCode(),
-                        $validation->getValidationName(),
+                        $validation->getName(),
                         'unknown-' . ++$unknownCounter,
                         $message->getArguments(),
                         $message->getTitle()

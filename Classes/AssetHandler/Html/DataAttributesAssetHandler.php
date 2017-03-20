@@ -53,7 +53,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         $formInstance = $formObject->getForm();
 
         foreach ($formObject->getConfiguration()->getFields() as $field) {
-            $fieldName = $field->getFieldName();
+            $fieldName = $field->getName();
 
             if (false === $formResult->fieldIsDeactivated($field)) {
                 $value = ObjectAccess::getProperty($formInstance, $fieldName);
@@ -169,7 +169,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         $formResult = $this->getFormObject()->getFormResult();
 
         foreach ($formConfiguration->getFields() as $field) {
-            $fieldName = $field->getFieldName();
+            $fieldName = $field->getName();
 
             if (false === $formResult->fieldIsDeactivated($field)
                 && false === $formResult->forProperty($fieldName)->hasErrors()

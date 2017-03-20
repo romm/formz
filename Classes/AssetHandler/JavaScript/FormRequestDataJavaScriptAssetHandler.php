@@ -101,7 +101,7 @@ JS;
             && $formObject->hasFormResult()
         ) {
             foreach ($this->getFormObject()->getConfiguration()->getFields() as $field) {
-                $fieldsMessages[$field->getFieldName()] = $this->getSingleFieldExistingMessages($field);
+                $fieldsMessages[$field->getName()] = $this->getSingleFieldExistingMessages($field);
             }
         }
 
@@ -115,7 +115,7 @@ JS;
     protected function getSingleFieldExistingMessages(Field $field)
     {
         $formResult = $this->getFormObject()->getFormResult();
-        $result = $formResult->forProperty($field->getFieldName());
+        $result = $formResult->forProperty($field->getName());
         $messages = [];
 
         if ($result->hasErrors()) {

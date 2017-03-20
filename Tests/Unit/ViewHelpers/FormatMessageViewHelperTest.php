@@ -76,10 +76,10 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
     public function renderViewHelperDataProvider()
     {
         $barField = new Field;
-        $barField->setFieldName('bar');
+        $barField->setName('bar');
 
         $bazField = new Field;
-        $bazField->setFieldName('baz');
+        $bazField->setName('baz');
 
         return [
             [

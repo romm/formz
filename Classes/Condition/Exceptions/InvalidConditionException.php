@@ -43,7 +43,7 @@ class InvalidConditionException extends FormzException
             self::INVALID_FIELD_CONDITION_CONFIGURATION,
             [
                 $conditionName,
-                $field->getFieldName(),
+                $field->getName(),
                 $formClassName,
                 $exception->getMessage(),
                 $exception->getCode()
@@ -69,8 +69,8 @@ class InvalidConditionException extends FormzException
             self::INVALID_VALIDATION_CONDITION_CONFIGURATION,
             [
                 $conditionName,
-                $validation->getValidationName(),
-                $validation->getParentField()->getFieldName(),
+                $validation->getName(),
+                $validation->getParentField()->getName(),
                 $formClassName,
                 $exception->getMessage(),
                 $exception->getCode()

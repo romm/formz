@@ -73,12 +73,12 @@ class FieldsActivationCssAssetHandler extends AbstractAssetHandler
     protected function getSingleFieldCssBlock($formName, $field, $fieldContainerSelector, $nodesSelector)
     {
         return <<<CSS
-/* Hiding the container of the field "{$field->getFieldName()}" by default */
+/* Hiding the container of the field "{$field->getName()}" by default */
 form[name="$formName"] $fieldContainerSelector {
     display: none;
 }
 
-/* Showing the container of the field "{$field->getFieldName()}" */
+/* Showing the container of the field "{$field->getName()}" */
 $nodesSelector {
     display: block;
 }

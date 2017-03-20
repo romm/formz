@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Condition\Parser;
 
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
