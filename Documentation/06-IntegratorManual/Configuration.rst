@@ -35,8 +35,8 @@ By default, the attribute which you should be using is ``fz-field-container``, w
 
 -----
 
-Feedback container
-------------------
+Message container
+-----------------
 
 The same way the field container must be registered, the message container for this field must also be defined. Then, FormZ can display or hide this element according to the presence of messages (mainly errors) or not.
 
@@ -46,10 +46,10 @@ This container is divided into two parts: a global container, and a container fo
     :linenos:
     :emphasize-lines: 1,4
 
-        <div fz-field-feedback-container="email">
+        <div fz-field-message-container="email">
             This field contains at least an error:
 
-            <div fz-field-feedback-list="email">
+            <div fz-field-message-list="email">
                 <f:form.validationResults for="exForm.email">
                     <f:for each="{validationResults.errors}" as="error">
                         <fz:formatMessage message="{error}" />
@@ -58,9 +58,9 @@ This container is divided into two parts: a global container, and a container fo
             </div>
         </div>
 
-In this example, the messages container is identified with ``fz-field-feedback-container="email"``, and the container of the messages list with ``fz-field-feedback-list="email"``. If the field ``email`` does not contain any message, the first container will be hidden.
+In this example, the messages container is identified with ``fz-field-message-container="email"``, and the container of the messages list with ``fz-field-message-list="email"``. If the field ``email`` does not contain any message, the first container will be hidden.
 
-The attributes used in this example are the default ones. It's possible to customize them, see “:ref:`Messages container selector <fieldsSettings-feedbackContainerSelector>`” and “:ref:`Messages list container selector <fieldsSettings-feedbackListSelector>`”.
+The attributes used in this example are the default ones. It's possible to customize them, see “:ref:`Messages container selector <fieldsSettings-messageContainerSelector>`” and “:ref:`Messages list container selector <fieldsSettings-messageListSelector>`”.
 
 -----
 

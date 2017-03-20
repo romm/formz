@@ -34,9 +34,9 @@ Property                                                                        
 
 :ref:`settings.fieldContainerSelector <fieldsSettings-fieldContainerSelector>`          Field container selector
 
-:ref:`settings.feedbackContainerSelector <fieldsSettings-feedbackContainerSelector>`    Feedback container selector
+:ref:`settings.messageContainerSelector <fieldsSettings-messageContainerSelector>`      Message container selector
 
-:ref:`settings.feedbackListSelector <fieldsSettings-feedbackListSelector>`              Feedback list container selector
+:ref:`settings.messageListSelector <fieldsSettings-messageListSelector>`                Message list container selector
 
 :ref:`settings.messageTemplate <fieldsSettings-messageTemplate>`                        Message template
 ======================================================================================= =====================================
@@ -210,23 +210,23 @@ Field container selector
 
             You can regroup several fields by assigning them the same container selector, as in the example above.
 
-.. _fieldsSettings-feedbackContainerSelector:
+.. _fieldsSettings-messageContainerSelector:
 
-Feedback container selector
+Message container selector
 ---------------------------
 
 .. container:: table-row
 
     Property
-        ``settings.feedbackContainerSelector``
+        ``settings.messageContainerSelector``
     Required?
         No
     Description
-        Contains the CSS selector which will be used to fetch the field feedback container.
+        Contains the CSS selector which will be used to fetch the field message container.
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[fz-field-feedback-container="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-message-container="#FIELD#"]``.
 
         **Example:**
 
@@ -236,31 +236,31 @@ Feedback container selector
                 fields {
                     email {
                         settings {
-                            feedbackContainerSelector = #errors-email
+                            messageContainerSelector = #errors-email
                         }
                     }
                 }
             }
 
-.. _fieldsSettings-feedbackListSelector:
+.. _fieldsSettings-messageListSelector:
 
-Feedback list selector
-----------------------
+Message list selector
+---------------------
 
 .. container:: table-row
 
     Property
-        ``settings.feedbackListSelector``
+        ``settings.messageListSelector``
     Required?
         No
     Description
-        Contains the CSS selector which will be used to fetch the block containing the field messages. It's a second selection layout for the feedback container (``settings.feedbackContainerSelector``): it allows adding static HTML contents which wont be cleaned up by JavaScript during the feedback refreshing.
+        Contains the CSS selector which will be used to fetch the block containing the field messages. It's a second selection layout for the message container (``settings.messageContainerSelector``): it allows adding static HTML contents which wont be cleaned up by JavaScript during the message refreshing.
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[fz-field-feedback-list="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-message-list="#FIELD#"]``.
 
-        If an empty value is set, then the feedback container will be used.
+        If an empty value is set, then the message container will be used.
 
         **Example:**
 
@@ -270,7 +270,7 @@ Feedback list selector
                 fields {
                     email {
                         settings {
-                            feedbackListSelector =
+                            messageListSelector =
                         }
                     }
                 }

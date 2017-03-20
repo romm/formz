@@ -16,13 +16,13 @@
     <fz:slot.render slot="Field" />
 </f:section>
 
-<f:section name="Feedback">
-    <fz:slot.render slot="Feedback.Out.Before" />
+<f:section name="Messages">
+    <fz:slot.render slot="Messages.Out.Before" />
 
-    <span class="help-block" fz-field-feedback-container="{fieldName}">
-		<fz:slot.render slot="Feedback.In.Before" />
+    <span class="help-block" fz-field-message-container="{fieldName}">
+		<fz:slot.render slot="Messages.In.Before" />
 
-		<span fz-field-feedback-list="{fieldName}">
+		<span fz-field-message-list="{fieldName}">
 			<f:form.validationResults for="{formName}.{fieldName}">
 				<f:if condition="{validationResults.errors}">
 					<div class="text-error">
@@ -48,10 +48,10 @@
             </f:form.validationResults>
 		</span>
 
-		<fz:slot.render slot="Feedback.In.After" />
+		<fz:slot.render slot="Messages.In.After" />
 	</span>
 
-    <fz:slot.render slot="Feedback.Out.After" />
+    <fz:slot.render slot="Messages.Out.After" />
 </f:section>
 
 </html>

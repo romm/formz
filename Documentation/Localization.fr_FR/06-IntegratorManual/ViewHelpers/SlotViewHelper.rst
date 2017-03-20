@@ -49,7 +49,7 @@ Exemple
             <!-- Ce slot apparaît juste avant l'affichage de la liste des messages
                  de validation. -->
 
-            <fz:slot name="Feedback.Out.Before" arguments="{myClass: 'info'}">
+            <fz:slot name="Messages.Out.Before" arguments="{myClass: 'info'}">
                 <div class="{myClass}">Hello world!</div>
             </fz:slot>
 

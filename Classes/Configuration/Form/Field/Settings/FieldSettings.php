@@ -34,7 +34,7 @@ class FieldSettings extends AbstractFormzConfiguration
      *
      * @var string
      */
-    protected $feedbackContainerSelector;
+    protected $messageContainerSelector;
 
     /**
      * CSS selector to get the block element which will contain all the error
@@ -44,7 +44,7 @@ class FieldSettings extends AbstractFormzConfiguration
      *
      * @var string
      */
-    protected $feedbackListSelector;
+    protected $messageListSelector;
 
     /**
      * @var string
@@ -72,26 +72,26 @@ class FieldSettings extends AbstractFormzConfiguration
      * @param null $fieldName
      * @return string
      */
-    public function getFeedbackContainerSelector($fieldName = null)
+    public function getMessageContainerSelector($fieldName = null)
     {
-        return $this->formatSelector($this->getSettingsProperty('feedbackContainerSelector'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('messageContainerSelector'), $fieldName);
     }
 
     /**
      * @param string $selector
      */
-    public function setFeedbackContainerSelector($selector)
+    public function setMessageContainerSelector($selector)
     {
-        $this->feedbackContainerSelector = $selector;
+        $this->messageContainerSelector = $selector;
     }
 
     /**
      * @param string $fieldName
      * @return string
      */
-    public function getFeedbackListSelector($fieldName = null)
+    public function getMessageListSelector($fieldName = null)
     {
-        return $this->formatSelector($this->getSettingsProperty('feedbackListSelector'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('messageListSelector'), $fieldName);
     }
 
     /**
