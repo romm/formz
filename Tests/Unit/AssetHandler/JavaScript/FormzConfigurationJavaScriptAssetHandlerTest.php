@@ -51,7 +51,7 @@ TXT;
             ->getConfiguration()
             ->getRootConfiguration();
         $rootConfiguration->calculateHash();
-        $hash = $rootConfiguration->getHash();
+        $hash = sha1($rootConfiguration->getHash());
 
         $this->assertNotFalse(strpos($assetHandler->getJavaScriptFileName(), $hash));
 

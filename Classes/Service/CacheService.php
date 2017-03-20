@@ -85,23 +85,15 @@ class CacheService implements SingletonInterface
     /**
      * Generic cache identifier creation for usages in the extension.
      *
-     * @param string $string
      * @param string $formClassName
-     * @param int    $maxLength
+     * @param string $formName
      * @return string
      */
-    public function getFormCacheIdentifier($string, $formClassName, $maxLength = 55)
+    public function getFormCacheIdentifier($formClassName, $formName)
     {
         $shortClassName = end(explode('\\', $formClassName));
 
-        $identifier = strtolower(
-            $string .
-            $shortClassName .
-            '-' .
-            HashService::get()->getHash($formClassName)
-        );
-
-        return substr($identifier, 0, $maxLength);
+        return StringService::get()->sanitizeString($shortClassName . '-' . $formName);
     }
 
     /**

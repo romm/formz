@@ -19,6 +19,7 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Service\CacheService;
+use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -71,7 +72,7 @@ class FormObjectFactory implements SingletonInterface
             throw InvalidArgumentTypeException::wrongFormType($className);
         }
 
-        $cacheIdentifier = CacheService::get()->getFormCacheIdentifier('form-object-', $className . '-' . $name);
+        $cacheIdentifier = $this->getCacheIdentifier($className, $name);
 
         if (false === isset($this->instances[$cacheIdentifier])) {
             $cacheInstance = CacheService::get()->getCacheInstance();
@@ -159,6 +160,22 @@ class FormObjectFactory implements SingletonInterface
         }
 
         unset($publicProperties);
+    }
+
+    /**
+     * @param string $className
+     * @param string $name
+     * @return string
+     */
+    protected function getCacheIdentifier($className, $name)
+    {
+        return vsprintf(
+            'form-object-%s-%s',
+            [
+                CacheService::get()->getFormCacheIdentifier($className, $name),
+                HashService::get()->getHash($className)
+            ]
+        );
     }
 
     /**

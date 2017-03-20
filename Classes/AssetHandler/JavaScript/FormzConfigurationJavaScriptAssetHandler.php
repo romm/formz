@@ -29,12 +29,12 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
      */
     public function getJavaScriptFileName()
     {
-        $hash = $this->getFormObject()
+        $hash = sha1($this->getFormObject()
             ->getConfiguration()
             ->getRootConfiguration()
-            ->getHash();
+            ->getHash());
 
-        return CacheService::GENERATED_FILES_PATH . 'formz-config-' . $hash . '.js';
+        return CacheService::GENERATED_FILES_PATH . 'fz-config-' . $hash . '.js';
     }
 
     /**

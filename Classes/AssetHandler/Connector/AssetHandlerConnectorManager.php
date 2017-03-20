@@ -112,13 +112,17 @@ class AssetHandlerConnectorManager
     public function getFormzGeneratedFilePath($prefix = '')
     {
         $formObject = $this->assetHandlerFactory->getFormObject();
+        $formIdentifier = CacheService::get()->getFormCacheIdentifier($formObject->getClassName(), $formObject->getName());
         $prefix = (false === empty($prefix))
             ? $prefix . '-'
             : '';
-        $identifier = CacheService::get()->getFormCacheIdentifier(
-            'formz-' . $prefix,
-            $formObject->getClassName() . '-' . $formObject->getName()
+
+        $identifier = substr(
+            'fz-' . $prefix . $formIdentifier,
+            0,
+            22
         );
+        $identifier .= '-' . md5($formObject->getHash());
 
         return CacheService::GENERATED_FILES_PATH . $identifier;
     }
