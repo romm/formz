@@ -1,6 +1,5 @@
 (function() {
-    // @todo
-    var checkValues = {};
+    var controllerNamespace = 'tx_formz_ajaxvalidation';
 
     /**
      * @param {Object}               messages
@@ -89,11 +88,11 @@
                     }
                 };
 
-                var data = 'formClassName=' + encodeURIComponent(field.getForm().getConfiguration()['className']);
-                data += '&formName=' + encodeURIComponent(field.getForm().getName());
-                data += '&validatorName=' + encodeURIComponent(states['validatorName']);
-                data += '&fieldName=' + encodeURIComponent(field.getName());
-                data += '&' + Fz.buildQueryForm(field.getForm().getElement(), 'form');
+                var data = wrapArgument('className', field.getForm().getConfiguration()['className'])
+                    + '&' + wrapArgument('name', field.getForm().getName())
+                    + '&' + wrapArgument('fieldName', field.getName())
+                    + '&' + wrapArgument('validatorName', states['validatorName'])
+                    + '&' + buildQueryForm(field.getForm().getElement());
 
                 request.send(data);
             } else {
@@ -101,4 +100,88 @@
             }
         }
     );
+
+    /**
+     * @param {string} name
+     * @param {string} value
+     * @returns {string}
+     */
+    var wrapArgument = function(name, value) {
+        return controllerNamespace + '[' + name + ']=' + encodeURIComponent(value)
+    };
+
+    var buildQueryForm = function (form) {
+        var query = '';
+        var elementsDone = {};
+        for (var i = 0; i < form.elements.length; i++) {
+            var key = form.elements[i].name;
+            if ('' !== key
+                && 'undefined' !== typeof key
+                && false == key in elementsDone
+                && null === key.match(/\[__referrer\]/)
+            ) {
+                var value = getElementValue(form.elements[i]);
+                if (value) {
+                    if ('' !== query) {
+                        query += '&';
+                    }
+
+                    key = key.replace(/\w+/, function () {
+                        return controllerNamespace;
+                    });
+
+                    query += encodeURIComponent(key) + '=' + encodeURIComponent(value);
+
+                    elementsDone[key] = true;
+                }
+            }
+        }
+
+        return query;
+    };
+
+    var getElementValue = function (formElement) {
+        var type = null;
+        if (formElement.length != null) {
+            type = formElement[0].type;
+        }
+        if (typeof(type) == 'undefined' || type == 0 || null == type) {
+            type = formElement.type;
+        }
+
+        var x = 0;
+
+        switch (type) {
+            case 'undefined':
+                return;
+
+            case 'radio':
+                var checkedOne = document.querySelector('[name="' + formElement.name + '"]:checked');
+                if (null !== checkedOne) {
+                    return checkedOne.value;
+                }
+
+                return;
+
+            case 'select-multiple':
+                var myArray = [];
+                for (x = 0; x < formElement.length; x++) {
+                    if (formElement[x].selected == true) {
+                        myArray[myArray.length] = formElement[x].value;
+                    }
+                }
+
+                return myArray;
+
+            case 'checkbox':
+                if (formElement.checked) {
+                    return formElement.value;
+                } else {
+                    return formElement.checked;
+                }
+
+            default:
+                return formElement.value;
+        }
+    };
 })();

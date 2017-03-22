@@ -13,11 +13,14 @@
 
 namespace Romm\Formz\Controller;
 
+use Exception;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Error\AjaxResult;
 use Romm\Formz\Error\FormzMessageInterface;
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Form\FormInterface;
@@ -28,49 +31,28 @@ use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Mvc\View\JsonView;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
+use TYPO3\CMS\Extbase\Mvc\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
-use TYPO3\CMS\Extbase\Property\PropertyMapper;
+use TYPO3\CMS\Extbase\Mvc\Web\Response;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 class AjaxValidationController extends ActionController
 {
-    const ARGUMENT_FORM_CLASS_NAME = 'formClassName';
-    const ARGUMENT_FORM_NAME = 'formName';
-    const ARGUMENT_FORM = 'form';
-    const ARGUMENT_FIELD_NAME = 'fieldName';
-    const ARGUMENT_VALIDATOR_NAME = 'validatorName';
-
     const DEFAULT_ERROR_MESSAGE_KEY = 'default_error_message';
-
-    /**
-     * @var array
-     */
-    public static $requiredArguments = [
-        self::ARGUMENT_FORM_CLASS_NAME,
-        self::ARGUMENT_FORM_NAME,
-        self::ARGUMENT_FORM,
-        self::ARGUMENT_FIELD_NAME,
-        self::ARGUMENT_VALIDATOR_NAME
-    ];
-
-    /**
-     * @var JsonView
-     */
-    protected $view;
-
-    /**
-     * @var string
-     */
-    protected $defaultViewObjectName = JsonView::class;
 
     /**
      * @var Request
      */
     protected $request;
+
+    /**
+     * @var Response
+     */
+    protected $response;
 
     /**
      * @var bool
@@ -88,11 +70,6 @@ class AjaxValidationController extends ActionController
     protected $formName;
 
     /**
-     * @var array
-     */
-    protected $form;
-
-    /**
      * @var string
      */
     protected $fieldName;
@@ -103,9 +80,24 @@ class AjaxValidationController extends ActionController
     protected $validatorName;
 
     /**
+     * @var FormInterface
+     */
+    protected $form;
+
+    /**
      * @var FormObject
      */
     protected $formObject;
+
+    /**
+     * @var AjaxResult
+     */
+    protected $result;
+
+    /**
+     * @var Validation
+     */
+    protected $validation;
 
     /**
      * The only accepted method for the request is `POST`.
@@ -117,131 +109,108 @@ class AjaxValidationController extends ActionController
         }
     }
 
-    public function getView()
-    {
-        return $this->view;
-    }
-
     /**
-     * Main action that will render the validation result.
-     */
-    public function runAction()
-    {
-        $result = ($this->protectedRequestMode)
-            ? $this->getProtectedRequestResult()
-            : $this->getRequestResult();
-
-        $this->view->setVariablesToRender(['result']);
-        $this->view->assign('result', $result);
-    }
-
-    /**
-     * @param bool $flag
-     */
-    public function setProtectedRequestMode($flag)
-    {
-        $this->protectedRequestMode = (bool)$flag;
-    }
-
-    /**
-     * Will fetch the result and prevent any exception or external message to be
-     * displayed.
+     * Will process the request, but also prevent any external message to be
+     * displayed, and catch any exception that could occur during the
+     * validation.
      *
-     * @return array
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     * @throws Exception
      */
-    protected function getProtectedRequestResult()
+    public function processRequest(RequestInterface $request, ResponseInterface $response)
     {
-        // Default technical error result if the function can not be reached.
-        $result = [
-            'success' => false,
-            'messages' => [
-                'errors' => ['default' => ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY)]
-            ]
-        ];
-
-        // We prevent any external message to be displayed here.
-        ob_start();
+        $this->result = new AjaxResult;
 
         try {
-            $result = $this->getRequestResult();
-        } catch (\Exception $exception) {
-            $result['data'] = ['errorCode' => $exception->getCode()];
-
-            if (ExtensionService::get()->isInDebugMode()) {
-                $result['messages']['errors']['default'] = $this->getDebugMessageForException($exception);
+            $this->processRequestParent($request, $response);
+        } catch (Exception $exception) {
+            if (false === $this->protectedRequestMode) {
+                throw $exception;
             }
+
+            $this->result->clear();
+
+            $errorMessage = ExtensionService::get()->isInDebugMode()
+                ? $this->getDebugMessageForException($exception)
+                : ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY);
+
+            $error = new Error($errorMessage, 1490176818);
+            $this->result->addError($error);
+            $this->result->setData('errorCode', $exception->getCode());
         }
 
-        ob_end_clean();
+        // Cleaning every external message.
+        ob_clean();
 
-        return $result;
+        $this->injectResultInResponse();
     }
 
     /**
-     * Will get the result of the validation for this Ajax request.
-     *
-     * If any error is found, an exception is thrown.
-     *
-     * @return array
+     * Will take care of adding a new argument to the request, based on the form
+     * name and the form class name found in the request arguments.
      */
-    protected function getRequestResult()
+    protected function initializeActionMethodValidators()
     {
-        $this->initializeArguments();
+        $this->initializeActionMethodValidatorsParent();
+
+        $request = $this->getRequest();
+
+        if (false === $request->hasArgument('name')) {
+            throw MissingArgumentException::ajaxControllerNameArgumentNotSet();
+        }
+
+        if (false === $request->hasArgument('className')) {
+            throw MissingArgumentException::ajaxControllerClassNameArgumentNotSet();
+        }
+
+        $className = $request->getArgument('className');
+
+        if (false === class_exists($className)) {
+            throw ClassNotFoundException::ajaxControllerFormClassNameNotFound($className);
+        }
+
+        if (false === in_array(FormInterface::class, class_implements($className))) {
+            throw InvalidArgumentTypeException::ajaxControllerWrongFormType($className);
+        }
+
+        $this->arguments->addNewArgument($request->getArgument('name'), $className, true);
+    }
+
+    /**
+     * Main action that will process the field validation.
+     *
+     * @param string $name
+     * @param string $className
+     * @param string $fieldName
+     * @param string $validatorName
+     */
+    public function runAction($name, $className, $fieldName, $validatorName)
+    {
+        $this->formName = $name;
+        $this->formClassName = $className;
+        $this->fieldName = $fieldName;
+        $this->validatorName = $validatorName;
+        $this->form = $this->getForm();
 
         $this->formObject = $this->getFormObject();
-        $this->checkConfigurationValidationResult();
-        $validation = $this->getFieldValidation();
-        $form = $this->buildFormObject();
-        $this->formObject->setForm($form);
-        $fieldValue = ObjectAccess::getProperty($form, $this->fieldName);
-        $validatorDataObject = new ValidatorDataObject($this->formObject, $validation);
+        $this->formObject->setForm($this->form);
+
+        $this->validation = $this->getFieldValidation();
+
+        $validatorDataObject = new ValidatorDataObject($this->formObject, $this->validation);
 
         /** @var ValidatorInterface $validator */
         $validator = GeneralUtility::makeInstance(
-            $validation->getClassName(),
-            $validation->getOptions(),
+            $this->validation->getClassName(),
+            $this->validation->getOptions(),
             $validatorDataObject
         );
 
+        $fieldValue = ObjectAccess::getProperty($this->form, $this->fieldName);
         $result = $validator->validate($fieldValue);
-        $result = MessageService::get()->sanitizeValidatorResult($result, $validation);
 
-        return $this->convertResultToJson($result);
-    }
-
-    /**
-     * Initializes all arguments for the request, and returns an array
-     * containing the missing arguments.
-     */
-    protected function initializeArguments()
-    {
-        $argumentsMissing = [];
-
-        foreach (self::$requiredArguments as $argument) {
-            $argumentValue = $this->getArgument($argument);
-
-            if ($argumentValue) {
-                $this->$argument = $argumentValue;
-            } else {
-                $argumentsMissing[] = $argument;
-            }
-        }
-
-        if (false === empty($argumentsMissing)) {
-            throw MissingArgumentException::ajaxControllerMissingArguments($argumentsMissing);
-        }
-    }
-
-    /**
-     * @throws InvalidConfigurationException
-     */
-    protected function checkConfigurationValidationResult()
-    {
-        $validationResult = $this->formObject->getConfigurationValidationResult();
-
-        if (true === $validationResult->hasErrors()) {
-            throw InvalidConfigurationException::ajaxControllerInvalidFormConfiguration();
-        }
+        $this->result->merge($result);
     }
 
     /**
@@ -251,7 +220,18 @@ class AjaxValidationController extends ActionController
      */
     protected function getFieldValidation()
     {
-        $formConfiguration = $this->getFormConfiguration($this->formObject);
+        $validationResult = $this->formObject->getConfigurationValidationResult();
+
+        if (true === $validationResult->hasErrors()) {
+            throw InvalidConfigurationException::ajaxControllerInvalidFormConfiguration();
+        }
+
+        $formConfiguration = $this->formObject->getConfiguration();
+
+        if (false === $formConfiguration->hasField($this->fieldName)) {
+            throw EntryNotFoundException::ajaxControllerFieldNotFound($this->fieldName, $this->formObject);
+        }
+
         $field = $formConfiguration->getField($this->fieldName);
 
         if (false === $field->hasValidation($this->validatorName)) {
@@ -268,60 +248,39 @@ class AjaxValidationController extends ActionController
     }
 
     /**
-     * @param FormObject $formObject
-     * @return Form
-     * @throws EntryNotFoundException
+     * Fetches errors/warnings/notices in the result, and put them in the JSON
+     * response.
      */
-    protected function getFormConfiguration(FormObject $formObject)
+    protected function injectResultInResponse()
     {
-        $formConfiguration = $formObject->getConfiguration();
+        $validationName = $this->validation instanceof Validation
+            ? $this->validation->getName()
+            : 'default';
 
-        if (false === $formConfiguration->hasField($this->fieldName)) {
-            throw EntryNotFoundException::ajaxControllerFieldNotFound($this->fieldName, $formObject);
-        }
+        $validationResult = MessageService::get()->sanitizeValidatorResult($this->result, $validationName);
 
-        return $formConfiguration;
-    }
-
-    /**
-     * Will build and fill an object with a form sent value.
-     *
-     * @return FormInterface
-     */
-    protected function buildFormObject()
-    {
-        $values = $this->cleanValuesFromUrl($this->form);
-
-        return $this->getPropertyMapper()->convert($values, $this->formClassName);
-    }
-
-    /**
-     * Will convert the result of the function called by this class in a JSON
-     * string.
-     *
-     * @param Result $result
-     * @return array
-     */
-    protected function convertResultToJson(Result $result)
-    {
-        $messages = [];
-
-        if ($result->hasErrors()) {
-            $messages['errors'] = $this->formatMessages($result->getErrors());
-        }
-
-        if ($result->hasWarnings()) {
-            $messages['warnings'] = $this->formatMessages($result->getWarnings());
-        }
-
-        if ($result->hasNotices()) {
-            $messages['notices'] = $this->formatMessages($result->getNotices());
-        }
-
-        return [
-            'success' => !$result->hasErrors(),
-            'messages' => $messages
+        $result = [
+            'success'  => !$this->result->hasErrors(),
+            'data'     => $this->result->getData(),
+            'messages' => [
+                'errors'   => $this->formatMessages($validationResult->getErrors()),
+                'warnings' => $this->formatMessages($validationResult->getWarnings()),
+                'notices'  => $this->formatMessages($validationResult->getNotices())
+            ]
         ];
+
+        $this->setUpResponseResult($result);
+    }
+
+    /**
+     * @param array $result
+     */
+    protected function setUpResponseResult(array $result)
+    {
+        $this->response->setHeader('Content-Type', 'application/json');
+        $this->response->setContent(json_encode($result));
+
+        Core::get()->getPageController()->setContentType('application/json');
     }
 
     /**
@@ -340,39 +299,50 @@ class AjaxValidationController extends ActionController
     }
 
     /**
-     * @param \Exception $exception
+     * Wrapper for unit tests.
+     *
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     */
+    protected function processRequestParent(RequestInterface $request, ResponseInterface $response)
+    {
+        parent::processRequest($request, $response);
+    }
+
+    /**
+     * Wrapper for unit tests.
+     */
+    protected function initializeActionMethodValidatorsParent()
+    {
+        parent::initializeActionMethodValidators();
+    }
+
+    /**
+     * Used in unit testing.
+     *
+     * @param bool $flag
+     */
+    public function setProtectedRequestMode($flag)
+    {
+        $this->protectedRequestMode = (bool)$flag;
+    }
+
+    /**
+     * @param Exception $exception
      * @return string
      */
-    protected function getDebugMessageForException(\Exception $exception)
+    protected function getDebugMessageForException(Exception $exception)
     {
         return 'Debug mode – ' . $exception->getMessage();
     }
 
     /**
-     * @param string $name
-     * @return mixed
+     * @return FormInterface
+     * @throws MissingArgumentException
      */
-    protected function getArgument($name)
+    protected function getForm()
     {
-        return GeneralUtility::_GP($name);
-    }
-
-    /**
-     * Will clean the string filled with form values sent with Ajax.
-     *
-     * @param array $values
-     * @return array
-     */
-    protected function cleanValuesFromUrl($values)
-    {
-        // Cleaning the given form values.
-        $values = reset($values);
-        unset($values['__referrer']);
-        unset($values['__trustedProperties']);
-
-        return isset($values[$this->formName])
-            ? $values[$this->formName]
-            : [];
+        return $this->arguments->getArgument($this->formName)->getValue();
     }
 
     /**
@@ -387,13 +357,12 @@ class AjaxValidationController extends ActionController
     }
 
     /**
-     * @return PropertyMapper
+     * Wrapper for unit tests.
+     *
+     * @return Request
      */
-    protected function getPropertyMapper()
+    protected function getRequest()
     {
-        /** @var PropertyMapper $propertyMapper */
-        $propertyMapper = Core::instantiate(PropertyMapper::class);
-
-        return $propertyMapper;
+        return $this->request;
     }
 }

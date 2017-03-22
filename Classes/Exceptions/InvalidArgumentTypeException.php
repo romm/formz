@@ -175,4 +175,21 @@ class InvalidArgumentTypeException extends FormzException
 
         return $exception;
     }
+
+    /**
+     * @code 1490179427
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function ajaxControllerWrongFormType($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_TYPE,
+            [FormInterface::class, $className]
+        );
+
+        return $exception;
+    }
 }

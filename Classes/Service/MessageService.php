@@ -14,7 +14,6 @@
 namespace Romm\Formz\Service;
 
 use Romm\Formz\Configuration\Form\Field\Validation\Message as FormzMessage;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -59,28 +58,28 @@ class MessageService implements SingletonInterface
      * if they are instances of `FormzMessageInterface`. If not, they are
      * converted in order to have more informations that are needed later.
      *
-     * @param Result     $result
-     * @param Validation $validation
+     * @param Result $result
+     * @param string $validationName
      * @return Result
      */
-    public function sanitizeValidatorResult(Result $result, Validation $validation)
+    public function sanitizeValidatorResult(Result $result, $validationName)
     {
         $newResult = new Result;
 
-        $this->sanitizeValidatorResultMessages('error', $result->getFlattenedErrors(), $newResult, $validation);
-        $this->sanitizeValidatorResultMessages('warning', $result->getFlattenedWarnings(), $newResult, $validation);
-        $this->sanitizeValidatorResultMessages('notice', $result->getFlattenedNotices(), $newResult, $validation);
+        $this->sanitizeValidatorResultMessages('error', $result->getFlattenedErrors(), $newResult, $validationName);
+        $this->sanitizeValidatorResultMessages('warning', $result->getFlattenedWarnings(), $newResult, $validationName);
+        $this->sanitizeValidatorResultMessages('notice', $result->getFlattenedNotices(), $newResult, $validationName);
 
         return $newResult;
     }
 
     /**
-     * @param string     $type
-     * @param array      $messages
-     * @param Result     $newResult
-     * @param Validation $validation
+     * @param string $type
+     * @param array  $messages
+     * @param Result $newResult
+     * @param string $validationName
      */
-    protected function sanitizeValidatorResultMessages($type, array $messages, Result $newResult, Validation $validation)
+    protected function sanitizeValidatorResultMessages($type, array $messages, Result $newResult, $validationName)
     {
         $addMethod = 'add' . ucfirst($type);
         $objectType = 'Romm\\Formz\\Error\\' . ucfirst($type);
@@ -93,7 +92,7 @@ class MessageService implements SingletonInterface
                     $message = new $objectType(
                         $message->getMessage(),
                         $message->getCode(),
-                        $validation->getName(),
+                        $validationName,
                         'unknown-' . ++$unknownCounter,
                         $message->getArguments(),
                         $message->getTitle()

@@ -113,4 +113,21 @@ class ClassNotFoundException extends FormzException
 
         return $exception;
     }
+
+    /**
+     * @code 1490179346
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function ajaxControllerFormClassNameNotFound($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_CLASS_NAME,
+            [$className]
+        );
+
+        return $exception;
+    }
 }

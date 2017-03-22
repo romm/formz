@@ -1,7 +1,6 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Service;
 
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Error\Error as FormzError;
 use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Error\Notice as FormzNotice;
@@ -24,9 +23,6 @@ class MessageServiceTest extends AbstractUnitTest
      */
     public function sanitizeValidatorResult()
     {
-        $validator = new Validation;
-        $validator->setName('foo');
-
         $result = new Result;
 
         $error1 = new Error('error1', 10);
@@ -48,7 +44,7 @@ class MessageServiceTest extends AbstractUnitTest
         $result->addNotice($notice2);
 
         $service = new MessageService;
-        $sanitizedResult = $service->sanitizeValidatorResult($result, $validator);
+        $sanitizedResult = $service->sanitizeValidatorResult($result, 'foo');
 
         $errors = $sanitizedResult->getErrors();
         $warnings = $sanitizedResult->getWarnings();

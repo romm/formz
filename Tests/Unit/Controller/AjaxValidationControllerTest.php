@@ -6,7 +6,9 @@ use ReflectionObject;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Controller\AjaxValidationController;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Form\FormObject;
@@ -17,10 +19,11 @@ use Romm\Formz\Tests\Fixture\Validation\Validator\ExceptionDummyValidator;
 use Romm\Formz\Tests\Fixture\Validation\Validator\MessagesValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
-use TYPO3\CMS\Extbase\Property\PropertyMapper;
-use TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationBuilder;
+use TYPO3\CMS\Extbase\Mvc\Web\Response;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 class AjaxValidationControllerTest extends AbstractUnitTest
 {
@@ -75,54 +78,6 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     }
 
     /**
-     * If an argument is missing in the HTTP request, an exception should be
-     * thrown.
-     *
-     * @param array $arguments
-     * @test
-     * @dataProvider missingArgumentThrowsExceptionDataProvider
-     */
-    public function missingArgumentThrowsException(array $arguments)
-    {
-        $this->setExpectedException(MissingArgumentException::class);
-
-        /** @var AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject $ajaxValidationController */
-        $ajaxValidationController = $this->getMockBuilder(AjaxValidationController::class)
-            ->setMethods(['getArgument'])
-            ->getMock();
-
-        $i = 0;
-
-        foreach ($arguments as $argument) {
-            $ajaxValidationController->expects($this->at($i++))
-                ->method('getArgument')
-                ->with($argument)
-                ->willReturn('foo');
-        }
-
-        $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction();
-    }
-
-    /**
-     * @return array
-     */
-    public function missingArgumentThrowsExceptionDataProvider()
-    {
-        $finalArguments = [];
-        $lastArgumentsList = [];
-        $requiredArguments = AjaxValidationController::$requiredArguments;
-        array_pop($requiredArguments);
-
-        foreach ($requiredArguments as $argument) {
-            $lastArgumentsList = array_merge($lastArgumentsList, [$argument]);
-            $finalArguments[] = [$lastArgumentsList];
-        }
-
-        return $finalArguments;
-    }
-
-    /**
      * When calling the request in protected mode, all exceptions should be
      * catch by the controller.
      *
@@ -132,18 +87,20 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     {
         $ajaxValidationController = $this->getAjaxValidationControllerMock();
 
-        $ajaxValidationController->runAction();
+        $ajaxValidationController->expects($this->once())
+            ->method('setUpResponseResult')
+            ->willReturnCallback(function ($result) {
+                $this->assertFalse($result['success']);
+                $this->assertEquals(
+                    ContextService::get()->translate(AjaxValidationController::DEFAULT_ERROR_MESSAGE_KEY),
+                    $result['messages']['errors']['unknown-1']
+                );
+            });
+
+        $ajaxValidationController->processRequest(new Request, new Response);
 
         $ajaxValidationController->expects($this->never())
             ->method('getDebugMessageForException');
-
-        $result = $ajaxValidationController->getView()->render();
-
-        $this->assertFalse($result['success']);
-        $this->assertEquals(
-            ContextService::get()->translate(AjaxValidationController::DEFAULT_ERROR_MESSAGE_KEY),
-            $result['messages']['errors']['default']
-        );
     }
 
     /**
@@ -162,17 +119,119 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $validation->activateAjaxUsage();
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
 
-        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
+        $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
         $ajaxValidationController->expects($this->once())
             ->method('getDebugMessageForException');
 
         $this->setExtensionConfigurationValue('debugMode', true);
 
-        $ajaxValidationController->runAction();
-        $result = $ajaxValidationController->getView()->render();
+        $ajaxValidationController->expects($this->once())
+            ->method('setUpResponseResult')
+            ->willReturnCallback(function ($result) {
+                $this->assertFalse($result['success']);
+            });
 
-        $this->assertFalse($result['success']);
+        $ajaxValidationController->processRequest(new Request, new Response);
+    }
+
+    /**
+     * @test
+     * @dataProvider requestArgumentMissingThrowsExceptionDataProvider
+     * @param RequestInterface $request
+     * @param string           $exceptionType
+     * @param string           $exceptionCode
+     */
+    public function requestArgumentMissingThrowsException(RequestInterface $request, $exceptionType = null, $exceptionCode = null)
+    {
+        if ($exceptionType) {
+            $this->setExpectedException($exceptionType, '', $exceptionCode);
+        }
+
+        /** @var AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject $controller */
+        $controller = $this->getMockBuilder(AjaxValidationController::class)
+            ->setMethods(['getRequest', 'resolveActionMethodName', 'initializeActionMethodArguments', 'initializeActionMethodValidatorsParent'])
+            ->getMock();
+
+        $controller->method('getRequest')
+            ->willReturn($request);
+
+        $controller->method('resolveActionMethodName')
+            ->willReturn('runAction');
+
+        $this->inject($controller, 'reflectionService', new ReflectionService);
+        $this->inject($controller, 'objectManager', Core::get()->getObjectManager());
+
+        $controller->setProtectedRequestMode(false);
+        $controller->processRequest(new Request, new Response);
+    }
+
+    /**
+     * @return array
+     */
+    public function requestArgumentMissingThrowsExceptionDataProvider()
+    {
+        /** @var Request|ObjectProphecy $request1 */
+        $request1 = $this->prophesize(Request::class);
+        $request1->hasArgument('name')
+            ->shouldBeCalled()
+            ->willReturn(false);
+
+        /** @var Request|ObjectProphecy $request1 */
+        $request2 = $this->prophesize(Request::class);
+        $request2->hasArgument('name')
+            ->shouldBeCalled()
+            ->willReturn(true);
+        $request2->hasArgument('className')
+            ->shouldBeCalled()
+            ->willReturn(false);
+
+        /** @var Request|ObjectProphecy $request1 */
+        $request3 = $this->prophesize(Request::class);
+        $request3->hasArgument('name')
+            ->shouldBeCalled()
+            ->willReturn(true);
+        $request3->hasArgument('className')
+            ->shouldBeCalled()
+            ->willReturn(true);
+        $request3->getArgument('className')
+            ->shouldBeCalled()
+            ->willReturn('undefined class');
+
+        /** @var Request|ObjectProphecy $request1 */
+        $request4 = $this->prophesize(Request::class);
+        $request4->hasArgument('name')
+            ->shouldBeCalled()
+            ->willReturn(true);
+        $request4->hasArgument('className')
+            ->shouldBeCalled()
+            ->willReturn(true);
+        $request4->getArgument('className')
+            ->shouldBeCalled()
+            ->willReturn(\stdClass::class);
+
+        return [
+            [
+                'request'       => $request1->reveal(),
+                'exceptionType' => MissingArgumentException::class,
+                'exceptionCode' => 1490179179
+            ],
+            [
+                'request'       => $request2->reveal(),
+                'exceptionType' => MissingArgumentException::class,
+                'exceptionCode' => 1490179250
+            ],
+            [
+                'request'       => $request3->reveal(),
+                'exceptionType' => ClassNotFoundException::class,
+                'exceptionCode' => 1490179346
+            ],
+            [
+                'request'       => $request4->reveal(),
+                'exceptionType' => InvalidArgumentTypeException::class,
+                'exceptionCode' => 1490179427
+            ]
+        ];
     }
 
     /**
@@ -187,10 +246,10 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $formObject = $this->getDefaultFormObject();
         $formObject->getConfigurationValidationResult()->addError(new Error('foo', 42));
 
-        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
+        $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction();
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
     }
 
     /**
@@ -203,10 +262,10 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     {
         $this->setExpectedException(EntryNotFoundException::class, '', 1487671603);
 
-        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([AjaxValidationController::ARGUMENT_FIELD_NAME => 'unknown']);
+        $ajaxValidationController = $this->getAjaxValidationControllerMock();
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction();
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'unknown', 'bar');
     }
 
     /**
@@ -218,10 +277,10 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     public function validatingFieldWithUnknownValidationThrowsException()
     {
         $this->setExpectedException(EntryNotFoundException::class, '', 1487672956);
-        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling();
+        $ajaxValidationController = $this->getAjaxValidationControllerMock();
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction();
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
     }
 
     /**
@@ -239,10 +298,10 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $validation->setName('bar');
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
 
-        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
+        $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction();
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
     }
 
     /**
@@ -251,8 +310,13 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     public function validationWithValidValueWorks()
     {
         $expectedResult = [
-            'success' => true,
-            'messages' => []
+            'success'  => true,
+            'messages' => [
+                'errors'   => [],
+                'warnings' => [],
+                'notices'  => []
+            ],
+            'data'     => []
         ];
 
         $formObject = $this->getDefaultFormObject();
@@ -262,13 +326,17 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $validation->activateAjaxUsage();
         $formObject->getConfiguration()->getField('foo')->addValidation($validation);
 
-        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
+        $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction();
-        $result = $ajaxValidationController->getView()->render();
 
-        $this->assertEquals($expectedResult, $result);
+        $ajaxValidationController->expects($this->once())
+            ->method('setUpResponseResult')
+            ->willReturnCallback(function ($result) use ($expectedResult) {
+                $this->assertEquals($expectedResult, $result);
+            });
+
+        $ajaxValidationController->processRequest(new Request, new Response);
     }
 
     /**
@@ -279,12 +347,13 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     public function messagesTypesAreReturnedInResult()
     {
         $expectedResult = [
-            'success' => false,
+            'success'  => false,
             'messages' => [
-                'errors' => [MessagesValidator::MESSAGE_1 => MessagesValidator::MESSAGE_1],
+                'errors'   => [MessagesValidator::MESSAGE_1 => MessagesValidator::MESSAGE_1],
                 'warnings' => [MessagesValidator::MESSAGE_2 => MessagesValidator::MESSAGE_2],
-                'notices' => [MessagesValidator::MESSAGE_3 => MessagesValidator::MESSAGE_3]
-            ]
+                'notices'  => [MessagesValidator::MESSAGE_3 => MessagesValidator::MESSAGE_3]
+            ],
+            'data'     => []
         ];
 
         $formObject = $this->getDefaultFormObject();
@@ -295,13 +364,17 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $messagesValidator->activateAjaxUsage();
         $formObject->getConfiguration()->getField('foo')->addValidation($messagesValidator);
 
-        $ajaxValidationController = $this->getAjaxValidationControllerMockWithArgumentsHandling([], $formObject);
+        $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction();
-        $result = $ajaxValidationController->getView()->render();
 
-        $this->assertEquals($expectedResult, $result);
+        $ajaxValidationController->expects($this->once())
+            ->method('setUpResponseResult')
+            ->willReturnCallback(function ($result) use ($expectedResult) {
+                $this->assertEquals($expectedResult, $result);
+            });
+
+        $ajaxValidationController->processRequest(new Request, new Response);
     }
 
     /**
@@ -312,17 +385,17 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     {
         /** @var AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject $ajaxValidationController */
         $ajaxValidationController = $this->getMockBuilder(AjaxValidationController::class)
-            ->setMethods(['getArgument', 'getFormObject', 'getPropertyMapper', 'throwStatus', 'getDebugMessageForException'])
+            ->setMethods(['processRequestParent', 'setUpResponseResult', 'getForm', 'getFormObject', 'throwStatus', 'getDebugMessageForException'])
             ->getMock();
 
-        /** @var PropertyMapper $propertyMapper */
-        $propertyMapper = new PropertyMapper;
-        $this->inject($propertyMapper, 'objectManager', Core::get()->getObjectManager());
-        $this->inject($propertyMapper, 'configurationBuilder', new PropertyMappingConfigurationBuilder);
-        $propertyMapper->initializeObject();
+        $ajaxValidationController->method('processRequestParent')
+            ->willReturnCallback(function () use ($ajaxValidationController) {
+                $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
+            });
 
-        $ajaxValidationController->method('getPropertyMapper')
-            ->willReturn($propertyMapper);
+        $form = new DefaultForm;
+        $ajaxValidationController->method('getForm')
+            ->willReturn($form);
 
         $view = $this->getMockBuilder(JsonView::class)
             ->setMethods(['render'])
@@ -343,40 +416,6 @@ class AjaxValidationControllerTest extends AbstractUnitTest
 
         $ajaxValidationController->method('getFormObject')
             ->willReturn($formObject);
-
-        return $ajaxValidationController;
-    }
-
-    /**
-     * @param array           $arguments
-     * @param FormObject|null $formObject
-     * @return AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getAjaxValidationControllerMockWithArgumentsHandling(array $arguments = [], FormObject $formObject = null)
-    {
-        $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
-
-        $defaultArguments = [
-            AjaxValidationController::ARGUMENT_FORM_CLASS_NAME => DefaultForm::class,
-            AjaxValidationController::ARGUMENT_FORM_NAME       => 'foo',
-            AjaxValidationController::ARGUMENT_FORM            => [
-                'tx_my_form' => [
-                    ['foo' => 'bar']
-                ]
-            ],
-            AjaxValidationController::ARGUMENT_FIELD_NAME      => 'foo',
-            AjaxValidationController::ARGUMENT_VALIDATOR_NAME  => 'bar'
-        ];
-
-        $i = 0;
-        $arguments = array_merge($defaultArguments, $arguments);
-
-        foreach ($arguments as $key => $value) {
-            $ajaxValidationController->expects($this->at($i++))
-                ->method('getArgument')
-                ->with($key)
-                ->willReturn($value);
-        }
 
         return $ajaxValidationController;
     }

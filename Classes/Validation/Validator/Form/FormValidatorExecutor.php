@@ -238,7 +238,7 @@ class FormValidatorExecutor
         );
 
         $validatorResult = $validator->validate($fieldValue);
-        $validatorResult = MessageService::get()->sanitizeValidatorResult($validatorResult, $validation);
+        $validatorResult = MessageService::get()->sanitizeValidatorResult($validatorResult, $validation->getName());
 
         if ($validator instanceof AbstractValidator
             && false === empty($validationData = $validator->getValidationData())
