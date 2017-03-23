@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -21,7 +21,7 @@ class Behaviour extends AbstractFormzConfiguration
     /**
      * @var string
      * @validate NotEmpty
-     * @validate Romm.Formz:Internal\ClassExists
+     * @validate Romm.ConfigurationObject:ClassExists
      */
     protected $className;
 
@@ -31,5 +31,13 @@ class Behaviour extends AbstractFormzConfiguration
     public function getClassName()
     {
         return $this->className;
+    }
+
+    /**
+     * @param string $className
+     */
+    public function setClassName($className)
+    {
+        $this->className = $className;
     }
 }

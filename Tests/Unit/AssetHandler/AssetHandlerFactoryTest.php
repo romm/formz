@@ -22,7 +22,7 @@ class AssetHandlerFactoryTest extends AbstractUnitTest
      */
     public function assetHandlerFactoryIsInitializedCorrectly()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -54,7 +54,7 @@ class AssetHandlerFactoryTest extends AbstractUnitTest
      */
     public function assetHandlerIsInitializedCorrectly()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
         $foo = 'foo';
         $bar = 'bar';
@@ -110,7 +110,7 @@ class AssetHandlerFactoryTest extends AbstractUnitTest
     {
         $this->setExpectedException(ClassNotFoundException::class);
 
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -128,7 +128,7 @@ class AssetHandlerFactoryTest extends AbstractUnitTest
     {
         $this->setExpectedException(InvalidArgumentTypeException::class);
 
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);

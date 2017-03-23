@@ -34,7 +34,7 @@ Fonction                                                                        
 
 :ref:`getElements() <developerManual-javaScript-field-getElements>`                                                         Récupère la configuration complète.
 
-:ref:`getFeedbackListContainer() <developerManual-javaScript-field-getFeedbackListContainer>`                               Récupérer l'élément DOM du conteneur de retours de validation.
+:ref:`getMessageListContainer() <developerManual-javaScript-field-getMessageListContainer>`                                 Récupérer l'élément DOM du conteneur de messages de validation.
 
 :ref:`getErrors() <developerManual-javaScript-field-getErrors>`                                                             Récupérer les erreurs.
 
@@ -66,7 +66,7 @@ Fonction                                                                        
 
 :ref:`onValidationDone() <developerManual-javaScript-field-onValidationDone>`                                               Détecter la fin de la validation.
 
-:ref:`refreshFeedback() <developerManual-javaScript-field-refreshFeedback>`                                                 Vider le conteneur de messages.
+:ref:`refreshMessages() <developerManual-javaScript-field-refreshMessage>`                                                  Vider le conteneur de messages.
 
 :ref:`validate() <developerManual-javaScript-field-validate>`                                                               Lancer le processus de validation.
 
@@ -126,7 +126,7 @@ Rajouter une condition d'activation
 
         .. note::
 
-            Cette fonction est appelée par le cœur de Formz, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de champs <fieldsActivation-condition>`.
+            Cette fonction est appelée par le cœur de FormZ, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de champs <fieldsActivation-expression>`.
 
 .. _developerManual-javaScript-field-addActivationConditionForValidator:
 
@@ -178,7 +178,7 @@ Rajouter une condition d'activation pour une règle de validation
 
         .. note::
 
-            Cette fonction est appelée par le cœur de Formz, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de règles de validation <validatorsActivation>`.
+            Cette fonction est appelée par le cœur de FormZ, dans du code généré automatiquement à partir des valeurs contenus dans la configuration TypoScript des :ref:`conditions d'activations de règles de validation <validatorsActivation>`.
 
 -----
 
@@ -195,7 +195,7 @@ Rajouter une règle de validation
         /
     Paramètres
         - ``validationName`` (String) : le nom de la règle (son index), doit être unique pour ce champ.
-        - ``validatorName`` (String) : le nom du validateur utilisé pour cette règle. Cela doit être un validateur existant, rajouté via :ref:`Formz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
+        - ``validatorName`` (String) : le nom du validateur utilisé pour cette règle. Cela doit être un validateur existant, rajouté via :ref:`Fz.Validation.registerValidator() <developerManual-javaScript-validation-registerValidator>`.
         - ``validationConfiguration`` (Object) : la configuration du validateur, qui lui sera transmise lorsque la validation sera lancée.
     Description
         Rajoute une règle de validation au champ.
@@ -364,7 +364,7 @@ Récupérer les éléments DOM du champ
 
 -----
 
-.. _developerManual-javaScript-field-getFeedbackListContainer:
+.. _developerManual-javaScript-field-getMessageListContainer:
 
 Récupérer l'élément DOM du conteneur de retours de validation
 -------------------------------------------------------------
@@ -372,7 +372,7 @@ Récupérer l'élément DOM du conteneur de retours de validation
 .. container:: table-row
 
     Fonction
-        ``getFeedbackListContainer()``
+        ``getMessageListContainer()``
     Retour
         ``Element``
     Description
@@ -382,7 +382,7 @@ Récupérer l'élément DOM du conteneur de retours de validation
 
         .. note::
 
-            La valeur du paramètre TypoScript :ref:`settings.feedbackListSelector <fieldsSettings-feedbackListSelector>` sera utilisée pour sélectionner l'élément.
+            La valeur du paramètre TypoScript :ref:`settings.messageListSelector <fieldsSettings-messageListSelector>` sera utilisée pour sélectionner l'élément.
 
 -----
 
@@ -436,7 +436,7 @@ Récupérer le formulaire parent
     Fonction
         ``getForm()``
     Retour
-        ``Formz.FullForm``
+        ``Fz.FullForm``
     Description
         Retourne l'instance du formulaire dont fait partie ce champ.
 
@@ -470,7 +470,7 @@ Récupérer le modèle de message
     Retour
         ``String``
     Description
-        Retourne le modèle de message à utiliser lorsqu'un message doit être rajouté dans le :ref:`conteneur de retours de validation <developerManual-javaScript-field-getFeedbackListContainer>`.
+        Retourne le modèle de message à utiliser lorsqu'un message doit être rajouté dans le :ref:`conteneur de retours de validation <developerManual-javaScript-field-getMessageListContainer>`.
 
         Ce modèle peut être récupéré de deux façons :
 
@@ -672,7 +672,7 @@ Détecter la fin de la validation
 
 -----
 
-.. _developerManual-javaScript-field-refreshFeedback:
+.. _developerManual-javaScript-field-refreshMessage:
 
 Vider le conteneur de messages
 ------------------------------
@@ -680,7 +680,7 @@ Vider le conteneur de messages
 .. container:: table-row
 
     Fonction
-        ``refreshFeedback()``
+        ``refreshMessages()``
     Retour
         /
     Description

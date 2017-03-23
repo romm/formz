@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\FormzMessageInterface;
 
@@ -60,7 +61,7 @@ class FieldHasErrorCondition extends AbstractConditionItem
     {
         return sprintf(
             '[%s="1"]',
-            DataAttributesAssetHandler::getFieldDataValidationErrorKey($this->fieldName, $this->validationName, $this->errorName)
+            DataAttributesAssetHandler::getFieldDataValidationMessageKey($this->fieldName, 'error', $this->validationName, $this->errorName)
         );
     }
 
@@ -69,13 +70,11 @@ class FieldHasErrorCondition extends AbstractConditionItem
      */
     public function getJavaScriptResult()
     {
-        return $this->getDefaultJavaScriptCall(
-            [
-                'fieldName'      => $this->fieldName,
-                'validationName' => $this->validationName,
-                'errorName'      => $this->errorName
-            ]
-        );
+        return $this->getDefaultJavaScriptCall([
+            'fieldName'      => $this->fieldName,
+            'validationName' => $this->validationName,
+            'errorName'      => $this->errorName
+        ]);
     }
 
     /**
@@ -84,9 +83,10 @@ class FieldHasErrorCondition extends AbstractConditionItem
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
         $flag = false;
-        $result = $dataObject->getFormValidator()
-            ->validateField($this->fieldName)
-            ->forProperty($this->fieldName);
+        $formValidator = $dataObject->getFormValidator();
+        $field = $this->formObject->getConfiguration()->getField($this->fieldName);
+        $formValidator->validateField($field);
+        $result = $formValidator->getResult()->forProperty($this->fieldName);
 
         foreach ($result->getErrors() as $error) {
             if ($error instanceof FormzMessageInterface
@@ -102,26 +102,22 @@ class FieldHasErrorCondition extends AbstractConditionItem
     }
 
     /**
-     * @return string
+     * @see validateConditionConfiguration()
+     * @throws InvalidConditionException
+     * @return bool
      */
-    public function getFieldName()
+    protected function checkConditionConfiguration()
     {
-        return $this->fieldName;
-    }
+        $configuration = $this->formObject->getConfiguration();
 
-    /**
-     * @return string
-     */
-    public function getValidationName()
-    {
-        return $this->validationName;
-    }
+        if (false === $configuration->hasField($this->fieldName)) {
+            throw InvalidConditionException::conditionFieldHasErrorFieldNotFound($this->fieldName);
+        }
 
-    /**
-     * @return string
-     */
-    public function getErrorName()
-    {
-        return $this->errorName;
+        if (false === $configuration->getField($this->fieldName)->hasValidation($this->validationName)) {
+            throw InvalidConditionException::conditionFieldHasErrorValidationNotFound($this->validationName, $this->fieldName);
+        }
+
+        return true;
     }
 }

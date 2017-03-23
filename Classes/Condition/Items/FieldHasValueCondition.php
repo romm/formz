@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -44,22 +45,6 @@ class FieldHasValueCondition extends AbstractConditionItem
     protected $fieldValue;
 
     /**
-     * @return string
-     */
-    public function getFieldName()
-    {
-        return $this->fieldName;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFieldValue()
-    {
-        return $this->fieldValue;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getCssResult()
@@ -76,12 +61,10 @@ class FieldHasValueCondition extends AbstractConditionItem
      */
     public function getJavaScriptResult()
     {
-        return $this->getDefaultJavaScriptCall(
-            [
-                'fieldName'  => $this->fieldName,
-                'fieldValue' => $this->fieldValue
-            ]
-        );
+        return $this->getDefaultJavaScriptCall([
+            'fieldName'  => $this->fieldName,
+            'fieldValue' => $this->fieldValue
+        ]);
     }
 
     /**
@@ -94,5 +77,21 @@ class FieldHasValueCondition extends AbstractConditionItem
         return (is_array($value))
             ? (true === in_array($this->fieldValue, $value))
             : ($value == $this->fieldValue);
+    }
+
+    /**
+     * @see validateConditionConfiguration()
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    protected function checkConditionConfiguration()
+    {
+        $configuration = $this->formObject->getConfiguration();
+
+        if (false === $configuration->hasField($this->fieldName)) {
+            throw InvalidConditionException::conditionFieldHasValueFieldNotFound($this->fieldName);
+        }
+
+        return true;
     }
 }

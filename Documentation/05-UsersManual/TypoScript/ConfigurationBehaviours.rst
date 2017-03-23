@@ -12,7 +12,7 @@ Behaviours
 
 A behaviour is a process bound to a field, and allows to dynamically modify its value. It will be called before the validation of a field, allowing more flexibility to the rules.
 
-A good example is available within the core of Formz: ``toLowerCase`` is a behaviour to transform to lower case the value of a field. For instance, it can be used on a field containing an email address.
+A good example is available within the core of FormZ: ``toLowerCase`` is a behaviour to transform to lower case the value of a field. For instance, it can be used on a field containing an email address.
 
 .. hint::
 

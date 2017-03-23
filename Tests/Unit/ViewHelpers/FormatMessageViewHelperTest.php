@@ -9,12 +9,11 @@ use Romm\Formz\Error\Notice;
 use Romm\Formz\Error\Warning;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
 use TYPO3\CMS\Extbase\Error\Message;
 
 class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
@@ -47,7 +46,7 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
         );
 
         $formService = $this->getFormService();
-        $fieldService = new FieldService;
+        $fieldService = new FieldViewHelperService;
 
         $viewHelper->injectFormService($formService);
         $viewHelper->injectFieldService($fieldService);
@@ -77,10 +76,10 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
     public function renderViewHelperDataProvider()
     {
         $barField = new Field;
-        $barField->setFieldName('bar');
+        $barField->setName('bar');
 
         $bazField = new Field;
-        $bazField->setFieldName('baz');
+        $bazField->setName('baz');
 
         return [
             [
@@ -96,12 +95,8 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
                 'expected' => '<span class="js-validation-rule-bar js-validation-type-notice js-validation-message-baz">foo</span>'
             ],
             [
-                'message'  => new Message('foo', 1337),
-                'expected' => '<span class="js-validation-rule-unknown js-validation-type-message js-validation-message-unknown">foo</span>'
-            ],
-            [
                 'message'         => new Error('foo', 1337, 'bar', 'baz'),
-                'expected'        => 'foo - formz-foo-foo - error - bar - baz - foo',
+                'expected'        => 'foo - fz-foo-foo - error - bar - baz - foo',
                 'messageTemplate' => '#FIELD# - #FIELD_ID# - #TYPE# - #VALIDATOR# - #KEY# - #MESSAGE#'
             ],
             [
@@ -128,18 +123,18 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
                 'message'           => new Error('foo', 1337, 'bar', 'baz'),
                 'expected'          => null,
                 'messageTemplate'   => null,
-                'expectedException' => InvalidEntryException::class,
+                'expectedException' => EntryNotFoundException::class,
                 'field'             => new Field
             ]
         ];
     }
 
     /**
-     * @return FormService|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getFormService()
     {
-        $service = $this->getMockBuilder(FormService::class)
+        $service = $this->getMockBuilder(FormViewHelperService::class)
             ->setMethods(['getFormObject'])
             ->getMock();
         $formObjectFactory = new FormObjectFactory;

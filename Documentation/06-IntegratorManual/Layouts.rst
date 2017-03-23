@@ -27,7 +27,7 @@ Finally, the **maintainability becomes harder**. Indeed, if a modification must 
 Solution
 ^^^^^^^^
 
-To solve this problem, Formz allows to **regroup templates for fields in standalone views**. The code required to integrate a field is then **much shorter and more understandable, but also more maintainable**: when a modification is done in a field layout, it is done for every real field which actually uses this layout.
+To solve this problem, FormZ allows to **regroup templates for fields in standalone views**. The code required to integrate a field is then **much shorter and more understandable, but also more maintainable**: when a modification is done in a field layout, it is done for every real field which actually uses this layout.
 
 -----
 
@@ -44,7 +44,7 @@ You are then able to use this new layout with any form field.
 TypoScript Configuration
 """"""""""""""""""""""""
 
-The TypoScript configuration of your layout must be inside a **layout group**. Formz provides by default the group ``default``.
+The TypoScript configuration of your layout must be inside a **layout group**. FormZ provides by default the group ``default``.
 
 .. tip::
 
@@ -71,7 +71,7 @@ Template file creation
 
 The template file declared in the property ``templateFile`` of the TypoScript configuration must be created, if it doesn't exist yet. You should try to use this template with as much layouts as you can.
 
-It's advised to divide your template in several sections, which contain the important blocks that are used by your layout. By default, three sections are used: ``Label``, ``Field`` and ``Feedback``.
+It's advised to divide your template in several sections, which contain the important blocks that are used by your layout. By default, three sections are used: ``Label``, ``Field`` and ``Message``.
 
 The following variables can be used in your template:
 
@@ -81,11 +81,11 @@ The following variables can be used in your template:
 
 * ``fieldName``: name of the current field (the value of the property ``name`` used in the ViewHelper :ref:`integratorManual-viewHelpers-field`).
 
-* ``fieldId``: if this argument was not declared before, it will be automatically filled with an identifier generated with the name of the form and the name of the field. Example for the field ``email`` of the form ``myForm``: ``formz-my-form-email``.
+* ``fieldId``: if this argument was not declared before, it will be automatically filled with an identifier generated with the name of the form and the name of the field. Example for the field ``email`` of the form ``myForm``: ``fz-my-form-email``.
 
 .. important::
 
-    In order to be fully working with Formz, your template must respect all the rules defined in the chapter “:ref:`integratorManual-configuration`”.
+    In order to be fully working with FormZ, your template must respect all the rules defined in the chapter “:ref:`integratorManual-configuration`”.
 
 **Example:**
 
@@ -95,23 +95,23 @@ The following variables can be used in your template:
 
     <f:layout name="{layout}" />
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <f:section name="Label">
         <label class="{f:if(condition: '{required}', then: 'required')}" for="{fieldId}">{label}</label>
     </f:section>
 
     <f:section name="Field">
-        <div formz-field-container="{fieldName}">
-            <formz:renderSection section="Field" />
+        <div fz-field-container="{fieldName}">
+            <fz:slot.render slot="Field" />
         </div>
     </f:section>
 
-    <f:section name="Feedback">
-        <div formz-field-feedback-container="{fieldName}">
-            <div formz-field-feedback-list="{fieldName}">
+    <f:section name="Messages">
+        <div fz-field-message-container="{fieldName}">
+            <div fz-field-message-list="{fieldName}">
                 <f:for each="{validationResults.errors}" iteration="iteration" as="error">
-                    <formz:formatMessage message="{error}" />
+                    <fz:formatMessage message="{error}" />
                 </f:for>
             </div>
         </div>
@@ -139,7 +139,7 @@ Use the layout to get the wanted dividing, which may then be used by the form fi
             <f:render section="Field" arguments="{_all}" />
         </div>
         <div class="col-md-4">
-            <f:render section="Feedback" arguments="{_all}" />
+            <f:render section="Messages" arguments="{_all}" />
         </div>
     </div>
 
@@ -158,16 +158,16 @@ If you need to know more, read the chapter “:ref:`integratorManual-viewHelpers
     :linenos:
     :emphasize-lines: 5
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
 
-        <formz:field name="email" layout="my-project.one-column">
-            <formz:option name="required" value="1" />
+        <fz:field name="email" layout="my-project.one-column">
+            <fz:option name="required" value="1" />
 
-            <formz:section name="Field">
+            <fz:slot name="Field">
                 <f:form.textfield property="{fieldName}" id="{fieldId}" placeholder="email" />
-            </formz:section>
-        </formz:field>
+            </fz:slot>
+        </fz:field>
 
-    </formz:form>
+    </fz:form>

@@ -1,4 +1,10 @@
 config.tx_formz {
+    settings {
+        defaultFieldSettings {
+            messageTemplate = <p class="js-validation-rule-#VALIDATOR# js-validation-type-#TYPE# js-validation-message-#KEY#">#MESSAGE#</p>
+        }
+    }
+
     view {
         classes {
             valid {

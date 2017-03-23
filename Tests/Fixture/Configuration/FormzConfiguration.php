@@ -10,9 +10,9 @@ class FormzConfiguration
 {
 
     /**
-     * Returns the default configuration for Formz.
+     * Returns the default configuration for FormZ.
      *
-     * Will parse the default Formz TypoScript configuration file, located at:
+     * Will parse the default FormZ TypoScript configuration file, located at:
      * `EXT:formz/Configuration/TypoScript/Configuration/Settings.ts` and
      * convert it to a plain array. The array is then returned.
      *

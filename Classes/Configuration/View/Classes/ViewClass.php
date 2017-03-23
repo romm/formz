@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -16,6 +16,7 @@ namespace Romm\Formz\Configuration\View\Classes;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 
 class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorInterface
 {
@@ -53,22 +54,34 @@ class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorIn
     }
 
     /**
-     * @param string $itemName
+     * @param string $name
      * @return bool
      */
-    public function hasItem($itemName)
+    public function hasItem($name)
     {
-        return true === isset($this->items[$itemName]);
+        return true === isset($this->items[$name]);
     }
 
     /**
-     * @param string $itemName
-     * @return array|null
+     * @param string $name
+     * @return array
+     * @throws EntryNotFoundException
      */
-    public function getItem($itemName)
+    public function getItem($name)
     {
-        return (true === isset($this->items[$itemName]))
-            ? $this->items[$itemName]
-            : null;
+        if (false === $this->hasItem($name)) {
+            throw EntryNotFoundException::viewClassNotFound($name);
+        }
+
+        return $this->items[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     */
+    public function addItem($name, $value)
+    {
+        $this->items[$name] = $value;
     }
 }

@@ -84,7 +84,7 @@ Récupérer un champ donné
     Fonction
         ``getFieldByName(name)``
     Retour
-        ``Formz.FullField``
+        ``Fz.FullField``
     Paramètres
         - ``name`` : le nom du champ.
     Description
@@ -108,7 +108,7 @@ Récupérer tous les champs
     Fonction
         ``getFields()``
     Retour
-        ``Object<Formz.FullField>``
+        ``Object<Fz.FullField>``
     Description
         Récupère tous les champs de ce formulaire.
 

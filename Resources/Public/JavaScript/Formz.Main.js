@@ -1,7 +1,7 @@
 // Declaring namespace.
-var Formz = (function() {
+var Fz = (function() {
     /**
-     * Contains the general configuration of Formz.
+     * Contains the general configuration of FormZ.
      *
      * @type {Object}
      */
@@ -48,15 +48,17 @@ var Formz = (function() {
         /**
          * This function is called to debug anything, and will actually display
          * something only if the debug tool is activated (this is an option in
-         * Formz extension configuration).
+         * FormZ extension configuration).
          *
          * @param {*}      value
          * @param {string} type
          */
         debug: function(value, type) {
-            if (typeof Formz.Debug !== 'undefined') {
-                Formz.Debug.debug(value, type);
+            if (typeof Fz.Debug !== 'undefined') {
+                Fz.Debug.debug(value, type);
             }
         }
     };
 })();
+
+var Formz = Fz;

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,12 +13,15 @@
 
 namespace Romm\Formz\Condition;
 
-use Romm\Formz\Condition\Items\AbstractConditionItem;
+use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Condition\Items\FieldHasErrorCondition;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
 use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
-use Romm\Formz\Service\Traits\FacadeInstanceTrait;
+use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -36,7 +39,7 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class ConditionFactory implements SingletonInterface
 {
-    use FacadeInstanceTrait;
+    use SelfInstantiateTrait;
 
     /**
      * @var array
@@ -57,27 +60,30 @@ class ConditionFactory implements SingletonInterface
      * used as the identifier for the TypoScript conditions. By convention, you
      * should use the following syntax: `extension_name.condition_name`.
      *
-     * The condition class must extend this class (`AbstractConditionItem`) and
-     * implement the abstract functions.
+     * The condition class must implement the interface
+     * `ConditionItemInterface`.
      *
-     * @param string $conditionName  The name of the condition, which will then be available for TypoScript conditions.
-     * @param string $conditionClass Class which will process the condition.
+     * @param string $name      The name of the condition, which will then be available for TypoScript conditions.
+     * @param string $className Class which will process the condition.
      * @return $this
-     * @throws \Exception
+     * @throws ClassNotFoundException
+     * @throws InvalidArgumentTypeException
      */
-    public function registerCondition($conditionName, $conditionClass)
+    public function registerCondition($name, $className)
     {
-        if (false === is_string($conditionName)) {
-            throw new \Exception('The name of the condition must be a correct string (current type: "' . gettype($conditionName) . '".', 1466588489);
+        if (false === is_string($name)) {
+            throw InvalidArgumentTypeException::conditionNameNotString($name);
         }
 
-        if (false === class_exists($conditionClass)
-            || false === is_subclass_of($conditionClass, AbstractConditionItem::class)
-        ) {
-            throw new \Exception('The condition class must extend "' . AbstractConditionItem::class . '" (given class is "' . $conditionClass . '").', 1466588495);
+        if (false === class_exists($className)) {
+            throw ClassNotFoundException::conditionClassNameNotFound($name, $className);
         }
 
-        $this->conditions[$conditionName] = $conditionClass;
+        if (false === in_array(ConditionItemInterface::class, class_implements($className))) {
+            throw InvalidArgumentTypeException::conditionClassNameNotValid($className);
+        }
+
+        $this->conditions[$name] = $className;
 
         return $this;
     }
@@ -97,22 +103,19 @@ class ConditionFactory implements SingletonInterface
      *
      * @param $conditionName
      * @return mixed
-     * @throws \Exception
+     * @throws EntryNotFoundException
      */
     public function getCondition($conditionName)
     {
         if (false === $this->hasCondition($conditionName)) {
-            throw new \Exception(
-                'Trying to access a condition which is not registered: "' . $conditionName . '". Here is a list of all currently registered conditions: "' . implode('" ,"', array_keys($this->conditions)) . '".',
-                1472650209
-            );
+            throw EntryNotFoundException::conditionNotFound($conditionName, $this->conditions);
         }
 
         return $this->conditions[$conditionName];
     }
 
     /**
-     * Registers all default conditions from Formz core.
+     * Registers all default conditions from FormZ core.
      */
     public function registerDefaultConditions()
     {

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -44,7 +45,7 @@ class FieldIsEmptyCondition extends AbstractConditionItem
      */
     public function getCssResult()
     {
-        return '[' . DataAttributesAssetHandler::getFieldDataValidKey($this->fieldName) . '=""]';
+        return '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '=""]';
     }
 
     /**
@@ -66,10 +67,18 @@ class FieldIsEmptyCondition extends AbstractConditionItem
     }
 
     /**
-     * @return string
+     * @see validateConditionConfiguration()
+     * @throws InvalidConditionException
+     * @return bool
      */
-    public function getFieldName()
+    protected function checkConditionConfiguration()
     {
-        return $this->fieldName;
+        $configuration = $this->formObject->getConfiguration();
+
+        if (false === $configuration->hasField($this->fieldName)) {
+            throw InvalidConditionException::conditionFieldIsEmptyFieldNotFound($this->fieldName);
+        }
+
+        return true;
     }
 }

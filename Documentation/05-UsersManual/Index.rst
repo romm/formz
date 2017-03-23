@@ -13,7 +13,7 @@ User manual
 
 .. only:: html
 
-    Formz configuration is exclusively done in TypoScript, see the configuration list: “:ref:`usersManual-typoScript`”.
+    FormZ configuration is exclusively done in TypoScript, see the configuration list: “:ref:`usersManual-typoScript`”.
 
     You can also read the chapter “:ref:`usersManual-tips`” for tips about it.
 

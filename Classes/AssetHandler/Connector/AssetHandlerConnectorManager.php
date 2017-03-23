@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -15,6 +15,7 @@ namespace Romm\Formz\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\FileCreationFailedException;
 use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -74,20 +75,17 @@ class AssetHandlerConnectorManager
      */
     public static function get(PageRenderer $pageRenderer, AssetHandlerFactory $assetHandlerFactory)
     {
-        $hash = sha1(spl_object_hash($pageRenderer) . spl_object_hash($assetHandlerFactory));
+        $hash = spl_object_hash($pageRenderer) . spl_object_hash($assetHandlerFactory);
 
         if (false === isset(self::$instances[$hash])) {
-            /** @noinspection PhpMethodParametersCountMismatchInspection */
-            self::$instances[$hash] = Core::get()
-                ->getObjectManager()
-                ->get(self::class, $pageRenderer, $assetHandlerFactory);
+            self::$instances[$hash] = Core::instantiate(self::class, $pageRenderer, $assetHandlerFactory);
         }
 
         return self::$instances[$hash];
     }
 
     /**
-     * Will take care of including internal Formz JavaScript and CSS files. They
+     * Will take care of including internal FormZ JavaScript and CSS files. They
      * will be included only once, even if the view helper is used several times
      * in the same page.
      *
@@ -114,11 +112,19 @@ class AssetHandlerConnectorManager
     public function getFormzGeneratedFilePath($prefix = '')
     {
         $formObject = $this->assetHandlerFactory->getFormObject();
+        $formIdentifier = CacheService::get()->getFormCacheIdentifier($formObject->getClassName(), $formObject->getName());
         $prefix = (false === empty($prefix))
             ? $prefix . '-'
             : '';
 
-        return CacheService::GENERATED_FILES_PATH . CacheService::get()->getCacheIdentifier('formz-' . $prefix, $formObject->getClassName() . '-' . $formObject->getName());
+        $identifier = substr(
+            'fz-' . $prefix . $formIdentifier,
+            0,
+            22
+        );
+        $identifier .= '-' . md5($formObject->getHash());
+
+        return CacheService::GENERATED_FILES_PATH . $identifier;
     }
 
     /**
@@ -132,6 +138,7 @@ class AssetHandlerConnectorManager
      * @param string   $relativePath
      * @param callable $callback
      * @return bool
+     * @throws FileCreationFailedException
      */
     public function createFileInTemporaryDirectory($relativePath, callable $callback)
     {
@@ -142,6 +149,10 @@ class AssetHandlerConnectorManager
             $content = call_user_func($callback);
 
             $result = $this->writeTemporaryFile($absolutePath, $content);
+
+            if (null !== $result) {
+                throw FileCreationFailedException::fileCreationFailed($absolutePath, $result);
+            }
         }
 
         return $result;
@@ -155,7 +166,8 @@ class AssetHandlerConnectorManager
      */
     protected function fileExists($absolutePath)
     {
-        return file_exists($absolutePath);
+        return file_exists($absolutePath)
+            && 0 !== filemtime($absolutePath);
     }
 
     /**
@@ -167,9 +179,7 @@ class AssetHandlerConnectorManager
      */
     protected function writeTemporaryFile($absolutePath, $content)
     {
-        $result = GeneralUtility::writeFileToTypo3tempDir($absolutePath, $content);
-
-        return null === $result;
+        return GeneralUtility::writeFileToTypo3tempDir($absolutePath, $content);
     }
 
     /**

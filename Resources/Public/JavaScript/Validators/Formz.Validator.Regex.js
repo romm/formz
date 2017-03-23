@@ -1,4 +1,4 @@
-Formz.Validation.registerValidator(
+Fz.Validation.registerValidator(
     'Romm\\Formz\\Validation\\Validator\\RegexValidator',
     /**
      * @param {string}                   value

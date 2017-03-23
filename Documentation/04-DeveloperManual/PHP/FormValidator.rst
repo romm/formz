@@ -12,11 +12,11 @@ Form validator
 
 A form validator is called after the **submission** of the form: it allows managing all its specific validation rules, and any additional process which could depend on its data.
 
-The goal of Formz is to automatize a maximum of processes, especially the validation ones. However, it is likely that complex forms require **more advanced mechanism**, which fit their **specific needs**. In this case, it is possible to very easily hook into the core of the validation process, and customize its behaviour by using the functions listed below.
+The goal of FormZ is to automatize a maximum of processes, especially the validation ones. However, it is likely that complex forms require **more advanced mechanism**, which fit their **specific needs**. In this case, it is possible to very easily hook into the core of the validation process, and customize its behaviour by using the functions listed below.
 
 .. tip::
 
-    If you do not need any additional process for your form, you can use the default validator provided by Formz: :php:`\Romm\Formz\Validation\Validator\Form\DefaultFormValidator`.
+    If you do not need any additional process for your form, you can use the default validator provided by FormZ: :php:`\Romm\Formz\Validation\Validator\Form\DefaultFormValidator`.
 
 API
 ^^^
@@ -25,15 +25,9 @@ A form validator gives you access to the following variables/functions:
 
 - :ref:`$form <formValidator-form>`
 - :ref:`$result <formValidator-result>`
-- :ref:`$deactivatedFields <formValidator-deactivatedFields>`
-- :ref:`$deactivatedFieldsValidators <formValidator-deactivatedFieldsValidators>`
 - :ref:`beforeValidationProcess() <formValidator-beforeValidationProcess>`
 - :ref:`*field*Validated() <formValidator-interValidationProcess>`
 - :ref:`afterValidationProcess() <formValidator-afterValidationProcess>`
-- :ref:`deactivateField($fieldName) <formValidator-deactivateField>`
-- :ref:`activateField($fieldName) <formValidator-activateField>`
-- :ref:`deactivateFieldValidator($fieldName, $validatorName) <formValidator-deactivateFieldValidator>`
-- :ref:`activateFieldValidator($fieldName, $validatorName) <formValidator-activateFieldValidator>`
 
 -----
 
@@ -70,46 +64,6 @@ Validation result
         In this variable is stored the **validation result**. You can interact with it according to your needs: especially adding/removing errors.
 
         This variable is returned to the controller at the end of the validation, which means if the result contains **at least one error**, the form will be **considered as invalid**.
-
-.. _formValidator-deactivatedFields:
-
-List of the fields deactivated by default
------------------------------------------
-
-.. container:: table-row
-
-    Property
-        .. code-block:: php
-
-            protected $deactivatedFields = ['myProperty'];
-    Type
-        :php:`array`
-    Description
-        You can override and fill this array with the names of the **deactivated fields by default**. It means you will have to activate these fields back with the function ``activateField()``.
-
-        Note that this array is automatically filled depending on the configuration of the fields activation conditions: the deactivated fields will be automatically added by Formz.
-
-.. _formValidator-deactivatedFieldsValidators:
-
-List of the fields validation rules deactivated by default
-----------------------------------------------------------
-
-.. container:: table-row
-
-    Property
-        .. code-block:: php
-
-            protected $deactivatedFieldsValidators = [
-                'myProperty' => ['required']
-            ];
-    Type
-        :php:`array`
-    Description
-        Override and fill this array with the name of the **fields validation rules deactivated by default**. The first level of the array corresponds to the name of the field, and is filled with a second array containing all the deactivated validation.
-
-        To activate back these validations, you will have to use the function ``activateFieldValidator()``.
-
-        Note that this array is automatically filled depending on the configuration of the activation conditions of the fields validation rules: the deactivated validation rules will be automatically added by Formz.
 
 .. _formValidator-beforeValidationProcess:
 
@@ -171,97 +125,6 @@ Post-validation process
         This function is called **just after the fields validation**. Override it to implement you own specific behaviours.
 
         Note that you can still use :php:`$this->result`.
-
-.. _formValidator-deactivateField:
-
-Field deactivation
-------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->deactivateField($fieldName);
-    Return
-        /
-    Parameters
-        - ``$fieldName``: name of the field which will be deactivated.
-    Description
-        Allows deactivating a field (its validation rules wont run anymore).
-
-        .. note::
-
-            Calling this function in ``afterValidationProcess()`` wont work.
-
-.. _formValidator-activateField:
-
-Field activation
-----------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->activateField($fieldName);
-    Return
-        /
-    Parameters
-        - ``$fieldName``: name of the field which will be activated back.
-    Description
-        Allows activating back a field.
-
-        .. note::
-
-            Calling this function in ``afterValidationProcess()`` wont work.
-
-.. _formValidator-deactivateFieldValidator:
-
-Field validation rule deactivation
-----------------------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->deactivateFieldValidator($fieldName, $validatorName);
-    Return
-        /
-    Parameters
-        - ``$fieldName``: name of the field containing the rule which should be deactivated.
-        - ``$validatorName``: name of the rule which should be deactivated.
-    Description
-        Allows deactivating a given validation rule for a given field.
-
-        .. note::
-
-            Calling this function in ``afterValidationProcess()`` wont work.
-
-.. _formValidator-activateFieldValidator:
-
-
-Field validation rule activation
---------------------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->activateFieldValidator($fieldName, $validatorName);
-    Return
-        /
-    Parameters
-        - ``$fieldName``: name of the field containing the rule which should be activated back.
-        - ``$validatorName``: name of the rule which should be activated back.
-    Description
-        Allows activating back a given validation rule for a given field.
-
-        .. note::
-
-            Calling this function in ``afterValidationProcess()`` wont work.
 
 -----
 

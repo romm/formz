@@ -2,29 +2,36 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
-use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Core\Core;
-use Romm\Formz\Form\FormObjectFactory;
-use Romm\Formz\Service\TypoScriptService;
+use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\FormObject;
+use Romm\Formz\Tests\Fixture\Form\DefaultForm;
+use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 trait AssetHandlerTestTrait
 {
 
     /**
-     * @param string $formClassName
+     * @param bool $extended
      * @return AssetHandlerFactory
      */
-    protected function getAssetHandlerFactoryInstance($formClassName)
+    protected function getAssetHandlerFactoryInstance($extended = false)
     {
-        $formObjectFactory = new FormObjectFactory;
-        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
-        $formObjectFactory->injectTypoScriptService(Core::instantiate(TypoScriptService::class));
+        /** @var FormObject $formObject */
+        $formObject = $extended
+            ? $this->getExtendedFormObject()
+            : $this->getDefaultFormObject();
 
-        $form = $formObjectFactory->getInstanceFromClassName($formClassName, 'foo');
+        $formClassName = $extended
+            ? ExtendedForm::class
+            : DefaultForm::class;
+
+        $formObject->setForm(new $formClassName());
+        $formObject->setFormResult(new FormResult);
+
         $controllerContext = new ControllerContext();
 
-        return AssetHandlerFactory::get($form, $controllerContext);
+        return AssetHandlerFactory::get($formObject, $controllerContext);
     }
 
     /**

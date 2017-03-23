@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -21,7 +21,7 @@ use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 class StringService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use ExtendedSelfInstantiateTrait;
 
     /**
      * @var EnvironmentService

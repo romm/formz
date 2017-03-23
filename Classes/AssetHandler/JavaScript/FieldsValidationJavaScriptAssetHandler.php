@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,9 +13,11 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\ValidatorService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -27,7 +29,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * It can also return the list of files which must be included in order to make
  * the form run correctly. Call the function `getJavaScriptValidationFiles()`.
  */
-class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FieldsValidationJavaScriptAssetHandler extends AbstractAssetHandler
 {
     /**
      * @var array
@@ -53,7 +55,7 @@ class FieldsValidationJavaScriptAssetHandler extends AbstractJavaScriptAssetHand
 
         return <<<JS
 (function() {
-    Formz.Form.get(
+    Fz.Form.get(
         $formName,
         function(form) {
             var field = null;
@@ -74,7 +76,7 @@ JS;
     protected function processField($field)
     {
         $javaScriptCode = [];
-        $fieldName = $field->getFieldName();
+        $fieldName = $field->getName();
 
         foreach ($field->getValidation() as $validationName => $validationConfiguration) {
             $validatorClassName = $validationConfiguration->getClassName();
@@ -146,10 +148,7 @@ JS;
      */
     protected function getValidationConfiguration(Field $field, $validationName, Validation $validatorConfiguration)
     {
-        $acceptsEmptyValues = $this
-            ->getDummyValidator()
-            ->cloneValidator($validatorConfiguration->getClassName())
-            ->acceptsEmptyValues();
+        $acceptsEmptyValues = ValidatorService::get()->validatorAcceptsEmptyValues($validatorConfiguration->getClassName());
 
         /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
         $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);

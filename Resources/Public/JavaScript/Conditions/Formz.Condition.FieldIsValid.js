@@ -1,4 +1,4 @@
-Formz.Condition.registerCondition(
+Fz.Condition.registerCondition(
 	'Romm\\Formz\\Condition\\Items\\FieldIsValidCondition',
 	/**
 	 * @param {Formz.FormInstance} form

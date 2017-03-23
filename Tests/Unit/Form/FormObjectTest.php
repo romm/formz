@@ -1,9 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Form;
 
-use Romm\ConfigurationObject\ConfigurationObjectInstance;
-use Romm\Formz\Configuration\Configuration;
-use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -18,7 +16,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function constructorPropertiesAreSet()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
 
         $this->assertEquals(self::FORM_OBJECT_DEFAULT_CLASS_NAME, $formObject->getClassName());
         $this->assertEquals(self::FORM_OBJECT_DEFAULT_NAME, $formObject->getName());
@@ -31,7 +29,7 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function addedPropertyIsGettable()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
 
         $formObject->addProperty('foo');
         $this->assertEquals(['foo'], $formObject->getProperties());
@@ -47,59 +45,20 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
-     * Setting a basic configuration array should be saved properly.
-     *
      * @test
      */
-    public function configurationArrayCanBeSet()
+    public function formObjectWithAddedPropertyHasProperty()
     {
-        $formObject = $this->getFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => 'foo'
-            ],
-            'bar'    => 'bar'
-        ];
+        $formObject = $this->createFormObject();
 
+        $this->assertFalse($formObject->hasProperty('foo'));
+        $this->assertFalse($formObject->hasProperty('bar'));
         $formObject->addProperty('foo');
-        $formObject->setConfigurationArray($arrayConfiguration);
-
-        $this->assertEquals($arrayConfiguration, $formObject->getConfigurationArray());
-
-        unset($formObject);
-    }
-
-    /**
-     * When injecting an array configuration, the property `fields` of the array
-     * should contain only fields that were added with the function
-     * `addProperty()`.
-     *
-     * The function will sanitize the array by removing the fields not found in
-     * the properties list.
-     *
-     * @test
-     */
-    public function configurationArrayDeletesAdditionalFields()
-    {
-        $formObject = $this->getFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => 'foo'
-            ],
-            'bar'    => 'bar'
-        ];
-        $additionalFieldsArrayConfiguration = [
-            'fields' => [
-                'bar' => 'bar'
-            ]
-        ];
-
-        $formObject->addProperty('foo');
-        $formObject->setConfigurationArray(array_merge_recursive($arrayConfiguration, $additionalFieldsArrayConfiguration));
-
-        $this->assertEquals($arrayConfiguration, $formObject->getConfigurationArray());
-
-        unset($formObject);
+        $this->assertTrue($formObject->hasProperty('foo'));
+        $this->assertFalse($formObject->hasProperty('bar'));
+        $formObject->addProperty('bar');
+        $this->assertTrue($formObject->hasProperty('foo'));
+        $this->assertTrue($formObject->hasProperty('bar'));
     }
 
     /**
@@ -112,7 +71,7 @@ class FormObjectTest extends AbstractUnitTest
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilder(FormObject::class)
             ->setMethods(['calculateHash'])
-            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME])
+            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME, []])
             ->getMock();
         $hash = 'foo';
 
@@ -136,7 +95,7 @@ class FormObjectTest extends AbstractUnitTest
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilder(FormObject::class)
             ->setMethods(['calculateHash'])
-            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME])
+            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME, []])
             ->getMock();
 
         $formObject->expects($this->once())
@@ -151,77 +110,6 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
-     * Will inject a basic configuration array, and check that the configuration
-     * object created by the form object is valid and without errors.
-     *
-     * @test
-     */
-    public function configurationObjectIsCorrectlyBuilt()
-    {
-        $formObject = $this->getFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => []
-            ]
-        ];
-
-        $formObject->addProperty('foo');
-        $formObject->setConfigurationArray($arrayConfiguration);
-
-        $configurationObject = $formObject->getConfigurationObject();
-
-        $this->assertEquals(ConfigurationObjectInstance::class, get_class($configurationObject));
-        $this->assertEquals(Form::class, get_class($configurationObject->getObject(true)));
-        $this->assertFalse($configurationObject->getValidationResult()->hasErrors());
-        $this->assertSame($configurationObject->getObject(true), $formObject->getConfiguration());
-
-        unset($formObject);
-    }
-
-    /**
-     * Checks that the configuration object is stored in cache, so it is not
-     * built every time it is fetched.
-     *
-     * @test
-     */
-    public function configurationObjectIsStoredInCache()
-    {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMockBuilder(FormObject::class)
-            ->setMethods(['buildConfigurationObject'])
-            ->setConstructorArgs([\stdClass::class, 'foo'])
-            ->getMock();
-
-        $formzConfiguration = new Configuration();
-        $result = new Result();
-        $configurationObjectInstance = new ConfigurationObjectInstance($formzConfiguration, $result);
-
-        $formObject->expects($this->once())
-            ->method('buildConfigurationObject')
-            ->willReturn($configurationObjectInstance);
-
-        for ($i = 0; $i < 3; $i++) {
-            $formObject->getConfigurationObject();
-        }
-
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject2 */
-        $formObject2 = $this->getMockBuilder(FormObject::class)
-            ->setMethods(['buildConfigurationObject'])
-            ->setConstructorArgs([\stdClass::class, 'foo'])
-            ->getMock();
-
-        $formObject2->expects($this->never())
-            ->method('buildConfigurationObject');
-
-        for ($i = 0; $i < 3; $i++) {
-            $formObject2->getConfigurationObject();
-        }
-
-        unset($formObject);
-        unset($formObject2);
-    }
-
-    /**
      * Checks that the configuration validation result is correctly built and
      * can be fetched.
      *
@@ -229,20 +117,28 @@ class FormObjectTest extends AbstractUnitTest
      */
     public function configurationValidationResultCanBeGet()
     {
-        $formObject = $this->getFormObject();
-        $arrayConfiguration = [
-            'fields' => [
-                'foo' => []
-            ]
-        ];
-
+        $formObject = $this->getDefaultFormObject();
         $formObject->addProperty('foo');
-        $formObject->setConfigurationArray($arrayConfiguration);
 
         $validationResult = $formObject->getConfigurationValidationResult();
         $this->assertInstanceOf(Result::class, $validationResult);
         $this->assertFalse($validationResult->hasErrors());
 
         unset($formObject);
+    }
+
+    /**
+     * @test
+     */
+    public function setLastValidationResultSetsLastValidationResult()
+    {
+        $formObject = new FormObject('foo', 'foo', []);
+
+        $formResult = new FormResult;
+
+        $this->assertFalse($formObject->hasFormResult());
+        $formObject->setFormResult($formResult);
+        $this->assertTrue($formObject->hasFormResult());
+        $this->assertSame($formResult, $formObject->getFormResult());
     }
 }

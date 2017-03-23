@@ -1,6 +1,6 @@
 config.tx_formz {
     settings {
-        # Default class name of the backend cache used by Formz.
+        # Default class name of the backend cache used by FormZ.
         defaultBackendCache = TYPO3\CMS\Core\Cache\Backend\FileBackend
 
         # Is only used to check if this TypoScript is included on a page which needs it.
@@ -25,23 +25,23 @@ config.tx_formz {
         # Default settings for the fields.
         #
         # Each one of these settings can be overridden in any single field. Example:
-        #   `config.tx_formz.defaultFieldSettings.fieldContainerSelector = [formz-field-container="#FIELD#"]`
+        #   `config.tx_formz.defaultFieldSettings.fieldContainerSelector = [fz-field-container="#FIELD#"]`
         # can be overridden for the field `myField` with:
         #   `config.tx_formz.forms.My\Custom\Form.fields.myField.settings.fieldContainerSelector = .my-field`
         defaultFieldSettings {
             # This is the CSS selector which is used to select the field container of a field.
             # The marker `#FIELD#` is replaced with the name of the field.
-            fieldContainerSelector = [formz-field-container="#FIELD#"]
+            fieldContainerSelector = [fz-field-container="#FIELD#"]
 
-            # This is the CSS selector which is used to select the feedback container of a field.
+            # This is the CSS selector which is used to select the message container of a field.
             # This container is shown whenever an error is returned by the field validation.
             # The marker `#FIELD#` is replaced with the name of the field.
-            feedbackContainerSelector = [formz-field-feedback-container="#FIELD#"]
+            messageContainerSelector = [fz-field-message-container="#FIELD#"]
 
-            # This is the CSS selector which is used to select the feedback list container of a field.
+            # This is the CSS selector which is used to select the message list container of a field.
             # This container will be directly filled with the error messages, so it should not contain any static content as it would be erased eventually.
             # The marker `#FIELD#` is replaced with the name of the field.
-            feedbackListSelector = [formz-field-feedback-list="#FIELD#"]
+            messageListSelector = [fz-field-message-list="#FIELD#"]
 
             # This is the HTML template of an error message, which will be used for every message of the field.
             # The following markers can be used:

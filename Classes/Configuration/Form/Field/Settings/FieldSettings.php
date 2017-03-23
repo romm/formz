@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -22,6 +22,8 @@ class FieldSettings extends AbstractFormzConfiguration
 {
     use ParentsTrait;
 
+    const FIELD_MARKER = '#FIELD#';
+
     /**
      * CSS selector to get the container of the field.
      *
@@ -34,17 +36,17 @@ class FieldSettings extends AbstractFormzConfiguration
      *
      * @var string
      */
-    protected $feedbackContainerSelector;
+    protected $messageContainerSelector;
 
     /**
-     * CSS selector to get the block element which will contain all the error
-     * messages. It must be a child element of `$errorContainerSelector`. If
-     * the value is empty, then `$errorContainerSelector` is considered to be
+     * CSS selector to get the block element which will contain all the
+     * messages. It must be a child element of `$messageContainerSelector`. If
+     * the value is empty, then `$messageContainerSelector` is considered to be
      * both the container and the block element.
      *
      * @var string
      */
-    protected $feedbackListSelector;
+    protected $messageListSelector;
 
     /**
      * @var string
@@ -52,39 +54,59 @@ class FieldSettings extends AbstractFormzConfiguration
     protected $messageTemplate;
 
     /**
-     * @param string $fieldName
      * @return string
      */
-    public function getFieldContainerSelector($fieldName = null)
+    public function getFieldContainerSelector()
     {
-        return $this->formatSelector($this->getSettingsProperty('fieldContainerSelector'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('fieldContainerSelector'));
     }
 
     /**
-     * @param null $fieldName
-     * @return string
+     * @param string $selector
      */
-    public function getFeedbackContainerSelector($fieldName = null)
+    public function setFieldContainerSelector($selector)
     {
-        return $this->formatSelector($this->getSettingsProperty('feedbackContainerSelector'), $fieldName);
+        $this->fieldContainerSelector = $selector;
     }
 
     /**
-     * @param string $fieldName
      * @return string
      */
-    public function getFeedbackListSelector($fieldName = null)
+    public function getMessageContainerSelector()
     {
-        return $this->formatSelector($this->getSettingsProperty('feedbackListSelector'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('messageContainerSelector'));
     }
 
     /**
-     * @param string $fieldName
+     * @param string $selector
+     */
+    public function setMessageContainerSelector($selector)
+    {
+        $this->messageContainerSelector = $selector;
+    }
+
+    /**
      * @return string
      */
-    public function getMessageTemplate($fieldName = null)
+    public function getMessageListSelector()
     {
-        return $this->formatSelector($this->getSettingsProperty('messageTemplate'), $fieldName);
+        return $this->formatSelector($this->getSettingsProperty('messageListSelector'));
+    }
+
+    /**
+     * @param string $messageListSelector
+     */
+    public function setMessageListSelector($messageListSelector)
+    {
+        $this->messageListSelector = $messageListSelector;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageTemplate()
+    {
+        return $this->formatSelector($this->getSettingsProperty('messageTemplate'));
     }
 
     /**
@@ -97,22 +119,23 @@ class FieldSettings extends AbstractFormzConfiguration
 
     /**
      * @param string $selector
-     * @param string $fieldName
      * @return string
      */
-    protected function formatSelector($selector, $fieldName = null)
+    protected function formatSelector($selector)
     {
-        if (null === $fieldName) {
-            $fieldName = $this->getFieldName();
+        $fieldName = $this->getFieldName();
+
+        if ($fieldName) {
+            $selector = str_replace(self::FIELD_MARKER, $fieldName, $selector);
         }
 
-        return str_replace('#FIELD#', $fieldName, $selector);
+        return $selector;
     }
 
     /**
      * This function will do the following: first, it will check if the wanted
      * property is set in this class instance (not null), then it returns it. If
-     * the value is null, it will fetch the global Formz configuration settings,
+     * the value is null, it will fetch the global FormZ configuration settings,
      * and return the default value for the asked property.
      *
      * Example:
@@ -126,12 +149,11 @@ class FieldSettings extends AbstractFormzConfiguration
     {
         $result = $this->$propertyName;
 
-        if (null === $result) {
-            $fieldName = $this->getFieldName();
-
+        if (empty($result)) {
             $result = $this->withFirstParent(
                 Configuration::class,
-                function (Configuration $configuration) use ($propertyName, $fieldName) {
+                function (Configuration $configuration) use ($propertyName) {
+                    $fieldName = $this->getFieldName();
                     $getter = 'get' . ucfirst($propertyName);
 
                     return $configuration->getSettings()->getDefaultFieldSettings()->$getter($fieldName);
@@ -150,7 +172,7 @@ class FieldSettings extends AbstractFormzConfiguration
         return $this->withFirstParent(
             Field::class,
             function (Field $field) {
-                return $field->getFieldName();
+                return $field->getName();
             }
         );
     }

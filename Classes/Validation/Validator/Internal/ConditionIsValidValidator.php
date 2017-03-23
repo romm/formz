@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,21 +14,12 @@
 namespace Romm\Formz\Validation\Validator\Internal;
 
 use Romm\Formz\Condition\Parser\ConditionParser;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class ConditionIsValidValidator extends AbstractValidator
 {
-
-    /**
-     * @inheritdoc
-     */
-    protected $supportedMessages = [
-        'default' => [
-            'key'       => 'validator.form.condition_is_valid.error',
-            'extension' => null
-        ]
-    ];
+    const ERROR_CODE = 1457621104;
 
     /**
      * Checks if the value is a valid condition string.
@@ -41,14 +32,16 @@ class ConditionIsValidValidator extends AbstractValidator
             ->parse($condition);
 
         if (true === $conditionTree->getValidationResult()->hasErrors()) {
-            $this->addError(
-                'default',
-                1457621104,
+            $errorMessage = $this->translateErrorMessage(
+                'validator.form.condition_is_valid.error',
+                'formz',
                 [
-                    $condition->getCondition(),
+                    $condition->getExpression(),
                     $conditionTree->getValidationResult()->getFirstError()->getMessage()
                 ]
             );
+
+            $this->addError($errorMessage, self::ERROR_CODE);
         }
     }
 }

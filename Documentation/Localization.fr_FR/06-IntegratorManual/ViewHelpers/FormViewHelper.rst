@@ -16,7 +16,7 @@ Il fonctionne de la même manière que le ViewHelper classique, à une différen
 
 .. important::
 
-    Vous **devez impérativement** utiliser ce ViewHelper lors de l'intégration d'un formulaire qui utilise Formz.
+    Vous **devez impérativement** utiliser ce ViewHelper lors de l'intégration d'un formulaire qui utilise FormZ.
 
 Arguments
 ---------
@@ -35,11 +35,11 @@ Exemple
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
-    <formz:form action="submitForm" name="myForm">
+    <fz:form action="submitForm" name="myForm">
         ...
-    </formz:form>
+    </fz:form>
 
 Le formulaire ci-dessus pointe vers l'action ``submitForm``. Si on va voir l'action dans la classe PHP du contrôleur :
 

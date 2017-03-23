@@ -1,8 +1,8 @@
-{namespace formz=Romm\Formz\ViewHelpers}
+{namespace fz=Romm\Formz\ViewHelpers}
 
-<div formz-field-container="{fieldName}" class="row form-group
-	{formz:class(name: 'errors.has-error')}
-	{f:if(condition: '{showSuccess}', then: '{formz:class(name: \'valid.has-success\')}')}
+<div fz-field-container="{fieldName}" class="row form-group
+	{fz:class(name: 'errors.has-error')}
+	{f:if(condition: '{showSuccess}', then: '{fz:class(name: \'valid.has-success\')}')}
 ">
 	<div class="col-sm-4">
 		<f:render section="Label" arguments="{_all}" />
@@ -13,6 +13,6 @@
 	</div>
 
 	<div class="col-sm-4">
-		<f:render section="Feedback" arguments="{_all}" />
+		<f:render section="Messages" arguments="{_all}" />
 	</div>
 </div>

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,6 +14,12 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
+use Romm\Formz\Condition\Parser\Node\ConditionNode;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\ArrayService;
 
 /**
@@ -58,7 +64,55 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     protected static $javaScriptFiles = [];
 
     /**
-     * Returns a generic JavaScript code which uses Formz API to validate a
+     * @var FormObject
+     * @disableMagicMethods
+     */
+    protected $formObject;
+
+    /**
+     * @var ActivationInterface
+     * @disableMagicMethods
+     */
+    protected $activation;
+
+    /**
+     * @var ConditionNode
+     * @disableMagicMethods
+     */
+    protected $conditionNode;
+
+    /**
+     * Will launch the condition validation: the child class should implement
+     * the function `checkConditionConfiguration()` and check if the condition
+     * can be considered as valid.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    final public function validateConditionConfiguration()
+    {
+        try {
+            $this->checkConditionConfiguration();
+        } catch (InvalidConditionException $exception) {
+            $this->throwInvalidConditionException($exception);
+        }
+
+        return true;
+    }
+
+    /**
+     * @see validateConditionConfiguration()
+     *
+     * @throws InvalidConditionException
+     * @return bool
+     */
+    abstract protected function checkConditionConfiguration();
+
+    /**
+     * Returns a generic JavaScript code which uses FormZ API to validate a
      * condition which was registered in a single JavaScript file (which is
      * filled in the `$javaScriptFiles` attribute of the PHP condition class).
      *
@@ -71,7 +125,7 @@ abstract class AbstractConditionItem implements ConditionItemInterface
         $data = ArrayService::get()->arrayToJavaScriptJson($data);
 
         return <<<JS
-Formz.Condition.validateCondition('$conditionName', form, $data)
+Fz.Condition.validateCondition('$conditionName', form, $data)
 JS;
     }
 
@@ -81,5 +135,59 @@ JS;
     public function getJavaScriptFiles()
     {
         return static::$javaScriptFiles;
+    }
+
+    /**
+     * @param InvalidConditionException $exception
+     * @throws InvalidConditionException
+     */
+    protected function throwInvalidConditionException(InvalidConditionException $exception)
+    {
+        $rootObject = $this->activation->getRootObject();
+        $conditionName = $this->conditionNode->getConditionName();
+        $formClassName = $this->formObject->getClassName();
+
+        if ($rootObject instanceof Field) {
+            throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        } elseif ($rootObject instanceof Validation) {
+            throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        }
+    }
+
+    /**
+     * @param FormObject $formObject
+     */
+    public function attachFormObject(FormObject $formObject)
+    {
+        $this->formObject = $formObject;
+    }
+
+    /**
+     * @param ActivationInterface $activation
+     */
+    public function attachActivation(ActivationInterface $activation)
+    {
+        $this->activation = $activation;
+    }
+
+    /**
+     * @param ConditionNode $conditionNode
+     */
+    public function attachConditionNode(ConditionNode $conditionNode)
+    {
+        $this->conditionNode = $conditionNode;
+    }
+
+    /**
+     * @return array
+     */
+    public function __sleep()
+    {
+        $properties = get_object_vars($this);
+        unset($properties['formObject']);
+        unset($properties['activation']);
+        unset($properties['conditionNode']);
+
+        return array_keys($properties);
     }
 }

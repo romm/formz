@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,7 +14,7 @@
 namespace Romm\Formz\Condition\Processor\DataObject;
 
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
 
 class PhpConditionDataObject
 {
@@ -24,9 +24,19 @@ class PhpConditionDataObject
     protected $form;
 
     /**
-     * @var AbstractFormValidator
+     * @var FormValidatorExecutor
      */
     protected $formValidator;
+
+    /**
+     * @param FormInterface         $form
+     * @param FormValidatorExecutor $formValidator
+     */
+    public function __construct(FormInterface $form, FormValidatorExecutor $formValidator)
+    {
+        $this->form = $form;
+        $this->formValidator = $formValidator;
+    }
 
     /**
      * @return FormInterface
@@ -39,13 +49,13 @@ class PhpConditionDataObject
     /**
      * @param FormInterface $form
      */
-    public function setForm($form)
+    public function setForm(FormInterface $form)
     {
         $this->form = $form;
     }
 
     /**
-     * @return AbstractFormValidator
+     * @return FormValidatorExecutor
      */
     public function getFormValidator()
     {
@@ -53,9 +63,9 @@ class PhpConditionDataObject
     }
 
     /**
-     * @param AbstractFormValidator $formValidator
+     * @param FormValidatorExecutor $formValidator
      */
-    public function setFormValidator($formValidator)
+    public function setFormValidator(FormValidatorExecutor $formValidator)
     {
         $this->formValidator = $formValidator;
     }

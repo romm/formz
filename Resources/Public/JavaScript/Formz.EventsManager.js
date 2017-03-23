@@ -1,4 +1,4 @@
-Formz.EventsManager = (function () {
+Fz.EventsManager = (function () {
     /**
      * @returns {Formz.EventsManagerInstance}
      */

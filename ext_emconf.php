@@ -1,10 +1,10 @@
 <?php
 /** @noinspection PhpUndefinedVariableInspection */
 $EM_CONF[$_EXTKEY] = [
-    'title'       => 'Formz : Handler for forms',
-    'version'     => '0.4.1',
-    'state'       => 'beta',
-    'description' => 'Handle forms very easily with provided tools: TypoScript based validation, Fluid helpers, a whole JavaScript API, and more. Use pre-defined layouts for Twitter Bootstrap and Foundation to build good-looking forms in minutes. Need to build a basic form with only two fields? Need to build a huge registration form with dozens of fields? Use Formz, it will fulfill your needs!',
+    'title'       => 'FormZ • Modern form handler',
+    'version'     => '1.0.0',
+    'state'       => 'stable',
+    'description' => 'Manage your forms easily with powerful tools: TypoScript based validation, Fluid view helpers, a whole JavaScript API, and more. Use pre-defined layouts for Twitter Bootstrap and Foundation to build nice-looking forms in minutes. Need to build a basic form with only two fields? Need to build a huge registration form with dozens of fields? Use FormZ, it will live up to your expectations! Visit typo3-formz.com for more information.',
 
     'author'       => 'Romain Canon',
     'author_email' => 'romain.hydrocanon@gmail.com',
@@ -15,7 +15,7 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'typo3'                => '6.2.0-8.6.99',
-            'configuration_object' => '1.2.3-1.99.99'
+            'configuration_object' => '1.6.0-1.99.99'
         ]
     ]
 ];

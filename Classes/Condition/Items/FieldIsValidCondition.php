@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -14,6 +14,7 @@
 namespace Romm\Formz\Condition\Items;
 
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 
 /**
@@ -59,31 +60,28 @@ class FieldIsValidCondition extends AbstractConditionItem
      */
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
-        $result = $dataObject->getFormValidator()
-            ->validateField($this->fieldName);
+        $formValidator = $dataObject->getFormValidator();
+        $field = $this->formObject->getConfiguration()->getField($this->fieldName);
+        $formValidator->validateField($field);
+        $result = $formValidator->getResult();
 
-        return
-            false === $result->forProperty($this->fieldName)->hasErrors()
-            && false === $result->fieldIsDeactivated($this->fieldName)
-        ;
+        return false === $result->forProperty($this->fieldName)->hasErrors()
+            && false === $result->fieldIsDeactivated($field);
     }
 
     /**
-     * @return string
+     * @see validateConditionConfiguration()
+     * @throws InvalidConditionException
+     * @return bool
      */
-    public function getFieldName()
+    protected function checkConditionConfiguration()
     {
-        return $this->fieldName;
-    }
+        $configuration = $this->formObject->getConfiguration();
 
-    /**
-     * @param string $fieldName
-     * @return $this
-     */
-    public function setFieldName($fieldName)
-    {
-        $this->fieldName = $fieldName;
+        if (false === $configuration->hasField($this->fieldName)) {
+            throw InvalidConditionException::conditionFieldIsValidFieldNotFound($this->fieldName);
+        }
 
-        return $this;
+        return true;
     }
 }

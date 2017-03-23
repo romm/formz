@@ -4,7 +4,7 @@
  * This is used for instance by the field validation service: the messages used
  * by the validation rules are fetched directly in this library.
  */
-Formz.Localization = (function () {
+Fz.Localization = (function () {
     /**
      * Contains all the real translations, bound to their hashed index.
      *

@@ -1,4 +1,4 @@
-Formz.Field.DataAttributesService = (function () {
+Fz.Field.DataAttributesService = (function () {
     /**
      * @param {Object}              states
      * @param {Formz.FieldInstance} states.field
@@ -10,10 +10,14 @@ Formz.Field.DataAttributesService = (function () {
         var field = states.field;
 
         var dataAttributesNames = {
-            valid: 'formz-valid-' + Formz.camelCaseToDashed(field.getName()),
-            value: 'formz-value-' + Formz.camelCaseToDashed(field.getName()),
-            error: 'formz-error-' + Formz.camelCaseToDashed(field.getName()),
+            valid: 'fz-valid-' + Fz.camelCaseToDashed(field.getName()),
+            value: 'fz-value-' + Fz.camelCaseToDashed(field.getName()),
+            error: 'fz-error-' + Fz.camelCaseToDashed(field.getName()),
+            warning: 'fz-warning-' + Fz.camelCaseToDashed(field.getName()),
+            notice: 'fz-notice-' + Fz.camelCaseToDashed(field.getName()),
             errors: [],
+            warnings: [],
+            notices: [],
             save: {}
         };
 
@@ -46,45 +50,58 @@ Formz.Field.DataAttributesService = (function () {
                 field.getForm().getElement().removeAttribute(dataAttributesNames.value);
             },
 
-            removeErrorsDataAttributes: function () {
+            removeMessagesDataAttributes: function () {
                 field.getForm().getElement().removeAttribute(dataAttributesNames.error);
+                field.getForm().getElement().removeAttribute(dataAttributesNames.warning);
+                field.getForm().getElement().removeAttribute(dataAttributesNames.notice);
 
                 for (var i = 0; i < dataAttributesNames.errors.length; i++) {
                     field.getForm().getElement().removeAttribute(dataAttributesNames.errors[i]);
                 }
+                for (i = 0; i < dataAttributesNames.warnings.length; i++) {
+                    field.getForm().getElement().removeAttribute(dataAttributesNames.warnings[i]);
+                }
+                for (i = 0; i < dataAttributesNames.notices.length; i++) {
+                    field.getForm().getElement().removeAttribute(dataAttributesNames.notices[i]);
+                }
             },
 
-            addErrorsDataAttributes: function (errors) {
-                dataAttributesNames.errors = [];
+            addMessagesDataAttributes: function (messages, type) {
+                var listKey = type + 's';
+                dataAttributesNames[listKey] = [];
 
-                for (var errorName in errors) {
-                    if (errors.hasOwnProperty(errorName)) {
-                        for (var errorMessageKey in errors[errorName]) {
-                            if (errors[errorName].hasOwnProperty(errorMessageKey)) {
-                                var dataErrorName = Formz.Field.DataAttributesService.getFieldErrorDataName(field, errorName, errorMessageKey);
-                                dataAttributesNames.errors.push(dataErrorName);
+                for (var name in messages) {
+                    if (messages.hasOwnProperty(name)) {
+                        for (var key in messages[name]) {
+                            if (messages[name].hasOwnProperty(key)) {
+                                var dataMessageName = Fz.Field.DataAttributesService.getFieldMessageDataName(field, type, name, key);
+                                dataAttributesNames[listKey].push(dataMessageName);
                             }
                         }
                     }
                 }
 
-                this.refreshErrorsDataAttributes();
+                this.refreshMessagesDataAttributes(type);
             },
 
-            refreshErrorsDataAttributes: function () {
-                if (dataAttributesNames.errors.length > 0) {
-                    field.getForm().getElement().setAttribute(dataAttributesNames.error, '1');
+            refreshMessagesDataAttributes: function (type) {
+                var listKey = type + 's';
+
+                if (dataAttributesNames[listKey].length > 0) {
+                    field.getForm().getElement().setAttribute(dataAttributesNames[type], '1');
                 }
 
-                for (var i = 0; i < dataAttributesNames.errors.length; i++) {
-                    field.getForm().getElement().setAttribute(dataAttributesNames.errors[i], '1');
+                for (var i = 0; i < dataAttributesNames[listKey].length; i++) {
+                    field.getForm().getElement().setAttribute(dataAttributesNames[listKey][i], '1');
                 }
             },
 
             saveAllDataAttributes: function () {
                 dataAttributesNames.save = {
                     valid: field.isValid(),
-                    errors: dataAttributesNames.errors
+                    errors: dataAttributesNames.errors,
+                    warnings: dataAttributesNames.warnings,
+                    notices: dataAttributesNames.notices
                 };
             },
 
@@ -92,13 +109,17 @@ Formz.Field.DataAttributesService = (function () {
                 this.saveAllDataAttributes();
                 this.removeValueDataAttribute();
                 this.removeValidDataAttribute();
-                this.removeErrorsDataAttributes();
+                this.removeMessagesDataAttributes();
             },
 
             restoreAllDataAttributes: function () {
                 this.refreshValueDataAttribute();
                 dataAttributesNames.errors = dataAttributesNames.save.errors;
-                this.refreshErrorsDataAttributes();
+                dataAttributesNames.warnings = dataAttributesNames.save.warnings;
+                dataAttributesNames.notices = dataAttributesNames.save.notices;
+                this.refreshMessagesDataAttributes('error');
+                this.refreshMessagesDataAttributes('warning');
+                this.refreshMessagesDataAttributes('notice');
                 if (true === dataAttributesNames.save.valid) {
                     this.addValidDataAttribute();
                 }
@@ -115,10 +136,10 @@ Formz.Field.DataAttributesService = (function () {
             return servicePrototype({field: field});
         },
 
-        getFieldErrorDataName: function(field, validationName, errorName) {
-            return 'formz-error-' + Formz.camelCaseToDashed(field.getName())
-                + '-' + Formz.camelCaseToDashed(validationName)
-                + '-' + Formz.camelCaseToDashed(errorName);
+        getFieldMessageDataName: function(field, type, validationName, errorName) {
+            return 'fz-' + type + '-' + Fz.camelCaseToDashed(field.getName())
+                + '-' + Fz.camelCaseToDashed(validationName)
+                + '-' + Fz.camelCaseToDashed(errorName);
         }
     }
 })();

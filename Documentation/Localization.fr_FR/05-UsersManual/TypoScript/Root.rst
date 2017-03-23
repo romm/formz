@@ -34,7 +34,7 @@ Liste des formulaires
     Requis ?
         Non
     Description
-        Contient la liste des formulaires qui utilisent Formz.
+        Contient la liste des formulaires qui utilisent FormZ.
 
         Plus d'informations ici : « :ref:`usersManual-typoScript-configurationForms` ».
 
@@ -51,7 +51,7 @@ Type de cache
     Requis ?
         Oui
     Description
-        Contient le type de cache utilisé par Formz.
+        Contient le type de cache utilisé par FormZ.
 
         La valeur par défaut est :php:`TYPO3\CMS\Core\Cache\Backend\FileBackend`.
 

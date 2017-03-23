@@ -5,15 +5,15 @@
 ---
 conf.py:
   copyright: 2016
-  project: Formz
-  version: 0.4.1
-  release: 0.4.1
+  project: FormZ
+  version: 1.0.0
+  release: 1.0.0
   language: fr
   pdf_language: fr_FR
   latex_documents:
   - - Index
     - formz.tex
-    - Formz
+    - FormZ
     - Romain Canon
     - manual
   latex_elements:

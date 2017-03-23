@@ -4,6 +4,7 @@ namespace Romm\Formz\Tests\Unit\Form;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -29,7 +30,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
         $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
 
         $this->assertInstanceOf(FormObject::class, $formObject);
-        $this->assertFalse($formObject->getConfigurationObject()->getValidationResult()->hasErrors());
+        $this->assertFalse($formObject->getConfigurationValidationResult()->hasErrors());
         $this->assertTrue($formObject->getConfiguration()->hasField('foo'));
 
         unset($formObject);
@@ -57,7 +58,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function wrongClassTypeGivenThrowsException()
     {
-        $this->setExpectedException(ClassNotFoundException::class);
+        $this->setExpectedException(InvalidArgumentTypeException::class);
         $formObjectFactory = new FormObjectFactory;
 
         $formObjectFactory->getInstanceFromClassName(\stdClass::class, 'foo');
@@ -71,7 +72,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function formObjectFromClassNameIsStoredAndFetchedFromCache()
     {
-        $formObject = new FormObject(DefaultForm::class, 'foo');
+        $formObject = new FormObject(DefaultForm::class, 'foo', []);
 
         /** @var ConfigurationFactory $configurationFactory */
         $configurationFactory = Core::instantiate(ConfigurationFactory::class);

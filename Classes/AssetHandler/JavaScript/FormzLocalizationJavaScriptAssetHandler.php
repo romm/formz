@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,16 +13,20 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Service\ArrayService;
+use Romm\Formz\Service\HashService;
+use Romm\Formz\Service\MessageService;
+use Romm\Formz\Service\ValidatorService;
 
 /**
- * This asset handler will manage the translations which will be sent to Formz
+ * This asset handler will manage the translations which will be sent to FormZ
  * in JavaScript (`Formz.Localization`).
  *
  * The validation messages of the fields are handled in this class.
  */
-class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FormzLocalizationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**
@@ -61,7 +65,7 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHan
         $translationsBinding = [];
 
         foreach ($this->translations as $key => $value) {
-            $hash = sha1($value);
+            $hash = HashService::get()->getHash($value);
             $realTranslations[$hash] = $value;
             $translationsBinding[$key] = $hash;
         }
@@ -70,7 +74,7 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractJavaScriptAssetHan
         $jsonTranslationsBinding = $this->handleTranslationsBinding(ArrayService::get()->arrayToJavaScriptJson($translationsBinding));
 
         return <<<JS
-Formz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);
+Fz.Localization.addLocalization($jsonRealTranslations, $jsonTranslationsBinding);
 JS;
     }
 
@@ -87,7 +91,7 @@ JS;
         $result = [];
 
         if (true === $field->hasValidation($validationName)) {
-            $key = $field->getFieldName() . '-' . $validationName;
+            $key = $field->getName() . '-' . $validationName;
 
             $this->storeTranslationsForFieldValidation($field);
 
@@ -124,19 +128,13 @@ JS;
     protected function storeTranslationsForFieldValidation(Field $field)
     {
         if (false === $this->translationsForFieldValidationWereInjected($field)) {
-            $fieldName = $field->getFieldName();
+            $fieldName = $field->getName();
 
-            foreach ($field->getValidation() as $validationName => $validationConfiguration) {
-                $dummyValidator = $this->getDummyValidator()
-                    ->cloneValidator($validationConfiguration->getClassName());
-
-                $messages = $dummyValidator->setExternalMessages($validationConfiguration->getMessages())
-                    ->getMessages();
+            foreach ($field->getValidation() as $validationName => $validation) {
+                $messages = ValidatorService::get()->getValidatorMessages($validation->getClassName(), $validation->getMessages());
 
                 foreach ($messages as $key => $message) {
-                    $message = $dummyValidator->getMessage($key, ['{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}']);
-
-                    $message = (is_string($message)) ? $message : '';
+                    $message = MessageService::get()->parseMessageArray($message, ['{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}']);
 
                     $localizationKey = $this->getIdentifierForFieldValidationName($field, $validationName, $key);
                     $this->addTranslation($localizationKey, $message);
@@ -145,7 +143,7 @@ JS;
 
                 $this->translationKeysForFieldValidation[$fieldName . '-' . $validationName] = $messages;
 
-                $key = $this->getFormObject()->getClassName() . '-' . $field->getFieldName();
+                $key = $this->getFormObject()->getClassName() . '-' . $field->getName();
                 $this->injectedTranslationKeysForFieldValidation[$key] = true;
             }
         }
@@ -154,7 +152,7 @@ JS;
     }
 
     /**
-     * Adds a global translation value which will be added to the Formz
+     * Adds a global translation value which will be added to the FormZ
      * JavaScript localization service.
      *
      * @param string $key
@@ -174,7 +172,7 @@ JS;
      */
     protected function translationsForFieldValidationWereInjected(Field $field)
     {
-        $key = $this->getFormObject()->getClassName() . '-' . $field->getFieldName();
+        $key = $this->getFormObject()->getClassName() . '-' . $field->getName();
 
         return true === isset($this->injectedTranslationKeysForFieldValidation[$key]);
     }
@@ -187,7 +185,7 @@ JS;
      */
     protected function getIdentifierForFieldValidationName(Field $field, $validationName, $messageKey)
     {
-        return str_replace(['\\', '_'], '', $this->getFormObject()->getClassName()) . '-' . $field->getFieldName() . '-' . $validationName . '-' . $messageKey;
+        return str_replace(['\\', '_'], '', $this->getFormObject()->getClassName()) . '-' . $field->getName() . '-' . $validationName . '-' . $messageKey;
     }
 
     /**

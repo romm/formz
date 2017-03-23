@@ -22,7 +22,7 @@ As a reminder, you can download an example of a working form in the chapter “:
 Data model
 ----------
 
-A form is no more than a data model. You should begin by creating the model containing all the logic, namely all the properties it is composed of, as well as the “*getters*” and “*setters*”.
+A form is no more than a data model. You should begin by creating the model containing all the logic, name all the properties it is composed of, as well as the “*getters*” and “*setters*”.
 
 You can find an example of a form model here: “:ref:`developerManual-php-model`”.
 
@@ -69,7 +69,7 @@ Your controller will generally contain at least two actions:
 
 .. note::
 
-    To enable validation for the form, the annotation ``@validate`` must be used in the function DocBlock. It is a feature provided by Extbase, and used by Formz to ease the form validation.
+    To enable validation for the form, the annotation ``@validate`` must be used in the function DocBlock. It is a feature provided by Extbase, and used by FormZ to ease the form validation.
 
     You can find an example below:
 
@@ -121,7 +121,7 @@ You must follow the explanations of the chapter “:ref:`usersManual`” to conf
                             required < config.tx_formz.validators.required
                         }
 
-                        activation.condition = someFieldIsValid
+                        activation.expression = someFieldIsValid
                     }
                 }
             }
@@ -141,7 +141,7 @@ Below is a basic example of a form integration:
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <h1>Lorem Ipsum</h1>
 
@@ -149,24 +149,24 @@ Below is a basic example of a form integration:
     lacus efficitur, sed feugiat turpis tincidunt. Sed sed tellus ornare, pellentesque
     orci mollis, consequat eros.</p>
 
-    <formz:form action="submitForm" name="exampleForm">
+    <fz:form action="submitForm" name="exampleForm">
         <fieldset>
-            <formz:field name="someField" layout="default">
-                <formz:option name="label" value="Some Field" />
+            <fz:field name="someField" layout="default">
+                <fz:option name="label" value="Some Field" />
 
-                <formz:section name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
 
-            <formz:field name="someOtherField" layout="default">
-                <formz:option name="label" value="Some other Field" />
+            <fz:field name="someOtherField" layout="default">
+                <fz:option name="label" value="Some other Field" />
 
-                <formz:section name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
         </fieldset>
-    </formz:form>
+    </fz:form>

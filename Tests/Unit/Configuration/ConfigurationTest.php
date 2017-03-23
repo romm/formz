@@ -36,7 +36,7 @@ class ConfigurationTest extends AbstractUnitTest
         $name = 'foo';
 
         $configuration = new Configuration();
-        $formObject = new FormObject($className, $name);
+        $formObject = new FormObject($className, $name, []);
 
         $this->assertFalse($configuration->hasForm($className, $name));
 
@@ -61,8 +61,8 @@ class ConfigurationTest extends AbstractUnitTest
         $name = 'foo';
 
         $configuration = new Configuration();
-        $formObject = new FormObject($className, $name);
-        $formObject2 = new FormObject($className, $name);
+        $formObject = new FormObject($className, $name, []);
+        $formObject2 = new FormObject($className, $name, []);
 
         $this->setExpectedException(DuplicateEntryException::class);
 

@@ -69,7 +69,7 @@ Votre contrôleur contiendra généralement au moins deux actions :
 
 .. note::
 
-    Pour que la validation prenne effet sur le formulaire, il faut rajouter l'annotation ``@validate`` dans le DocBlock de la fonction. Il s'agit d'une fonctionnalité fournie par Extbase, utilisée par Formz pour faciliter la validation du formulaire.
+    Pour que la validation prenne effet sur le formulaire, il faut rajouter l'annotation ``@validate`` dans le DocBlock de la fonction. Il s'agit d'une fonctionnalité fournie par Extbase, utilisée par FormZ pour faciliter la validation du formulaire.
 
     Inspirez-vous de l'exemple ci-dessous.
 
@@ -121,7 +121,7 @@ Vous devrez donc suivre les indications du chapitre « :ref:`usersManual` » pou
                             required < config.tx_formz.validators.required
                         }
 
-                        activation.condition = someFieldIsValid
+                        activation.expression = someFieldIsValid
                     }
                 }
             }
@@ -141,7 +141,7 @@ Ci-dessous un exemple simple d'intégration de formulaire.
 
 .. code-block:: html
 
-    {namespace formz=Romm\Formz\ViewHelpers}
+    {namespace fz=Romm\Formz\ViewHelpers}
 
     <h1>Lorem Ipsum</h1>
 
@@ -149,24 +149,24 @@ Ci-dessous un exemple simple d'intégration de formulaire.
     lacus efficitur, sed feugiat turpis tincidunt. Sed sed tellus ornare, pellentesque
     orci mollis, consequat eros.</p>
 
-    <formz:form action="submitForm" name="exampleForm">
+    <fz:form action="submitForm" name="exampleForm">
         <fieldset>
-            <formz:field name="someField" layout="default">
-                <formz:option name="label" value="Some Field" />
+            <fz:field name="someField" layout="default">
+                <fz:option name="label" value="Some Field" />
 
-                <formz:section name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
 
-            <formz:field name="someOtherField" layout="default">
-                <formz:option name="label" value="Some other Field" />
+            <fz:field name="someOtherField" layout="default">
+                <fz:option name="label" value="Some other Field" />
 
-                <formz:section name="Field">
+                <fz:slot name="Field">
                     <f:form.textfield property="{fieldName}"
                                       id="{fieldId}" />
-                </formz:section>
-            </formz:field>
+                </fz:slot>
+            </fz:field>
         </fieldset>
-    </formz:form>
+    </fz:form>

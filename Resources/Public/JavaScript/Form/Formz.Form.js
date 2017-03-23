@@ -8,7 +8,7 @@
 /**
  * @typedef {Formz.FormInstance|Formz.Form.SubmissionServiceInstance} Formz.FullForm
  */
-Formz.Form = (function () {
+Fz.Form = (function () {
     /**
      * @param {Object}          states
      * @param {HTMLFormElement} states.element
@@ -47,7 +47,7 @@ Formz.Form = (function () {
         /**
          * @type {Object<Array>}
          */
-        var existingErrors = {};
+        var existingMessages = {};
 
         /**
          * @type {boolean}
@@ -67,6 +67,11 @@ Formz.Form = (function () {
         var fieldsHaveBeenInitialized = false;
 
         /**
+         * @type {Array}
+         */
+        var deactivatedFields = [];
+
+        /**
          * Initializes all the fields of this form: an instance is created for
          * every field.
          *
@@ -82,21 +87,40 @@ Formz.Form = (function () {
             var configurationFields = configuration['fields'];
             for (var fieldName in configurationFields) {
                 if (configurationFields.hasOwnProperty(fieldName)) {
-                    var fieldExistingErrors = (fieldName in existingErrors)
-                        ? existingErrors[fieldName]
-                        : [];
+                    var existingErrors = {};
+                    var existingWarning = {};
+                    var existingNotices = {};
+
+                    if (fieldName in existingMessages) {
+                        var fieldExistingMessages = existingMessages[fieldName];
+
+                        if ('errors' in fieldExistingMessages) {
+                            existingErrors = fieldExistingMessages['errors'];
+                        }
+                        if ('warnings' in fieldExistingMessages) {
+                            existingWarning = fieldExistingMessages['warnings'];
+                        }
+                        if ('notices' in fieldExistingMessages) {
+                            existingNotices = fieldExistingMessages['notices'];
+                        }
+                    }
 
                     var submittedFieldValue = (fieldName in submittedValues)
                         ? submittedValues[fieldName]
                         : '';
 
-                    var field = Formz.Field.get(
+                    var isDeactivated = -1 !== deactivatedFields.indexOf(fieldName);
+
+                    var field = Fz.Field.get(
                         fieldName,
                         configurationFields[fieldName],
                         formInstance,
-                        fieldExistingErrors,
+                        existingErrors,
+                        existingWarning,
+                        existingNotices,
                         submittedFieldValue,
-                        formWasValidated
+                        formWasValidated,
+                        isDeactivated
                     );
                     if (field.getElements().length > 0) {
                         fields[fieldName] = field;
@@ -126,9 +150,9 @@ Formz.Form = (function () {
                 var formElements = window.document.getElementsByName(name);
 
                 if (formElements.length === 0) {
-                    Formz.debug(
+                    Fz.debug(
                         'Could not get the DOM element for the form "' + name + '"!',
-                        Formz.TYPE_ERROR
+                        Fz.TYPE_ERROR
                     )
                 }
 
@@ -168,7 +192,7 @@ Formz.Form = (function () {
             /**
              * This function takes care of refreshing the validation for the
              * fields which may have been changed with no detection of the whole
-             * Formz system.
+             * FormZ system.
              *
              * This actually occurs when the user submits a form, then comes
              * back to it with the return functionality of his browser.
@@ -195,29 +219,31 @@ Formz.Form = (function () {
 
             /**
              * @param {string}  submittedFormValues
-             * @param {string}  existingFormErrors
+             * @param {string}  existingFormMessages
              * @param {boolean} formValidationDone
+             * @param {Array}   deactivatedFieldsNames
              */
-            injectRequestData: function (submittedFormValues, existingFormErrors, formValidationDone) {
+            injectRequestData: function (submittedFormValues, existingFormMessages, formValidationDone, deactivatedFieldsNames) {
                 submittedValues = submittedFormValues;
-                existingErrors = existingFormErrors;
+                existingMessages = existingFormMessages;
                 formWasValidated = formValidationDone;
+                deactivatedFields = deactivatedFieldsNames;
             }
         };
 
         /**
          * When a field is validated, the form is entirely checked to see if all
          * fields are valid, in which case an attribute is added to the form DOM
-         * element: `formz-valid`.
+         * element: `fz-valid`.
          *
          * Several usages can be found for this: for instance, the submission
          * button can be shown only when the form is valid (logical behaviour
          * since the submission is canceled whenever an error is found).
          */
-        Formz.Form.get(name, function () {
+        Fz.Form.get(name, function () {
             var checkFormIsValid = function () {
                 var globalFlag = true;
-                var fieldsNumber = Formz.objectSize(fields);
+                var fieldsNumber = Fz.objectSize(fields);
                 var fieldsChecked = 0;
 
                 /**
@@ -228,9 +254,9 @@ Formz.Form = (function () {
                 var checkAllFieldsWereProcessed = function () {
                     if (fieldsNumber === fieldsChecked) {
                         if (true === globalFlag) {
-                            field.getForm().getElement().setAttribute('formz-valid', '1');
+                            field.getForm().getElement().setAttribute('fz-valid', '1');
                         } else {
-                            field.getForm().getElement().removeAttribute('formz-valid');
+                            field.getForm().getElement().removeAttribute('fz-valid');
                         }
                     }
                 };
@@ -247,7 +273,7 @@ Formz.Form = (function () {
                     fieldsChecked++;
 
                     field.getActivatedValidationRules(function (validationRules) {
-                        if (0 === Formz.objectSize(validationRules)) {
+                        if (0 === Fz.objectSize(validationRules)) {
                             // If the field does not have any validation rule, it is obviously considered valid.
                             flag = true;
                         } else {
@@ -363,9 +389,9 @@ Formz.Form = (function () {
                 configuration: configuration
             });
 
-            formsRepository[name] = Formz.extend(
+            formsRepository[name] = Fz.extend(
                 form,
-                Formz.Form.SubmissionService.get(name)
+                Fz.Form.SubmissionService.get(name)
             );
         },
 

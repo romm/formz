@@ -118,7 +118,7 @@ Layouts
 
         .. note::
 
-            Formz offers by default layouts for the CSS frameworks **Twitter Bootstrap** and **Foundation**. Read the chapter “:ref:`@todo <>`” for more information.
+            FormZ offers by default layouts for the CSS frameworks **Twitter Bootstrap** and **Foundation**. Read the chapter “:ref:`@todo <>`” for more information.
 
 .. _viewLayoutRootPaths:
 
@@ -136,7 +136,7 @@ Layout root paths
 
         .. note::
 
-            At index ``10`` is the path to Formz layouts.
+            At index ``10`` is the path to FormZ layouts.
 
         **Example:**
 
@@ -164,7 +164,7 @@ Partial root paths
 
         .. note::
 
-            At index ``10`` is the path to Formz partials.
+            At index ``10`` is the path to FormZ partials.
 
         **Example:**
 

@@ -17,7 +17,7 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
      */
     public function defaultCssFilesAreIncluded()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -47,7 +47,7 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
      */
     public function generatedCssAreGeneratedOnceAndIncluded()
     {
-        $formObject = $this->getFormObject();
+        $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
 
         $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
@@ -74,8 +74,7 @@ class CssAssetHandlerConnectorTest extends AbstractUnitTest
             });
 
         $assetHandlerConnectorManager->expects($this->once())
-            ->method('writeTemporaryFile')
-            ->willReturn(true);
+            ->method('writeTemporaryFile');
 
         $cssAssetHandlerConnector = new CssAssetHandlerConnector($assetHandlerConnectorManager);
 

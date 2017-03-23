@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -59,8 +59,13 @@ class Core implements SingletonInterface
     public static function instantiate($className)
     {
         $objectManager = self::get()->getObjectManager();
+        $args = func_get_args();
 
-        return call_user_func_array([$objectManager, 'get'], func_get_args());
+        if (1 === count($args)) {
+            return $objectManager->get($className);
+        }
+
+        return call_user_func_array([$objectManager, 'get'], $args);
     }
 
     /**

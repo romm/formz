@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -17,6 +17,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class EmailValidator extends AbstractValidator
 {
+    const MESSAGE_DEFAULT = 'default';
 
     /**
      * @inheritdoc
@@ -29,7 +30,7 @@ class EmailValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.email.error',
             'extension' => null
         ]
@@ -41,10 +42,7 @@ class EmailValidator extends AbstractValidator
     public function isValid($value)
     {
         if (false === GeneralUtility::validEmail((string)$value)) {
-            $this->addError(
-                'default',
-                1447333632
-            );
+            $this->addError(self::MESSAGE_DEFAULT, 1447333632);
         }
     }
 }

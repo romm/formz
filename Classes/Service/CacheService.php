@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,9 +13,10 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Core\Core;
-use Romm\Formz\Service\Traits\ExtendedFacadeInstanceTrait;
-use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
+use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\InvalidOptionValueException;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
+use TYPO3\CMS\Core\Cache\Backend\BackendInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -23,10 +24,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CacheService implements SingletonInterface
 {
-    use ExtendedFacadeInstanceTrait;
+    use ExtendedSelfInstantiateTrait;
 
     const CACHE_IDENTIFIER = 'cache_formz';
-    const GENERATED_FILES_PATH = 'typo3temp/Formz/';
+    const CONFIGURATION_OBJECT_CACHE_IDENTIFIER = 'cache_formz_configuration_object';
+    const GENERATED_FILES_PATH = 'typo3temp/FormZ/';
 
     /**
      * @var TypoScriptService
@@ -39,75 +41,105 @@ class CacheService implements SingletonInterface
     protected $cacheInstance;
 
     /**
+     * @var CacheManager
+     */
+    protected $cacheManager;
+
+    /**
      * Returns the type of backend cache defined in TypoScript at the path:
      * `settings.defaultBackendCache`.
      *
      * @return string
-     * @throws \Exception
+     * @throws ClassNotFoundException
+     * @throws InvalidOptionValueException
      */
     public function getBackendCache()
     {
         $backendCache = $this->typoScriptService->getExtensionConfigurationFromPath('settings.defaultBackendCache');
 
-        if (false === class_exists($backendCache)
-            && false === in_array(AbstractBackend::class, class_parents($backendCache))
-        ) {
-            throw new \Exception(
-                'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "' . AbstractBackend::class . '" (current value: "' . (string)$backendCache . '")',
-                1459251263
-            );
+        if (false === class_exists($backendCache)) {
+            throw ClassNotFoundException::backendCacheClassNameNotFound($backendCache);
+        }
+
+        if (false === in_array(BackendInterface::class, class_implements($backendCache))) {
+            throw InvalidOptionValueException::wrongBackendCacheType($backendCache);
         }
 
         return $backendCache;
     }
 
     /**
-     * Returns the cache instance for this extension.
+     * Returns the cache instance used by this extension.
      *
      * @return FrontendInterface
      */
     public function getCacheInstance()
     {
         if (null === $this->cacheInstance) {
-            /** @var $cacheManager CacheManager */
-            $cacheManager = Core::instantiate(CacheManager::class);
-
-            if ($cacheManager->hasCache(self::CACHE_IDENTIFIER)) {
-                $this->cacheInstance = $cacheManager->getCache(self::CACHE_IDENTIFIER);
-            }
+            $this->cacheInstance = $this->cacheManager->getCache(self::CACHE_IDENTIFIER);
         }
 
         return $this->cacheInstance;
     }
 
     /**
-     * @param FrontendInterface $cacheInstance
+     * Generic cache identifier creation for usages in the extension.
+     *
+     * @param string $formClassName
+     * @param string $formName
+     * @return string
      */
-    public function setCacheInstance(FrontendInterface $cacheInstance)
+    public function getFormCacheIdentifier($formClassName, $formName)
     {
-        $this->cacheInstance = $cacheInstance;
+        $shortClassName = end(explode('\\', $formClassName));
+
+        return StringService::get()->sanitizeString($shortClassName . '-' . $formName);
     }
 
     /**
-     * Generic cache identifier creation for usages in the extension.
+     * Function called when clearing TYPO3 caches. It will remove the temporary
+     * asset files created by FormZ.
      *
-     * @param string $string
-     * @param string $formClassName
-     * @param int    $maxLength
-     * @return string
+     * @param array $parameters
      */
-    public function getCacheIdentifier($string, $formClassName, $maxLength = 55)
+    public function clearCacheCommand($parameters)
     {
-        $explodedClassName = explode('\\', $formClassName);
+        if (in_array($parameters['cacheCmd'], ['all', 'system'])) {
+            $files = $this->getFilesInPath(self::GENERATED_FILES_PATH . '*');
 
-        $identifier = strtolower(
-            $string .
-            end($explodedClassName) .
-            '-' .
-            sha1($formClassName)
-        );
+            foreach ($files as $file) {
+                $this->clearFile($file);
+            }
+        }
+    }
 
-        return substr($identifier, 0, $maxLength);
+    /**
+     * @param string $path
+     * @return array
+     */
+    protected function getFilesInPath($path)
+    {
+        $files = glob(GeneralUtility::getFileAbsFileName($path));
+
+        return (false === $files)
+            ? []
+            : $files;
+    }
+
+    /**
+     * @param string $file
+     */
+    protected function clearFile($file)
+    {
+        touch($file, 0);
+    }
+
+    /**
+     * @param CacheManager $cacheManager
+     */
+    public function injectCacheManager(CacheManager $cacheManager)
+    {
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -116,28 +148,5 @@ class CacheService implements SingletonInterface
     public function injectTypoScriptService(TypoScriptService $typoScriptService)
     {
         $this->typoScriptService = $typoScriptService;
-    }
-
-    /**
-     * Function called when clearing TYPO3 caches. It will remove the temporary
-     * asset files created by Formz.
-     *
-     * @param array $parameters
-     */
-    public function clearCacheCommand($parameters)
-    {
-        if (false === in_array($parameters['cacheCmd'], ['all', 'system'])) {
-            return;
-        }
-
-        $files = glob(GeneralUtility::getFileAbsFileName(self::GENERATED_FILES_PATH . '*'));
-
-        if (false === $files) {
-            return;
-        }
-
-        foreach ($files as $assetCacheFile) {
-            unlink($assetCacheFile);
-        }
     }
 }

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,6 +13,9 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
+use Romm\Formz\Condition\Parser\ConditionTree;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -20,7 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * validation rules for a given field. For example, you may want to enable the
  * rule "required" of a given field only under certain circumstances.
  */
-class FieldsValidationActivationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FieldsValidationActivationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**
@@ -33,19 +36,17 @@ class FieldsValidationActivationJavaScriptAssetHandler extends AbstractJavaScrip
         $javaScriptBlocks = [];
         $formConfiguration = $this->getFormObject()->getConfiguration();
 
-        foreach ($formConfiguration->getFields() as $fieldName => $field) {
-            foreach ($field->getValidation() as $validatorName => $validation) {
+        foreach ($formConfiguration->getFields() as $field) {
+            foreach ($field->getValidation() as $validation) {
                 $fieldConditionExpression = [];
-                $javaScriptTree = $this->conditionProcessor
-                    ->getActivationConditionTreeForValidation($validation)
-                    ->getJavaScriptConditions();
+                $javaScriptTree = $this->getConditionTreeForValidation($validation)->getJavaScriptConditions();
 
                 if (false === empty($javaScriptTree)) {
                     foreach ($javaScriptTree as $node) {
                         $fieldConditionExpression[] = 'flag = flag || (' . $node . ');';
                     }
 
-                    $javaScriptBlocks[] = $this->getSingleFieldActivationConditionFunction($fieldName, $validatorName, $fieldConditionExpression);
+                    $javaScriptBlocks[] = $this->getSingleFieldActivationConditionFunction($validation, $fieldConditionExpression);
                 }
             }
         }
@@ -55,7 +56,7 @@ class FieldsValidationActivationJavaScriptAssetHandler extends AbstractJavaScrip
 
         return <<<JS
 (function() {
-    Formz.Form.get(
+    Fz.Form.get(
         $formName,
         function(form) {
             var field = null;
@@ -72,15 +73,14 @@ JS;
     /**
      * This function is just here to make the class more readable.
      *
-     * @param string $fieldName                Name of the field.
-     * @param string $validatorName            Name of the validation rule.
-     * @param array  $fieldConditionExpression Array containing the JavaScript condition expression for the field.
+     * @param Validation $validation
+     * @param array      $fieldConditionExpression Array containing the JavaScript condition expression for the field.
      * @return string
      */
-    protected function getSingleFieldActivationConditionFunction($fieldName, $validatorName, $fieldConditionExpression)
+    protected function getSingleFieldActivationConditionFunction(Validation $validation, $fieldConditionExpression)
     {
-        $fieldName = GeneralUtility::quoteJSvalue($fieldName);
-        $validatorName = GeneralUtility::quoteJSvalue($validatorName);
+        $fieldName = GeneralUtility::quoteJSvalue($validation->getParentField()->getName());
+        $validationName = GeneralUtility::quoteJSvalue($validation->getName());
         $fieldConditionExpression = implode(CRLF . str_repeat(' ', 20), $fieldConditionExpression);
 
         return <<<JS
@@ -89,7 +89,7 @@ JS;
             if (null !== field) {
                 field.addActivationConditionForValidator(
                     '__auto',
-                    $validatorName,
+                    $validationName,
                     function (field, continueValidation) {
                         var flag = false;
                         $fieldConditionExpression
@@ -98,5 +98,14 @@ JS;
                 );
             }
 JS;
+    }
+
+    /**
+     * @param Validation $valid
+     * @return ConditionTree
+     */
+    protected function getConditionTreeForValidation(Validation $valid)
+    {
+        return $this->conditionProcessor->getActivationConditionTreeForValidation($valid);
     }
 }

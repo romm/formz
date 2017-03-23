@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -16,30 +16,33 @@ namespace Romm\Formz\Configuration\Form\Field;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Condition\Activation\ActivationInterface;
-use Romm\Formz\Configuration\Form\Condition\Activation\EmptyActivation;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
 use Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour;
 use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
 use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 
-class Field extends AbstractFormzConfiguration
+class Field extends AbstractFormzConfiguration implements ActivationUsageInterface
 {
     use StoreArrayIndexTrait;
     use ParentsTrait;
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Validation\Validation>
+     * @var \Romm\Formz\Configuration\Form\Field\Validation\Validation[]
      */
     protected $validation = [];
 
     /**
-     * @var \ArrayObject<Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour>
+     * @var \Romm\Formz\Configuration\Form\Field\Behaviour\Behaviour[]
      */
     protected $behaviours = [];
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Condition\Activation\ActivationResolver
+     * @var ActivationInterface
+     * @mixedTypesResolver \Romm\Formz\Configuration\Form\Field\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;
@@ -55,14 +58,14 @@ class Field extends AbstractFormzConfiguration
      *
      * @var string
      */
-    private $fieldName;
+    private $name;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->settings = new FieldSettings();
+        $this->settings = new FieldSettings;
         $this->settings->setParents([$this]);
 
         $this->activation = EmptyActivation::get();
@@ -73,7 +76,18 @@ class Field extends AbstractFormzConfiguration
      */
     public function getForm()
     {
-        return $this->getFirstParent(Form::class);
+        /** @var Form $form */
+        $form = $this->getFirstParent(Form::class);
+
+        return $form;
+    }
+
+    /**
+     * @return Validation[]
+     */
+    public function getValidation()
+    {
+        return $this->validation;
     }
 
     /**
@@ -86,19 +100,26 @@ class Field extends AbstractFormzConfiguration
     }
 
     /**
-     * @param string|null $validationName If given, will try to fetch the validation with the given name.
-     * @return Validation|Validation[]
+     * @param Validation $validation
      */
-    public function getValidation($validationName = null)
+    public function addValidation(Validation $validation)
     {
-        $result = $this->validation;
-        if (null !== $validationName) {
-            $result = (true === isset($this->validation[$validationName]))
-                ? $this->validation[$validationName]
-                : null;
+        $this->validation[$validation->getName()] = $validation;
+        $validation->setParents([$this]);
+    }
+
+    /**
+     * @param string $validationName
+     * @return Validation
+     * @throws EntryNotFoundException
+     */
+    public function getValidationByName($validationName)
+    {
+        if (false === $this->hasValidation($validationName)) {
+            throw EntryNotFoundException::validationNotFound($validationName);
         }
 
-        return $result;
+        return $this->validation[$validationName];
     }
 
     /**
@@ -107,6 +128,15 @@ class Field extends AbstractFormzConfiguration
     public function getBehaviours()
     {
         return $this->behaviours;
+    }
+
+    /**
+     * @param string    $name
+     * @param Behaviour $behaviour
+     */
+    public function addBehaviour($name, Behaviour $behaviour)
+    {
+        $this->behaviours[$name] = $behaviour;
     }
 
     /**
@@ -126,6 +156,16 @@ class Field extends AbstractFormzConfiguration
     }
 
     /**
+     * @param ActivationInterface $activation
+     */
+    public function setActivation(ActivationInterface $activation)
+    {
+        $activation->setRootObject($this);
+
+        $this->activation = $activation;
+    }
+
+    /**
      * @return FieldSettings
      */
     public function getSettings()
@@ -136,20 +176,20 @@ class Field extends AbstractFormzConfiguration
     /**
      * @return string
      */
-    public function getFieldName()
+    public function getName()
     {
-        if (null === $this->fieldName) {
-            $this->fieldName = $this->getArrayIndex();
+        if (null === $this->name) {
+            $this->name = $this->getArrayIndex();
         }
 
-        return $this->fieldName;
+        return $this->name;
     }
 
     /**
-     * @param string $fieldName
+     * @param string $name
      */
-    public function setFieldName($fieldName)
+    public function setName($name)
     {
-        $this->fieldName = $fieldName;
+        $this->name = $name;
     }
 }

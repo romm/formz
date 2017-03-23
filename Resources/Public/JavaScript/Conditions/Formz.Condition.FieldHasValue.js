@@ -1,4 +1,4 @@
-Formz.Condition.registerCondition(
+Fz.Condition.registerCondition(
 	'Romm\\Formz\\Condition\\Items\\FieldHasValueCondition',
 	/**
 	 * @param {Formz.FormInstance} form
@@ -13,10 +13,14 @@ Formz.Condition.registerCondition(
 
 		if (null !== field) {
 			if (value !== '') {
-				flag = (Formz.commaSeparatedValues(field.getValue()).search(value) > -1)
-			} else {
-				flag = (Formz.commaSeparatedValues(field.getValue()) == '')
-			}
+			    var fieldValue = field.getValue();
+
+                flag = (typeof fieldValue === 'string')
+                    ? fieldValue === value
+                    : (Fz.commaSeparatedValues(fieldValue).search(value) > -1);
+            } else {
+				flag = (Fz.commaSeparatedValues(field.getValue()) == '')
+            }
 		}
 
 		return flag;

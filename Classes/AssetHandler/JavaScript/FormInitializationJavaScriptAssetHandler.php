@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\AssetHandler\JavaScript;
 
+use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Service\ArrayService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -20,7 +21,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * This asset handler generates the JavaScript code which will initialize the
  * form and its whole configuration.
  */
-class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHandler
+class FormInitializationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**
@@ -35,7 +36,7 @@ class FormInitializationJavaScriptAssetHandler extends AbstractJavaScriptAssetHa
 
         $javaScriptCode = <<<JS
 (function() {
-    Formz.Form.register($formName, $formConfigurationJson);
+    Fz.Form.register($formName, $formConfigurationJson);
 })();
 JS;
 

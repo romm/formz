@@ -28,15 +28,15 @@ Property                                                                        
 
 :ref:`behaviours <fieldsBehaviours>`                                                    Field behaviours
 
-:ref:`activation.items <fieldsActivation-items>`                                        Activation conditions
+:ref:`activation.conditions <fieldsActivation-conditions>`                              Activation conditions
 
-:ref:`activation.condition <fieldsActivation-condition>`                                Field activation expression
+:ref:`activation.expression <fieldsActivation-expression>`                              Field activation expression
 
 :ref:`settings.fieldContainerSelector <fieldsSettings-fieldContainerSelector>`          Field container selector
 
-:ref:`settings.feedbackContainerSelector <fieldsSettings-feedbackContainerSelector>`    Feedback container selector
+:ref:`settings.messageContainerSelector <fieldsSettings-messageContainerSelector>`      Message container selector
 
-:ref:`settings.feedbackListSelector <fieldsSettings-feedbackListSelector>`              Feedback list container selector
+:ref:`settings.messageListSelector <fieldsSettings-messageListSelector>`                Message list container selector
 
 :ref:`settings.messageTemplate <fieldsSettings-messageTemplate>`                        Message template
 ======================================================================================= =====================================
@@ -110,7 +110,7 @@ Field behaviours
 
             Note that the validators configurations are fetched directly from ``config.tx_formz.behaviours``. It prevents a configuration duplication when the behaviours are used at several places.
 
-.. _fieldsActivation-items:
+.. _fieldsActivation-conditions:
 
 Activation conditions
 ---------------------
@@ -118,7 +118,7 @@ Activation conditions
 .. container:: table-row
 
     Property
-        ``activation.items``
+        ``activation.conditions``
     Required?
         No
     Description
@@ -138,7 +138,7 @@ Activation conditions
                 }
             }
 
-.. _fieldsActivation-condition:
+.. _fieldsActivation-expression:
 
 Field activation
 ----------------
@@ -146,7 +146,7 @@ Field activation
 .. container:: table-row
 
     Property
-        ``activation.condition``
+        ``activation.expression``
     Required?
         No
     Description
@@ -178,7 +178,7 @@ Field container selector
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-container="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-container="#FIELD#"]``.
 
         **Example:**
 
@@ -188,7 +188,7 @@ Field container selector
                 fields {
                     email {
                         settings {
-                            fieldContainerSelector = [formz-field-container="#FIELD#"]
+                            fieldContainerSelector = [fz-field-container="#FIELD#"]
                         }
                     }
 
@@ -210,23 +210,23 @@ Field container selector
 
             You can regroup several fields by assigning them the same container selector, as in the example above.
 
-.. _fieldsSettings-feedbackContainerSelector:
+.. _fieldsSettings-messageContainerSelector:
 
-Feedback container selector
+Message container selector
 ---------------------------
 
 .. container:: table-row
 
     Property
-        ``settings.feedbackContainerSelector``
+        ``settings.messageContainerSelector``
     Required?
         No
     Description
-        Contains the CSS selector which will be used to fetch the field feedback container.
+        Contains the CSS selector which will be used to fetch the field message container.
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-feedback-container="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-message-container="#FIELD#"]``.
 
         **Example:**
 
@@ -236,31 +236,31 @@ Feedback container selector
                 fields {
                     email {
                         settings {
-                            feedbackContainerSelector = #errors-email
+                            messageContainerSelector = #errors-email
                         }
                     }
                 }
             }
 
-.. _fieldsSettings-feedbackListSelector:
+.. _fieldsSettings-messageListSelector:
 
-Feedback list selector
-----------------------
+Message list selector
+---------------------
 
 .. container:: table-row
 
     Property
-        ``settings.feedbackListSelector``
+        ``settings.messageListSelector``
     Required?
         No
     Description
-        Contains the CSS selector which will be used to fetch the block containing the field messages. It's a second selection layout for the feedback container (``settings.feedbackContainerSelector``): it allows adding static HTML contents which wont be cleaned up by JavaScript during the feedback refreshing.
+        Contains the CSS selector which will be used to fetch the block containing the field messages. It's a second selection layout for the message container (``settings.messageContainerSelector``): it allows adding static HTML contents which wont be cleaned up by JavaScript during the message refreshing.
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 
-        The default value of this parameter is: ``[formz-field-feedback-list="#FIELD#"]``.
+        The default value of this parameter is: ``[fz-field-message-list="#FIELD#"]``.
 
-        If an empty value is set, then the feedback container will be used.
+        If an empty value is set, then the message container will be used.
 
         **Example:**
 
@@ -270,7 +270,7 @@ Feedback list selector
                 fields {
                     email {
                         settings {
-                            feedbackListSelector =
+                            messageListSelector =
                         }
                     }
                 }

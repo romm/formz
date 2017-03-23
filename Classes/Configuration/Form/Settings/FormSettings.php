@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -23,6 +23,8 @@ class FormSettings extends AbstractFormzConfiguration
 {
     use ParentsTrait;
 
+    const DEFAULT_ERROR_MESSAGE_KEY = 'default_error_message';
+
     /**
      * @var string
      */
@@ -34,14 +36,6 @@ class FormSettings extends AbstractFormzConfiguration
     protected $defaultErrorMessage;
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->defaultErrorMessage = 'default_error_message';
-    }
-
-    /**
      * @return string
      */
     public function getDefaultClass()
@@ -50,17 +44,35 @@ class FormSettings extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string $defaultClass
+     */
+    public function setDefaultClass($defaultClass)
+    {
+        $this->defaultClass = $defaultClass;
+    }
+
+    /**
      * @return string
      */
     public function getDefaultErrorMessage()
     {
-        return ContextService::get()->translate($this->getSettingsProperty('defaultErrorMessage'));
+        $message = $this->getSettingsProperty('defaultErrorMessage') ?: self::DEFAULT_ERROR_MESSAGE_KEY;
+
+        return ContextService::get()->translate($message);
+    }
+
+    /**
+     * @param string $defaultErrorMessage
+     */
+    public function setDefaultErrorMessage($defaultErrorMessage)
+    {
+        $this->defaultErrorMessage = $defaultErrorMessage;
     }
 
     /**
      * This function will do the following: first, it will check if the wanted
      * property is set in this class instance (not null), then it returns it. If
-     * the value is null, it will fetch the global Formz configuration settings,
+     * the value is null, it will fetch the global FormZ configuration settings,
      * and return the default value for the asked property.
      *
      * Example:

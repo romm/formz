@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -17,8 +17,8 @@ use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -41,7 +41,7 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  *
  * Please be aware that this view helper is useful only when used at the same
  * level or under the HTML element containing the field selector (usually the
- * one with the data attribute `formz-field-container`). You may encounter
+ * one with the data attribute `fz-field-container`). You may encounter
  * strange behaviours if you do not respect this requirement.
  */
 class ClassViewHelper extends AbstractViewHelper
@@ -55,12 +55,12 @@ class ClassViewHelper extends AbstractViewHelper
     protected static $acceptedClassesNameSpace = [self::CLASS_ERRORS, self::CLASS_VALID];
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
@@ -103,7 +103,7 @@ class ClassViewHelper extends AbstractViewHelper
         $this->initializeFieldName();
 
         $result = vsprintf(
-            'formz-%s-%s',
+            'fz-%s-%s',
             [
                 $this->classNameSpace,
                 str_replace(' ', '-', $this->classValue)
@@ -126,10 +126,7 @@ class ClassViewHelper extends AbstractViewHelper
         list($this->classNameSpace, $this->className) = GeneralUtility::trimExplode('.', $this->arguments['name']);
 
         if (false === in_array($this->classNameSpace, self::$acceptedClassesNameSpace)) {
-            throw new InvalidEntryException(
-                'The class "' . $this->arguments['name'] . '" is not valid: the namespace of the error must be one of the following: ' . implode(', ', self::$acceptedClassesNameSpace) . '.',
-                1467623504
-            );
+            throw InvalidEntryException::invalidCssClassNamespace($this->arguments['name'], self::$acceptedClassesNameSpace);
         }
     }
 
@@ -149,14 +146,11 @@ class ClassViewHelper extends AbstractViewHelper
         ) {
             $this->fieldName = $this->fieldService
                 ->getCurrentField()
-                ->getFieldName();
+                ->getName();
         }
 
         if (null === $this->fieldName) {
-            throw new EntryNotFoundException(
-                'The field could not be fetched for the class "' . $this->arguments['name'] . '": please either use this view helper inside the view helper "' . FieldViewHelper::class . '", or fill the parameter "field" of this view helper with the field name you want.',
-                1467623761
-            );
+            throw EntryNotFoundException::classViewHelperFieldNotFound($this->arguments['name']);
         }
     }
 
@@ -171,7 +165,7 @@ class ClassViewHelper extends AbstractViewHelper
         $classesConfiguration = $this->formService
             ->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration()
+            ->getRootConfiguration()
             ->getView()
             ->getClasses();
 
@@ -179,10 +173,7 @@ class ClassViewHelper extends AbstractViewHelper
         $class = ObjectAccess::getProperty($classesConfiguration, $this->classNameSpace);
 
         if (false === $class->hasItem($this->className)) {
-            throw new UnregisteredConfigurationException(
-                'The class "' . $this->arguments['name'] . '" is not valid: the class name "' . $this->className . '" was not found in the namespace "' . $this->classNameSpace . '".',
-                1467623662
-            );
+            throw UnregisteredConfigurationException::cssClassNameNotFound($this->arguments['name'], $this->classNameSpace, $this->className);
         }
 
         $this->classValue = $class->getItem($this->className);
@@ -196,14 +187,17 @@ class ClassViewHelper extends AbstractViewHelper
      */
     protected function getFormResultClass()
     {
-        $formResult = $this->formService->getFormResult();
-        $propertyResult = ($formResult)
-            ? $formResult->forProperty($this->fieldName)
-            : null;
+        $result = '';
+        $formObject = $this->formService->getFormObject();
 
-        return ($this->formService->formWasSubmitted() && null !== $propertyResult)
-            ? $this->getPropertyResultClass($propertyResult)
-            : '';
+        if ($formObject->formWasSubmitted()
+            && $formObject->hasFormResult()
+        ) {
+            $fieldResult = $formObject->getFormResult()->forProperty($this->fieldName);
+            $result = $this->getPropertyResultClass($fieldResult);
+        }
+
+        return $result;
     }
 
     /**
@@ -216,14 +210,10 @@ class ClassViewHelper extends AbstractViewHelper
 
         switch ($this->classNameSpace) {
             case self::CLASS_ERRORS:
-                if (true === $propertyResult->hasErrors()) {
-                    $result .= ' ' . $this->classValue;
-                }
+                $result = $this->getPropertyErrorClass($propertyResult);
                 break;
             case self::CLASS_VALID:
-                if (false === $propertyResult->hasErrors()) {
-                    $result .= ' ' . $this->classValue;
-                }
+                $result = $this->getPropertyValidClass($propertyResult);
                 break;
         }
 
@@ -231,17 +221,52 @@ class ClassViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param FormService $service
+     * @param Result $propertyResult
+     * @return string
      */
-    public function injectFormService(FormService $service)
+    protected function getPropertyErrorClass(Result $propertyResult)
+    {
+        return (true === $propertyResult->hasErrors())
+            ? ' ' . $this->classValue
+            : '';
+    }
+
+    /**
+     * @param Result $propertyResult
+     * @return string
+     */
+    protected function getPropertyValidClass(Result $propertyResult)
+    {
+        $result = '';
+        $formObject = $this->formService->getFormObject();
+        $field = $formObject->getConfiguration()->getField($this->fieldName);
+
+        if ($formObject->hasForm()
+            && false === $propertyResult->hasErrors()
+            && false === $formObject->getFormResult()->fieldIsDeactivated($field)
+        ) {
+            $fieldValue = ObjectAccess::getProperty($formObject->getForm(), $this->fieldName);
+
+            if (false === empty($fieldValue)) {
+                $result .= ' ' . $this->classValue;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param FormViewHelperService $service
+     */
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }

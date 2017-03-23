@@ -1,16 +1,20 @@
 <?php
 namespace Romm\Formz\Tests\Unit;
 
-use Prophecy\Prophet;
+use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
+use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
-use Romm\Formz\Service\FacadeService;
+use Romm\Formz\Service\InstanceService;
 use Romm\Formz\Service\TypoScriptService;
 use Romm\Formz\Tests\Fixture\Configuration\FormzConfiguration;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
@@ -19,20 +23,16 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Package\Package;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Object\Container\Container;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 trait FormzUnitTestUtility
 {
-    /**
-     * @var Prophet
-     */
-    protected $prophet;
-
     /**
      * @var EnvironmentService|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -47,11 +47,6 @@ trait FormzUnitTestUtility
      * @var array
      */
     protected $formzConfiguration = [];
-
-    /**
-     * @var array
-     */
-    protected $formConfiguration = [];
 
     /**
      * @var array
@@ -89,14 +84,19 @@ trait FormzUnitTestUtility
         */
         $this->initializeConfigurationObjectTestServices();
 
-        FacadeService::get()->reset();
+        InstanceService::get()->reset();
+
+        /*
+         * Will return a configuration that can be manipulated during tests.
+         */
+        $this->formzConfiguration = FormzConfiguration::getDefaultConfiguration();
+
         $this->backUpPackageManager();
         $this->overrideExtbaseContainer();
         $this->changeReflectionCache();
         $this->injectTransientMemoryCacheInFormzCore();
         $this->setUpExtensionServiceMock();
-
-        $this->prophet = new Prophet;
+        $this->setUpContextService();
     }
 
     /**
@@ -104,26 +104,22 @@ trait FormzUnitTestUtility
      */
     protected function formzTearDown()
     {
-        if ($this->prophet) {
-            $this->prophet->checkPredictions();
-        }
-
         $this->restorePackageManager();
 
         // Reset asset handler factory instances.
         $reflectedClass = new \ReflectionClass(AssetHandlerFactory::class);
-        $objectManagerProperty = $reflectedClass->getProperty('factoryInstances');
-        $objectManagerProperty->setAccessible(true);
-        $objectManagerProperty->setValue([]);
-        $objectManagerProperty->setAccessible(false);
+        $property = $reflectedClass->getProperty('factoryInstances');
+        $property->setAccessible(true);
+        $property->setValue([]);
+        $property->setAccessible(false);
 
         // Reset configuration factory instances.
         $configurationFactory = Core::instantiate(ConfigurationFactory::class);
         $reflectedObject = new \ReflectionObject($configurationFactory);
-        $objectManagerProperty = $reflectedObject->getProperty('instances');
-        $objectManagerProperty->setAccessible(true);
-        $objectManagerProperty->setValue($configurationFactory, []);
-        $objectManagerProperty->setAccessible(false);
+        $property = $reflectedObject->getProperty('instances');
+        $property->setAccessible(true);
+        $property->setValue($configurationFactory, []);
+        $property->setAccessible(false);
 
         UnitTestContainer::get()->resetInstances();
     }
@@ -131,17 +127,71 @@ trait FormzUnitTestUtility
     /**
      * @return FormObject
      */
-    protected function getFormObject()
+    protected function getDefaultFormObject()
     {
-        $formObject = new FormObject(
-            AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
-            AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME
-        );
+        return $this->createFormObject(['foo']);
+    }
 
-        /** @var ConfigurationFactory $configurationFactory */
-        $configurationFactory = Core::instantiate(ConfigurationFactory::class);
+    /**
+     * @return FormObject
+     */
+    protected function getExtendedFormObject()
+    {
+        return $this->createFormObject(['foo', 'bar']);
+    }
 
-        $formObject->injectConfigurationFactory($configurationFactory);
+    /**
+     * @param array $fields
+     * @return FormObject
+     */
+    protected function createFormObject(array $fields = [])
+    {
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
+        $formObject = $this->getMockBuilderWrap(FormObject::class)
+            ->setMethods(['getConfiguration', 'getConfigurationValidationResult', 'setUpConfiguration'])
+            ->setConstructorArgs([
+                AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
+                AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME,
+                []
+            ])
+            ->getMock();
+
+        $formConfiguration = new Form;
+
+        foreach ($fields as $fieldName) {
+            $field = new Field;
+            $field->setName($fieldName);
+            $field->setParents([$formConfiguration]);
+            $formConfiguration->addField($field);
+
+            $formObject->addProperty($fieldName);
+        }
+
+        $configurationObjectInstance = new ConfigurationObjectInstance($formConfiguration, new Result);
+        $configurationObjectInstance->setValidationResult(new Result);
+
+        $formzConfiguration = new Configuration();
+
+        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setMessageContainerSelector('[fz-field-message-container="#FIELD#"]');
+        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setFieldContainerSelector('[fz-field-container="#FIELD#"]');
+
+        $errors = new ViewClass;
+        $errors->addItem('foo', 'foo');
+        /** @noinspection PhpUndefinedMethodInspection */
+        $formzConfiguration->getView()->getClasses()->setErrors($errors);
+
+        $valid = new ViewClass;
+        $valid->addItem('bar', 'bar');
+        /** @noinspection PhpUndefinedMethodInspection */
+        $formzConfiguration->getView()->getClasses()->setValid($valid);
+
+        $formConfiguration->setParents([$formzConfiguration]);
+
+        $formObject->method('getConfiguration')
+            ->willReturn($configurationObjectInstance->getObject(true));
+
+        $formObject->method('getConfigurationValidationResult')
+            ->willReturn(new Result);
 
         return $formObject;
     }
@@ -182,13 +232,13 @@ trait FormzUnitTestUtility
     protected function setUpPackageManagerMock()
     {
         /** @var Package|\PHPUnit_Framework_MockObject_MockObject $package */
-        $package = $this->getMockBuilder(Package::class)
+        $package = $this->getMockBuilderWrap(Package::class)
             ->setMethods(['getPackagePath'])
             ->disableOriginalConstructor()
             ->getMock();
 
         /** @var PackageManager|\PHPUnit_Framework_MockObject_MockObject $packageManager */
-        $packageManager = $this->getMockBuilder(PackageManager::class)
+        $packageManager = $this->getMockBuilderWrap(PackageManager::class)
             ->setMethods(['isPackageActive', 'getPackage'])
             ->getMock();
 
@@ -203,6 +253,7 @@ trait FormzUnitTestUtility
             ->with('formz')
             ->will($this->returnValue($package));
 
+        /** @noinspection PhpInternalEntityUsedInspection */
         ExtensionManagementUtility::setPackageManager($packageManager);
     }
 
@@ -222,6 +273,7 @@ trait FormzUnitTestUtility
      */
     protected function restorePackageManager()
     {
+        /** @noinspection PhpInternalEntityUsedInspection */
         ExtensionManagementUtility::setPackageManager($this->packageManagerBackUp);
     }
 
@@ -232,16 +284,11 @@ trait FormzUnitTestUtility
     protected function setUpExtensionServiceMock()
     {
         /** @var ExtensionService|\PHPUnit_Framework_MockObject_MockObject $extensionServiceMock */
-        $extensionServiceMock = $this->getMockBuilder(ExtensionService::class)
+        $extensionServiceMock = $this->getMockBuilderWrap(ExtensionService::class)
             ->setMethods(['getFullExtensionConfiguration', 'getExtensionRelativePath'])
             ->getMock();
 
-        FacadeService::get()->forceInstance(ExtensionService::class, $extensionServiceMock);
-
-        /*
-         * Will return a configuration that can be manipulated during tests.
-         */
-        $this->setFormzConfiguration(FormzConfiguration::getDefaultConfiguration());
+        InstanceService::get()->forceInstance(ExtensionService::class, $extensionServiceMock);
 
         $extensionServiceMock->method('getFullExtensionConfiguration')
             ->willReturnCallback(function () {
@@ -272,9 +319,14 @@ trait FormzUnitTestUtility
     protected function setUpContextService()
     {
         /** @var ContextService|\PHPUnit_Framework_MockObject_MockObject $contextServiceMock */
-        $contextServiceMock = $this->getMockBuilder(ContextService::class)
+        $contextServiceMock = $this->getMockBuilderWrap(ContextService::class)
             ->setMethods(['translate'])
             ->getMock();
+
+        InstanceService::get()->forceInstance(ContextService::class, $contextServiceMock);
+
+        $contextServiceMock->injectEnvironmentService($this->getMockedEnvironmentService());
+        $contextServiceMock->injectTypoScriptService($this->getMockedTypoScriptService());
 
         /*
          * Mocking the translate function, to avoid the fatal error due to TYPO3
@@ -309,37 +361,18 @@ trait FormzUnitTestUtility
     }
 
     /**
-     * @param array $formzConfiguration
-     */
-    protected function setFormzConfiguration(array $formzConfiguration)
-    {
-        $this->formzConfiguration = $formzConfiguration;
-    }
-
-    /**
      * @param array $configuration
      */
     protected function addFormzConfiguration(array $configuration)
     {
-        $this->setFormzConfiguration(array_merge_recursive(
+        ArrayUtility::mergeRecursiveWithOverrule(
             $this->formzConfiguration,
             [
                 'config' => [
                     'tx_formz' => $configuration
                 ]
             ]
-        ));
-    }
-
-    /**
-     * Sets the array configuration for a given form class name.
-     *
-     * @param string $className
-     * @param array  $configuration
-     */
-    protected function setFormConfigurationFromClassName($className, array $configuration)
-    {
-        $this->formConfiguration[$className] = $configuration;
+        );
     }
 
     /**
@@ -356,7 +389,7 @@ trait FormzUnitTestUtility
      */
     protected function setExtensionConfigurationValue($key, $value)
     {
-        $this->extensionConfiguration[$key] = $value;
+        $this->extensionConfiguration = ArrayUtility::setValueByPath($this->extensionConfiguration, $key, $value, '.');
     }
 
     /**
@@ -367,7 +400,7 @@ trait FormzUnitTestUtility
         $cacheFactory = new CacheFactory('foo', new CacheManager);
         $cacheInstance = $cacheFactory->create('foo', VariableFrontend::class, TransientMemoryBackend::class);
 
-        CacheService::get()->setCacheInstance($cacheInstance);
+        $this->inject(CacheService::get(), 'cacheInstance', $cacheInstance);
     }
 
     /**
@@ -380,7 +413,7 @@ trait FormzUnitTestUtility
     protected function getMockedEnvironmentService()
     {
         if (null === $this->mockedEnvironmentService) {
-            $this->mockedEnvironmentService = $this->getMockBuilder(EnvironmentService::class)
+            $this->mockedEnvironmentService = $this->getMockBuilderWrap(EnvironmentService::class)
                 ->setMethods(['isEnvironmentInFrontendMode', 'isEnvironmentInBackendMode'])
                 ->getMock();
 
@@ -407,18 +440,12 @@ trait FormzUnitTestUtility
     protected function getMockedTypoScriptService()
     {
         if (null === $this->mockedTypoScriptService) {
-            $this->mockedTypoScriptService = $this->getMockBuilder(TypoScriptService::class)
+            $this->mockedTypoScriptService = $this->getMockBuilderWrap(TypoScriptService::class)
                 ->setMethods(['getFrontendTypoScriptConfiguration', 'getBackendTypoScriptConfiguration'])
                 ->getMock();
 
             $configurationCallBack = function () {
-                $configuration = ArrayUtility::setValueByPath(
-                    $this->formzConfiguration,
-                    'config.tx_formz.forms',
-                    $this->formConfiguration
-                );
-
-                return $configuration;
+                return $this->formzConfiguration;
             };
 
             $this->mockedTypoScriptService->method('getFrontendTypoScriptConfiguration')
@@ -432,5 +459,16 @@ trait FormzUnitTestUtility
         }
 
         return $this->mockedTypoScriptService;
+    }
+
+    /**
+     * Just a wrapper to have auto-completion.
+     *
+     * @param string $className
+     * @return \PHPUnit_Framework_MockObject_MockBuilder
+     */
+    private function getMockBuilderWrap($className)
+    {
+        return $this->getMockBuilder($className);
     }
 }

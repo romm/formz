@@ -2,7 +2,7 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
+use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use Romm\Formz\Validation\Validator\RequiredValidator;
@@ -19,26 +19,19 @@ class FormzLocalizationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkLocalizationIsInitializedCorrectly()
     {
         $expectedJavaScriptCode = <<<TXT
-Formz.Localization.addLocalization(#REAL_TRANSLATIONS#, #TRANSLATIONS_BINDING#);
+Fz.Localization.addLocalization(#REAL_TRANSLATIONS#, #TRANSLATIONS_BINDING#);
 TXT;
 
-        $defaultFormConfiguration = [
-            'fields'              => [
-                'foo' => [
-                    'validation' => [
-                        'required' => [
-                            'className' => RequiredValidator::class
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        $this->setFormConfigurationFromClassName(DefaultForm::class, $defaultFormConfiguration);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
+        $field = $assetHandlerFactory->getFormObject()->getConfiguration()->getField('foo');
+        $validation = new Validation;
+        $validation->setName('validation-name');
+        $validation->setClassName(RequiredValidator::class);
+        $field->addValidation($validation);
 
-        /** @var FormzLocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzLocalizationJavaScriptAssetHandler */
-        $formzLocalizationJavaScriptAssetHandler = $this->getMockBuilder(FormzLocalizationJavaScriptAssetHandler::class)
+            /** @var FormzLocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        $assetHandler = $this->getMockBuilder(FormzLocalizationJavaScriptAssetHandler::class)
             ->setMethods(['handleRealTranslations', 'handleTranslationsBinding'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
@@ -46,25 +39,25 @@ TXT;
         $jsonRealTranslations = '';
         $jsonTranslationsBinding = '';
 
-        $formzLocalizationJavaScriptAssetHandler->method('handleRealTranslations')
+        $assetHandler->method('handleRealTranslations')
             ->willReturnCallback(function ($realTranslations) use (&$jsonRealTranslations) {
                 $jsonRealTranslations = $realTranslations;
 
                 return $realTranslations;
             });
 
-        $formzLocalizationJavaScriptAssetHandler->method('handleTranslationsBinding')
+        $assetHandler->method('handleTranslationsBinding')
             ->willReturnCallback(function ($translationsBinding) use (&$jsonTranslationsBinding) {
                 $jsonTranslationsBinding = $translationsBinding;
 
                 return $translationsBinding;
             });
 
-        $formzLocalizationJavaScriptAssetHandler->injectTranslationsForFormFieldsValidation();
+        $assetHandler->injectTranslationsForFormFieldsValidation();
 
-        $translationKeys = $formzLocalizationJavaScriptAssetHandler->getTranslationKeysForFieldValidation($assetHandlerFactory->getFormObject()->getConfiguration()->getField('foo'), 'required');
+        $translationKeys = $assetHandler->getTranslationKeysForFieldValidation($field, 'validation-name');
 
-        $javaScriptCode = $formzLocalizationJavaScriptAssetHandler->getJavaScriptCode();
+        $javaScriptCode = $assetHandler->getJavaScriptCode();
 
         $expectedJavaScriptCode = str_replace('#REAL_TRANSLATIONS#', $jsonRealTranslations, $expectedJavaScriptCode);
         $expectedJavaScriptCode = str_replace('#TRANSLATIONS_BINDING#', $jsonTranslationsBinding, $expectedJavaScriptCode);

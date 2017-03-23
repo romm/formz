@@ -1,8 +1,8 @@
-{namespace formz=Romm\Formz\ViewHelpers}
+{namespace fz=Romm\Formz\ViewHelpers}
 
-<div formz-field-container="{fieldName}" class="form-group
-	{formz:class(name: 'errors.has-error')}
-	{f:if(condition: '{showSuccess}', then: '{formz:class(name: \'valid.has-success\')}')}
+<div fz-field-container="{fieldName}" class="form-group
+	{fz:class(name: 'errors.has-error')}
+	{f:if(condition: '{showSuccess}', then: '{fz:class(name: \'valid.has-success\')}')}
 ">
 	<f:render section="Label" arguments="{_all}" />
 
@@ -16,7 +16,7 @@
 						</f:else>
 					</f:if>
 					<span class="input-group-addon">
-						<formz:renderSection section="Field-{key}" />
+						<fz:slot.render slot="Field-{key}" />
 		            </span>
 					<f:if condition="{item.reverse}">
 						<label class="btn btn-default form-control" for="{fieldId}-{key}">{item.label}</label>
@@ -26,5 +26,5 @@
 		</f:for>
 	</div>
 
-	<f:render section="Feedback" arguments="{_all}" />
+	<f:render section="Messages" arguments="{_all}" />
 </div>

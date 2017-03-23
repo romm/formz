@@ -2,7 +2,6 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 
@@ -18,19 +17,19 @@ class FormzConfigurationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Formz.setConfiguration(#CONFIGURATION#);})();
+(function(){Fz.setConfiguration(#CONFIGURATION#);})();
 TXT;
 
-        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(DefaultForm::class);
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
-        /** @var FormzConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzConfigurationJavaScriptAssetHandler */
-        $formzConfigurationJavaScriptAssetHandler = $this->getMockBuilder(FormzConfigurationJavaScriptAssetHandler::class)
+        /** @var FormzConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        $assetHandler = $this->getMockBuilder(FormzConfigurationJavaScriptAssetHandler::class)
             ->setMethods(['handleFormzConfiguration'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
 
         $jsonFormzConfiguration = '';
-        $formzConfigurationJavaScriptAssetHandler->method('handleFormzConfiguration')
+        $assetHandler->method('handleFormzConfiguration')
             ->willReturnCallback(
                 function ($formzConfiguration) use (&$jsonFormzConfiguration) {
                     $jsonFormzConfiguration = $formzConfiguration;
@@ -39,7 +38,7 @@ TXT;
                 }
             );
 
-        $javaScriptCode = $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
+        $javaScriptCode = $assetHandler->getJavaScriptCode();
 
         $this->assertNotNull($jsonFormzConfiguration);
         $this->assertEquals(
@@ -47,13 +46,14 @@ TXT;
             $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 
-        $hash = $assetHandlerFactory
+        $rootConfiguration = $assetHandlerFactory
             ->getFormObject()
             ->getConfiguration()
-            ->getFormzConfiguration()
-            ->getHash();
+            ->getRootConfiguration();
+        $rootConfiguration->calculateHash();
+        $hash = sha1($rootConfiguration->getHash());
 
-        $this->assertNotFalse(strpos($formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName(), $hash));
+        $this->assertNotFalse(strpos($assetHandler->getJavaScriptFileName(), $hash));
 
         unset($assetHandlerFactory);
     }

@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -15,18 +15,18 @@ namespace Romm\Formz\ViewHelpers;
 
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Configuration\View\View;
-use Romm\Formz\Core\Core;
+use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
+use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\ViewHelpers\Service\FieldService;
-use Romm\Formz\ViewHelpers\Service\FormService;
-use Romm\Formz\ViewHelpers\Service\SectionService;
+use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * This view helper is used to automatize the rendering of a field layout. It
@@ -54,19 +54,19 @@ class FieldViewHelper extends AbstractViewHelper
     public static $reservedVariablesNames = ['layout', 'formName', 'fieldName', 'fieldId'];
 
     /**
-     * @var FormService
+     * @var FormViewHelperService
      */
     protected $formService;
 
     /**
-     * @var FieldService
+     * @var FieldViewHelperService
      */
     protected $fieldService;
 
     /**
-     * @var SectionService
+     * @var SlotViewHelperService
      */
-    protected $sectionService;
+    protected $slotService;
 
     /**
      * @var array
@@ -94,7 +94,9 @@ class FieldViewHelper extends AbstractViewHelper
          * First, we check if this view helper is called from within the
          * `FormViewHelper`, because it would not make sense anywhere else.
          */
-        $this->formService->checkIsInsideFormViewHelper();
+        if (false === $this->formService->formContextExists()) {
+            throw ContextNotFoundException::fieldViewHelperFormContextNotFound();
+        }
 
         /*
          * Then, we inject the wanted field in the `FieldService` so we can know
@@ -104,8 +106,7 @@ class FieldViewHelper extends AbstractViewHelper
 
         /*
          * Calling this here will process every view helper beneath this one,
-         * allowing options and sections to be used correctly in the field
-         * layout.
+         * allowing options and slots to be used correctly in the field layout.
          */
         $this->renderChildren();
 
@@ -121,7 +122,7 @@ class FieldViewHelper extends AbstractViewHelper
          * `OptionViewHelper`.
          */
         $templateArguments = $this->arguments['arguments'] ?: [];
-        $templateArguments = ArrayUtility::arrayMergeRecursiveOverrule($templateArguments, $this->fieldService->getFieldOptions());
+        ArrayUtility::mergeRecursiveWithOverrule($templateArguments, $this->fieldService->getFieldOptions());
 
         $currentView = $viewHelperVariableContainer->getView();
 
@@ -130,9 +131,8 @@ class FieldViewHelper extends AbstractViewHelper
         /*
          * Resetting all services data.
          */
-        $this->fieldService->removeCurrentField();
-        $this->fieldService->resetFieldOptions();
-        $this->sectionService->resetSectionClosures();
+        $this->fieldService->resetState();
+        $this->slotService->resetState();
 
         $viewHelperVariableContainer->setView($currentView);
         $this->restoreOriginalArguments($templateArguments);
@@ -152,7 +152,7 @@ class FieldViewHelper extends AbstractViewHelper
         $fieldName = $this->arguments['name'];
         $formObject = $this->formService->getFormObject();
         $formConfiguration = $formObject->getConfiguration();
-        $viewConfiguration = $formConfiguration->getFormzConfiguration()->getView();
+        $viewConfiguration = $formConfiguration->getRootConfiguration()->getView();
         $layout = $this->getLayout($viewConfiguration);
 
         $templateArguments['layout'] = $layout->getLayout();
@@ -160,16 +160,15 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = ($templateArguments['fieldId']) ?: StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
-        /** @var StandaloneView $view */
-        $view = Core::instantiate(StandaloneView::class);
-        $view->setTemplatePathAndFilename($layout->getTemplateFile());
-        $view->setLayoutRootPaths($viewConfiguration->getLayoutRootPaths());
-        $view->setPartialRootPaths($viewConfiguration->getPartialRootPaths());
+        $view = $this->fieldService->getView();
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
         } else {
+            $view->setControllerContext($this->controllerContext);
+
             $variableProvider = $this->getVariableProvider();
+
             foreach ($templateArguments as $key => $value) {
                 if ($variableProvider->exists($key)) {
                     $variableProvider->remove($key);
@@ -179,6 +178,9 @@ class FieldViewHelper extends AbstractViewHelper
             }
         }
 
+        $view->setTemplatePathAndFilename($layout->getTemplateFile());
+        $view->setLayoutRootPaths($viewConfiguration->getAbsoluteLayoutRootPaths());
+        $view->setPartialRootPaths($viewConfiguration->getAbsolutePartialRootPaths());
         $view->assignMultiple($templateArguments);
 
         return $view->render();
@@ -191,8 +193,8 @@ class FieldViewHelper extends AbstractViewHelper
      * Throws an error if the field is not found or incorrect.
      *
      * @param string $fieldName
-     * @throws EntryNotFoundException
      * @throws InvalidArgumentTypeException
+     * @throws PropertyNotAccessibleException
      */
     protected function injectFieldInService($fieldName)
     {
@@ -200,14 +202,9 @@ class FieldViewHelper extends AbstractViewHelper
         $formConfiguration = $formObject->getConfiguration();
 
         if (false === is_string($fieldName)) {
-            throw new InvalidArgumentTypeException(
-                'The argument "name" of the view helper "' . __CLASS__ . '" must be a string.',
-                1465243479
-            );
+            throw InvalidArgumentTypeException::fieldViewHelperInvalidTypeNameArgument();
         } elseif (false === $formConfiguration->hasField($fieldName)) {
-            throw new EntryNotFoundException(
-                'The form "' . $formObject->getClassName() . '" does not have an accessible property "' . $fieldName . '". Please be sure this property exists, and it has a proper getter to access its value.',
-                1465243619);
+            throw PropertyNotAccessibleException::fieldViewHelperFieldNotAccessibleInForm($formObject, $fieldName);
         }
 
         $this->fieldService->setCurrentField($formConfiguration->getField($fieldName));
@@ -227,36 +224,25 @@ class FieldViewHelper extends AbstractViewHelper
         $layout = $this->arguments['layout'];
 
         if (false === is_string($layout)) {
-            throw new InvalidArgumentTypeException(
-                'The argument "layout" must be a string (' . gettype($layout) . ' given).',
-                1485786193
-            );
+            throw InvalidArgumentTypeException::invalidTypeNameArgumentFieldViewHelper($layout);
         }
 
         list($layoutName, $templateName) = GeneralUtility::trimExplode('.', $layout);
-        if (false === is_string($templateName)) {
+
+        if (empty($templateName)) {
             $templateName = 'default';
         }
 
         if (empty($layoutName)) {
-            throw new InvalidArgumentValueException(
-                'The layout name cannot be empty, please fill with a value.',
-                1485786285
-            );
+            throw InvalidArgumentValueException::fieldViewHelperEmptyLayout();
         }
 
         if (false === $viewConfiguration->hasLayout($layoutName)) {
-            throw new EntryNotFoundException(
-                'The layout "' . $layout . '" could not be found. Please check your TypoScript configuration.',
-                1465243586
-            );
+            throw EntryNotFoundException::fieldViewHelperLayoutNotFound($layout);
         }
 
         if (false === $viewConfiguration->getLayout($layoutName)->hasItem($templateName)) {
-            throw new EntryNotFoundException(
-                'The layout "' . $layout . '" does not have an item "' . $templateName . '".',
-                1485867803
-            );
+            throw EntryNotFoundException::fieldViewHelperLayoutItemNotFound($layout, $templateName);
         }
 
         return $viewConfiguration->getLayout($layoutName)->getItem($templateName);
@@ -303,26 +289,26 @@ class FieldViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param FormService $service
+     * @param FormViewHelperService $service
      */
-    public function injectFormService(FormService $service)
+    public function injectFormService(FormViewHelperService $service)
     {
         $this->formService = $service;
     }
 
     /**
-     * @param FieldService $service
+     * @param FieldViewHelperService $service
      */
-    public function injectFieldService(FieldService $service)
+    public function injectFieldService(FieldViewHelperService $service)
     {
         $this->fieldService = $service;
     }
 
     /**
-     * @param SectionService $sectionService
+     * @param SlotViewHelperService $slotService
      */
-    public function injectSectionService(SectionService $sectionService)
+    public function injectSlotService(SlotViewHelperService $slotService)
     {
-        $this->sectionService = $sectionService;
+        $this->slotService = $slotService;
     }
 }

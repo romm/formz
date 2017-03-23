@@ -9,7 +9,7 @@
 			</trans-unit>
 
 			<trans-unit id="form.typoscript_not_included.error_message">
-				<source>Formz TypoScript configuration seems not to be included. Please include the "formz" static TypoScript on this page.</source>
+				<source>FormZ TypoScript configuration seems not to be included. Please include the "formz" static TypoScript on this page.</source>
 			</trans-unit>
 			<trans-unit id="form.wrong_configuration.error_message">
 				<source>The configuration for this form contains at least one error:</source>
@@ -55,9 +55,6 @@
 			</trans-unit>
 			<trans-unit id="validator.form.equals_to_field.error">
 				<source>This field must have the same value as %s.</source>
-			</trans-unit>
-			<trans-unit id="validator.form.class_exists.error">
-				<source>The value « %s » is not referring to an existing class.</source>
 			</trans-unit>
 			<trans-unit id="validator.form.condition_is_valid.error">
 				<source>The condition « %s » has at least one error: « %s ».</source>

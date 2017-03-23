@@ -2,7 +2,7 @@
 /*
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
- * This file is part of the TYPO3 Formz project.
+ * This file is part of the TYPO3 FormZ project.
  * It is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License, either
  * version 3 of the License, or any later version.
@@ -15,6 +15,10 @@ namespace Romm\Formz\Validation\Validator;
 
 class RegexValidator extends AbstractValidator
 {
+    const MESSAGE_DEFAULT = 'default';
+
+    const OPTION_PATTERN = 'pattern';
+    const OPTION_OPTIONS = 'options';
 
     /**
      * @inheritdoc
@@ -27,15 +31,24 @@ class RegexValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $supportedOptions = [
-        'pattern' => ['', 'The pattern given to the regex.', 'string', true],
-        'options' => ['', 'The options given to the regex.', 'string']
+        self::OPTION_PATTERN => [
+            '',
+            'The pattern given to the regex.',
+            'string',
+            true
+        ],
+        self::OPTION_OPTIONS => [
+            '',
+            'The options given to the regex.',
+            'string'
+        ]
     ];
 
     /**
      * @inheritdoc
      */
     protected $supportedMessages = [
-        'default' => [
+        self::MESSAGE_DEFAULT => [
             'key'       => 'validator.form.default_error',
             'extension' => null
         ]
@@ -46,11 +59,15 @@ class RegexValidator extends AbstractValidator
      */
     public function isValid($value)
     {
-        if (!preg_match('/' . $this->options['pattern'] . '/' . $this->options['options'], $value)) {
-            $this->addError(
-                'default',
-                1445952446
-            );
+        $pattern = $this->options[self::OPTION_PATTERN];
+        $options = $this->options[self::OPTION_OPTIONS];
+        $checking = "/$pattern/$options";
+        $result = preg_match($checking, $value);
+
+        if (false === $result
+            || 0 === $result
+        ) {
+            $this->addError(self::MESSAGE_DEFAULT, 1445952446);
         }
     }
 }

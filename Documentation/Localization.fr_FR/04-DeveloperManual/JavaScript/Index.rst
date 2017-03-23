@@ -10,13 +10,13 @@
 API — JavaScript
 =================
 
-Pour permettre des comportements JavaScript plus évolués que ceux proposés par défaut par Formz, une API est à disposition.
+Pour permettre des comportements JavaScript plus évolués que ceux proposés par défaut par FormZ, une API est à disposition.
 
 Pour récupérer un formulaire, vous devrez utiliser un code similaire à celui-ci :
 
 .. code-block:: javascript
 
-    Formz.Form.get('myFormName', function(form) {
+    Fz.Form.get('myFormName', function(form) {
         // Whatever...
     });
 

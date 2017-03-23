@@ -26,9 +26,9 @@ Vous retrouverez ci-dessous un schéma permettant de comprendre facilement le d�
 Téléchargement
 --------------
 
-Pour que Formz fonctionne correctement, vous devrez installer :
+Pour que FormZ fonctionne correctement, vous devrez installer :
 
-- **configuration_object** – cette extension permet de convertir la configuration TypoScript de Formz. Sans rentrer dans les détails, elle permet notamment de détecter les erreurs dans la configuration. Elle est obligatoire.
+- **configuration_object** – cette extension permet de convertir la configuration TypoScript de FormZ. Sans rentrer dans les détails, elle permet notamment de détecter les erreurs dans la configuration. Elle est obligatoire.
 
   Vous pouvez l'installer :
 
@@ -97,7 +97,7 @@ Mode « Debug »
 
 Un mode « Debug » est disponible et permet, si activé, d'avoir des informations supplémentaires en cas de problème.
 
-Pour l'activer, allez dans le gestionnaire d'extension, rentrez dans les options de Formz, et cochez la case « **debugMode** ».
+Pour l'activer, allez dans le gestionnaire d'extension, rentrez dans les options de FormZ, et cochez la case « **debugMode** ».
 
 .. warning::
 
