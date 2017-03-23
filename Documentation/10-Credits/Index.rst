@@ -20,3 +20,13 @@ This company proposes several offers of electricity and gas supply for individua
 I want to thank the whole team which provided a lot of support during the development of this tool, but also for the awesome atmosphere which transforms work into a daily pleasure! :-)
 
 http://www.direct-energie.com/
+
+Logo
+----
+
+A big thanks to `pierre.tl <http://www.pierre.tl/>`_ for the beautiful logo!
+
+.. figure:: ../Images/formz-icon.png
+    :alt: Logo FormZ
+
+Credits for the first version of the logo go to **profet**!

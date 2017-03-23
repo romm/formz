@@ -20,3 +20,13 @@ Cette entreprise propose différentes offres de fourniture d’électricité et 
 Je tiens à remercier toute l’équipe qui a apporté beaucoup de soutien durant le développement de cet outil, mais également pour l’excellente ambiance qui transforme le travail en un plaisir au quotidien ! :-)
 
 http://www.direct-energie.com/
+
+Logo
+----
+
+Un grand merci à `pierre.tl <http://www.pierre.tl/>`_ pour le superbe logo !
+
+.. figure:: ../../Images/formz-icon.png
+    :alt: Logo FormZ
+
+Les crédits pour la première version du logo vont à **profet** !
