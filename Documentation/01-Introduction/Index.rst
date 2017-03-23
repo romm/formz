@@ -13,17 +13,17 @@ FormZ
 
 *Check out FormZ official website at: http://typo3-formz.com/*
 
-Forms are **common elements in the conception of a website**, as they allow a **direct interaction** between the user and the application. Technically, setting up a form can quickly become **complex** and require a **lot of time**: many aspects must be considered: **style, displaying, validation, security**…
+Forms are **common elements in the conception of a website**, as they allow a **direct interaction** between the user and the application. Technically, setting up a form can quickly become **complex** and require a **lot of time**: many aspects must be considered: **style, display conditions, validation, security**…
 
-This is why FormZ was born: facilitate the **set up** and the **maintenance** of a form, by providing tools which are **simple and fast to use**, but also **powerful and flexible** to fulfill every need.
+This is why FormZ was born: to facilitate the **set up** and the **maintenance** of a form, by providing tools that are **simple and fast to use**, but also **powerful and flexible** enough to fulfill every need.
 
 FormZ helps with the following topics:
 
 - **HTML** – tools are provided for Fluid, to facilitate integration.
 - **Validation** – with a TypoScript based configuration, every field's validation rule is easy to set up and maintain.
-- **Style** – with its advanced “data attributes” system, FormZ can fulfill almost all possible display needs.
-- **UX** – a whole JavaScript API is provided to make a user experience as fast and as pleasant as possible.
-- **Code generation** – FormZ can generate JavaScript and CSS, which are then injected in the page and will automatize a part of the client-sided behaviours.
+- **Style** – an advanced “data attributes” system allows FormZ to fulfill almost all possible display needs.
+- **UX** – a whole JavaScript API is provided to make the user experience as fast and as pleasant as possible.
+- **Code generation** – FormZ can generate JavaScript and CSS, which are then injected into the page and will automatize a huge part of the client-sided behaviours.
 
 What is this for?
 -----------------
