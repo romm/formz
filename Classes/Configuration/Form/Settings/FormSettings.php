@@ -87,9 +87,7 @@ class FormSettings extends AbstractFormzConfiguration
         $result = $this->$propertyName;
 
         if (empty($result)) {
-            if ($this->hasParent(Form::class)
-                && $this->hasParent(Configuration::class)
-            ) {
+            if ($this->hasParent(Form::class)) {
                 $result = $this->withFirstParent(
                     Configuration::class,
                     function (Configuration $configuration) use ($propertyName) {
