@@ -8,6 +8,7 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
 use TYPO3\CMS\Extbase\Validation\Error;
 
@@ -206,8 +207,11 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['getFormObject'])
             ->getMock();
 
+        $formObject = $this->getDefaultFormObject();
         $service->method('getFormObject')
-            ->willReturn($this->getDefaultFormObject());
+            ->willReturn($formObject);
+
+        $formObject->setForm(new DefaultForm);
 
         return $service;
     }

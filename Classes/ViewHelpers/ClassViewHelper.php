@@ -241,10 +241,15 @@ class ClassViewHelper extends AbstractViewHelper
         $formObject = $this->formService->getFormObject();
         $field = $formObject->getConfiguration()->getField($this->fieldName);
 
-        if (false === $propertyResult->hasErrors()
+        if ($formObject->hasForm()
+            && false === $propertyResult->hasErrors()
             && false === $formObject->getFormResult()->fieldIsDeactivated($field)
         ) {
-            $result .= ' ' . $this->classValue;
+            $fieldValue = ObjectAccess::getProperty($formObject->getForm(), $this->fieldName);
+
+            if (false === empty($fieldValue)) {
+                $result .= ' ' . $this->classValue;
+            }
         }
 
         return $result;

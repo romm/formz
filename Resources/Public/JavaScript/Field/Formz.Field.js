@@ -494,9 +494,17 @@ Fz.Field = (function () {
                             Fz.addClass(element, className);
                         });
                     } else {
-                        loopOnClasses('valid', function (element, className) {
-                            Fz.addClass(element, className);
-                        });
+                        var value = states.field.getValue();
+
+                        if (typeof value === 'string'
+                            && value !== ''
+                            || typeof value === 'object'
+                            && value.length > 0
+                        ) {
+                            loopOnClasses('valid', function (element, className) {
+                                Fz.addClass(element, className);
+                            });
+                        }
                     }
                 });
 
