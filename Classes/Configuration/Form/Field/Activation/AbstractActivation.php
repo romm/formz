@@ -33,7 +33,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     protected $expression;
 
     /**
-     * @var ConditionItemInterface[]
+     * @var \Romm\Formz\Condition\Items\ConditionItemInterface[]
      * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\ConditionItemResolver
      */
     protected $conditions = [];

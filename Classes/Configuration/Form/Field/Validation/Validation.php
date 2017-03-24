@@ -52,7 +52,7 @@ class Validation extends AbstractFormzConfiguration implements ActivationUsageIn
     protected $messages = [];
 
     /**
-     * @var ActivationInterface
+     * @var \Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface
      * @mixedTypesResolver \Romm\Formz\Configuration\Form\Field\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */

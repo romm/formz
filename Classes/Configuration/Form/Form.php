@@ -44,7 +44,7 @@ class Form extends AbstractFormzConfiguration implements ConfigurationObjectInte
     protected $fields = [];
 
     /**
-     * @var ConditionItemInterface[]
+     * @var \Romm\Formz\Condition\Items\ConditionItemInterface[]
      * @mixedTypesResolver \Romm\Formz\Configuration\Form\Condition\ConditionItemResolver
      */
     protected $conditionList = [];
