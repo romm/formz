@@ -309,8 +309,7 @@ JS;
 
         return $uriBuilder->reset()
             ->setTargetPageType(1473682545)
-            ->setNoCache(true)
-            ->setUseCacheHash(false)
+            ->setArguments(['FormZ' => true])
             ->setCreateAbsoluteUri(true)
             ->build();
     }
