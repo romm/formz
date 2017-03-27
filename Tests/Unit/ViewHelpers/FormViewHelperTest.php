@@ -16,6 +16,7 @@ use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper;
 use Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
+use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
@@ -67,6 +68,61 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
+     * If the value sent in the argument `object` is not an object, an exception
+     * must be thrown.
+     *
+     * @test
+     */
+    public function formArgumentIsNotAnObjectThrowsException()
+    {
+        $this->setExpectedException(InvalidOptionValueException::class, '', 1490713939);
+
+        $viewHelper = $this->getFormViewHelperMock(['getFormClassName']);
+
+        $viewHelper->setArguments(['object' => true]);
+        $viewHelper->initializeArguments();
+        $viewHelper->initialize();
+    }
+
+    /**
+     * If the value sent in the argument `object` is not an instance of
+     * `FormInterface`, an exception must be thrown.
+     *
+     * @test
+     */
+    public function formArgumentIsNotFormThrowsException()
+    {
+        $this->setExpectedException(InvalidOptionValueException::class, '', 1490714346);
+
+        $viewHelper = $this->getFormViewHelperMock(['getFormClassName']);
+
+        $viewHelper->setArguments(['object' => new \stdClass]);
+        $viewHelper->initializeArguments();
+        $viewHelper->initialize();
+    }
+
+    /**
+     * If the value sent in the argument `object` is not an instance of the
+     * expected form class (fetched from the controller action argument), an
+     * exception must be thrown.
+     *
+     * @test
+     */
+    public function formArgumentIsNotExpectedClassThrowsException()
+    {
+        $this->setExpectedException(InvalidOptionValueException::class, '', 1490714534);
+
+        $viewHelper = $this->getFormViewHelperMock(['getFormClassName']);
+
+        $viewHelper->method('getFormClassName')
+            ->willReturn(ExtendedForm::class);
+
+        $viewHelper->setArguments(['object' => new DefaultForm]);
+        $viewHelper->initializeArguments();
+        $viewHelper->initialize();
+    }
+
+    /**
      * The argument `form` given to the view helper should be attached to the
      * `FormObject` if it is a valid form instance, and the form was not
      * submitted.
@@ -87,6 +143,10 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
             ->with($form);
 
         $viewHelper = $this->getFormViewHelperMock(['getFormClassName'], $formObject);
+
+        $viewHelper->method('getFormClassName')
+            ->willReturn(DefaultForm::class);
+
         $viewHelper->setArguments(['object' => $form]);
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
@@ -116,6 +176,10 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $formObject->markFormAsSubmitted();
 
         $viewHelper = $this->getFormViewHelperMock(['getFormClassName'], $formObject);
+
+        $viewHelper->method('getFormClassName')
+            ->willReturn(DefaultForm::class);
+
         $viewHelper->setArguments(['object' => $form]);
         $viewHelper->initializeArguments();
         $viewHelper->initialize();

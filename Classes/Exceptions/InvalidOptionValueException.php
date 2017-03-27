@@ -20,6 +20,12 @@ class InvalidOptionValueException extends FormzException
 {
     const WRONG_FORM_TYPE = 'The form class must be an instance of "%s", given value: "%s".';
 
+    const WRONG_FORM_VALUE_TYPE = 'The form given in the argument `object` of `FormViewHelper` must be an instance of "%s", given value is of type "%s".';
+
+    const WRONG_FORM_VALUE_OBJECT_TYPE = 'The form given in the argument `object` of `FormViewHelper` must be an instance of "%s", given value is an instance of "%s".';
+
+    const WRONG_FORM_VALUE_CLASS_NAME = 'The form given in the argument `object` of `FormViewHelper` must be an instance of "%s", given value is an instance of "%s".';
+
     const WRONG_BACKEND_CACHE_TYPE = 'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "%s" (current value: "%s")';
 
     /**
@@ -34,6 +40,58 @@ class InvalidOptionValueException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
             [FormInterface::class, $name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490713939
+     *
+     * @param mixed $value
+     * @return InvalidOptionValueException
+     */
+    final public static function formViewHelperWrongFormValueType($value)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_VALUE_TYPE,
+            [FormInterface::class, gettype($value)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490714346
+     *
+     * @param object $value
+     * @return InvalidOptionValueException
+     */
+    final public static function formViewHelperWrongFormValueObjectType($value)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_VALUE_OBJECT_TYPE,
+            [FormInterface::class, get_class($value)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490714534
+     *
+     * @param string $className
+     * @param object $value
+     * @return InvalidOptionValueException
+     */
+    final public static function formViewHelperWrongFormValueClassName($className, $value)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_VALUE_CLASS_NAME,
+            [$className, get_class($value)]
         );
 
         return $exception;
