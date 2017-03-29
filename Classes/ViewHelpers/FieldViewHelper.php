@@ -160,7 +160,7 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = ($templateArguments['fieldId']) ?: StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
-        $view = $this->fieldService->getView();
+        $view = $this->fieldService->getView($layout);
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
@@ -178,7 +178,6 @@ class FieldViewHelper extends AbstractViewHelper
             }
         }
 
-        $view->setTemplatePathAndFilename($layout->getTemplateFile());
         $view->setLayoutRootPaths($viewConfiguration->getAbsoluteLayoutRootPaths());
         $view->setPartialRootPaths($viewConfiguration->getAbsolutePartialRootPaths());
         $view->assignMultiple($templateArguments);

@@ -2,6 +2,7 @@
 namespace Romm\Formz\Tests\Unit\Service\ViewHelper;
 
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
@@ -74,12 +75,23 @@ class FieldViewHelperServiceTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function viewIsInstantiatedOnce()
+    public function viewIsInstantiatedOncePerLayout()
     {
         $fieldService = new FieldViewHelperService;
-        $view1 = $fieldService->getView();
-        $view2 = $fieldService->getView();
+
+        $layout1 = new Layout;
+        $layout1->setTemplateFile('foo/bar');
+
+        $layout2 = new Layout;
+        $layout2->setTemplateFile('bar/baz');
+
+        $view1 = $fieldService->getView($layout1);
+        $view2 = $fieldService->getView($layout1);
 
         $this->assertSame($view1, $view2);
+
+        $view3 = $fieldService->getView($layout2);
+
+        $this->assertNotSame($view1, $view3);
     }
 }
