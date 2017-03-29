@@ -8,6 +8,7 @@ use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
 use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 
 class RenderViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -28,7 +29,7 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
-            ->setMethods(['getSlotClosure', 'getSlotArguments', 'hasSlot'])
+            ->setMethods(['getSlotClosure', 'getSlotArguments', 'hasSlot', 'getTemplateVariableContainer'])
             ->getMock();
         $slotService->expects($this->once())
             ->method('hasSlot')
@@ -73,7 +74,7 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
             ->getMock();
         $emptyClosure = function () {
         };
-        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'bar']);
+        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'bar'], new RenderingContext);
 
         $slotService->expects($this->once())
             ->method('addTemplateVariables');

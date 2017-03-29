@@ -64,7 +64,7 @@ class SlotViewHelper extends AbstractViewHelper implements CompilableInterface
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
 
-        $slotService->addSlot($arguments['name'], $renderChildrenClosure, $arguments['arguments']);
+        $slotService->addSlot($arguments['name'], $renderChildrenClosure, $arguments['arguments'], $renderingContext);
     }
 
     /**
