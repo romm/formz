@@ -39,7 +39,7 @@ class DuplicateEntryException extends FormzException
      * @code 1477255145
      *
      * @param FormObject $form
-     * @return DuplicateEntryException
+     * @return self
      */
     final public static function formWasAlreadyRegistered(FormObject $form)
     {

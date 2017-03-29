@@ -49,7 +49,7 @@ class InvalidOptionValueException extends FormzException
      * @code 1490713939
      *
      * @param mixed $value
-     * @return InvalidOptionValueException
+     * @return self
      */
     final public static function formViewHelperWrongFormValueType($value)
     {
@@ -66,7 +66,7 @@ class InvalidOptionValueException extends FormzException
      * @code 1490714346
      *
      * @param object $value
-     * @return InvalidOptionValueException
+     * @return self
      */
     final public static function formViewHelperWrongFormValueObjectType($value)
     {
@@ -84,7 +84,7 @@ class InvalidOptionValueException extends FormzException
      *
      * @param string $className
      * @param object $value
-     * @return InvalidOptionValueException
+     * @return self
      */
     final public static function formViewHelperWrongFormValueClassName($className, $value)
     {

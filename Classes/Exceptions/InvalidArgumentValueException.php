@@ -20,7 +20,7 @@ class InvalidArgumentValueException extends FormzException
     /**
      * @code 1485786285
      *
-     * @return InvalidArgumentValueException
+     * @return self
      */
     final public static function fieldViewHelperEmptyLayout()
     {

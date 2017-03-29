@@ -23,7 +23,7 @@ class UnregisteredConfigurationException extends FormzException
      * @param string $class
      * @param string $classNamespace
      * @param string $className
-     * @return UnregisteredConfigurationException
+     * @return self
      */
     final public static function cssClassNameNotFound($class, $classNamespace, $className)
     {

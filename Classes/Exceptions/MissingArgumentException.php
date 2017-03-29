@@ -20,7 +20,7 @@ class MissingArgumentException extends FormzException
     /**
      * @code 1490179179
      *
-     * @return MissingArgumentException
+     * @return self
      */
     final public static function ajaxControllerNameArgumentNotSet()
     {
@@ -36,7 +36,7 @@ class MissingArgumentException extends FormzException
     /**
      * @code 1490179250
      *
-     * @return MissingArgumentException
+     * @return self
      */
     final public static function ajaxControllerClassNameArgumentNotSet()
     {

@@ -84,7 +84,7 @@ class ClassNotFoundException extends FormzException
      * @param string $formName
      * @param string $controller
      * @param string $action
-     * @return ClassNotFoundException
+     * @return self
      */
     final public static function formViewHelperClassNotFound($formClassName, $formName, $controller, $action)
     {

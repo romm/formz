@@ -24,7 +24,7 @@ class PropertyNotAccessibleException extends FormzException
      *
      * @param FormObject $formObject
      * @param string     $fieldName
-     * @return PropertyNotAccessibleException
+     * @return self
      */
     final public static function fieldViewHelperFieldNotAccessibleInForm(FormObject $formObject, $fieldName)
     {
