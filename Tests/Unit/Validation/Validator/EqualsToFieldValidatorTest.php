@@ -1,4 +1,5 @@
 <?php
+
 namespace Romm\Formz\Tests\Unit\Validation\Validator;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
@@ -64,7 +65,7 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObjectMock */
         $formObjectMock = $this->getMockBuilder(FormObject::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(['foo', 'foo', []])
             ->setMethods(['hasProperty'])
             ->getMock();
 

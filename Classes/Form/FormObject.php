@@ -16,7 +16,6 @@ namespace Romm\Formz\Form;
 use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Service\HashService;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -65,9 +64,9 @@ class FormObject
     protected $formResult;
 
     /**
-     * @var string
+     * @var FormObjectHash
      */
-    protected $hash;
+    protected $hashService;
 
     /**
      * You should never create a new instance of this class directly, use the
@@ -81,7 +80,8 @@ class FormObject
     {
         $this->className = $className;
         $this->name = $name;
-        $this->setUpConfiguration($formConfiguration);
+        $this->configuration = Core::instantiate(FormObjectConfiguration::class, $this, $formConfiguration);
+        $this->hashService = Core::instantiate(FormObjectHash::class, $this);
     }
 
     /**
@@ -127,7 +127,7 @@ class FormObject
     {
         if (false === $this->hasProperty($name)) {
             $this->properties[] = $name;
-            $this->resetHash();
+            $this->hashService->resetHash();
         }
 
         return $this;
@@ -223,44 +223,13 @@ class FormObject
     }
 
     /**
-     * Returns the hash, which should be calculated only once for performance
-     * concerns.
+     * Returns a unique hash for this form object.
      *
      * @return string
      */
     public function getHash()
     {
-        if (null === $this->hash) {
-            $this->hash = $this->calculateHash();
-        }
-
-        return $this->hash;
-    }
-
-    /**
-     * @param array $formConfiguration
-     */
-    protected function setUpConfiguration(array $formConfiguration)
-    {
-        $this->configuration = Core::instantiate(FormObjectConfiguration::class, $this, $formConfiguration);
-    }
-
-    /**
-     * Returns the calculated hash of this class.
-     *
-     * @return string
-     */
-    protected function calculateHash()
-    {
-        return HashService::get()->getHash(serialize($this));
-    }
-
-    /**
-     * Resets the hash, which will be calculated on next access.
-     */
-    protected function resetHash()
-    {
-        $this->hash = null;
+        return $this->hashService->getHash();
     }
 
     /**
@@ -271,6 +240,6 @@ class FormObject
      */
     public function __sleep()
     {
-        return ['name', 'className', 'properties', 'hash', 'configuration'];
+        return ['name', 'className', 'properties', 'hashService', 'configuration'];
     }
 }

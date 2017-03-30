@@ -62,54 +62,6 @@ class FormObjectTest extends AbstractUnitTest
     }
 
     /**
-     * Checking that the hash can be retrieved with its getter.
-     *
-     * @test
-     */
-    public function hashCanBeRetrieved()
-    {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMockBuilder(FormObject::class)
-            ->setMethods(['calculateHash'])
-            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME, []])
-            ->getMock();
-        $hash = 'foo';
-
-        $formObject->expects($this->any())
-            ->method('calculateHash')
-            ->willReturn($hash);
-
-        $this->assertEquals($hash, $formObject->getHash());
-
-        unset($formObject);
-    }
-
-    /**
-     * The hash should be calculated only once, as it can lead to performance
-     * issues if the object is used many times.
-     *
-     * @test
-     */
-    public function hashIsCalculatedOnlyOnce()
-    {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMockBuilder(FormObject::class)
-            ->setMethods(['calculateHash'])
-            ->setConstructorArgs([self::FORM_OBJECT_DEFAULT_CLASS_NAME, self::FORM_OBJECT_DEFAULT_NAME, []])
-            ->getMock();
-
-        $formObject->expects($this->once())
-            ->method('calculateHash')
-            ->willReturn('foo');
-
-        for ($i = 0; $i < 3; $i++) {
-            $formObject->getHash();
-        }
-
-        unset($formObject);
-    }
-
-    /**
      * Checks that the configuration validation result is correctly built and
      * can be fetched.
      *
