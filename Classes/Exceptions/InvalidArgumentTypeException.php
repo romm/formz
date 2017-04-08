@@ -109,7 +109,7 @@ class InvalidArgumentTypeException extends FormzException
      * @code 1485786193
      *
      * @param mixed $value
-     * @return InvalidArgumentTypeException
+     * @return self
      */
     final public static function invalidTypeNameArgumentFieldViewHelper($value)
     {
@@ -126,7 +126,7 @@ class InvalidArgumentTypeException extends FormzException
      * @code 1467021406
      *
      * @param mixed $value
-     * @return InvalidArgumentTypeException
+     * @return self
      */
     final public static function formatMessageViewHelperMessageInvalidType($value)
     {

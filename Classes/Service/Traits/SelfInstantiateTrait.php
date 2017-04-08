@@ -28,6 +28,6 @@ trait SelfInstantiateTrait
      */
     public static function get()
     {
-        return InstanceService::get()->getInstance(self::class);
+        return InstanceService::get()->getInstance(static::class);
     }
 }

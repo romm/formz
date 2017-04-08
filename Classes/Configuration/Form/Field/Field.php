@@ -41,7 +41,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     protected $behaviours = [];
 
     /**
-     * @var ActivationInterface
+     * @var \Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface
      * @mixedTypesResolver \Romm\Formz\Configuration\Form\Field\Activation\ActivationResolver
      * @validate Romm.Formz:Internal\ConditionIsValid
      */

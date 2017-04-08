@@ -136,9 +136,9 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
              * If the argument `object` was filled with an instance of Form, it
              * is added to the `FormObject`.
              */
-            $objectArgument = $this->arguments['object'];
+            $objectArgument = $this->getFormObjectArgument();
 
-            if ($objectArgument instanceof FormInterface
+            if (null !== $objectArgument
                 && false === $this->formObject->formWasSubmitted()
             ) {
                 $this->formObject->setForm($objectArgument);
@@ -352,6 +352,38 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->pageRenderer->addCssFile(StringService::get()->getResourceRelativePath($templatePath));
 
         return $view->render();
+    }
+
+    /**
+     * Checks the type of the argument `object`, and returns it if everything is
+     * ok.
+     *
+     * @return FormInterface|null
+     * @throws InvalidOptionValueException
+     */
+    protected function getFormObjectArgument()
+    {
+        $objectArgument = $this->arguments['object'];
+
+        if (null === $objectArgument) {
+            return null;
+        }
+
+        if (false === is_object($objectArgument)) {
+            throw InvalidOptionValueException::formViewHelperWrongFormValueType($objectArgument);
+        }
+
+        if (false === $objectArgument instanceof FormInterface) {
+            throw InvalidOptionValueException::formViewHelperWrongFormValueObjectType($objectArgument);
+        }
+
+        $formClassName = $this->getFormClassName();
+
+        if (false === $objectArgument instanceof $formClassName) {
+            throw InvalidOptionValueException::formViewHelperWrongFormValueClassName($formClassName, $objectArgument);
+        }
+
+        return $objectArgument;
     }
 
     /**

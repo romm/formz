@@ -22,7 +22,7 @@ class FileCreationFailedException extends FormzException
      *
      * @param string $absolutePath
      * @param string $message
-     * @return FileCreationFailedException
+     * @return self
      */
     final public static function fileCreationFailed($absolutePath, $message)
     {

@@ -18,6 +18,7 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3\CMS\Fluid\Core\ViewHelper\TemplateVariableContainer;
 
 class SlotViewHelperService implements SingletonInterface
 {
@@ -35,6 +36,11 @@ class SlotViewHelperService implements SingletonInterface
     private $arguments = [];
 
     /**
+     * @var RenderingContextInterface|\TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface[]
+     */
+    private $renderingContext = [];
+
+    /**
      * @var array[]
      */
     private $injectedVariables = [];
@@ -48,14 +54,16 @@ class SlotViewHelperService implements SingletonInterface
      * Adds a closure - which will render the slot with the given name - to the
      * private storage in this class.
      *
-     * @param string  $name
-     * @param Closure $closure
-     * @param array   $arguments
+     * @param string                    $name
+     * @param Closure                   $closure
+     * @param array                     $arguments
+     * @param RenderingContextInterface $renderingContext
      */
-    public function addSlot($name, Closure $closure, array $arguments)
+    public function addSlot($name, Closure $closure, array $arguments, RenderingContextInterface $renderingContext)
     {
         $this->closures[$name] = $closure;
         $this->arguments[$name] = $arguments;
+        $this->renderingContext[$name] = $renderingContext;
     }
 
     /**
@@ -108,11 +116,10 @@ class SlotViewHelperService implements SingletonInterface
      *
      * @param string                    $slotName
      * @param array                     $arguments
-     * @param RenderingContextInterface $renderingContext
      */
-    public function addTemplateVariables($slotName, array $arguments, RenderingContextInterface $renderingContext)
+    public function addTemplateVariables($slotName, array $arguments)
     {
-        $templateVariableContainer = $renderingContext->getTemplateVariableContainer();
+        $templateVariableContainer = $this->getTemplateVariableContainer($slotName);
         $savedArguments = [];
 
         ArrayUtility::mergeRecursiveWithOverrule(
@@ -138,11 +145,10 @@ class SlotViewHelperService implements SingletonInterface
      * container, and restore the ones that were saved before being overridden.
      *
      * @param string                    $slotName
-     * @param RenderingContextInterface $renderingContext
      */
-    public function restoreTemplateVariables($slotName, RenderingContextInterface $renderingContext)
+    public function restoreTemplateVariables($slotName)
     {
-        $templateVariableContainer = $renderingContext->getTemplateVariableContainer();
+        $templateVariableContainer = $this->getTemplateVariableContainer($slotName);
         $mergedArguments = (isset($this->injectedVariables[$slotName])) ? $this->injectedVariables[$slotName] : [];
         $savedArguments = (isset($this->savedVariables[$slotName])) ? $this->savedVariables[$slotName] : [];
 
@@ -153,6 +159,18 @@ class SlotViewHelperService implements SingletonInterface
         foreach ($savedArguments as $key => $value) {
             $templateVariableContainer->add($key, $value);
         }
+    }
+
+    /**
+     * @param string $slotName
+     * @return TemplateVariableContainer
+     */
+    protected function getTemplateVariableContainer($slotName)
+    {
+        /** @var TemplateVariableContainer $templateVariableContainer */
+        $templateVariableContainer = $this->renderingContext[$slotName]->getTemplateVariableContainer();
+
+        return $templateVariableContainer;
     }
 
     /**

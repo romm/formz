@@ -1,5 +1,5 @@
 <phpunit
-        bootstrap=".Build/vendor/typo3/cms/components/testing_framework/Resources/Core/Build/UnitTestsBootstrap.php"
+        bootstrap=".Build/vendor/nimut/testing-framework/res/Configuration/UnitTestsBootstrap.php"
         backupGlobals="false"
         backupStaticAttributes="false"
         colors="true"

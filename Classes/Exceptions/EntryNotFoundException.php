@@ -61,7 +61,7 @@ class EntryNotFoundException extends FormzException
      *
      * @param string $name
      * @param array  $list
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function conditionNotFound($name, array $list)
     {
@@ -184,7 +184,7 @@ class EntryNotFoundException extends FormzException
      *
      * @param string $validationName
      * @param string $fieldName
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function ajaxControllerValidationNotFoundForField($validationName, $fieldName)
     {
@@ -202,7 +202,7 @@ class EntryNotFoundException extends FormzException
      *
      * @param string     $fieldName
      * @param FormObject $formObject
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function ajaxControllerFieldNotFound($fieldName, FormObject $formObject)
     {
@@ -220,7 +220,7 @@ class EntryNotFoundException extends FormzException
      *
      * @param string            $key
      * @param AbstractValidator $validator
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function errorKeyNotFoundForValidator($key, AbstractValidator $validator)
     {
@@ -238,7 +238,7 @@ class EntryNotFoundException extends FormzException
      *
      * @param string     $fieldName
      * @param FormObject $formObject
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function equalsToFieldValidatorFieldNotFound($fieldName, FormObject $formObject)
     {
@@ -307,7 +307,7 @@ class EntryNotFoundException extends FormzException
      *
      * @param string $layoutName
      * @param string $itemName
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function fieldViewHelperLayoutItemNotFound($layoutName, $itemName)
     {
@@ -325,7 +325,7 @@ class EntryNotFoundException extends FormzException
      *
      * @param string     $fieldName
      * @param FormObject $formObject
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function formatMessageViewHelperFieldNotFoundInForm($fieldName, FormObject $formObject)
     {
@@ -344,7 +344,7 @@ class EntryNotFoundException extends FormzException
      * @param string $controllerObjectName
      * @param string $actionName
      * @param string $formName
-     * @return EntryNotFoundException
+     * @return self
      */
     final public static function controllerServiceActionFormArgumentMissing($controllerObjectName, $actionName, $formName)
     {

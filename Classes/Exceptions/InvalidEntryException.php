@@ -22,7 +22,7 @@ class InvalidEntryException extends FormzException
      *
      * @param string $className
      * @param array  $acceptedClassesNameSpace
-     * @return InvalidEntryException
+     * @return self
      */
     final public static function invalidCssClassNamespace($className, array $acceptedClassesNameSpace)
     {

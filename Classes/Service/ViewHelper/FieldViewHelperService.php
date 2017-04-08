@@ -14,6 +14,7 @@
 namespace Romm\Formz\Service\ViewHelper;
 
 use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Core\Core;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -35,7 +36,7 @@ class FieldViewHelperService implements SingletonInterface
     protected $fieldOptions = [];
 
     /**
-     * @var StandaloneView
+     * @var StandaloneView[]
      */
     protected $view;
 
@@ -97,14 +98,25 @@ class FieldViewHelperService implements SingletonInterface
     }
 
     /**
+     * Returns a view instance, based on the template file of the layout. The
+     * view is stored in local cache, to improve performance: the template file
+     * content will be fetched only once.
+     *
+     * @param Layout $layout
      * @return StandaloneView
      */
-    public function getView()
+    public function getView(Layout $layout)
     {
-        if (null === $this->view) {
-            $this->view = Core::instantiate(StandaloneView::class);
+        $identifier = $layout->getTemplateFile();
+
+        if (null === $this->view[$identifier]) {
+            /** @var StandaloneView $view */
+            $view = Core::instantiate(StandaloneView::class);
+            $view->setTemplatePathAndFilename($layout->getTemplateFile());
+
+            $this->view[$identifier] = $view;
         }
 
-        return $this->view;
+        return $this->view[$identifier];
     }
 }

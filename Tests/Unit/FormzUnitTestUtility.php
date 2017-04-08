@@ -148,7 +148,7 @@ trait FormzUnitTestUtility
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
-            ->setMethods(['getConfiguration', 'getConfigurationValidationResult', 'setUpConfiguration'])
+            ->setMethods(['getConfiguration', 'getConfigurationValidationResult'])
             ->setConstructorArgs([
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME,

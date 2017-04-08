@@ -24,7 +24,7 @@ class InvalidConfigurationException extends FormzException
     /**
      * @code 1487671395
      *
-     * @return InvalidConfigurationException
+     * @return self
      */
     final public static function ajaxControllerInvalidFormConfiguration()
     {
@@ -39,7 +39,7 @@ class InvalidConfigurationException extends FormzException
      *
      * @param string $validationName
      * @param string $fieldName
-     * @return InvalidConfigurationException
+     * @return self
      */
     final public static function ajaxControllerAjaxValidationNotActivated($validationName, $fieldName)
     {
@@ -56,7 +56,7 @@ class InvalidConfigurationException extends FormzException
      * @code 1458150438
      *
      * @param string $operator
-     * @return InvalidConfigurationException
+     * @return self
      */
     final public static function wrongBooleanNodeOperator($operator)
     {

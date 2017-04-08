@@ -29,7 +29,7 @@ class ContextNotFoundException extends FormzException
     /**
      * @code 1465243085
      *
-     * @return ContextNotFoundException
+     * @return self
      */
     final public static function fieldViewHelperFormContextNotFound()
     {
@@ -45,7 +45,7 @@ class ContextNotFoundException extends FormzException
     /**
      * @code 1465243287
      *
-     * @return ContextNotFoundException
+     * @return self
      */
     final public static function optionViewHelperFieldContextNotFound()
     {
@@ -61,7 +61,7 @@ class ContextNotFoundException extends FormzException
     /**
      * @code 1488473956
      *
-     * @return ContextNotFoundException
+     * @return self
      */
     final public static function slotRenderViewHelperFieldContextNotFound()
     {
@@ -77,7 +77,7 @@ class ContextNotFoundException extends FormzException
     /**
      * @code 1488474106
      *
-     * @return ContextNotFoundException
+     * @return self
      */
     final public static function slotViewHelperFieldContextNotFound()
     {
@@ -93,7 +93,7 @@ class ContextNotFoundException extends FormzException
     /**
      * @code 1488988566
      *
-     * @return ContextNotFoundException
+     * @return self
      */
     final public static function slotHasViewHelperFieldContextNotFound()
     {
