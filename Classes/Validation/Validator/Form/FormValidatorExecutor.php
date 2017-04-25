@@ -17,10 +17,10 @@ use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
@@ -120,7 +120,7 @@ class FormValidatorExecutor
      */
     public function checkFieldsActivation()
     {
-        foreach ($this->getFormObject()->getConfiguration()->getFields() as $field) {
+        foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
             if (false === $this->result->fieldIsDeactivated($field)) {
                 $this->checkFieldActivation($field);
             }
@@ -175,7 +175,7 @@ class FormValidatorExecutor
      */
     public function validateFields(callable $callback = null)
     {
-        foreach ($this->getFormObject()->getConfiguration()->getFields() as $field) {
+        foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
             $this->validateField($field);
 
             if ($this->fieldWasValidated($field)

@@ -2,7 +2,7 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use Romm\Formz\Validation\Validator\RequiredValidator;
@@ -24,7 +24,7 @@ TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
-        $field = $assetHandlerFactory->getFormObject()->getConfiguration()->getField('foo');
+        $field = $assetHandlerFactory->getFormObject()->getDefinition()->getField('foo');
         $validation = new Validation;
         $validation->setName('validation-name');
         $validation->setClassName(RequiredValidator::class);

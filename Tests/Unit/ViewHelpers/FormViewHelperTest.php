@@ -267,7 +267,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
 
-        $formObject->getConfiguration()
+        $formObject->getDefinition()
             ->getSettings()
             ->setDefaultClass($defaultClass);
 
@@ -566,7 +566,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
     public function errorHelpTextIsReturnedWhenConfigurationHasError()
     {
         $formObject = $this->getDefaultFormObject();
-        $formObject->getConfigurationValidationResult()->addError(new Error('foo', 42));
+        $formObject->getDefinitionValidationResult()->addError(new Error('foo', 42));
 
         $viewHelper = $this->getFormViewHelperMock(
             [

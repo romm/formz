@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Service;
 
-use Romm\Formz\Configuration\Form\Field\Validation\Message as FormzMessage;
 use Romm\Formz\Error\FormzMessageInterface;
+use Romm\Formz\Form\Definition\Field\Validation\Message as FormzMessage;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;

@@ -45,7 +45,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidator */
         $formValidator = $this->getMockBuilder(FormValidatorExecutor::class)
@@ -85,7 +85,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidator */
         $formValidator = $this->getMockBuilder(FormValidatorExecutor::class)

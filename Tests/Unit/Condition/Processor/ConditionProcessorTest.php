@@ -9,11 +9,11 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
-use Romm\Formz\Configuration\Form\Field\Activation\Activation;
-use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
-use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Form\Definition\Field\Activation\Activation;
+use Romm\Formz\Form\Definition\Field\Activation\EmptyActivation;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\InstanceService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -105,7 +105,7 @@ class ConditionProcessorTest extends AbstractUnitTest
     {
         $formObject = $this->getMockBuilder(FormObject::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getConfiguration'])
+            ->setMethods(['getDefinition'])
             ->getMock();
 
         /** @var ConditionProcessor|\PHPUnit_Framework_MockObject_MockObject $conditionProcessor */
@@ -121,9 +121,9 @@ class ConditionProcessorTest extends AbstractUnitTest
             ->method('getActivationConditionTreeForValidation');
 
         $formObject->expects($this->once())
-            ->method('getConfiguration')
+            ->method('getDefinition')
             ->willReturnCallback(function () use ($conditionProcessor) {
-                $formConfiguration = $this->getMockBuilder(Form::class)
+                $formConfiguration = $this->getMockBuilder(FormDefinition::class)
                     ->setMethods(['getFields'])
                     ->getMock();
 

@@ -30,7 +30,7 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
     public function getJavaScriptFileName()
     {
         $hash = sha1($this->getFormObject()
-            ->getConfiguration()
+            ->getDefinition()
             ->getRootConfiguration()
             ->getHash());
 
@@ -70,7 +70,7 @@ JS;
     protected function getFormzConfiguration()
     {
         $rootConfigurationArray = $this->getFormObject()
-            ->getConfiguration()
+            ->getDefinition()
             ->getRootConfiguration()
             ->toArray();
 

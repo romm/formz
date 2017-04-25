@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Validation\DataObject;
 
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject;
 
 class ValidatorDataObject

@@ -72,7 +72,7 @@ class FormObjectTest extends AbstractUnitTest
         $formObject = $this->getDefaultFormObject();
         $formObject->addProperty('foo');
 
-        $validationResult = $formObject->getConfigurationValidationResult();
+        $validationResult = $formObject->getDefinitionValidationResult();
         $this->assertInstanceOf(Result::class, $validationResult);
         $this->assertFalse($validationResult->hasErrors());
 

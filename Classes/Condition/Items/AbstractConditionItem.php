@@ -16,9 +16,9 @@ namespace Romm\Formz\Condition\Items;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
-use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\ArrayService;
 

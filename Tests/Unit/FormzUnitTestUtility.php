@@ -6,10 +6,10 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\ContextService;
@@ -148,7 +148,7 @@ trait FormzUnitTestUtility
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
-            ->setMethods(['getConfiguration', 'getConfigurationValidationResult'])
+            ->setMethods(['getDefinition', 'getDefinitionValidationResult'])
             ->setConstructorArgs([
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME,
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME,
@@ -156,7 +156,7 @@ trait FormzUnitTestUtility
             ])
             ->getMock();
 
-        $formConfiguration = new Form;
+        $formConfiguration = new FormDefinition;
 
         foreach ($fields as $fieldName) {
             $field = new Field;
@@ -187,10 +187,10 @@ trait FormzUnitTestUtility
 
         $formConfiguration->setParents([$formzConfiguration]);
 
-        $formObject->method('getConfiguration')
+        $formObject->method('getDefinition')
             ->willReturn($configurationObjectInstance->getObject(true));
 
-        $formObject->method('getConfigurationValidationResult')
+        $formObject->method('getDefinitionValidationResult')
             ->willReturn(new Result);
 
         return $formObject;

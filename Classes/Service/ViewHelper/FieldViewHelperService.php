@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\Service\ViewHelper;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Form\Definition\Field\Field;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 

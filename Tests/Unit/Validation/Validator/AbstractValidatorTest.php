@@ -1,8 +1,8 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Validation\Validator;
 
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;

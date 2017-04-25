@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Validation\Validator\Internal;
 
-use Romm\Formz\Configuration\Form\Field\Activation\AbstractActivation;
+use Romm\Formz\Form\Definition\Field\Activation\AbstractActivation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\Validator\Internal\ConditionIsValidValidator;
 

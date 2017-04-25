@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\Form;
 
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\Definition\FormDefinition;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -134,11 +134,11 @@ class FormObject
     }
 
     /**
-     * @return Form
+     * @return FormDefinition
      */
-    public function getConfiguration()
+    public function getDefinition()
     {
-        /** @var Form $configuration */
+        /** @var FormDefinition $configuration */
         $configuration = $this->configuration->getConfigurationObject()->getObject(true);
 
         return $configuration;
@@ -150,7 +150,7 @@ class FormObject
      *
      * @return Result
      */
-    public function getConfigurationValidationResult()
+    public function getDefinitionValidationResult()
     {
         return $this->configuration->getConfigurationValidationResult();
     }

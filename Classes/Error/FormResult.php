@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Error;
 
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Service\Traits\StoreDataTrait;
 use TYPO3\CMS\Extbase\Error\Result;
 

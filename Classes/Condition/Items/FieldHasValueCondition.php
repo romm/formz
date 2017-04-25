@@ -86,7 +86,7 @@ class FieldHasValueCondition extends AbstractConditionItem
      */
     protected function checkConditionConfiguration()
     {
-        $configuration = $this->formObject->getConfiguration();
+        $configuration = $this->formObject->getDefinition();
 
         if (false === $configuration->hasField($this->fieldName)) {
             throw InvalidConditionException::conditionFieldHasValueFieldNotFound($this->fieldName);

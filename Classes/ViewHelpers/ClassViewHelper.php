@@ -164,7 +164,7 @@ class ClassViewHelper extends AbstractViewHelper
     {
         $classesConfiguration = $this->formService
             ->getFormObject()
-            ->getConfiguration()
+            ->getDefinition()
             ->getRootConfiguration()
             ->getView()
             ->getClasses();
@@ -239,7 +239,7 @@ class ClassViewHelper extends AbstractViewHelper
     {
         $result = '';
         $formObject = $this->formService->getFormObject();
-        $field = $formObject->getConfiguration()->getField($this->fieldName);
+        $field = $formObject->getDefinition()->getField($this->fieldName);
 
         if ($formObject->hasForm()
             && false === $propertyResult->hasErrors()

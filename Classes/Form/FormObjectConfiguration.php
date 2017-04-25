@@ -16,8 +16,8 @@ namespace Romm\Formz\Form;
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
 use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Service\CacheService;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -188,7 +188,7 @@ class FormObjectConfiguration
      */
     protected function getConfigurationObjectInstance(array $configuration)
     {
-        return ConfigurationObjectFactory::getInstance()->get(Form::class, $configuration);
+        return ConfigurationObjectFactory::getInstance()->get(FormDefinition::class, $configuration);
     }
 
     /**

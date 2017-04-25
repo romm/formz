@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Behaviours;
 
-use Romm\Formz\Configuration\Form\Form;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -35,11 +35,11 @@ class BehavioursManager implements SingletonInterface
      * in `$formProperties`, the behaviours are applied and the value is
      * changed.
      *
-     * @param array $formProperties    Properties values of the submitted form.
-     * @param Form  $formConfiguration Configuration object of the form.
+     * @param array          $formProperties    Properties values of the submitted form.
+     * @param FormDefinition $formConfiguration Configuration object of the form.
      * @return array
      */
-    public function applyBehaviourOnPropertiesArray(array $formProperties, Form $formConfiguration)
+    public function applyBehaviourOnPropertiesArray(array $formProperties, FormDefinition $formConfiguration)
     {
         foreach ($formConfiguration->getFields() as $fieldName => $field) {
             if (true === isset($formProperties[$fieldName])) {
@@ -67,7 +67,7 @@ class BehavioursManager implements SingletonInterface
         if ($formObject->hasForm()) {
             $formInstance = $formObject->getForm();
 
-            foreach ($formObject->getConfiguration()->getFields() as $fieldName => $field) {
+            foreach ($formObject->getDefinition()->getFields() as $fieldName => $field) {
                 if (ObjectAccess::isPropertyGettable($formInstance, $fieldName)
                     && ObjectAccess::isPropertySettable($formInstance, $fieldName)
                 ) {

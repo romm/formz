@@ -13,10 +13,10 @@
 
 namespace Romm\Formz\Validation\Validator\Form;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\FormService;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;

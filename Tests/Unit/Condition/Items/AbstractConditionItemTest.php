@@ -4,8 +4,8 @@ namespace Romm\Formz\Tests\Unit\Condition\Items;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Items\AbstractConditionItem;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
-use Romm\Formz\Configuration\Form\Field\Activation\Activation;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Activation\Activation;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class AbstractConditionItemTest extends AbstractUnitTest
@@ -31,7 +31,7 @@ class AbstractConditionItemTest extends AbstractUnitTest
 
         $formObject = $this->getDefaultFormObject();
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         $activation = new Activation;
         $activation->setRootObject($field);
@@ -66,7 +66,7 @@ class AbstractConditionItemTest extends AbstractUnitTest
 
         $formObject = $this->getDefaultFormObject();
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         $validation = new Validation;
         $validation->setParents([$field]);

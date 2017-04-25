@@ -19,10 +19,10 @@ use Romm\ConfigurationObject\Service\ServiceFactory;
 use Romm\ConfigurationObject\Service\ServiceInterface;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\DefaultConfigurationObjectTrait;
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Exceptions\DuplicateEntryException;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Service\CacheService as InternalCacheService;
 use Romm\Formz\Service\HashService;
@@ -101,7 +101,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
             throw DuplicateEntryException::formWasAlreadyRegistered($form);
         }
 
-        $form->getConfiguration()->setParents([$this]);
+        $form->getDefinition()->setParents([$this]);
 
         $this->forms[$form->getClassName()][$form->getName()] = $form;
     }
@@ -119,7 +119,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     /**
      * @param string $className
      * @param string $name
-     * @return null|Form
+     * @return null|FormDefinition
      */
     public function getForm($className, $name)
     {

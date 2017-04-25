@@ -61,7 +61,7 @@ JS;
      */
     protected function getFormConfiguration()
     {
-        $formConfigurationArray = $this->getFormObject()->getConfiguration()->toArray();
+        $formConfigurationArray = $this->getFormObject()->getDefinition()->toArray();
         $this->removeFieldsValidationConfiguration($formConfigurationArray)
             ->addClassNameProperty($formConfigurationArray);
 

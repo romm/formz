@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\ViewHelpers;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
@@ -168,11 +168,11 @@ class FormatMessageViewHelper extends AbstractViewHelper
         $formObject = $this->formService->getFormObject();
         $fieldName = $this->getFieldName();
 
-        if (false === $formObject->getConfiguration()->hasField($fieldName)) {
+        if (false === $formObject->getDefinition()->hasField($fieldName)) {
             throw EntryNotFoundException::formatMessageViewHelperFieldNotFoundInForm($fieldName, $formObject);
         }
 
-        return $formObject->getConfiguration()->getField($fieldName);
+        return $formObject->getDefinition()->getField($fieldName);
     }
 
     /**

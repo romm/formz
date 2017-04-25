@@ -182,7 +182,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 : '';
         }
 
-        $formzValidationResult = $this->formObject->getConfigurationValidationResult();
+        $formzValidationResult = $this->formObject->getDefinitionValidationResult();
 
         $result = ($formzValidationResult->hasErrors())
             // If the form configuration is not valid, we display the errors list.
@@ -268,7 +268,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected function addDefaultClass()
     {
         $formDefaultClass = $this->formObject
-            ->getConfiguration()
+            ->getDefinition()
             ->getSettings()
             ->getDefaultClass();
 

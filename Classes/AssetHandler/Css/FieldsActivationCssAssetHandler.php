@@ -15,7 +15,7 @@ namespace Romm\Formz\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Parser\ConditionTree;
-use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Form\Definition\Field\Field;
 
 /**
  * This asset handler generates the CSS code which will automatically hide
@@ -37,7 +37,7 @@ class FieldsActivationCssAssetHandler extends AbstractAssetHandler
     public function getFieldsActivationCss()
     {
         $cssBlocks = [];
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formConfiguration = $this->getFormObject()->getDefinition();
 
         foreach ($formConfiguration->getFields() as $field) {
             $formName = $this->getFormObject()->getName();

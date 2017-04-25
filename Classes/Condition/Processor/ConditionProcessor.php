@@ -17,9 +17,9 @@ use Romm\Formz\Condition\Parser\ConditionParserFactory;
 use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
-use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject;
 
 class ConditionProcessor
@@ -100,7 +100,7 @@ class ConditionProcessor
      */
     public function calculateAllTrees()
     {
-        $fields = $this->formObject->getConfiguration()->getFields();
+        $fields = $this->formObject->getDefinition()->getFields();
 
         foreach ($fields as $field) {
             $this->getActivationConditionTreeForField($field);

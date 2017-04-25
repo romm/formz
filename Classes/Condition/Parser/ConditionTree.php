@@ -17,7 +17,7 @@ use Romm\Formz\Condition\Parser\Node\ActivationDependencyAwareInterface;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**

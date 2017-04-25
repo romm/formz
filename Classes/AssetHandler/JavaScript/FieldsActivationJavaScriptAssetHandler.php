@@ -15,7 +15,7 @@ namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Parser\ConditionTree;
-use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Form\Definition\Field\Field;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -34,7 +34,7 @@ class FieldsActivationJavaScriptAssetHandler extends AbstractAssetHandler
     public function getFieldsActivationJavaScriptCode()
     {
         $javaScriptBlocks = [];
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formConfiguration = $this->getFormObject()->getDefinition();
 
         foreach ($formConfiguration->getFields() as $field) {
             $fieldConditionExpression = [];

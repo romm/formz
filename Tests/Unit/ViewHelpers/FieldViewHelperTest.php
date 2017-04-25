@@ -57,7 +57,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper->injectFieldService($fieldServiceMock);
         $fieldServiceMock->expects($this->once())
             ->method('setCurrentField')
-            ->with($formObject->getConfiguration()->getField($fieldName));
+            ->with($formObject->getDefinition()->getField($fieldName));
 
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());

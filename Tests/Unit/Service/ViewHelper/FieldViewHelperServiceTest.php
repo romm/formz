@@ -1,8 +1,8 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Service\ViewHelper;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Configuration\View\Layouts\Layout;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 

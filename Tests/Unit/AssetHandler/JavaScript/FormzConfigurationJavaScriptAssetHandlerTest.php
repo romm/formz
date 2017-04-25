@@ -48,7 +48,7 @@ TXT;
 
         $rootConfiguration = $assetHandlerFactory
             ->getFormObject()
-            ->getConfiguration()
+            ->getDefinition()
             ->getRootConfiguration();
         $rootConfiguration->calculateHash();
         $hash = sha1($rootConfiguration->getHash());

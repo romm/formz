@@ -14,8 +14,8 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\ValidatorService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -44,7 +44,7 @@ class FieldsValidationJavaScriptAssetHandler extends AbstractAssetHandler
     public function getJavaScriptCode()
     {
         $fieldsJavaScriptCode = [];
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formConfiguration = $this->getFormObject()->getDefinition();
 
         foreach ($formConfiguration->getFields() as $field) {
             $fieldsJavaScriptCode[] = $this->processField($field);
@@ -171,7 +171,7 @@ JS;
         if (null === $this->javaScriptValidationFiles) {
             $this->javaScriptValidationFiles = [];
 
-            $formConfiguration = $this->getFormObject()->getConfiguration();
+            $formConfiguration = $this->getFormObject()->getDefinition();
 
             foreach ($formConfiguration->getFields() as $field) {
                 foreach ($field->getValidation() as $validationConfiguration) {

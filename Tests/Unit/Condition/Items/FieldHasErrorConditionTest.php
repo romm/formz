@@ -3,9 +3,9 @@ namespace Romm\Formz\Tests\Unit\Condition\Items;
 
 use Romm\Formz\Condition\Items\FieldHasErrorCondition;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
 
@@ -42,7 +42,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $validation = new Validation;
         $validation->setName('bar');
         $formObject = $this->getDefaultFormObject();
-        $formObject->getConfiguration()->getField('foo')->addValidation($validation);
+        $formObject->getDefinition()->getField('foo')->addValidation($validation);
 
         /** @var FieldHasErrorCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldHasErrorCondition::class, $formObject);
@@ -65,7 +65,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidator */
         $formValidator = $this->getMockBuilder(FormValidatorExecutor::class)
@@ -103,7 +103,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidator */
         $formValidator = $this->getMockBuilder(FormValidatorExecutor::class)
@@ -145,7 +145,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidator */
         $formValidator = $this->getMockBuilder(FormValidatorExecutor::class)

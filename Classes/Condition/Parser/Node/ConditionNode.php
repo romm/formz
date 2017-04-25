@@ -16,7 +16,7 @@ namespace Romm\Formz\Condition\Parser\Node;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Configuration\Form\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
 
 /**
  * A condition node, which contains an instance of `ConditionItemInterface`.

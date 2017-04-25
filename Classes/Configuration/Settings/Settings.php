@@ -14,8 +14,8 @@
 namespace Romm\Formz\Configuration\Settings;
 
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
-use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
-use Romm\Formz\Configuration\Form\Settings\FormSettings;
+use Romm\Formz\Form\Definition\Field\Settings\FieldSettings;
+use Romm\Formz\Form\Definition\Settings\FormSettings;
 use TYPO3\CMS\Core\Cache\Backend\FileBackend;
 
 class Settings extends AbstractFormzConfiguration
@@ -28,12 +28,12 @@ class Settings extends AbstractFormzConfiguration
     protected $defaultBackendCache = FileBackend::class;
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Settings\FormSettings
+     * @var \Romm\Formz\Form\Definition\Settings\FormSettings
      */
     protected $defaultFormSettings;
 
     /**
-     * @var \Romm\Formz\Configuration\Form\Field\Settings\FieldSettings
+     * @var \Romm\Formz\Form\Definition\Field\Settings\FieldSettings
      */
     protected $defaultFieldSettings;
 

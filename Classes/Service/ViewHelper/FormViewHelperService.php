@@ -89,7 +89,7 @@ class FormViewHelperService implements SingletonInterface
 
                 $formProperties = $behavioursManager->applyBehaviourOnPropertiesArray(
                     $originalForm,
-                    $this->formObject->getConfiguration()
+                    $this->formObject->getDefinition()
                 );
 
                 $request->setArgument($formName, $formProperties);

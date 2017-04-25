@@ -14,8 +14,8 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormzMessageInterface;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\MessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -100,7 +100,7 @@ JS;
         if ($formObject->formWasSubmitted()
             && $formObject->hasFormResult()
         ) {
-            foreach ($this->getFormObject()->getConfiguration()->getFields() as $field) {
+            foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
                 $fieldsMessages[$field->getName()] = $this->getSingleFieldExistingMessages($field);
             }
         }

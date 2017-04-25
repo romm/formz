@@ -151,7 +151,7 @@ class FieldViewHelper extends AbstractViewHelper
     {
         $fieldName = $this->arguments['name'];
         $formObject = $this->formService->getFormObject();
-        $formConfiguration = $formObject->getConfiguration();
+        $formConfiguration = $formObject->getDefinition();
         $viewConfiguration = $formConfiguration->getRootConfiguration()->getView();
         $layout = $this->getLayout($viewConfiguration);
 
@@ -198,7 +198,7 @@ class FieldViewHelper extends AbstractViewHelper
     protected function injectFieldInService($fieldName)
     {
         $formObject = $this->formService->getFormObject();
-        $formConfiguration = $formObject->getConfiguration();
+        $formConfiguration = $formObject->getDefinition();
 
         if (false === is_string($fieldName)) {
             throw InvalidArgumentTypeException::fieldViewHelperInvalidTypeNameArgument();

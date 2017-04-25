@@ -40,7 +40,7 @@ TXT;
         $result = new Result;
         $formResult = new FormResult;
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
         $formResult->deactivateField($field);
 
         $error = new Error(

@@ -1,11 +1,11 @@
 <?php
 namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -47,7 +47,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
         $classViewHelper->setArguments($arguments);
 
         $classesObject = $formService->getFormObject()
-            ->getConfiguration()
+            ->getDefinition()
             ->getRootConfiguration()
             ->getView()
             ->getClasses();

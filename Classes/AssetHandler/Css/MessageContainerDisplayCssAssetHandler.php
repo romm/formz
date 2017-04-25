@@ -31,7 +31,7 @@ class MessageContainerDisplayCssAssetHandler extends AbstractAssetHandler
     public function getErrorContainerDisplayCss()
     {
         $cssBlocks = [];
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formConfiguration = $this->getFormObject()->getDefinition();
 
         foreach ($formConfiguration->getFields() as $fieldName => $field) {
             $formName = $this->getFormObject()->getName();

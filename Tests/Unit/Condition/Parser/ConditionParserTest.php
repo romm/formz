@@ -9,8 +9,8 @@ use Romm\Formz\Condition\Parser\Node\BooleanNode;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Parser\Node\NullNode;
-use Romm\Formz\Configuration\Form\Field\Activation\Activation;
-use Romm\Formz\Configuration\Form\Field\Activation\EmptyActivation;
+use Romm\Formz\Form\Definition\Field\Activation\Activation;
+use Romm\Formz\Form\Definition\Field\Activation\EmptyActivation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class ConditionParserTest extends AbstractUnitTest

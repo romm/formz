@@ -1,9 +1,9 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Validation\Validator\Form;
 
-use Romm\Formz\Configuration\Form\Field\Activation\Activation;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\Definition\Field\Activation\Activation;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -31,8 +31,8 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     public function fieldActivationIsCalledOncePerField()
     {
         $formObject = $this->getExtendedFormObject();
-        $fieldFoo = $formObject->getConfiguration()->getField('foo');
-        $fieldBar = $formObject->getConfiguration()->getField('bar');
+        $fieldFoo = $formObject->getDefinition()->getField('foo');
+        $fieldBar = $formObject->getDefinition()->getField('bar');
 
         $result = new FormResult;
 
@@ -75,7 +75,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     public function fieldActivationCheckRunsCorrectly()
     {
         $formObject = $this->getDefaultFormObject();
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
         $field->setActivation(new Activation);
 
         $result = new FormResult;
@@ -107,7 +107,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     public function fieldValidationActivationCheckRunsCorrectly()
     {
         $formObject = $this->getDefaultFormObject();
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
         $validation = new Validation;
         $field->addValidation($validation);
 
@@ -148,7 +148,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     {
         $formObject = $this->getDefaultFormObject();
 
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         $validation = new Validation;
         $field->addValidation($validation);
@@ -181,7 +181,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     public function validationIsCorrectlyDeactivatedWhenItHasCondition()
     {
         $formObject = $this->getDefaultFormObject();
-        $field = $formObject->getConfiguration()->getField('foo');
+        $field = $formObject->getDefinition()->getField('foo');
 
         $validation = new Validation;
         $field->addValidation($validation);

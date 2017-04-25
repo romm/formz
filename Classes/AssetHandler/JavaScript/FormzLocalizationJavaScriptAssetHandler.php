@@ -14,7 +14,7 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
-use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\MessageService;
@@ -109,7 +109,7 @@ JS;
      */
     public function injectTranslationsForFormFieldsValidation()
     {
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formConfiguration = $this->getFormObject()->getDefinition();
 
         foreach ($formConfiguration->getFields() as $field) {
             $this->storeTranslationsForFieldValidation($field);

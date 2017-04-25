@@ -84,7 +84,7 @@ class FieldHasErrorCondition extends AbstractConditionItem
     {
         $flag = false;
         $formValidator = $dataObject->getFormValidator();
-        $field = $this->formObject->getConfiguration()->getField($this->fieldName);
+        $field = $this->formObject->getDefinition()->getField($this->fieldName);
         $formValidator->validateField($field);
         $result = $formValidator->getResult()->forProperty($this->fieldName);
 
@@ -108,7 +108,7 @@ class FieldHasErrorCondition extends AbstractConditionItem
      */
     protected function checkConditionConfiguration()
     {
-        $configuration = $this->formObject->getConfiguration();
+        $configuration = $this->formObject->getDefinition();
 
         if (false === $configuration->hasField($this->fieldName)) {
             throw InvalidConditionException::conditionFieldHasErrorFieldNotFound($this->fieldName);

@@ -14,7 +14,6 @@
 namespace Romm\Formz\Controller;
 
 use Exception;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\AjaxResult;
 use Romm\Formz\Error\FormzMessageInterface;
@@ -23,6 +22,7 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
@@ -220,13 +220,13 @@ class AjaxValidationController extends ActionController
      */
     protected function getFieldValidation()
     {
-        $validationResult = $this->formObject->getConfigurationValidationResult();
+        $validationResult = $this->formObject->getDefinitionValidationResult();
 
         if (true === $validationResult->hasErrors()) {
             throw InvalidConfigurationException::ajaxControllerInvalidFormConfiguration();
         }
 
-        $formConfiguration = $this->formObject->getConfiguration();
+        $formConfiguration = $this->formObject->getDefinition();
 
         if (false === $formConfiguration->hasField($this->fieldName)) {
             throw EntryNotFoundException::ajaxControllerFieldNotFound($this->fieldName, $this->formObject);

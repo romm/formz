@@ -52,7 +52,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         $formObject = $this->getFormObject();
         $formInstance = $formObject->getForm();
 
-        foreach ($formObject->getConfiguration()->getFields() as $field) {
+        foreach ($formObject->getDefinition()->getFields() as $field) {
             $fieldName = $field->getName();
 
             if (false === $formResult->fieldIsDeactivated($field)) {
@@ -83,7 +83,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public function getFieldsMessagesDataAttributes()
     {
         $result = [];
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formConfiguration = $this->getFormObject()->getDefinition();
         $formResult = $this->getFormObject()->getFormResult();
 
         foreach ($formResult->getSubResults() as $fieldName => $fieldResult) {
@@ -165,7 +165,7 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     public function getFieldsValidDataAttributes()
     {
         $result = [];
-        $formConfiguration = $this->getFormObject()->getConfiguration();
+        $formConfiguration = $this->getFormObject()->getDefinition();
         $formResult = $this->getFormObject()->getFormResult();
 
         foreach ($formConfiguration->getFields() as $field) {

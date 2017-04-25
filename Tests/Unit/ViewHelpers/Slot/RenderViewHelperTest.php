@@ -1,8 +1,8 @@
 <?php
 namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Exceptions\ContextNotFoundException;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;

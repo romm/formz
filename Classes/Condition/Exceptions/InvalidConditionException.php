@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\Condition\Exceptions;
 
-use Romm\Formz\Configuration\Form\Field\Field;
-use Romm\Formz\Configuration\Form\Field\Validation\Validation;
 use Romm\Formz\Exceptions\FormzException;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
 
 class InvalidConditionException extends FormzException
 {

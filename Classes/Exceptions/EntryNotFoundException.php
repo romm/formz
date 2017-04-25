@@ -13,11 +13,11 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Configuration\Form\Field\Activation\AbstractActivation;
-use Romm\Formz\Configuration\Form\Form;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Configuration\View\View;
+use Romm\Formz\Form\Definition\Field\Activation\AbstractActivation;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
@@ -105,7 +105,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONFIGURATION_FIELD_NOT_FOUND,
-            [$name, Form::class]
+            [$name, FormDefinition::class]
         );
 
         return $exception;

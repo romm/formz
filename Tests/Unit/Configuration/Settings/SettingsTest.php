@@ -1,9 +1,9 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Configuration\View;
 
-use Romm\Formz\Configuration\Form\Field\Settings\FieldSettings;
-use Romm\Formz\Configuration\Form\Settings\FormSettings;
 use Romm\Formz\Configuration\Settings\Settings;
+use Romm\Formz\Form\Definition\Field\Settings\FieldSettings;
+use Romm\Formz\Form\Definition\Settings\FormSettings;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class SettingsTest extends AbstractUnitTest

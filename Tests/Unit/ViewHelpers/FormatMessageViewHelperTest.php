@@ -2,13 +2,13 @@
 namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
 use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\Notice;
 use Romm\Formz\Error\Warning;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
@@ -57,7 +57,7 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
 
         if (null !== $messageTemplate) {
             $formService->getFormObject()
-                ->getConfiguration()
+                ->getDefinition()
                 ->getField('foo')
                 ->getSettings()
                 ->setMessageTemplate($messageTemplate);
