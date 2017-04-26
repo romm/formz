@@ -11,7 +11,7 @@ use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
@@ -413,6 +413,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $this->inject($ajaxValidationController, 'view', $view);
 
         $formObject = $formObject ?: $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
 
         $ajaxValidationController->method('getFormObject')
             ->willReturn($formObject);

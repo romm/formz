@@ -20,7 +20,7 @@ use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 
 class ConditionProcessor
 {

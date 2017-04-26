@@ -14,7 +14,7 @@
 namespace Romm\Formz\Behaviours;
 
 use Romm\Formz\Form\Definition\FormDefinition;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;

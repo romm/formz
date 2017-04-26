@@ -97,9 +97,7 @@ JS;
         $fieldsMessages = [];
         $formObject = $this->getFormObject();
 
-        if ($formObject->formWasSubmitted()
-            && $formObject->hasFormResult()
-        ) {
+        if ($formObject->formWasSubmitted()) {
             foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
                 $fieldsMessages[$field->getName()] = $this->getSingleFieldExistingMessages($field);
             }
@@ -160,8 +158,6 @@ JS;
      */
     protected function getDeactivatedFields()
     {
-        return ($this->getFormObject()->hasFormResult())
-            ? array_keys($this->getFormObject()->getFormResult()->getDeactivatedFields())
-            : [];
+        return array_keys($this->getFormObject()->getFormResult()->getDeactivatedFields());
     }
 }

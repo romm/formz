@@ -52,7 +52,7 @@ class EqualsToFieldValidator extends AbstractValidator
         $fieldName = $this->options[self::OPTION_FIELD];
         $formObject = $this->dataObject->getFormObject();
 
-        if (false === $formObject->hasProperty($fieldName)) {
+        if (false === $formObject->getDefinition()->hasField($fieldName)) {
             throw EntryNotFoundException::equalsToFieldValidatorFieldNotFound($fieldName, $formObject);
         }
 

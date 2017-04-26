@@ -36,7 +36,7 @@ class SlotViewHelperService implements SingletonInterface
     private $arguments = [];
 
     /**
-     * @var RenderingContextInterface|\TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface[]
+     * @var RenderingContextInterface[]|\TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface[]
      */
     private $renderingContext = [];
 

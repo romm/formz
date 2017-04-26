@@ -24,8 +24,8 @@ use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
-use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\MessageService;
@@ -194,7 +194,6 @@ class AjaxValidationController extends ActionController
         $this->form = $this->getForm();
 
         $this->formObject = $this->getFormObject();
-        $this->formObject->setForm($this->form);
 
         $this->validation = $this->getFieldValidation();
 
@@ -350,10 +349,7 @@ class AjaxValidationController extends ActionController
      */
     protected function getFormObject()
     {
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-
-        return $formObjectFactory->getInstanceFromClassName($this->formClassName, $this->formName);
+        return FormObjectFactory::get()->getInstanceWithFormInstance($this->form, $this->formName);
     }
 
     /**

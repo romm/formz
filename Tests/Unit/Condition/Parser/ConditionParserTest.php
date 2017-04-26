@@ -327,7 +327,7 @@ class ConditionParserTest extends AbstractUnitTest
     }
 
     /**
-     * @todo
+     * List of condition expressions with syntax errors.
      *
      * @test
      * @dataProvider parseConditionReturnsErrorDataProvider

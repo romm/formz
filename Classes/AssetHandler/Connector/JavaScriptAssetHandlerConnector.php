@@ -25,7 +25,7 @@ use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\StringService;

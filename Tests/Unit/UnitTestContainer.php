@@ -1,6 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit;
 
+use Romm\Formz\Service\InstanceService;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Extbase\Object\Container\ClassInfo;
 use TYPO3\CMS\Extbase\Object\Container\Container;
@@ -36,6 +37,8 @@ class UnitTestContainer extends Container
      */
     public function registerMockedInstance($className, $instance)
     {
+        InstanceService::get()->forceInstance($className, $instance);
+
         $this->mockedInstances[$className] = $instance;
     }
 
@@ -55,6 +58,8 @@ class UnitTestContainer extends Container
      */
     public function resetInstances()
     {
+        InstanceService::get()->reset();
+
         $blankInstance = new static;
         $reflectionClass = new \ReflectionClass(get_parent_class());
 

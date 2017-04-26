@@ -1,11 +1,11 @@
 <?php
 namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
-use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\UnregisteredConfigurationException;
 use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -199,15 +199,16 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
     }
 
     /**
-     * @return FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject
+     * @param callable|null $proxyCallback
+     * @return \PHPUnit_Framework_MockObject_MockObject|FormViewHelperService
      */
-    protected function getDefaultFormService()
+    protected function getDefaultFormService(callable $proxyCallback = null)
     {
         $service = $this->getMockBuilder(FormViewHelperService::class)
             ->setMethods(['getFormObject'])
             ->getMock();
 
-        $formObject = $this->getDefaultFormObject();
+        $formObject = $this->getDefaultFormObject($proxyCallback);
         $service->method('getFormObject')
             ->willReturn($formObject);
 
@@ -243,9 +244,9 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getServiceWithNoErrorResult()
     {
-        $service = $this->getDefaultFormService();
-        $service->getFormObject()->markFormAsSubmitted();
-        $service->getFormObject()->setFormResult(new FormResult);
+        $service = $this->getDefaultFormService(function (FormObjectProxy $proxy) {
+            $proxy->markFormAsSubmitted();
+        });
 
         return $service;
     }

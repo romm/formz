@@ -9,8 +9,8 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
-use Romm\Formz\Form\FormObject;
-use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
@@ -83,7 +83,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         return [
             [
@@ -124,7 +124,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $this->injectDependenciesIntoViewHelper($viewHelper);
 
         $formService = new FormViewHelperService;
-        $formService->setFormObject(new FormObject('foo', 'bar', []));
+        $formService->setFormObject($this->getDefaultFormObject());
         $formService->activateFormContext();
         $viewHelper->injectFormService($formService);
 
@@ -146,7 +146,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
@@ -174,7 +174,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
@@ -205,7 +205,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
@@ -238,7 +238,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
@@ -271,7 +271,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
@@ -307,7 +307,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     {
         /** @var FormObjectFactory $formObjectFactory */
         $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceFromClassName(DefaultForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)

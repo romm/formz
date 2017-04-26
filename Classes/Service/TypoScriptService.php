@@ -14,6 +14,7 @@
 namespace Romm\Formz\Service;
 
 use Romm\Formz\Core\Core;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
@@ -25,6 +26,8 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService as ExtbaseTypoScriptService;
  */
 class TypoScriptService implements SingletonInterface
 {
+    use ExtendedSelfInstantiateTrait;
+
     const EXTENSION_CONFIGURATION_PATH = 'config.tx_formz';
 
     /**

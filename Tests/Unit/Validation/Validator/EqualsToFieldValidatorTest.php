@@ -4,7 +4,6 @@ namespace Romm\Formz\Tests\Unit\Validation\Validator;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Validation\Validator\EqualsToFieldValidator;
 
@@ -56,37 +55,6 @@ class EqualsToFieldValidatorTest extends AbstractValidatorUnitTest
                 'exception' => EntryNotFoundException::class
             ]
         ];
-    }
-
-    /**
-     * @return FormObject|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getFormObject()
-    {
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObjectMock */
-        $formObjectMock = $this->getMockBuilder(FormObject::class)
-            ->setConstructorArgs(['foo', 'foo', []])
-            ->setMethods(['hasProperty'])
-            ->getMock();
-
-        $formObjectMock->expects($this->at(0))
-            ->method('hasProperty')
-            ->willReturn(false);
-
-        $formObjectMock->expects($this->at(1))
-            ->method('hasProperty')
-            ->willReturnCallback(function ($name) {
-                return $name === 'foo';
-            });
-
-        $formObjectMock->expects($this->exactly(2))
-            ->method('hasProperty');
-
-        $formObjectMock->addProperty('foo');
-
-        $formObjectMock->setForm(new DefaultForm);
-
-        return $formObjectMock;
     }
 
     /**

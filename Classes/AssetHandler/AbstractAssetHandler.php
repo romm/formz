@@ -16,7 +16,7 @@ namespace Romm\Formz\AssetHandler;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 

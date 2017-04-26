@@ -1,5 +1,5 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Form\Definition\Field;
+namespace Romm\Formz\Tests\Unit\Configuration\Field;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;

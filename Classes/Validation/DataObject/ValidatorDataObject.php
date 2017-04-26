@@ -14,7 +14,7 @@
 namespace Romm\Formz\Validation\DataObject;
 
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 
 class ValidatorDataObject
 {

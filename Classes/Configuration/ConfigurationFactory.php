@@ -18,6 +18,7 @@ use Romm\ConfigurationObject\ConfigurationObjectInstance;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\HashService;
+use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -29,6 +30,8 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class ConfigurationFactory implements SingletonInterface
 {
+    use ExtendedSelfInstantiateTrait;
+
     /**
      * @var TypoScriptService
      */

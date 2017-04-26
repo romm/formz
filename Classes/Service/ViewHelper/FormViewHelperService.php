@@ -15,7 +15,7 @@ namespace Romm\Formz\Service\ViewHelper;
 
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Exceptions\DuplicateEntryException;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;

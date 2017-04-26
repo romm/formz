@@ -13,12 +13,13 @@
 
 namespace Romm\Formz\Exceptions;
 
+use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Form\Definition\Field\Activation\AbstractActivation;
 use Romm\Formz\Form\Definition\FormDefinition;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
@@ -55,6 +56,8 @@ class EntryNotFoundException extends FormzException
     const CONTROLLER_SERVICE_ACTION_FORM_ARGUMENT_MISSING = 'The method `%s::%s()` must have a parameter `$%s`. Note that you can also change the parameter `name` of the form view helper.';
 
     const SLOT_NOT_FOUND = 'No slot "%s" was found.';
+
+    const FORM_CONFIGURATION_NOT_FOUND = 'The configuration for form of class "%s" was not found. Please use the function `%s::hasForm()` before.';
 
     /**
      * @code 1472650209
@@ -386,6 +389,22 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::SLOT_NOT_FOUND,
             [$name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1491997168
+     *
+     * @return self
+     */
+    final public static function formConfigurationNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_CONFIGURATION_NOT_FOUND,
+            [Configuration::class]
         );
 
         return $exception;

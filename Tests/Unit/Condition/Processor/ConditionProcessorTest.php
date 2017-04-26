@@ -14,9 +14,9 @@ use Romm\Formz\Form\Definition\Field\Activation\EmptyActivation;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\Definition\FormDefinition;
-use Romm\Formz\Form\FormObject;
-use Romm\Formz\Service\InstanceService;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Tests\Unit\UnitTestContainer;
 use TYPO3\CMS\Extbase\Error\Result;
 
 class ConditionProcessorTest extends AbstractUnitTest
@@ -45,7 +45,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             $conditionProcessor
         );
 
-        InstanceService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
+        UnitTestContainer::get()->registerMockedInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
 
         $tree1 = $conditionProcessor->getActivationConditionTreeForField($field1);
         $tree2 = $conditionProcessor->getActivationConditionTreeForField($field1);
@@ -85,7 +85,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             $conditionProcessor
         );
 
-        InstanceService::get()->forceInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
+        UnitTestContainer::get()->registerMockedInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
 
         $tree1 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);
         $tree2 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);

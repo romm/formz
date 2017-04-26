@@ -1,15 +1,13 @@
 <?php
 namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
-use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\Notice;
 use Romm\Formz\Error\Warning;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
@@ -138,9 +136,7 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['getFormObject'])
             ->getMock();
         $formObjectFactory = new FormObjectFactory;
-        $formObjectFactory->injectConfigurationFactory(Core::instantiate(ConfigurationFactory::class));
-        $formObjectFactory->injectTypoScriptService($this->getMockedTypoScriptService());
-        $formObject = $formObjectFactory->getInstanceFromClassName(ExtendedForm::class, 'foo');
+        $formObject = $formObjectFactory->getInstanceWithClassName(ExtendedForm::class, 'foo');
 
         /** @noinspection PhpUndefinedMethodInspection */
         $service->method('getFormObject')

@@ -2,8 +2,7 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler;
 
 use Romm\Formz\AssetHandler\AssetHandlerFactory;
-use Romm\Formz\Error\FormResult;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -27,7 +26,6 @@ trait AssetHandlerTestTrait
             : DefaultForm::class;
 
         $formObject->setForm(new $formClassName());
-        $formObject->setFormResult(new FormResult);
 
         $controllerContext = new ControllerContext();
 

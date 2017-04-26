@@ -18,14 +18,14 @@ use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
-use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
-use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ControllerService;
 use Romm\Formz\Service\ExtensionService;
+use Romm\Formz\Service\FormService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
@@ -126,23 +126,15 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
         if (true === $this->typoScriptIncluded) {
             $this->timeTracker = TimeTrackerService::getAndStart();
+
             $this->formObjectClassName = $this->getFormClassName();
-            $this->formObject = $this->getFormObject();
+            $this->formObject = $this->getFormObject($this->getFormInstance());
+
             $this->timeTracker->logTime('post-config');
-            $this->formService->setFormObject($this->formObject);
+
             $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
 
-            /*
-             * If the argument `object` was filled with an instance of Form, it
-             * is added to the `FormObject`.
-             */
-            $objectArgument = $this->getFormObjectArgument();
-
-            if (null !== $objectArgument
-                && false === $this->formObject->formWasSubmitted()
-            ) {
-                $this->formObject->setForm($objectArgument);
-            }
+            $this->formService->setFormObject($this->formObject);
         }
 
         /*
@@ -291,7 +283,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $dataAttributesAssetHandler = $this->getDataAttributesAssetHandler();
 
         if ($this->formObject->hasForm()) {
-            if (false === $this->formObject->hasFormResult()) {
+            if (false === $this->formObject->formWasValidated()) {
                 $form = $this->formObject->getForm();
                 $formValidator = $this->getFormValidator($this->getFormObjectName());
                 $formResult = $formValidator->validateGhost($form);
@@ -304,6 +296,9 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
         if (true === $this->formObject->formWasSubmitted()) {
             $dataAttributes += [DataAttributesAssetHandler::getFieldSubmissionDone() => '1'];
+        }
+
+        if (true === $this->formObject->formWasValidated()) {
             $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes();
             $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
         }
@@ -420,7 +415,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * request.
      *
      * @return string
-     * @throws EntryNotFoundException
      */
     protected function getFormClassNameFromControllerAction()
     {
@@ -496,14 +490,36 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     }
 
     /**
+     * @return FormInterface
+     */
+    protected function getFormInstance()
+    {
+        /*
+         * If the argument `object` was filled with an instance of Form, it
+         * becomes the form instance. Otherwise we try to fetch an instance from
+         * the form with errors list. If there is still no form, we create an
+         * empty instance.
+         */
+        $objectArgument = $this->getFormObjectArgument();
+
+        if ($objectArgument) {
+            $form = $objectArgument;
+        } else {
+            $submittedForm = FormService::getFormWithErrors($this->getFormClassName());
+
+            $form = $submittedForm ?: Core::get()->getObjectManager()->getEmptyObject($this->getFormClassName());
+        }
+
+        return $form;
+    }
+
+    /**
+     * @param FormInterface $form
      * @return FormObject
      */
-    protected function getFormObject()
+    protected function getFormObject(FormInterface $form)
     {
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-
-        return $formObjectFactory->getInstanceFromClassName($this->formObjectClassName, $this->getFormObjectName());
+        return FormObjectFactory::get()->getInstanceWithFormInstance($form, $this->getFormObjectName());
     }
 
     /**

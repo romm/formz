@@ -14,7 +14,10 @@ class ConditionIsValidValidatorTest extends AbstractUnitTest
      */
     public function validatorWorks()
     {
-        $validator = new ConditionIsValidValidator;
+        /** @var ConditionIsValidValidator $validator */
+        $validator = $this->getMockBuilder(ConditionIsValidValidator::class)
+            ->setMethods(['translateErrorMessage'])
+            ->getMock();
 
         /** @var AbstractActivation|\PHPUnit_Framework_MockObject_MockObject $condition */
         $condition = $this->getMockBuilder(AbstractActivation::class)

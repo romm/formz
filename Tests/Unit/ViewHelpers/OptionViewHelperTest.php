@@ -14,18 +14,17 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelper()
     {
-        /** @var FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject $formService */
-        $formService = $this->getMockBuilder(FieldViewHelperService::class)
+        /** @var FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject $fieldService */
+        $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
             ->setMethods(['setFieldOption'])
             ->getMock();
-        $formService->expects($this->once())
+        $fieldService->expects($this->once())
             ->method('setFieldOption')
             ->with('foo', 'bar');
 
-        $fieldService = new FieldViewHelperService;
         $fieldService->setCurrentField(new Field);
 
-        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $formService);
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
 
         $viewHelper = new OptionViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);

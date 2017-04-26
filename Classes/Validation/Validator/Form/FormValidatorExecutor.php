@@ -22,8 +22,8 @@ use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
-use Romm\Formz\Form\FormObjectFactory;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -43,11 +43,6 @@ class FormValidatorExecutor
      * @var string
      */
     protected $formName;
-
-    /**
-     * @var FormResult
-     */
-    protected $result;
 
     /**
      * @var FormObject
@@ -91,13 +86,11 @@ class FormValidatorExecutor
     /**
      * @param FormInterface $form
      * @param string        $formName
-     * @param FormResult    $result
      */
-    public function __construct(FormInterface $form, $formName, FormResult $result)
+    public function __construct(FormInterface $form, $formName)
     {
         $this->form = $form;
         $this->formName = $formName;
-        $this->result = $result;
     }
 
     /**
@@ -121,7 +114,7 @@ class FormValidatorExecutor
     public function checkFieldsActivation()
     {
         foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
-            if (false === $this->result->fieldIsDeactivated($field)) {
+            if (false === $this->getResult()->fieldIsDeactivated($field)) {
                 $this->checkFieldActivation($field);
             }
         }
@@ -146,7 +139,7 @@ class FormValidatorExecutor
         if (true === $field->hasActivation()
             && false === $this->getFieldActivationProcessResult($field)
         ) {
-            $this->result->deactivateField($field);
+            $this->getResult()->deactivateField($field);
         }
 
         $this->checkFieldValidationActivation($field);
@@ -164,7 +157,7 @@ class FormValidatorExecutor
             if (true === $validation->hasActivation()
                 && false === $this->getValidationActivationProcessResult($validation)
             ) {
-                $this->result->deactivateValidation($validation);
+                $this->getResult()->deactivateValidation($validation);
             }
         }
     }
@@ -190,7 +183,7 @@ class FormValidatorExecutor
 
     /**
      * Will loop on each validation rule and apply it of the field.
-     * Errors are stored in `$this->result`.
+     * Errors are stored in `$this->getResult()`.
      *
      * @param Field $field
      */
@@ -199,12 +192,12 @@ class FormValidatorExecutor
         if (false === $this->fieldWasValidated($field)) {
             $this->checkFieldActivation($field);
 
-            if (false === $this->result->fieldIsDeactivated($field)) {
+            if (false === $this->getResult()->fieldIsDeactivated($field)) {
                 $this->markFieldAsValidated($field);
 
                 // Looping on the field's validation settings...
                 foreach ($field->getValidation() as $validation) {
-                    if ($this->result->validationIsDeactivated($validation)) {
+                    if ($this->getResult()->validationIsDeactivated($validation)) {
                         continue;
                     }
 
@@ -252,7 +245,7 @@ class FormValidatorExecutor
             $this->form->setValidationData($this->validationData);
         }
 
-        $this->result->forProperty($fieldName)->merge($validatorResult);
+        $this->getResult()->forProperty($fieldName)->merge($validatorResult);
         unset($validatorDataObject);
 
         return $validatorResult;
@@ -263,7 +256,7 @@ class FormValidatorExecutor
      */
     public function getResult()
     {
-        return $this->result;
+        return $this->getFormObject()->getFormResult();
     }
 
     /**
@@ -356,7 +349,7 @@ class FormValidatorExecutor
             /** @var FormObjectFactory $formObjectFactory */
             $formObjectFactory = Core::instantiate(FormObjectFactory::class);
 
-            $this->formObject = $formObjectFactory->getInstanceFromFormInstance($this->form, $this->formName);
+            $this->formObject = $formObjectFactory->getInstanceWithFormInstance($this->form, $this->formName);
         }
 
         return $this->formObject;

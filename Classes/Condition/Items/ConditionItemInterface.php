@@ -17,7 +17,7 @@ use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 
 interface ConditionItemInterface
 {

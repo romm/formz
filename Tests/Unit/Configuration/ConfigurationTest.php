@@ -4,12 +4,12 @@ namespace Romm\Formz\Tests\Unit\Configuration;
 use Romm\ConfigurationObject\Service\ServiceFactory;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Exceptions\DuplicateEntryException;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Service\CacheService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Tests\Unit\UnitTestContainer;
 
 class ConfigurationTest extends AbstractUnitTest
 {
-
     /**
      * Checks that the static function `getConfigurationObjectServices` needed
      * by the `configuration_object` API returns a valid class.
@@ -18,6 +18,15 @@ class ConfigurationTest extends AbstractUnitTest
      */
     public function configurationObjectServicesAreValid()
     {
+        $cacheServiceMock = $this->getMockBuilder(CacheService::class)
+            ->setMethods(['getBackendCache'])
+            ->getMock();
+
+        $cacheServiceMock->method('getBackendCache')
+            ->willReturn('foo');
+
+        UnitTestContainer::get()->registerMockedInstance(CacheService::class, $cacheServiceMock);
+
         $serviceFactory = Configuration::getConfigurationObjectServices();
 
         $this->assertInstanceOf(ServiceFactory::class, $serviceFactory);
@@ -32,18 +41,17 @@ class ConfigurationTest extends AbstractUnitTest
      */
     public function formCanBeAdded()
     {
-        $className = \stdClass::class;
-        $name = 'foo';
-
         $configuration = new Configuration();
-        $formObject = new FormObject($className, $name, []);
+        $formObjectStatic = $this->getDefaultFormObjectStatic();
 
-        $this->assertFalse($configuration->hasForm($className, $name));
+        $className = $formObjectStatic->getClassName();
 
-        $configuration->addForm($formObject);
+        $this->assertFalse($configuration->hasForm($className));
 
-        $this->assertTrue($configuration->hasForm($className, $name));
-        $this->assertSame($formObject, $configuration->getForm($className, $name));
+        $configuration->addForm($formObjectStatic);
+
+        $this->assertTrue($configuration->hasForm($className));
+        $this->assertSame($formObjectStatic, $configuration->getForm($className));
 
         unset($configuration);
         unset($formObject);
@@ -57,17 +65,14 @@ class ConfigurationTest extends AbstractUnitTest
      */
     public function addingSameFormTwoTimesThrowsException()
     {
-        $className = \stdClass::class;
-        $name = 'foo';
-
         $configuration = new Configuration();
-        $formObject = new FormObject($className, $name, []);
-        $formObject2 = new FormObject($className, $name, []);
+        $formObjectStatic = $this->getDefaultFormObjectStatic();
+        $formObjectStatic2 = $this->getDefaultFormObjectStatic();
 
         $this->setExpectedException(DuplicateEntryException::class);
 
-        $configuration->addForm($formObject);
-        $configuration->addForm($formObject2);
+        $configuration->addForm($formObjectStatic);
+        $configuration->addForm($formObjectStatic2);
 
         unset($configuration);
         unset($formObject);

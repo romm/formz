@@ -14,13 +14,16 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Configuration\Configuration;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectStatic;
 
 class DuplicateEntryException extends FormzException
 {
     const DUPLICATED_FORM_CONTEXT = 'You can not use a form view helper inside another one.';
 
-    const FORM_WAS_ALREADY_REGISTERED = 'The form "%s" of class "%s" was already registered. You can only register a form once. Check the function `%s::hasForm()`.';
+    const FORM_WAS_ALREADY_REGISTERED = 'The form "%s" was already registered. You can only register a form once. Check the function `%s::hasForm()`.';
+
+    const FORM_INSTANCE_ALREADY_ADDED = 'The form instance was already added for the form object of class "%s". You cannot add it twice.';
 
     /**
      * @code 1465242575
@@ -38,15 +41,32 @@ class DuplicateEntryException extends FormzException
     /**
      * @code 1477255145
      *
-     * @param FormObject $form
+     * @param FormObjectStatic $form
      * @return self
      */
-    final public static function formWasAlreadyRegistered(FormObject $form)
+    final public static function formWasAlreadyRegistered(FormObjectStatic $form)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_WAS_ALREADY_REGISTERED,
-            [$form->getName(), $form->getClassName(), Configuration::class]
+            [$form->getClassName(), Configuration::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1491898212
+     *
+     * @param FormObject $formObject
+     * @return self
+     */
+    final public static function formInstanceAlreadyAdded(FormObject $formObject)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_INSTANCE_ALREADY_ADDED,
+            [$formObject->getClassName()]
         );
 
         return $exception;

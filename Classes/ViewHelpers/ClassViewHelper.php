@@ -190,9 +190,7 @@ class ClassViewHelper extends AbstractViewHelper
         $result = '';
         $formObject = $this->formService->getFormObject();
 
-        if ($formObject->formWasSubmitted()
-            && $formObject->hasFormResult()
-        ) {
+        if ($formObject->formWasSubmitted()) {
             $fieldResult = $formObject->getFormResult()->forProperty($this->fieldName);
             $result = $this->getPropertyResultClass($fieldResult);
         }

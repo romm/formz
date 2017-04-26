@@ -3,7 +3,9 @@ namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
 use Romm\Formz\Error\Error;
-use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectProxy;
+use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -25,11 +27,16 @@ class FormRequestDataJavaScriptAssetHandlerTest extends AbstractUnitTest
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
+        $formObjectMock = $this->getFormObjectMock();
 
-        $assetHandler = new FormRequestDataJavaScriptAssetHandler($assetHandlerFactory);
+        /** @var FormRequestDataJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        $assetHandler = $this->getMockBuilder(FormRequestDataJavaScriptAssetHandler::class)
+            ->setConstructorArgs([$assetHandlerFactory])
+            ->setMethods(['getFormObject'])
+            ->getMock();
 
-        $formObject = $assetHandler->getFormObject();
-        $formObject->markFormAsSubmitted();
+        $assetHandler->method('getFormObject')
+            ->willReturn($formObjectMock);
 
         $originalRequest = new Request;
         $originalRequest->setArgument('foo', ['foo' => 'foo']);
@@ -38,9 +45,9 @@ TXT;
         $request->setOriginalRequest($originalRequest);
 
         $result = new Result;
-        $formResult = new FormResult;
+        $formResult = $formObjectMock->getFormResult();
 
-        $field = $formObject->getDefinition()->getField('foo');
+        $field = $formObjectMock->getDefinition()->getField('foo');
         $formResult->deactivateField($field);
 
         $error = new Error(
@@ -56,8 +63,6 @@ TXT;
         $result->forProperty('foo')
             ->merge($formResult);
 
-        $formObject->setFormResult($formResult);
-
         $request->setOriginalRequestMappingResults($result);
 
         $assetHandlerFactory->getControllerContext()->setRequest($request);
@@ -70,5 +75,25 @@ TXT;
         );
 
         unset($assetHandlerFactory);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|FormObject
+     */
+    protected function getFormObjectMock()
+    {
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObjectMock */
+        $formObjectMock = $this->getMockBuilder(FormObject::class)
+            ->setConstructorArgs(['foo', $this->getDefaultFormObjectStatic()])
+            ->setMethods(['formWasSubmitted', 'getProxy'])
+            ->getMock();
+
+        $formObjectMock->method('formWasSubmitted')
+            ->willReturn(true);
+
+        $formObjectMock->method('getProxy')
+            ->willReturn(new FormObjectProxy($formObjectMock, new DefaultForm));
+
+        return $formObjectMock;
     }
 }

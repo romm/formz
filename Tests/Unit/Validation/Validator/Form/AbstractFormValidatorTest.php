@@ -80,8 +80,11 @@ class AbstractFormValidatorTest extends AbstractUnitTest
             ->disableOriginalConstructor()
             ->getMock();
 
+        $formObject = $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
+
         $formValidatorExecutorMock->method('getFormObject')
-            ->willReturn($this->getDefaultFormObject());
+            ->willReturn($formObject);
 
         $validatorMock->expects($this->once())
             ->method('getFormValidatorExecutor')

@@ -3,7 +3,7 @@ namespace Romm\Formz\Tests\Unit\Condition\Items;
 
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 abstract class AbstractConditionItemUnitTest extends AbstractUnitTest

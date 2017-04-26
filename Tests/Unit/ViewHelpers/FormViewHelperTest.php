@@ -8,20 +8,18 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\ClassNotFoundException;
-use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Service\ControllerService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper;
 use Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
-use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Error\Error;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 use TYPO3\CMS\Fluid\Core\ViewHelper\TagBuilder;
 
 class FormViewHelperTest extends AbstractViewHelperUnitTest
@@ -133,52 +131,14 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
     {
         $form = new DefaultForm;
 
-        $formObject = $this->getMockBuilder(FormObject::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setForm'])
-            ->getMock();
-
-        $formObject->expects($this->once())
-            ->method('setForm')
-            ->with($form);
-
-        $viewHelper = $this->getFormViewHelperMock(['getFormClassName'], $formObject);
+        $viewHelper = $this->getFormViewHelperMock(['getFormClassName']);
 
         $viewHelper->method('getFormClassName')
             ->willReturn(DefaultForm::class);
 
-        $viewHelper->setArguments(['object' => $form]);
-        $viewHelper->initializeArguments();
-        $viewHelper->initialize();
-    }
-
-    /**
-     * The argument `form` given to the view helper should be attached to the
-     * `FormObject` if it is a valid form instance, and the form was not
-     * submitted.
-     *
-     * @test
-     */
-    public function formArgumentIsNotGivenToFormObjectIfFormWasSubmitted()
-    {
-        $form = new DefaultForm;
-
-        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
-        $formObject = $this->getMockBuilder(FormObject::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setForm'])
-            ->getMock();
-
-        $formObject->expects($this->never())
-            ->method('setForm')
+        $viewHelper->expects($this->once())
+            ->method('getFormObject')
             ->with($form);
-
-        $formObject->markFormAsSubmitted();
-
-        $viewHelper = $this->getFormViewHelperMock(['getFormClassName'], $formObject);
-
-        $viewHelper->method('getFormClassName')
-            ->willReturn(DefaultForm::class);
 
         $viewHelper->setArguments(['object' => $form]);
         $viewHelper->initializeArguments();
@@ -193,7 +153,11 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function assetHandlerMethodsAreCalledCorrectly()
     {
-        $viewHelper = $this->getFormViewHelperMock(['getAssetHandlerConnectorManager', 'getFormClassName']);
+        $viewHelper = $this->getFormViewHelperMock(['getAssetHandlerConnectorManager', 'getFormClassName', 'getFormInstance']);
+
+        $viewHelper->method('getFormInstance')
+            ->willReturn(new DefaultForm);
+
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
 
@@ -260,10 +224,15 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
             [
                 'handleDataAttributes',
                 'handleAssets',
-                'getFormClassName'
+                'getFormClassName',
+                'getFormInstance'
             ],
             $formObject
         );
+
+        $viewHelper->method('getFormInstance')
+            ->willReturn(new DefaultForm);
+
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
 
@@ -297,7 +266,6 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
 
         $formObject = $this->getDefaultFormObject();
         $formObject->setForm(new DefaultForm);
-        $formObject->setFormResult(new FormResult);
 
         $formService = new FormViewHelperService;
         $formService->setFormObject($formObject);
@@ -307,10 +275,15 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
                 'addDefaultClass',
                 'handleAssets',
                 'getDataAttributesAssetHandler',
-                'getFormClassName'
+                'getFormClassName',
+                'getFormInstance'
             ],
             $formObject
         );
+
+        $viewHelper->method('getFormInstance')
+            ->willReturn(new DefaultForm);
+
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
         $viewHelper->injectFormService($formService);
@@ -366,10 +339,11 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
             $fieldsMessagesDataAttributes
         );
 
-        $formObject = $this->getDefaultFormObject();
+        $formObject = $this->getDefaultFormObject(function (FormObjectProxy $proxy) {
+            $proxy->markFormAsSubmitted();
+            $proxy->markFormAsValidated();
+        });
         $formObject->setForm(new DefaultForm);
-        $formObject->setFormResult(new FormResult);
-        $formObject->markFormAsSubmitted();
 
         $formService = new FormViewHelperService;
         $formService->setFormObject($formObject);
@@ -379,10 +353,15 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
                 'addDefaultClass',
                 'handleAssets',
                 'getDataAttributesAssetHandler',
-                'getFormClassName'
+                'getFormClassName',
+                'getFormInstance'
             ],
             $formObject
         );
+
+        $viewHelper->method('getFormInstance')
+            ->willReturn(new DefaultForm);
+
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
         $viewHelper->injectFormService($formService);
@@ -441,10 +420,15 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
                 'handleAssets',
                 'getDataAttributesAssetHandler',
                 'getFormClassName',
-                'getFormValidator'
+                'getFormValidator',
+                'getFormInstance'
             ],
             $formObject
         );
+
+        $viewHelper->method('getFormInstance')
+            ->willReturn(new DefaultForm);
+
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
 
@@ -525,34 +509,9 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
     {
         $viewHelper = $this->getFormViewHelperMock(['getFormClassNameFromControllerAction']);
 
-        $viewHelper->expects($this->once())
+        $viewHelper->expects($this->atLeastOnce())
             ->method('getFormClassNameFromControllerAction')
             ->willReturn(DefaultForm::class);
-
-        $viewHelper->initialize();
-    }
-
-    /**
-     * If the form name is not found in the arguments list of the controller
-     * action, an exception must be thrown.
-     *
-     * @test
-     */
-    public function formNameNotFoundInControllerActionArgumentsThrowsException()
-    {
-        $this->setExpectedException(EntryNotFoundException::class);
-
-        $reflectionServiceMock = $this->getMockBuilder(ReflectionService::class)
-            ->setMethods(['getMethodParameters'])
-            ->getMock();
-
-        $reflectionServiceMock->expects($this->once())
-            ->method('getMethodParameters')
-            ->willReturn([]);
-
-        UnitTestContainer::get()->registerMockedInstance(ReflectionService::class, $reflectionServiceMock);
-
-        $viewHelper = $this->getFormViewHelperMock();
 
         $viewHelper->initialize();
     }
@@ -572,10 +531,14 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
             [
                 'renderForm',
                 'getFormClassName',
-                'getErrorText'
+                'getErrorText',
+                'getFormInstance'
             ],
             $formObject
         );
+
+        $viewHelper->method('getFormInstance')
+            ->willReturn(new DefaultForm);
 
         $viewHelper->expects($this->once())
             ->method('getErrorText');

@@ -22,8 +22,8 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\DefaultConfigurationObje
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Exceptions\DuplicateEntryException;
-use Romm\Formz\Form\Definition\FormDefinition;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Form\FormObject\FormObjectStatic;
 use Romm\Formz\Service\CacheService as InternalCacheService;
 use Romm\Formz\Service\HashService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -39,7 +39,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     protected $settings;
 
     /**
-     * @var FormObject[]
+     * @var FormObjectStatic[]
      */
     protected $forms = [];
 
@@ -92,40 +92,41 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      * function will also handle the parent service from the
      * `configuration_object` extension.
      *
-     * @param FormObject $form
+     * @param FormObjectStatic $form
      * @throws DuplicateEntryException
      */
-    public function addForm(FormObject $form)
+    public function addForm(FormObjectStatic $form)
     {
-        if (true === $this->hasForm($form->getClassName(), $form->getName())) {
+        if (true === $this->hasForm($form->getClassName())) {
             throw DuplicateEntryException::formWasAlreadyRegistered($form);
         }
 
         $form->getDefinition()->setParents([$this]);
 
-        $this->forms[$form->getClassName()][$form->getName()] = $form;
+        $this->forms[$form->getClassName()] = $form;
     }
 
     /**
      * @param string $className
-     * @param string $name
      * @return bool
      */
-    public function hasForm($className, $name)
+    public function hasForm($className)
     {
-        return true === isset($this->forms[$className][$name]);
+        return true === isset($this->forms[$className]);
     }
 
     /**
      * @param string $className
-     * @param string $name
-     * @return null|FormDefinition
+     * @return FormObjectStatic
+     * @throws EntryNotFoundException
      */
-    public function getForm($className, $name)
+    public function getForm($className)
     {
-        return ($this->hasForm($className, $name))
-            ? $this->forms[$className][$name]
-            : null;
+        if (false === $this->hasForm($className)) {
+            throw EntryNotFoundException::formConfigurationNotFound();
+        }
+
+        return $this->forms[$className];
     }
 
     /**

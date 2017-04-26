@@ -3,7 +3,7 @@ namespace Romm\Formz\Tests\Unit\Validation\Validator;
 
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;

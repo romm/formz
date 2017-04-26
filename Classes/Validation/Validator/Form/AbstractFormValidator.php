@@ -18,6 +18,7 @@ use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\FormService;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 
@@ -104,8 +105,8 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         }
 
         $this->form = $form;
-        $this->result = new FormResult;
         $this->formValidatorExecutor = $this->getFormValidatorExecutor($form);
+        $this->result = $this->formValidatorExecutor->getFormObject()->getFormResult();
     }
 
     /**
@@ -119,13 +120,11 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     {
         $this->initializeValidator($form);
 
-        $formObject = $this->formValidatorExecutor->getFormObject();
-        $formObject->markFormAsSubmitted();
-        $formObject->setForm($form);
+        $proxy = FormObjectFactory::get()->getProxy($form);
+        $proxy->markFormAsValidated();
+        $proxy->markFormAsSubmitted();
 
         $this->validateGhost($form, false);
-
-        $formObject->setFormResult($this->result);
 
         return $this->result;
     }
@@ -215,7 +214,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected function getFormValidatorExecutor(FormInterface $form)
     {
         /** @var FormValidatorExecutor $formValidatorExecutor */
-        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $form, $this->options['name'], $this->result);
+        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $form, $this->options['name']);
 
         return $formValidatorExecutor;
     }

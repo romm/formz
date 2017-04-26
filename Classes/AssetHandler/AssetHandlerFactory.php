@@ -15,7 +15,7 @@ namespace Romm\Formz\AssetHandler;
 
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Form\FormObject;
+use Romm\Formz\Form\FormObject\FormObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
