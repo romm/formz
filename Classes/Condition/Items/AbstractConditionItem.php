@@ -81,9 +81,9 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     protected $conditionNode;
 
     /**
-     * @var bool
+     * @var bool|InvalidConditionException
      */
-    private $configurationWasValidated = false;
+    private $configurationValidationResult;
 
     /**
      * Will launch the condition validation: the child class must implement
@@ -91,13 +91,22 @@ abstract class AbstractConditionItem implements ConditionItemInterface
      * can be considered as valid.
      *
      * @param FormDefinition $formDefinition
+     * @throws InvalidConditionException
      */
     final public function validateConditionConfiguration(FormDefinition $formDefinition)
     {
-        if (false === $this->configurationWasValidated) {
-            $this->configurationWasValidated = true;
+        if (null === $this->configurationValidationResult) {
+            $this->configurationValidationResult = true;
 
-            $this->checkConditionConfiguration($formDefinition);
+            try {
+                $this->checkConditionConfiguration($formDefinition);
+            } catch (InvalidConditionException $exception) {
+                $this->configurationValidationResult = $exception;
+            }
+        }
+
+        if ($this->configurationValidationResult instanceof InvalidConditionException) {
+            throw $this->configurationValidationResult;
         }
     }
 

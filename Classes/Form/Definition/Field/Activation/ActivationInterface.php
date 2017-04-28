@@ -43,6 +43,14 @@ interface ActivationInterface
     public function getConditions();
 
     /**
+     * Returns the condition items merged list of the activation, and its
+     * parents.
+     *
+     * @return ConditionItemInterface[]
+     */
+    public function getAllConditions();
+
+    /**
      * Returns true if the given item exists.
      *
      * @param string $name Name of the item.

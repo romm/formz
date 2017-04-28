@@ -60,11 +60,19 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     }
 
     /**
+     * @return ConditionItemInterface[]
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    /**
      * Will merge the conditions with the condition list of the parent form.
      *
      * @return ConditionItemInterface[]
      */
-    public function getConditions()
+    public function getAllConditions()
     {
         $conditionList = $this->withFirstParent(
             FormDefinition::class,
@@ -85,7 +93,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
      */
     public function hasCondition($name)
     {
-        $conditions = $this->getConditions();
+        $conditions = $this->getAllConditions();
 
         return true === isset($conditions[$name]);
     }
@@ -103,7 +111,7 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
             throw EntryNotFoundException::activationConditionNotFound($name);
         }
 
-        $items = $this->getConditions();
+        $items = $this->getAllConditions();
 
         return $items[$name];
     }

@@ -14,8 +14,10 @@
 namespace Romm\Formz\Form\FormObject\Service;
 
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
+use Romm\Formz\Validation\Validator\Internal\FormDefinitionValidator;
 use TYPO3\CMS\Extbase\Error\Result;
 
 class FormObjectConfiguration
@@ -68,17 +70,25 @@ class FormObjectConfiguration
      */
     protected function getMergedValidationResult()
     {
-        $globalConfigurationValidationResult = $this->getGlobalConfigurationValidationResult();
-
         $result = new Result;
-        $result->merge($globalConfigurationValidationResult);
+        $formPropertyName = 'forms.' . $this->static->getClassName();
 
-        $propertyName = 'forms.' . $this->static->getClassName();
-        $formValidationResult = $this->definition->getValidationResult();
-
-        $result->forProperty($propertyName)->merge($formValidationResult);
+        $result->merge($this->getGlobalConfigurationValidationResult());
+        $result->forProperty($formPropertyName)->merge($this->definition->getValidationResult());
+        $result->forProperty($formPropertyName)->merge($this->getFormDefinitionValidationResult());
 
         return $result;
+    }
+
+    /**
+     * @return Result
+     */
+    protected function getFormDefinitionValidationResult()
+    {
+        /** @var FormDefinitionValidator $formDefinitionValidator */
+        $formDefinitionValidator = Core::instantiate(FormDefinitionValidator::class);
+
+        return $formDefinitionValidator->validate($this->definition->getObject(true));
     }
 
     /**

@@ -12,6 +12,7 @@ use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use TYPO3\CMS\Extbase\Error\Result;
 
 class FormObjectFactoryTest extends AbstractUnitTest
 {
@@ -261,9 +262,15 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     protected function getDummyFormObjectStaticInstance()
     {
-        return $this->getMockBuilder(FormObjectStatic::class)
+        $static = $this->getMockBuilder(FormObjectStatic::class)
+            ->setMethods(['getDefinitionValidationResult'])
             ->disableOriginalConstructor()
             ->getMock();
+
+        $static->method('getDefinitionValidationResult')
+            ->willReturn(new Result);
+
+        return $static;
     }
 
     /**

@@ -28,7 +28,7 @@ class ActivationTest extends AbstractUnitTest
     {
         $activation = new Activation;
 
-        /** @var ActivationUsageInterface $conditionItem */
+        /** @var ActivationUsageInterface $rootObject */
         $rootObject = $this->getMockBuilder(ActivationUsageInterface::class)
             ->getMockForAbstractClass();
 
@@ -99,7 +99,7 @@ class ActivationTest extends AbstractUnitTest
                 'foo' => $condition1,
                 'bar' => $condition2
             ],
-            $activation->getConditions()
+            $activation->getAllConditions()
         );
     }
 
@@ -131,7 +131,7 @@ class ActivationTest extends AbstractUnitTest
 
         $this->assertSame(
             ['foo' => $condition2],
-            $activation->getConditions()
+            $activation->getAllConditions()
         );
     }
 }

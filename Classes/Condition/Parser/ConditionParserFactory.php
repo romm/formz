@@ -45,7 +45,7 @@ class ConditionParserFactory implements SingletonInterface
         $hash = 'condition-tree-' .
             HashService::get()->getHash(serialize([
                 $activation->getExpression(),
-                $activation->getConditions()
+                $activation->getAllConditions()
             ]));
 
         if (false === array_key_exists($hash, $this->trees)) {
