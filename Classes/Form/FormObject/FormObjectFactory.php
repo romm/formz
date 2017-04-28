@@ -133,7 +133,9 @@ class FormObjectFactory implements SingletonInterface
                 $static = $this->buildStaticInstance($className);
                 $static->getObjectHash();
 
-                $cacheInstance->set($cacheIdentifier, $static);
+                if (false === $static->getDefinitionValidationResult()->hasErrors()) {
+                    $cacheInstance->set($cacheIdentifier, $static);
+                }
             }
 
             $this->addToGlobalConfiguration($static);
