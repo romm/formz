@@ -18,7 +18,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
         /** @var FieldIsValidCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldIsValidCondition::class, 1488183577);
         $conditionItem->setFieldName('baz');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**
@@ -29,7 +29,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
         /** @var FieldIsValidCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldIsValidCondition::class);
         $conditionItem->setFieldName('foo');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**

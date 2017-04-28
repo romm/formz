@@ -17,6 +17,7 @@ use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 
 interface ConditionItemInterface
@@ -40,10 +41,16 @@ interface ConditionItemInterface
     public function attachConditionNode(ConditionNode $conditionNode);
 
     /**
+     * Checks the condition configuration/options.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
+     * @param FormDefinition $formDefinition
+     * @return void
      * @throws InvalidConditionException
-     * @return bool
      */
-    public function validateConditionConfiguration();
+    public function validateConditionConfiguration(FormDefinition $formDefinition);
 
     /**
      * @return string

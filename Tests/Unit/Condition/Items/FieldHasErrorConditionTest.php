@@ -19,7 +19,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         /** @var FieldHasErrorCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldHasErrorCondition::class, 1488192037);
         $conditionItem->setFieldName('baz');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**
@@ -31,7 +31,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldHasErrorCondition::class, 1488192055);
         $conditionItem->setFieldName('foo');
         $conditionItem->setValidationName('baz');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**
@@ -48,7 +48,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
         $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldHasErrorCondition::class, $formObject);
         $conditionItem->setFieldName('foo');
         $conditionItem->setValidationName('bar');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($formObject->getDefinition());
     }
 
     /**

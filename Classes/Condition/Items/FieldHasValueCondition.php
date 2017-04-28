@@ -16,6 +16,7 @@ namespace Romm\Formz\Condition\Items;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Form\Definition\FormDefinition;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
@@ -80,18 +81,18 @@ class FieldHasValueCondition extends AbstractConditionItem
     }
 
     /**
-     * @see validateConditionConfiguration()
+     * Checks the condition configuration/options.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
+     * @param FormDefinition $formDefinition
      * @throws InvalidConditionException
-     * @return bool
      */
-    protected function checkConditionConfiguration()
+    protected function checkConditionConfiguration(FormDefinition $formDefinition)
     {
-        $configuration = $this->formObject->getDefinition();
-
-        if (false === $configuration->hasField($this->fieldName)) {
+        if (false === $formDefinition->hasField($this->fieldName)) {
             throw InvalidConditionException::conditionFieldHasValueFieldNotFound($this->fieldName);
         }
-
-        return true;
     }
 }

@@ -17,6 +17,7 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\FormzMessageInterface;
+use Romm\Formz\Form\Definition\FormDefinition;
 
 /**
  * This condition will match when a field is does have a specific error.
@@ -102,22 +103,22 @@ class FieldHasErrorCondition extends AbstractConditionItem
     }
 
     /**
-     * @see validateConditionConfiguration()
+     * Checks the condition configuration/options.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
+     * @param FormDefinition $formDefinition
      * @throws InvalidConditionException
-     * @return bool
      */
-    protected function checkConditionConfiguration()
+    protected function checkConditionConfiguration(FormDefinition $formDefinition)
     {
-        $configuration = $this->formObject->getDefinition();
-
-        if (false === $configuration->hasField($this->fieldName)) {
+        if (false === $formDefinition->hasField($this->fieldName)) {
             throw InvalidConditionException::conditionFieldHasErrorFieldNotFound($this->fieldName);
         }
 
-        if (false === $configuration->getField($this->fieldName)->hasValidation($this->validationName)) {
+        if (false === $formDefinition->getField($this->fieldName)->hasValidation($this->validationName)) {
             throw InvalidConditionException::conditionFieldHasErrorValidationNotFound($this->validationName, $this->fieldName);
         }
-
-        return true;
     }
 }

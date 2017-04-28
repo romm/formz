@@ -11,49 +11,34 @@ abstract class AbstractConditionItemUnitTest extends AbstractUnitTest
     /**
      * @param $className
      * @param $errorCode
-     * @return ConditionItemInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConditionItemInterface
      */
     protected function getConditionItemWithFailedConfigurationValidation($className, $errorCode)
     {
-        $conditionItem = $this->getConditionItem($className);
+        $this->setExpectedException(InvalidConditionException::class, '', $errorCode);
 
-        $conditionItem->expects($this->once())
-            ->method('throwInvalidConditionException')
-            ->willReturnCallback(function ($exception) use ($errorCode) {
-                /** @var InvalidConditionException $exception */
-                $this->assertInstanceOf(InvalidConditionException::class, $exception);
-                $this->assertEquals($errorCode, $exception->getCode());
-            });
-
-        return $conditionItem;
+        return $this->getConditionItem($className);
     }
 
     /**
      * @param string     $className
      * @param FormObject $formObject
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConditionItemInterface
+     * @return ConditionItemInterface
      */
     protected function getConditionItemWithValidConfigurationValidation($className, FormObject $formObject = null)
     {
-        $conditionItem = $this->getConditionItem($className, $formObject);
-
-        $conditionItem->expects($this->never())
-            ->method('throwInvalidConditionException');
-
-        return $conditionItem;
+        return $this->getConditionItem($className, $formObject);
     }
 
     /**
      * @param string     $className
      * @param FormObject $formObject
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConditionItemInterface
+     * @return ConditionItemInterface
      */
     private function getConditionItem($className, FormObject $formObject = null)
     {
-        /** @var ConditionItemInterface|\PHPUnit_Framework_MockObject_MockObject $conditionItem */
-        $conditionItem = $this->getMockBuilder($className)
-            ->setMethods(['throwInvalidConditionException'])
-            ->getMock();
+        /** @var ConditionItemInterface $conditionItem */
+        $conditionItem = new $className;
 
         $formObject = $formObject ?: $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);

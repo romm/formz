@@ -13,10 +13,15 @@
 
 namespace Romm\Formz\Condition\Parser\Node;
 
+use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\FormObject\FormObject;
 
 /**
  * A condition node, which contains an instance of `ConditionItemInterface`.
@@ -32,6 +37,16 @@ class ConditionNode extends AbstractNode implements ActivationDependencyAwareInt
      * @var ConditionItemInterface
      */
     protected $condition;
+
+    /**
+     * @var FormObject
+     */
+    protected $formObject;
+
+    /**
+     * @var ActivationInterface
+     */
+    protected $activation;
 
     /**
      * Constructor, which needs a name for the condition and an instance of a
@@ -52,7 +67,10 @@ class ConditionNode extends AbstractNode implements ActivationDependencyAwareInt
      */
     public function injectDependencies(ConditionProcessor $processor, ActivationInterface $activation)
     {
-        $this->condition->attachFormObject($processor->getFormObject());
+        $this->formObject = $processor->getFormObject();
+        $this->activation = $activation;
+
+        $this->condition->attachFormObject($this->formObject);
         $this->condition->attachActivation($activation);
         $this->condition->attachConditionNode($this);
     }
@@ -78,9 +96,44 @@ class ConditionNode extends AbstractNode implements ActivationDependencyAwareInt
      */
     public function getPhpResult(PhpConditionDataObject $dataObject)
     {
-        $this->condition->validateConditionConfiguration();
+        $this->checkConditionConfiguration();
 
         return $this->condition->getPhpResult($dataObject);
+    }
+
+    /**
+     * Validates the configuration of the condition instance.
+     *
+     * @see \Romm\Formz\Condition\Items\ConditionItemInterface::validateConditionConfiguration
+     */
+    protected function checkConditionConfiguration()
+    {
+        try {
+            $definition = $this->getFormObject()->getDefinition();
+
+            $this->condition->validateConditionConfiguration($definition);
+        } catch (InvalidConditionException $exception) {
+            $this->throwInvalidConditionException($exception);
+        }
+    }
+
+    /**
+     * @param InvalidConditionException $exception
+     * @throws InvalidConditionException
+     */
+    protected function throwInvalidConditionException(InvalidConditionException $exception)
+    {
+        $rootObject = $this->getRootObject();
+        $conditionName = $this->getConditionName();
+        $formClassName = $this->getFormObject()->getClassName();
+
+        if ($rootObject instanceof Field) {
+            throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        } elseif ($rootObject instanceof Validation) {
+            throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
+        } else {
+            throw $exception;
+        }
     }
 
     /**
@@ -97,5 +150,31 @@ class ConditionNode extends AbstractNode implements ActivationDependencyAwareInt
     public function getCondition()
     {
         return $this->condition;
+    }
+
+    public function __sleep()
+    {
+        $properties = get_object_vars($this);
+
+        unset($properties['formObject']);
+        unset($properties['activation']);
+
+        return array_keys($properties);
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getFormObject()
+    {
+        return $this->formObject;
+    }
+
+    /**
+     * @return ActivationUsageInterface
+     */
+    protected function getRootObject()
+    {
+        return $this->activation->getRootObject();
     }
 }

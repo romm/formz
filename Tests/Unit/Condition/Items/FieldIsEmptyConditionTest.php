@@ -16,7 +16,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
         /** @var FieldIsEmptyCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldIsEmptyCondition::class, 1488191994);
         $conditionItem->setFieldName('baz');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**
@@ -27,7 +27,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
         /** @var FieldIsEmptyCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldIsEmptyCondition::class);
         $conditionItem->setFieldName('foo');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**

@@ -16,7 +16,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
         /** @var FieldHasValueCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldHasValueCondition::class, 1488192031);
         $conditionItem->setFieldName('baz');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**
@@ -27,7 +27,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
         /** @var FieldHasValueCondition $conditionItem */
         $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldHasValueCondition::class);
         $conditionItem->setFieldName('foo');
-        $conditionItem->validateConditionConfiguration();
+        $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
     /**

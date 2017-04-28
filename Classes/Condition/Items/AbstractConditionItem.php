@@ -17,8 +17,7 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
-use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ArrayService;
 
@@ -82,34 +81,36 @@ abstract class AbstractConditionItem implements ConditionItemInterface
     protected $conditionNode;
 
     /**
-     * Will launch the condition validation: the child class should implement
+     * @var bool
+     */
+    private $configurationWasValidated = false;
+
+    /**
+     * Will launch the condition validation: the child class must implement
      * the function `checkConditionConfiguration()` and check if the condition
      * can be considered as valid.
+     *
+     * @param FormDefinition $formDefinition
+     */
+    final public function validateConditionConfiguration(FormDefinition $formDefinition)
+    {
+        if (false === $this->configurationWasValidated) {
+            $this->configurationWasValidated = true;
+
+            $this->checkConditionConfiguration($formDefinition);
+        }
+    }
+
+    /**
+     * Checks the condition configuration/options.
      *
      * If any syntax/configuration error is found, an exception of type
      * `InvalidConditionException` must be thrown.
      *
+     * @param FormDefinition $formDefinition
      * @throws InvalidConditionException
-     * @return bool
      */
-    final public function validateConditionConfiguration()
-    {
-        try {
-            $this->checkConditionConfiguration();
-        } catch (InvalidConditionException $exception) {
-            $this->throwInvalidConditionException($exception);
-        }
-
-        return true;
-    }
-
-    /**
-     * @see validateConditionConfiguration()
-     *
-     * @throws InvalidConditionException
-     * @return bool
-     */
-    abstract protected function checkConditionConfiguration();
+    abstract protected function checkConditionConfiguration(FormDefinition $formDefinition);
 
     /**
      * Returns a generic JavaScript code which uses FormZ API to validate a
@@ -135,23 +136,6 @@ JS;
     public function getJavaScriptFiles()
     {
         return static::$javaScriptFiles;
-    }
-
-    /**
-     * @param InvalidConditionException $exception
-     * @throws InvalidConditionException
-     */
-    protected function throwInvalidConditionException(InvalidConditionException $exception)
-    {
-        $rootObject = $this->activation->getRootObject();
-        $conditionName = $this->conditionNode->getConditionName();
-        $formClassName = $this->formObject->getClassName();
-
-        if ($rootObject instanceof Field) {
-            throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-        } elseif ($rootObject instanceof Validation) {
-            throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-        }
     }
 
     /**
@@ -184,6 +168,7 @@ JS;
     public function __sleep()
     {
         $properties = get_object_vars($this);
+
         unset($properties['formObject']);
         unset($properties['activation']);
         unset($properties['conditionNode']);
