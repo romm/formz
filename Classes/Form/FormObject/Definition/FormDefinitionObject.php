@@ -20,10 +20,23 @@ use TYPO3\CMS\Extbase\Error\Result;
 class FormDefinitionObject extends ConfigurationObjectInstance
 {
     /**
+     * @var FormDefinition
+     */
+    protected $object;
+
+    /**
      * @param FormDefinition $objectInstance
      */
     public function __construct(FormDefinition $objectInstance)
     {
         parent::__construct($objectInstance, new Result);
+    }
+
+    /**
+     * @return FormDefinition
+     */
+    public function getDefinition()
+    {
+        return $this->object;
     }
 }

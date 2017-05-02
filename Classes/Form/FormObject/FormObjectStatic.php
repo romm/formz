@@ -66,10 +66,7 @@ class FormObjectStatic
      */
     public function getDefinition()
     {
-        /** @var FormDefinition $configuration */
-        $configuration = $this->definition->getObject(true);
-
-        return $configuration;
+        return $this->definition->getDefinition();
     }
 
     /**

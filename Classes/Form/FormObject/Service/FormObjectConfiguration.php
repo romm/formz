@@ -88,7 +88,7 @@ class FormObjectConfiguration
         /** @var FormDefinitionValidator $formDefinitionValidator */
         $formDefinitionValidator = Core::instantiate(FormDefinitionValidator::class);
 
-        return $formDefinitionValidator->validate($this->definition->getObject(true));
+        return $formDefinitionValidator->validate($this->definition->getDefinition());
     }
 
     /**

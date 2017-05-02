@@ -52,6 +52,8 @@ abstract class AbstractFormObjectBuilder implements FormObjectBuilderInterface
 
         $this->process();
 
+        $formDefinitionObject->getDefinition();
+
         return $this->static;
     }
 

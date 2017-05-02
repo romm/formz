@@ -41,11 +41,11 @@ class FormObjectStaticTest extends AbstractUnitTest
         /** @var FormDefinitionObject|\PHPUnit_Framework_MockObject_MockObject $formDefinitionObject */
         $formDefinitionObject = $this->getMockBuilder(FormDefinitionObject::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getObject'])
+            ->setMethods(['getDefinition'])
             ->getMock();
 
         $formDefinitionObject->expects($this->once())
-            ->method('getObject')
+            ->method('getDefinition')
             ->willReturn($formDefinition);
 
         $static = new FormObjectStatic(DefaultForm::class, $formDefinitionObject);
