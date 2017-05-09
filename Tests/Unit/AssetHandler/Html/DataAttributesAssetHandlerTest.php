@@ -40,6 +40,39 @@ class DataAttributesAssetHandlerTest extends AbstractUnitTest
     }
 
     /**
+     * When a field has been deactivated (in the form result that is given to
+     * the function for fields values data attributes), the data attributes for
+     * this very field are removed.
+     *
+     * @test
+     */
+    public function deactivatedFieldValuesDataAttributesAreNotAdded()
+    {
+        $expectedResult = [
+            DataAttributesAssetHandler::getFieldDataValueKey('foo') => 'foo'
+        ];
+
+        $assetHandlerFactory = $this->getAssetHandlerFactoryInstance(true);
+
+        /** @var ExtendedForm $form */
+        $form = $assetHandlerFactory->getFormObject()->getForm();
+        $form->setFoo('foo');
+        $form->setBar(['john', 'doe']);
+
+        $dataAttributesValuesAssetHandler = new DataAttributesAssetHandler($assetHandlerFactory);
+
+        $formResult = new FormResult;
+        $barField = $assetHandlerFactory->getFormObject()->getDefinition()->getField('bar');
+        $formResult->deactivateField($barField);
+
+        $dataAttributesValues = $dataAttributesValuesAssetHandler->getFieldsValuesDataAttributes($formResult);
+
+        $this->assertEquals($expectedResult, $dataAttributesValues);
+
+        unset($assetHandlerFactory);
+    }
+
+    /**
      * Checks that the field error data attributes are valid.
      *
      * @param array $expectedResult

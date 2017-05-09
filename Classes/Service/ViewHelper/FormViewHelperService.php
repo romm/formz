@@ -13,9 +13,12 @@
 
 namespace Romm\Formz\Service\ViewHelper;
 
+use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -67,6 +70,16 @@ class FormViewHelperService implements SingletonInterface
     }
 
     /**
+     * Returns `true` if the `FormViewHelper` context exists.
+     *
+     * @return bool
+     */
+    public function formContextExists()
+    {
+        return $this->formContext;
+    }
+
+    /**
      * Will loop on the submitted form fields and apply behaviours if their
      * configuration contains.
      *
@@ -98,13 +111,55 @@ class FormViewHelperService implements SingletonInterface
     }
 
     /**
-     * Returns `true` if the `FormViewHelper` context exists.
+     * Fetches all data attributes that are bound to the form: fields values,
+     * validation result and others.
      *
-     * @return bool
+     * @param DataAttributesAssetHandler $dataAttributesAssetHandler
+     * @return array
      */
-    public function formContextExists()
+    public function getDataAttributes(DataAttributesAssetHandler $dataAttributesAssetHandler)
     {
-        return $this->formContext;
+        $dataAttributes = [];
+
+        if ($this->formObject->hasForm()) {
+            /*
+             * Getting the data attributes for the form values. It is needed to
+             * have a validation result because a field can be deactivated (in
+             * that case, the data attribute for this field is removed).
+             */
+            if (false === $this->formObject->formWasValidated()) {
+                $form = $this->formObject->getForm();
+                $formValidator = $this->getFormValidator($this->formObject->getName());
+                $formResult = $formValidator->validateGhost($form);
+            } else {
+                $formResult = $this->formObject->getFormResult();
+            }
+
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($formResult);
+        }
+
+        if (true === $this->formObject->formWasSubmitted()) {
+            $dataAttributes += $dataAttributesAssetHandler->getFieldSubmissionDoneDataAttribute();
+        }
+
+        if (true === $this->formObject->formWasValidated()) {
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes();
+            $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
+        }
+
+        return $dataAttributes;
+    }
+
+    /**
+     * @param string $formName
+     * @return DefaultFormValidator
+     */
+    protected function getFormValidator($formName)
+    {
+        /** @var DefaultFormValidator $validation */
+        $validation = Core::instantiate(DefaultFormValidator::class, ['name' => $formName]);
+
+        return $validation;
     }
 
     /**

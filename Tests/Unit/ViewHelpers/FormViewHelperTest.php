@@ -5,19 +5,15 @@ use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Connector\CssAssetHandlerConnector;
 use Romm\Formz\AssetHandler\Connector\JavaScriptAssetHandlerConnector;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
-use Romm\Formz\Core\Core;
-use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Service\ControllerService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper;
 use Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
-use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Fluid\Core\ViewHelper\TagBuilder;
@@ -261,14 +257,10 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function fieldsValuesDataAttributesAreAdded()
     {
-        $fieldsValuesDataAttributes = ['data-attributes-values' => 'foo'];
-        $mergedDataAttributes = array_merge($fieldsValuesDataAttributes);
+        $dataAttributes = ['foo' => 'bar'];
 
         $formObject = $this->getDefaultFormObject();
         $formObject->setForm(new DefaultForm);
-
-        $formService = new FormViewHelperService;
-        $formService->setFormObject($formObject);
 
         $viewHelper = $this->getFormViewHelperMock(
             [
@@ -281,12 +273,11 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
             $formObject
         );
 
+        $viewHelper->method('getDataAttributesAssetHandler')
+            ->willReturn($this->prophesize(DataAttributesAssetHandler::class)->reveal());
+
         $viewHelper->method('getFormInstance')
             ->willReturn(new DefaultForm);
-
-        $viewHelper->initializeArguments();
-        $viewHelper->initialize();
-        $viewHelper->injectFormService($formService);
 
         $tagBuilder = $this->getMockBuilder(TagBuilder::class)
             ->setMethods(['addAttributes'])
@@ -295,175 +286,20 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
 
         $tagBuilder->expects($this->exactly(1))
             ->method('addAttributes')
-            ->with($mergedDataAttributes);
+            ->with($dataAttributes);
 
-        $viewHelper->expects($this->once())
-            ->method('getDataAttributesAssetHandler')
-            ->willReturnCallback(function () use ($fieldsValuesDataAttributes) {
-                $assetHandlerMock = $this->getMockBuilder(DataAttributesAssetHandler::class)
-                    ->disableOriginalConstructor()
-                    ->setMethods(['getFieldsValuesDataAttributes', 'getFieldsValidDataAttributes', 'getFieldsMessagesDataAttributes'])
-                    ->getMock();
+        /** @var FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject $formService */
+        $formService = $this->getMockBuilder(FormViewHelperService::class)
+            ->setMethods(['applyBehavioursOnSubmittedForm', 'getDataAttributes'])
+            ->getMock();
 
-                $assetHandlerMock->expects($this->once())
-                    ->method('getFieldsValuesDataAttributes')
-                    ->willReturn($fieldsValuesDataAttributes);
-
-                $assetHandlerMock->expects($this->never())
-                    ->method('getFieldsValidDataAttributes');
-
-                $assetHandlerMock->expects($this->never())
-                    ->method('getFieldsMessagesDataAttributes');
-
-                return $assetHandlerMock;
-            });
-
-        $viewHelper->render();
-    }
-
-    /**
-     * Checks that all data attributes that can be added for a field are added
-     * to the form HTML tag.
-     *
-     * @test
-     */
-    public function fieldsAllDataAttributesAreAdded()
-    {
-        $fieldsValuesDataAttributes = ['data-attributes-values' => 'foo'];
-        $fieldsValidDataAttributes = ['data-attributes-valid' => 'foo'];
-        $fieldsMessagesDataAttributes = ['data-attributes-messages' => 'foo'];
-        $mergedDataAttributes = array_merge(
-            $fieldsValuesDataAttributes,
-            [DataAttributesAssetHandler::getFieldSubmissionDone() => '1'],
-            $fieldsValidDataAttributes,
-            $fieldsMessagesDataAttributes
-        );
-
-        $formObject = $this->getDefaultFormObject(function (FormObjectProxy $proxy) {
-            $proxy->markFormAsSubmitted();
-            $proxy->markFormAsValidated();
-        });
-        $formObject->setForm(new DefaultForm);
-
-        $formService = new FormViewHelperService;
-        $formService->setFormObject($formObject);
-
-        $viewHelper = $this->getFormViewHelperMock(
-            [
-                'addDefaultClass',
-                'handleAssets',
-                'getDataAttributesAssetHandler',
-                'getFormClassName',
-                'getFormInstance'
-            ],
-            $formObject
-        );
-
-        $viewHelper->method('getFormInstance')
-            ->willReturn(new DefaultForm);
+        $formService->expects($this->once())
+            ->method('getDataAttributes')
+            ->willReturn($dataAttributes);
 
         $viewHelper->initializeArguments();
         $viewHelper->initialize();
         $viewHelper->injectFormService($formService);
-
-        $tagBuilder = $this->getMockBuilder(TagBuilder::class)
-            ->setMethods(['addAttributes'])
-            ->getMock();
-        $this->inject($viewHelper, 'tag', $tagBuilder);
-
-        $tagBuilder->expects($this->exactly(1))
-            ->method('addAttributes')
-            ->with($mergedDataAttributes);
-
-        $viewHelper->expects($this->once())
-            ->method('getDataAttributesAssetHandler')
-            ->willReturnCallback(function () use ($fieldsValuesDataAttributes, $fieldsValidDataAttributes, $fieldsMessagesDataAttributes) {
-                $assetHandlerMock = $this->getMockBuilder(DataAttributesAssetHandler::class)
-                    ->disableOriginalConstructor()
-                    ->setMethods(['getFieldsValuesDataAttributes', 'getFieldsValidDataAttributes', 'getFieldsMessagesDataAttributes'])
-                    ->getMock();
-
-                $assetHandlerMock->expects($this->once())
-                    ->method('getFieldsValuesDataAttributes')
-                    ->willReturn($fieldsValuesDataAttributes);
-
-                $assetHandlerMock->expects($this->once())
-                    ->method('getFieldsValidDataAttributes')
-                    ->willReturn($fieldsValidDataAttributes);
-
-                $assetHandlerMock->expects($this->once())
-                    ->method('getFieldsMessagesDataAttributes')
-                    ->willReturn($fieldsMessagesDataAttributes);
-
-                return $assetHandlerMock;
-            });
-
-        $viewHelper->render();
-    }
-
-    /**
-     * If a form instance if given to the `FormObject` (mostly with the `object`
-     * argument of the `FormViewHelper`), and if there is no validation result
-     * for the form, a temporary result is fetched to be given to the data
-     * attributes asset handler managing the fields values.
-     *
-     * @test
-     */
-    public function temporaryFormValidationResultIsFetchedForFieldsValuesDataAttributes()
-    {
-        $formObject = $this->getDefaultFormObject();
-        $formObject->setForm(new DefaultForm);
-
-        $viewHelper = $this->getFormViewHelperMock(
-            [
-                'addDefaultClass',
-                'handleAssets',
-                'getDataAttributesAssetHandler',
-                'getFormClassName',
-                'getFormValidator',
-                'getFormInstance'
-            ],
-            $formObject
-        );
-
-        $viewHelper->method('getFormInstance')
-            ->willReturn(new DefaultForm);
-
-        $viewHelper->initializeArguments();
-        $viewHelper->initialize();
-
-        $formResult = new FormResult;
-
-        $viewHelper->expects($this->once())
-            ->method('getFormValidator')
-            ->willReturnCallback(function () use ($formResult) {
-                $formValidation = $this->getMockBuilder(DefaultFormValidator::class)
-                    ->disableOriginalConstructor()
-                    ->setMethods(['validateGhost'])
-                    ->getMock();
-
-                $formValidation->expects($this->once())
-                    ->method('validateGhost')
-                    ->willReturn($formResult);
-
-                return $formValidation;
-            });
-
-        $viewHelper->expects($this->once())
-            ->method('getDataAttributesAssetHandler')
-            ->willReturnCallback(function () use ($formResult) {
-                $assetHandlerMock = $this->getMockBuilder(DataAttributesAssetHandler::class)
-                    ->disableOriginalConstructor()
-                    ->setMethods(['getFieldsValuesDataAttributes'])
-                    ->getMock();
-
-                $assetHandlerMock->expects($this->once())
-                    ->method('getFieldsValuesDataAttributes')
-                    ->with($formResult)
-                    ->willReturn([]);
-
-                return $assetHandlerMock;
-            });
 
         $viewHelper->render();
     }
@@ -572,7 +408,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
         $this->inject($viewHelper, 'tag', $tagBuilder);
 
         $viewHelper->injectFormService(new FormViewHelperService);
-        $viewHelper->injectControllerService(Core::instantiate(ControllerService::class));
+        $viewHelper->injectControllerService(new ControllerService);
 
         return $viewHelper;
     }

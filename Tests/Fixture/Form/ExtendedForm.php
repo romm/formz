@@ -5,12 +5,12 @@ class ExtendedForm extends DefaultForm
 {
 
     /**
-     * @var string
+     * @var array
      */
     protected $bar;
 
     /**
-     * @return string
+     * @return array
      */
     public function getBar()
     {
@@ -18,7 +18,7 @@ class ExtendedForm extends DefaultForm
     }
 
     /**
-     * @param string $bar
+     * @param array $bar
      */
     public function setBar($bar)
     {

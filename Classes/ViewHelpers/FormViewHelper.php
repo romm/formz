@@ -29,7 +29,6 @@ use Romm\Formz\Service\FormService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
-use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -273,35 +272,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     }
 
     /**
-     * Adds custom data attributes to the form element, based on the
-     * submitted form values and results.
+     * Adds data attributes to the form element, based on several statements,
+     * like the submitted form values, the validation result and others.
      */
     protected function handleDataAttributes()
     {
-        $dataAttributes = [];
-
         $dataAttributesAssetHandler = $this->getDataAttributesAssetHandler();
-
-        if ($this->formObject->hasForm()) {
-            if (false === $this->formObject->formWasValidated()) {
-                $form = $this->formObject->getForm();
-                $formValidator = $this->getFormValidator($this->getFormObjectName());
-                $formResult = $formValidator->validateGhost($form);
-            } else {
-                $formResult = $this->formObject->getFormResult();
-            }
-
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValuesDataAttributes($formResult);
-        }
-
-        if (true === $this->formObject->formWasSubmitted()) {
-            $dataAttributes += [DataAttributesAssetHandler::getFieldSubmissionDone() => '1'];
-        }
-
-        if (true === $this->formObject->formWasValidated()) {
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes();
-            $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
-        }
+        $dataAttributes = $this->formService->getDataAttributes($dataAttributesAssetHandler);
 
         $this->tag->addAttributes($dataAttributes);
     }
@@ -456,18 +433,6 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             ?: $this->controllerContext
                 ->getRequest()
                 ->getControllerActionName();
-    }
-
-    /**
-     * @param string $formName
-     * @return DefaultFormValidator
-     */
-    protected function getFormValidator($formName)
-    {
-        /** @var DefaultFormValidator $validation */
-        $validation = Core::instantiate(DefaultFormValidator::class, ['name' => $formName]);
-
-        return $validation;
     }
 
     /**

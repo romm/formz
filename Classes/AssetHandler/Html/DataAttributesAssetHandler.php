@@ -37,7 +37,6 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class DataAttributesAssetHandler extends AbstractAssetHandler
 {
-
     /**
      * Handles the data attributes containing the values of the form fields.
      *
@@ -64,6 +63,40 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
                 if (false === empty($value)) {
                     $result[self::getFieldDataValueKey($fieldName)] = $value;
                 }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldSubmissionDoneDataAttribute()
+    {
+        return [self::getFieldSubmissionDone() => '1'];
+    }
+
+    /**
+     * Handles the data attributes for the fields which are valid.
+     *
+     * Example: `fz-valid-email="1"`
+     *
+     * @return array
+     */
+    public function getFieldsValidDataAttributes()
+    {
+        $result = [];
+        $formConfiguration = $this->getFormObject()->getDefinition();
+        $formResult = $this->getFormObject()->getFormResult();
+
+        foreach ($formConfiguration->getFields() as $field) {
+            $fieldName = $field->getName();
+
+            if (false === $formResult->fieldIsDeactivated($field)
+                && false === $formResult->forProperty($fieldName)->hasErrors()
+            ) {
+                $result[self::getFieldDataValidKey($fieldName)] = '1';
             }
         }
 
@@ -150,32 +183,6 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
             $messageKey = MessageService::get()->getMessageKey($message);
 
             $result[self::getFieldDataValidationMessageKey($fieldName, $type, $validationName, $messageKey)] = '1';
-        }
-
-        return $result;
-    }
-
-    /**
-     * Handles the data attributes for the fields which are valid.
-     *
-     * Example: `fz-valid-email="1"`
-     *
-     * @return array
-     */
-    public function getFieldsValidDataAttributes()
-    {
-        $result = [];
-        $formConfiguration = $this->getFormObject()->getDefinition();
-        $formResult = $this->getFormObject()->getFormResult();
-
-        foreach ($formConfiguration->getFields() as $field) {
-            $fieldName = $field->getName();
-
-            if (false === $formResult->fieldIsDeactivated($field)
-                && false === $formResult->forProperty($fieldName)->hasErrors()
-            ) {
-                $result[self::getFieldDataValidKey($fieldName)] = '1';
-            }
         }
 
         return $result;
