@@ -7,10 +7,8 @@ use Romm\Formz\Error\Warning;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
-use Romm\Formz\Tests\Fixture\Form\ExtendedForm;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
 use TYPO3\CMS\Extbase\Error\Message;
 
@@ -135,12 +133,10 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
         $service = $this->getMockBuilder(FormViewHelperService::class)
             ->setMethods(['getFormObject'])
             ->getMock();
-        $formObjectFactory = new FormObjectFactory;
-        $formObject = $formObjectFactory->getInstanceWithClassName(ExtendedForm::class, 'foo');
 
         /** @noinspection PhpUndefinedMethodInspection */
         $service->method('getFormObject')
-            ->willReturn($formObject);
+            ->willReturn($this->getExtendedFormObject());
 
         return $service;
     }

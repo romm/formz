@@ -17,13 +17,10 @@ use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validation;
-use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -35,19 +32,9 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 class FormValidatorExecutor
 {
     /**
-     * @var FormInterface
-     */
-    protected $form;
-
-    /**
-     * @var string
-     */
-    protected $formName;
-
-    /**
      * @var FormObject
      */
-    private $formObject;
+    protected $formObject;
 
     /**
      * @var ConditionProcessor
@@ -84,13 +71,11 @@ class FormValidatorExecutor
     protected $phpConditionDataObject;
 
     /**
-     * @param FormInterface $form
-     * @param string        $formName
+     * @param FormObject $formObject
      */
-    public function __construct(FormInterface $form, $formName)
+    public function __construct(FormObject $formObject)
     {
-        $this->form = $form;
-        $this->formName = $formName;
+        $this->formObject = $formObject;
     }
 
     /**
@@ -100,7 +85,7 @@ class FormValidatorExecutor
     {
         /** @var BehavioursManager $behavioursManager */
         $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
-        $behavioursManager->applyBehaviourOnFormInstance($this->getFormObject());
+        $behavioursManager->applyBehaviourOnFormInstance($this->formObject);
 
         return $this;
     }
@@ -113,7 +98,7 @@ class FormValidatorExecutor
      */
     public function checkFieldsActivation()
     {
-        foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
+        foreach ($this->formObject->getDefinition()->getFields() as $field) {
             if (false === $this->getResult()->fieldIsDeactivated($field)) {
                 $this->checkFieldActivation($field);
             }
@@ -168,7 +153,7 @@ class FormValidatorExecutor
      */
     public function validateFields(callable $callback = null)
     {
-        foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
+        foreach ($this->formObject->getDefinition()->getFields() as $field) {
             $this->validateField($field);
 
             if ($this->fieldWasValidated($field)
@@ -219,9 +204,10 @@ class FormValidatorExecutor
      */
     protected function processFieldValidation(Field $field, Validation $validation)
     {
+        $form = $this->formObject->getForm();
         $fieldName = $field->getName();
-        $fieldValue = ObjectAccess::getProperty($this->form, $fieldName);
-        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validation);
+        $fieldValue = ObjectAccess::getProperty($form, $fieldName);
+        $validatorDataObject = new ValidatorDataObject($this->formObject, $validation);
 
         /** @var ValidatorInterface $validator */
         $validator = GeneralUtility::makeInstance(
@@ -242,7 +228,7 @@ class FormValidatorExecutor
                 $validationData
             );
 
-            $this->form->setValidationData($this->validationData);
+            $form->setValidationData($this->validationData);
         }
 
         $this->getResult()->forProperty($fieldName)->merge($validatorResult);
@@ -256,7 +242,7 @@ class FormValidatorExecutor
      */
     public function getResult()
     {
-        return $this->getFormObject()->getFormResult();
+        return $this->formObject->getFormResult();
     }
 
     /**
@@ -341,27 +327,12 @@ class FormValidatorExecutor
     }
 
     /**
-     * @return FormObject
-     */
-    public function getFormObject()
-    {
-        if (null === $this->formObject) {
-            /** @var FormObjectFactory $formObjectFactory */
-            $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-
-            $this->formObject = $formObjectFactory->getInstanceWithFormInstance($this->form, $this->formName);
-        }
-
-        return $this->formObject;
-    }
-
-    /**
      * @return ConditionProcessor
      */
     protected function getConditionProcessor()
     {
         if (null === $this->conditionProcessor) {
-            $this->conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
+            $this->conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->formObject);
         }
 
         return $this->conditionProcessor;
@@ -373,7 +344,7 @@ class FormValidatorExecutor
     protected function getPhpConditionDataObject()
     {
         if (null === $this->phpConditionDataObject) {
-            $this->phpConditionDataObject = new PhpConditionDataObject($this->form, $this);
+            $this->phpConditionDataObject = new PhpConditionDataObject($this->formObject->getForm(), $this);
         }
 
         return $this->phpConditionDataObject;

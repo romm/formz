@@ -161,7 +161,7 @@ class FormViewHelperServiceTest extends AbstractUnitTest
                     ->disableOriginalConstructor()
                     ->getMock();
                 $formValidatorMock->expects($this->once())
-                    ->method('validateGhost')
+                    ->method('validate')
                     ->willReturn($formResult);
 
                 return $formValidatorMock;
@@ -195,7 +195,14 @@ class FormViewHelperServiceTest extends AbstractUnitTest
         });
         $formObject->setForm(new DefaultForm);
 
-        $formService = new FormViewHelperService;
+        /** @var FormViewHelperService|\PHPUnit_Framework_MockObject_MockObject $formService */
+        $formService = $this->getMockBuilder(FormViewHelperService::class)
+            ->setMethods(['getFormValidationResult'])
+            ->getMock();
+
+        $formService->method('getFormValidationResult')
+            ->willReturn(new FormResult);
+
         $formService->activateFormContext();
         $formService->setFormObject($formObject);
 

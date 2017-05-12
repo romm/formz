@@ -16,6 +16,7 @@ namespace Romm\Formz\Service\ViewHelper;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
@@ -128,9 +129,7 @@ class FormViewHelperService implements SingletonInterface
              * that case, the data attribute for this field is removed).
              */
             if (false === $this->formObject->formWasValidated()) {
-                $form = $this->formObject->getForm();
-                $formValidator = $this->getFormValidator($this->formObject->getName());
-                $formResult = $formValidator->validateGhost($form);
+                $formResult = $this->getFormValidationResult();
             } else {
                 $formResult = $this->formObject->getFormResult();
             }
@@ -151,18 +150,6 @@ class FormViewHelperService implements SingletonInterface
     }
 
     /**
-     * @param string $formName
-     * @return DefaultFormValidator
-     */
-    protected function getFormValidator($formName)
-    {
-        /** @var DefaultFormValidator $validation */
-        $validation = Core::instantiate(DefaultFormValidator::class, ['name' => $formName]);
-
-        return $validation;
-    }
-
-    /**
      * @return FormObject
      */
     public function getFormObject()
@@ -176,5 +163,33 @@ class FormViewHelperService implements SingletonInterface
     public function setFormObject(FormObject $formObject)
     {
         $this->formObject = $formObject;
+    }
+
+    /**
+     * @return FormResult
+     */
+    protected function getFormValidationResult()
+    {
+        $formValidator = $this->getFormValidator($this->formObject->getName());
+
+        return $formValidator->validate($this->formObject->getForm());
+    }
+
+    /**
+     * @param string $formName
+     * @return DefaultFormValidator
+     */
+    protected function getFormValidator($formName)
+    {
+        /** @var DefaultFormValidator $validation */
+        $validation = Core::instantiate(
+            DefaultFormValidator::class,
+            [
+                'name'  => $formName,
+                'dummy' => true
+            ]
+        );
+
+        return $validation;
     }
 }

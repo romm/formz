@@ -349,7 +349,7 @@ class AjaxValidationController extends ActionController
      */
     protected function getFormObject()
     {
-        return FormObjectFactory::get()->getInstanceWithFormInstance($this->form, $this->formName);
+        return FormObjectFactory::get()->registerAndGetFormInstance($this->form, $this->formName);
     }
 
     /**

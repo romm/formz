@@ -18,13 +18,17 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\DuplicateEntryException;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\Builder\DefaultFormObjectBuilder;
 use Romm\Formz\Form\FormObject\Builder\FormObjectBuilderInterface;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -55,20 +59,71 @@ class FormObjectFactory implements SingletonInterface
     protected $proxy = [];
 
     /**
+     * Returns the form object for the given form instance. The form instance
+     * must have been defined first in this factory, or an exception is thrown.
+     *
+     * @param FormInterface $form
+     * @return FormObject
+     * @throws EntryNotFoundException
+     */
+    public function getInstanceWithFormInstance(FormInterface $form)
+    {
+        if (false === $this->formInstanceWasRegistered($form)) {
+            throw EntryNotFoundException::formObjectInstanceNotFound($form);
+        }
+
+        return $this->instances[spl_object_hash($form)];
+    }
+
+    /**
+     * Checks that the given form instance was registered in this factory.
+     *
+     * @param FormInterface $form
+     * @return bool
+     */
+    public function formInstanceWasRegistered(FormInterface $form)
+    {
+        return isset($this->instances[spl_object_hash($form)]);
+    }
+
+    /**
+     * Registers a new form instance.
+     *
+     * @param FormInterface $form
+     * @param string        $name
+     * @throws DuplicateEntryException
+     * @throws InvalidArgumentValueException
+     */
+    public function registerFormInstance(FormInterface $form, $name)
+    {
+        if (empty($name)) {
+            throw InvalidArgumentValueException::formNameEmpty($form);
+        }
+
+        if ($this->formInstanceWasRegistered($form)) {
+            throw DuplicateEntryException::formObjectInstanceAlreadyRegistered($form, $name);
+        }
+
+        $hash = spl_object_hash($form);
+        $this->instances[$hash] = $this->getInstanceWithClassName(get_class($form), $name);
+        $this->instances[$hash]->setForm($form);
+    }
+
+    /**
+     * A shortcut function to register the given form instance (if it was not
+     * already registered) and return the form object.
+     *
      * @param FormInterface $form
      * @param string        $name
      * @return FormObject
      */
-    public function getInstanceWithFormInstance(FormInterface $form, $name = 'defaultName')
+    public function registerAndGetFormInstance(FormInterface $form, $name)
     {
-        $hash = $name . '-' . spl_object_hash($form);
-
-        if (false === isset($this->instances[$hash])) {
-            $this->instances[$hash] = $this->getInstanceWithClassName(get_class($form), $name);
-            $this->instances[$hash]->setForm($form);
+        if (false === $this->formInstanceWasRegistered($form)) {
+            $this->registerFormInstance($form, $name);
         }
 
-        return $this->instances[$hash];
+        return $this->getInstanceWithFormInstance($form);
     }
 
     /**
@@ -125,7 +180,7 @@ class FormObjectFactory implements SingletonInterface
         $cacheIdentifier = $this->getCacheIdentifier($className);
 
         if (false === isset($this->static[$cacheIdentifier])) {
-            $cacheInstance = CacheService::get()->getCacheInstance();
+            $cacheInstance = $this->getCacheInstance();
 
             if ($cacheInstance->has($cacheIdentifier)) {
                 $static = $cacheInstance->get($cacheIdentifier);
@@ -152,7 +207,7 @@ class FormObjectFactory implements SingletonInterface
      *
      * @param FormObjectStatic $static
      */
-    public function addToGlobalConfiguration(FormObjectStatic $static)
+    protected function addToGlobalConfiguration(FormObjectStatic $static)
     {
         if (false === $this->getGlobalConfiguration()->hasForm($static->getClassName())) {
             $this->getGlobalConfiguration()->addForm($static);
@@ -206,5 +261,13 @@ class FormObjectFactory implements SingletonInterface
     protected function getGlobalConfiguration()
     {
         return ConfigurationFactory::get()->getFormzConfiguration()->getObject(true);
+    }
+
+    /**
+     * @return FrontendInterface
+     */
+    protected function getCacheInstance()
+    {
+        return CacheService::get()->getCacheInstance();
     }
 }

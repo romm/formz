@@ -2,20 +2,108 @@
 
 namespace Romm\Formz\Tests\Unit\Form\FormObject;
 
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Romm\Formz\Configuration\Configuration;
-use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Exceptions\ClassNotFoundException;
+use Romm\Formz\Exceptions\DuplicateEntryException;
+use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
-use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Tests\Unit\UnitTestContainer;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Extbase\Error\Result;
 
 class FormObjectFactoryTest extends AbstractUnitTest
 {
+    /**
+     * @var FrontendInterface
+     */
+    protected $cacheInstance;
+
+    /**
+     * Trying to get the form object instance for a given form instance that was
+     * not registered must throw an exception.
+     *
+     * @test
+     */
+    public function getUnregisteredInstanceThrowsException()
+    {
+        $this->setExpectedException(EntryNotFoundException::class);
+
+        $formObjectFactory = $this->getFormObjectFactory();
+        $form = new DefaultForm;
+
+        $this->assertFalse($formObjectFactory->formInstanceWasRegistered($form));
+        $formObjectFactory->getInstanceWithFormInstance($form);
+    }
+
+    /**
+     * The name of a registered form must be filled, or an exception is thrown.
+     *
+     * @test
+     */
+    public function registerFormInstanceWithEmptyNameThrowsException()
+    {
+        $this->setExpectedException(InvalidArgumentValueException::class);
+
+        $formObjectFactory = $this->getFormObjectFactory();
+        $formObjectFactory->registerFormInstance(new DefaultForm, '');
+    }
+
+    /**
+     * A form instance can be registered only once.
+     *
+     * @test
+     */
+    public function registerFormInstanceThrowsException()
+    {
+        $this->setExpectedException(DuplicateEntryException::class);
+
+        $formObjectFactory = $this->getFormObjectFactory();
+        $form = new DefaultForm;
+
+        $formObjectFactory->registerFormInstance($form, 'foo');
+        $formObjectFactory->registerFormInstance($form, 'foo');
+    }
+
+    /**
+     * Checks that when a form instance was registered, its form object can be
+     * retrieved.
+     *
+     * @test
+     */
+    public function registerFormInstanceWorksAsExpected()
+    {
+        $formObjectFactory = $this->getFormObjectFactory();
+        $form = new DefaultForm;
+
+        $this->assertFalse($formObjectFactory->formInstanceWasRegistered($form));
+        $formObjectFactory->registerFormInstance($form, 'foo');
+        $this->assertTrue($formObjectFactory->formInstanceWasRegistered($form));
+        $this->assertInstanceOf(FormObject::class, $formObjectFactory->getInstanceWithFormInstance($form));
+    }
+
+    /**
+     * @test
+     */
+    public function registerAndGetFormInstanceWorksAsExpected()
+    {
+        $formObjectFactory = $this->getFormObjectFactory();
+        $form = new DefaultForm;
+
+        $formObject = $formObjectFactory->registerAndGetFormInstance($form, 'foo');
+        $this->assertInstanceOf(FormObject::class, $formObject);
+
+        $formObject2 = $formObjectFactory->registerAndGetFormInstance($form, 'foo');
+        $this->assertSame($formObject, $formObject2);
+    }
+
     /**
      * Checks that a form object is created and returned.
      *
@@ -23,25 +111,10 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function formObjectFromClassNameIsCreated()
     {
-        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
-        $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['getStaticInstance'])
-            ->getMock();
-
-        $formObjectFactory->expects($this->once())
-            ->method('getStaticInstance')
-            ->willReturn(
-                $this->getMockBuilder(FormObjectStatic::class)
-                    ->disableOriginalConstructor()
-                    ->getMock()
-            );
-
+        $formObjectFactory = $this->getFormObjectFactory();
         $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
 
         $this->assertInstanceOf(FormObject::class, $formObject);
-
-        unset($formObject);
-        unset($formObjectFactory);
     }
 
     /**
@@ -72,51 +145,6 @@ class FormObjectFactoryTest extends AbstractUnitTest
     }
 
     /**
-     * When getting a form object from a form instance and a given name,
-     * memoization must be used: with the exact same form instance and name, the
-     * exact same form object instance must be returned.
-     *
-     * @test
-     */
-    public function getInstanceFromFormInstanceUsesMemoization()
-    {
-        $configurationFactory = new ConfigurationFactory;
-        $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
-
-        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
-        $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['getInstanceWithClassName'])
-            ->getMock();
-
-        $formObjectFactory->expects($this->exactly(2))
-            ->method('getInstanceWithClassName')
-            ->willReturnCallback(function () {
-                $formObject = $this->getMockBuilder(FormObject::class)
-                    ->disableOriginalConstructor()
-                    ->setMethods(['setForm'])
-                    ->getMock();
-
-                $formObject->expects($this->once())
-                    ->method('setForm');
-
-                return $formObject;
-            });
-
-        $form = new DefaultForm;
-
-        $formObject1 = $formObjectFactory->getInstanceWithFormInstance($form, 'foo');
-        $formObject2 = $formObjectFactory->getInstanceWithFormInstance($form, 'foo');
-
-        $this->assertSame($formObject1, $formObject2);
-
-        $formObject3 = $formObjectFactory->getInstanceWithFormInstance($form);
-        $formObject4 = $formObjectFactory->getInstanceWithFormInstance($form);
-
-        $this->assertSame($formObject3, $formObject4);
-        $this->assertNotSame($formObject1, $formObject3);
-    }
-
-    /**
      * The static form object instance of a given form class must be stored in
      * local cache.
      *
@@ -124,24 +152,13 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function formObjectStaticUsesMemoization()
     {
-        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
-        $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['buildStaticInstance', 'getGlobalConfiguration'])
-            ->getMock();
-
+        $formObjectFactory = $this->getFormObjectFactory();
         $formObjectFactory->expects($this->once())
-            ->method('buildStaticInstance')
-            ->willReturn($this->getDummyFormObjectStaticInstance());
-
-        $formObjectFactory->expects($this->once())
-            ->method('getGlobalConfiguration')
-            ->willReturn($this->getConfigurationMock());
+            ->method('buildStaticInstance');
 
         $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
         $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
         $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-
-        unset($formObjectFactory);
     }
 
     /**
@@ -152,39 +169,18 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function formObjectStaticIsStoredInCache()
     {
-        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory1 */
-        $formObjectFactory1 = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['buildStaticInstance', 'getGlobalConfiguration'])
-            ->getMock();
-
+        $formObjectFactory1 = $this->getFormObjectFactory();
         $formObjectFactory1->expects($this->once())
-            ->method('buildStaticInstance')
-            ->willReturn($this->getDummyFormObjectStaticInstance());
+            ->method('buildStaticInstance');
 
-        $formObjectFactory1->expects($this->once())
-            ->method('getGlobalConfiguration')
-            ->willReturn($this->getConfigurationMock());
-
-        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory2 */
-        $formObjectFactory2 = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['buildStaticInstance', 'getGlobalConfiguration'])
-            ->getMock();
-
+        $formObjectFactory2 = $this->getFormObjectFactory();
         $formObjectFactory2->expects($this->never())
-            ->method('buildStaticInstance')
-            ->willReturn($this->getDummyFormObjectStaticInstance());
-
-        $formObjectFactory2->expects($this->once())
-            ->method('getGlobalConfiguration')
-            ->willReturn($this->getConfigurationMock());
+            ->method('buildStaticInstance');
 
         $formObjectFactory1->getInstanceWithClassName(DefaultForm::class, 'foo');
         $formObjectFactory1->getInstanceWithClassName(DefaultForm::class, 'foo');
         $formObjectFactory2->getInstanceWithClassName(DefaultForm::class, 'foo');
         $formObjectFactory2->getInstanceWithClassName(DefaultForm::class, 'foo');
-
-        unset($formObjectFactory1);
-        unset($formObjectFactory2);
     }
 
     /**
@@ -195,18 +191,9 @@ class FormObjectFactoryTest extends AbstractUnitTest
      */
     public function formIsInjectedInGlobalConfiguration()
     {
-        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
-        $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['buildStaticInstance', 'getGlobalConfiguration'])
-            ->getMock();
-
+        $formObjectFactory = $this->getFormObjectFactory();
         $formObjectFactory->expects($this->once())
-            ->method('buildStaticInstance')
-            ->willReturn($this->getDummyFormObjectStaticInstance());
-
-        $formObjectFactory->expects($this->once())
-            ->method('getGlobalConfiguration')
-            ->willReturn($this->getConfigurationMock());
+            ->method('getGlobalConfiguration');
 
         $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
         $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
@@ -218,78 +205,77 @@ class FormObjectFactoryTest extends AbstractUnitTest
      *
      * @test
      */
-    public function formObjectProxyUsesMemoization()
+    public function formObjectProxyIsAlwaysTheSame()
     {
-        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
-        $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['getNewProxyInstance'])
-            ->getMock();
+        $formObjectFactory = $this->getFormObjectFactory();
+        $form = new DefaultForm;
 
-        $form1 = new DefaultForm;
-        $form2 = new DefaultForm;
+        $formObjectFactory->registerFormInstance($form, 'foo');
 
-        $proxy1 = $this->getDummyFormObjectProxyInstance();
-        $proxy2 = $this->getDummyFormObjectProxyInstance();
+        $proxy1 = $formObjectFactory->getProxy($form);
+        $proxy2 = $formObjectFactory->getProxy($form);
 
-        $formObjectFactory->expects($this->at(0))
-            ->method('getNewProxyInstance')
-            ->with($form1)
-            ->willReturn($proxy1);
-
-        $formObjectFactory->expects($this->at(1))
-            ->method('getNewProxyInstance')
-            ->with($form2)
-            ->willReturn($proxy2);
-
-        $formObjectFactory->expects($this->exactly(2))
-            ->method('getNewProxyInstance');
-
-        $proxyResult1 = $formObjectFactory->getProxy($form1);
-        $this->assertSame($proxy1, $proxyResult1);
-
-        $proxyResult2 = $formObjectFactory->getProxy($form2);
-        $this->assertSame($proxy2, $proxyResult2);
-
-        $proxyResult3 = $formObjectFactory->getProxy($form1);
-        $this->assertSame($proxyResult1, $proxyResult3);
-
-        $proxyResult4 = $formObjectFactory->getProxy($form2);
-        $this->assertSame($proxyResult2, $proxyResult4);
+        $this->assertSame($proxy1, $proxy2);
     }
 
     /**
-     * @return FormObjectStatic|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getDummyFormObjectStaticInstance()
+    protected function getFormObjectFactory()
     {
+        /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
+        $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
+            ->setMethods(['buildStaticInstance', 'getCacheInstance', 'getGlobalConfiguration'])
+            ->getMock();
+
         $static = $this->getMockBuilder(FormObjectStatic::class)
-            ->setMethods(['getDefinitionValidationResult'])
             ->disableOriginalConstructor()
+            ->setMethods(['getDefinitionValidationResult'])
             ->getMock();
 
         $static->method('getDefinitionValidationResult')
             ->willReturn(new Result);
 
-        return $static;
+        $formObjectFactory->method('buildStaticInstance')
+            ->willReturn($static);
+
+        $formObjectFactory->method('getCacheInstance')
+            ->willReturn($this->getCacheInstance()->reveal());
+
+        $formObjectFactory->method('getGlobalConfiguration')
+            ->willReturn($this->getMockBuilder(Configuration::class)->getMock());
+
+        UnitTestContainer::get()->registerMockedInstance(FormObjectFactory::class, $formObjectFactory);
+
+        return $formObjectFactory;
     }
 
     /**
-     * @return FormObjectProxy|\PHPUnit_Framework_MockObject_MockObject
+     * @return ObjectProphecy
      */
-    protected function getDummyFormObjectProxyInstance()
+    protected function getCacheInstance()
     {
-        return $this->getMockBuilder(FormObjectProxy::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+        if (null === $this->cacheInstance) {
+            /** @var FrontendInterface|ObjectProphecy $cacheInstance */
+            $cacheInstance = $this->prophesize(FrontendInterface::class);
 
-    /**
-     * @return Configuration|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getConfigurationMock()
-    {
-        return $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+            $cacheInstance->has(Argument::type('string'))
+                ->willReturn(false);
+
+            $cacheInstance->set(Argument::type('string'), Argument::type(FormObjectStatic::class))
+                ->will(
+                    function ($arguments) use ($cacheInstance) {
+                        $cacheInstance->has($arguments[0])
+                            ->willReturn(true);
+
+                        $cacheInstance->get($arguments[0])
+                            ->willReturn($arguments[1]);
+                    }
+                );
+
+            $this->cacheInstance = $cacheInstance;
+        }
+
+        return $this->cacheInstance;
     }
 }

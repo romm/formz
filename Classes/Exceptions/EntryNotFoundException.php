@@ -19,7 +19,9 @@ use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Form\Definition\Field\Activation\AbstractActivation;
 use Romm\Formz\Form\Definition\FormDefinition;
+use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
@@ -58,6 +60,8 @@ class EntryNotFoundException extends FormzException
     const SLOT_NOT_FOUND = 'No slot "%s" was found.';
 
     const FORM_CONFIGURATION_NOT_FOUND = 'The configuration for form of class "%s" was not found. Please use the function `%s::hasForm()` before.';
+
+    const FORM_OBJECT_INSTANCE_NOT_FOUND = 'The form instance for the object of type "%s" was not found. Please take care of registering it before with "%s::registerFormInstance()".';
 
     /**
      * @code 1472650209
@@ -405,6 +409,23 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_CONFIGURATION_NOT_FOUND,
             [Configuration::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1494514957
+     *
+     * @param FormInterface $form
+     * @return self
+     */
+    final public static function formObjectInstanceNotFound(FormInterface $form)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_OBJECT_INSTANCE_NOT_FOUND,
+            [get_class($form), FormObjectFactory::class]
         );
 
         return $exception;

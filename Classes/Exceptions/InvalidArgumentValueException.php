@@ -13,9 +13,13 @@
 
 namespace Romm\Formz\Exceptions;
 
+use Romm\Formz\Form\FormInterface;
+
 class InvalidArgumentValueException extends FormzException
 {
     const FIELD_VIEW_HELPER_EMPTY_LAYOUT = 'The layout name cannot be empty, please fill with a value.';
+
+    const FORM_NAME_EMPTY = 'The name of the form (type: "%s") can not be empty.';
 
     /**
      * @code 1485786285
@@ -26,6 +30,23 @@ class InvalidArgumentValueException extends FormzException
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_EMPTY_LAYOUT);
+
+        return $exception;
+    }
+
+    /**
+     * @code 1494515073
+     *
+     * @param FormInterface $form
+     * @return self
+     */
+    final public static function formNameEmpty(FormInterface $form)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_NAME_EMPTY,
+            [get_class($form)]
+        );
 
         return $exception;
     }

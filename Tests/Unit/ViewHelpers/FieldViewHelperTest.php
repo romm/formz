@@ -3,18 +3,15 @@ namespace Romm\Formz\Tests\Unit\ViewHelpers;
 
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
-use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
 use TYPO3\CMS\Core\Cache\CacheFactory;
@@ -81,15 +78,11 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $this->registerFluidTemplateCache();
         $this->addFooLayoutToTypoScriptConfiguration();
 
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-
         return [
             [
                 'fieldName'  => 'foo',
                 'layoutName' => 'foo',
-                'formObject' => $formObject
+                'formObject' => $this->getDefaultFormObject()
             ]
         ];
     }
@@ -144,15 +137,11 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     {
         $this->setExpectedException(PropertyNotAccessibleException::class);
 
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
             ->setMethods(['renderChildren'])
             ->getMock();
-        $viewHelper->injectFormService($this->getMockedFormService($formObject));
+        $viewHelper->injectFormService($this->getMockedFormService($this->getDefaultFormObject()));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
@@ -172,15 +161,11 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     {
         $this->setExpectedException(InvalidArgumentTypeException::class);
 
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
             ->setMethods(['renderChildren'])
             ->getMock();
-        $viewHelper->injectFormService($this->getMockedFormService($formObject));
+        $viewHelper->injectFormService($this->getMockedFormService($this->getDefaultFormObject()));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
@@ -203,15 +188,11 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     {
         $this->setExpectedException(InvalidArgumentValueException::class);
 
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
             ->setMethods(['renderChildren'])
             ->getMock();
-        $viewHelper->injectFormService($this->getMockedFormService($formObject));
+        $viewHelper->injectFormService($this->getMockedFormService($this->getDefaultFormObject()));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
@@ -236,15 +217,11 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $this->setExpectedException(EntryNotFoundException::class, '', 1465243586);
         $this->addFooLayoutToTypoScriptConfiguration();
 
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
             ->setMethods(['renderChildren'])
             ->getMock();
-        $viewHelper->injectFormService($this->getMockedFormService($formObject));
+        $viewHelper->injectFormService($this->getMockedFormService($this->getDefaultFormObject()));
         $viewHelper->injectFieldService($this->getMockedFieldService());
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
@@ -269,9 +246,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $this->setExpectedException(EntryNotFoundException::class, '', 1485867803);
         $this->addFooLayoutToTypoScriptConfiguration();
 
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
+        $formObject = $this->getDefaultFormObject();
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)
@@ -305,9 +280,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function originalArgumentsAreRestoredAfterViewHelperIsRendered()
     {
-        /** @var FormObjectFactory $formObjectFactory */
-        $formObjectFactory = Core::instantiate(FormObjectFactory::class);
-        $formObject = $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
+        $formObject = $this->getDefaultFormObject();
 
         /** @var FieldViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */
         $viewHelper = $this->getMockBuilder(FieldViewHelper::class)

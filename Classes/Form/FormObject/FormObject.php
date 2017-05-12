@@ -112,6 +112,8 @@ class FormObject
             throw DuplicateEntryException::formInstanceAlreadyAdded($this);
         }
 
+        $this->registerFormInstance($form);
+
         $this->proxy = $this->createProxy($form);
     }
 
@@ -153,6 +155,16 @@ class FormObject
     public function getObjectHash()
     {
         return $this->static->getObjectHash();
+    }
+
+    /**
+     * @param FormInterface $form
+     */
+    protected function registerFormInstance(FormInterface $form)
+    {
+        if (false === FormObjectFactory::get()->formInstanceWasRegistered($form)) {
+            FormObjectFactory::get()->registerFormInstance($form, $this->getName());
+        }
     }
 
     /**

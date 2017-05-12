@@ -28,44 +28,6 @@ class AbstractFormValidatorTest extends AbstractUnitTest
      *
      * @test
      */
-    public function validatorMethodsAreCalledInRightOrder()
-    {
-        /** @var DummyFormValidator|\PHPUnit_Framework_MockObject_MockObject $validatorMock */
-        $validatorMock = $this->getMockBuilder(DummyFormValidator::class)
-            ->setMethods(['beforeValidationProcess', 'afterValidationProcess', 'fooValidated'])
-            ->setConstructorArgs([['name' => 'foo']])
-            ->getMock();
-
-        $counter = 0;
-
-        $validatorMock->expects($this->once())
-            ->method('beforeValidationProcess')
-            ->willReturnCallback(function () use (&$counter) {
-                $this->assertEquals(0, $counter);
-                $counter++;
-            });
-
-        $validatorMock->expects($this->once())
-            ->method('fooValidated')
-            ->willReturnCallback(function () use (&$counter) {
-                $this->assertEquals(1, $counter);
-                $counter++;
-            });
-
-        $validatorMock->expects($this->once())
-            ->method('afterValidationProcess')
-            ->willReturnCallback(function () use (&$counter) {
-                $this->assertEquals(2, $counter);
-            });
-
-        $validatorMock->validate(new DefaultForm);
-    }
-
-    /**
-     * Methods must be called in a specific order.
-     *
-     * @test
-     */
     public function validatorExecutorMethodsAreCalledInRightOrder()
     {
         /** @var DummyFormValidator|\PHPUnit_Framework_MockObject_MockObject $validatorMock */
@@ -76,15 +38,9 @@ class AbstractFormValidatorTest extends AbstractUnitTest
 
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutorMock */
         $formValidatorExecutorMock = $this->getMockBuilder(FormValidatorExecutor::class)
-            ->setMethods(['applyBehaviours', 'checkFieldsActivation', 'validateFields', 'getFormObject'])
+            ->setMethods(['applyBehaviours', 'checkFieldsActivation', 'validateFields'])
             ->disableOriginalConstructor()
             ->getMock();
-
-        $formObject = $this->getDefaultFormObject();
-        $formObject->setForm(new DefaultForm);
-
-        $formValidatorExecutorMock->method('getFormObject')
-            ->willReturn($formObject);
 
         $validatorMock->expects($this->once())
             ->method('getFormValidatorExecutor')

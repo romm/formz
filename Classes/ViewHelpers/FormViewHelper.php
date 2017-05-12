@@ -484,7 +484,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function getFormObject(FormInterface $form)
     {
-        return FormObjectFactory::get()->getInstanceWithFormInstance($form, $this->getFormObjectName());
+        return FormObjectFactory::get()->registerAndGetFormInstance($form, $this->getFormObjectName());
     }
 
     /**

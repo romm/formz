@@ -7,6 +7,8 @@ use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
+use Romm\Formz\Configuration\View\Layouts\Layout;
+use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\FormDefinition;
@@ -171,7 +173,7 @@ trait FormzUnitTestUtility
 
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
-            ->setMethods(['createProxy', 'getDefinition', 'getDefinitionValidationResult'])
+            ->setMethods(['createProxy', 'getDefinition', 'getDefinitionValidationResult', 'aze'])
             ->setConstructorArgs([
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME,
                 $formObjectStatic
@@ -196,28 +198,32 @@ trait FormzUnitTestUtility
             $formDefinition->addField($field);
         }
 
-        $formDefinitionObject = new FormDefinitionObject($formDefinition, new Result);
-        $formDefinitionObject->setValidationResult(new Result);
+        $rootConfiguration = new Configuration();
 
-        $formzConfiguration = new Configuration();
-
-        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setMessageContainerSelector('[fz-field-message-container="#FIELD#"]');
-        $formzConfiguration->getSettings()->getDefaultFieldSettings()->setFieldContainerSelector('[fz-field-container="#FIELD#"]');
+        $rootConfiguration->getSettings()->getDefaultFieldSettings()->setMessageContainerSelector('[fz-field-message-container="#FIELD#"]');
+        $rootConfiguration->getSettings()->getDefaultFieldSettings()->setFieldContainerSelector('[fz-field-container="#FIELD#"]');
+        $rootConfiguration->getSettings()->getDefaultFieldSettings()->setMessageTemplate('<span class="js-validation-rule-#VALIDATOR# js-validation-type-#TYPE# js-validation-message-#KEY#">#MESSAGE#</span>');
 
         $errors = new ViewClass;
         $errors->addItem('foo', 'foo');
         /** @noinspection PhpUndefinedMethodInspection */
-        $formzConfiguration->getView()->getClasses()->setErrors($errors);
+        $rootConfiguration->getView()->getClasses()->setErrors($errors);
 
         $valid = new ViewClass;
         $valid->addItem('bar', 'bar');
         /** @noinspection PhpUndefinedMethodInspection */
-        $formzConfiguration->getView()->getClasses()->setValid($valid);
+        $rootConfiguration->getView()->getClasses()->setValid($valid);
 
-        $formDefinition->setParents([$formzConfiguration]);
+        $layout = new Layout;
+        $layout->setTemplateFile('EXT:formz/Tests/Fixture/ViewHelpers/StandaloneViewFixture.html');
+        $layoutGroup = new LayoutGroup;
+        $layoutGroup->addItem('default', $layout);
+        $rootConfiguration->getView()->setLayout('foo', $layoutGroup);
+
+        $formDefinition->attachParent($rootConfiguration);
 
         $formObject->method('getDefinition')
-            ->willReturn($formDefinitionObject->getObject(true));
+            ->willReturn($formDefinition);
 
         $formObject->method('getDefinitionValidationResult')
             ->willReturn(new Result);

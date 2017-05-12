@@ -14,6 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Configuration\Configuration;
+use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
 
@@ -24,6 +25,8 @@ class DuplicateEntryException extends FormzException
     const FORM_WAS_ALREADY_REGISTERED = 'The form "%s" was already registered. You can only register a form once. Check the function `%s::hasForm()`.';
 
     const FORM_INSTANCE_ALREADY_ADDED = 'The form instance was already added for the form object of class "%s". You cannot add it twice.';
+
+    const FORM_OBJECT_INSTANCE_ALREADY_REGISTERED = 'The form instance of type "%s" (name "%s") was already registered in the form object factory.';
 
     /**
      * @code 1465242575
@@ -67,6 +70,24 @@ class DuplicateEntryException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_INSTANCE_ALREADY_ADDED,
             [$formObject->getClassName()]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1494515318
+     *
+     * @param FormInterface $form
+     * @param string        $name
+     * @return self
+     */
+    final public static function formObjectInstanceAlreadyRegistered(FormInterface $form, $name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_OBJECT_INSTANCE_ALREADY_REGISTERED,
+            [get_class($form), $name]
         );
 
         return $exception;

@@ -79,7 +79,7 @@ class FormObjectTest extends AbstractUnitTest
     {
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilder(FormObject::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(['foo', $this->prophesize(FormObjectStatic::class)->reveal()])
             ->setMethods(['createProxy'])
             ->getMock();
 
@@ -160,7 +160,7 @@ class FormObjectTest extends AbstractUnitTest
 
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilder(FormObject::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(['foo', $this->prophesize(FormObjectStatic::class)->reveal()])
             ->setMethods(['createProxy'])
             ->getMock();
 

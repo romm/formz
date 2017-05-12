@@ -18,6 +18,7 @@ use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\FormService;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
@@ -74,7 +75,8 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      * @inheritdoc
      */
     protected $supportedOptions = [
-        'name' => ['', 'Name of the form.', 'string', true]
+        'name'  => ['', 'Name of the form.', 'string'],
+        'dummy' => [false, 'Dummy mode?', 'bool']
     ];
 
     /**
@@ -88,6 +90,11 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected $form;
 
     /**
+     * @var FormObject
+     */
+    protected $formObject;
+
+    /**
      * @var FormValidatorExecutor
      */
     private $formValidatorExecutor;
@@ -98,15 +105,16 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      * @param FormInterface $form
      * @throws InvalidArgumentTypeException
      */
-    private function initializeValidator($form)
+    protected function initializeValidator($form)
     {
         if (false === $form instanceof FormInterface) {
             throw InvalidArgumentTypeException::validatingWrongFormType(get_class($form));
         }
 
         $this->form = $form;
-        $this->formValidatorExecutor = $this->getFormValidatorExecutor($form);
-        $this->result = $this->formValidatorExecutor->getFormObject()->getFormResult();
+        $this->formObject = FormObjectFactory::get()->registerAndGetFormInstance($form, $this->options['name']);
+        $this->formValidatorExecutor = $this->getFormValidatorExecutor();
+        $this->result = $this->formObject->getFormResult();
     }
 
     /**
@@ -116,31 +124,14 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      * @param FormInterface $form The form instance to be validated.
      * @return FormResult
      */
-    final public function validate($form)
+    public function validate($form)
     {
         $this->initializeValidator($form);
 
-        $proxy = FormObjectFactory::get()->getProxy($form);
-        $proxy->markFormAsValidated();
-        $proxy->markFormAsSubmitted();
-
-        $this->validateGhost($form, false);
-
-        return $this->result;
-    }
-
-    /**
-     * Validates the form, but wont save form data in the form object.
-     *
-     * @param FormInterface $form
-     * @param bool          $initialize
-     * @return FormResult
-     * @internal
-     */
-    public function validateGhost($form, $initialize = true)
-    {
-        if ($initialize) {
-            $this->initializeValidator($form);
+        if (true !== $this->options['dummy']) {
+            $proxy = FormObjectFactory::get()->getProxy($form);
+            $proxy->markFormAsValidated();
+            $proxy->markFormAsSubmitted();
         }
 
         $this->isValid($form);
@@ -208,13 +199,12 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     }
 
     /**
-     * @param FormInterface $form
      * @return FormValidatorExecutor
      */
-    protected function getFormValidatorExecutor(FormInterface $form)
+    protected function getFormValidatorExecutor()
     {
         /** @var FormValidatorExecutor $formValidatorExecutor */
-        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $form, $this->options['name']);
+        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $this->formObject);
 
         return $formValidatorExecutor;
     }
