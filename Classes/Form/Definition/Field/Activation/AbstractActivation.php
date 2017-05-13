@@ -13,17 +13,14 @@
 
 namespace Romm\Formz\Form\Definition\Field\Activation;
 
-use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
-use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\FormDefinition;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Extbase\Error\Error;
 
-abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface, DataPreProcessorInterface
+abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface
 {
     use ParentsTrait;
 
@@ -139,28 +136,5 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     public function setRootObject(ActivationUsageInterface $rootObject)
     {
         $this->rootObject = $rootObject;
-    }
-
-    /**
-     * @param DataPreProcessor $processor
-     */
-    public static function dataPreProcessor(DataPreProcessor $processor)
-    {
-        $data = $processor->getData();
-
-        if (isset($data['condition'])) {
-            $error = new Error(
-                'The property "condition" has been deprecated and renamed to "expression", please change your TypoScript configuration.',
-                1488483802
-            );
-            $processor->addError($error);
-        }
-        if (isset($data['items'])) {
-            $error = new Error(
-                'The property "items" has been deprecated and renamed to "conditions", please change your TypoScript configuration.',
-                1488531112
-            );
-            $processor->addError($error);
-        }
     }
 }

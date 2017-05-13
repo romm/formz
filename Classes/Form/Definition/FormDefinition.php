@@ -14,8 +14,6 @@
 namespace Romm\Formz\Form\Definition;
 
 use Romm\ConfigurationObject\ConfigurationObjectInterface;
-use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
-use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\ConfigurationObject\Service\ServiceFactory;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
@@ -28,9 +26,8 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Validation\Error;
 
-class FormDefinition extends AbstractFormzConfiguration implements ConfigurationObjectInterface, DataPreProcessorInterface
+class FormDefinition extends AbstractFormzConfiguration implements ConfigurationObjectInterface
 {
     use DefaultConfigurationObjectTrait;
     use StoreArrayIndexTrait;
@@ -149,21 +146,5 @@ class FormDefinition extends AbstractFormzConfiguration implements Configuration
     public function getSettings()
     {
         return $this->settings;
-    }
-
-    /**
-     * @param DataPreProcessor $processor
-     */
-    public static function dataPreProcessor(DataPreProcessor $processor)
-    {
-        $data = $processor->getData();
-
-        if (isset($data['activationCondition'])) {
-            $error = new Error(
-                'The property "activationCondition" has been deprecated and renamed to "conditionList", please change your TypoScript configuration.',
-                1489763042
-            );
-            $processor->addError($error);
-        }
     }
 }
