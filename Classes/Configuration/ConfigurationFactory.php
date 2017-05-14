@@ -21,6 +21,7 @@ use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * This class is used to build and manage the whole FormZ configuration: from a
@@ -32,10 +33,17 @@ class ConfigurationFactory implements SingletonInterface
 {
     use ExtendedSelfInstantiateTrait;
 
+    const POST_CONFIGURATION_PROCESS_SIGNAL = 'postConfigurationProcess';
+
     /**
      * @var TypoScriptService
      */
     protected $typoScriptService;
+
+    /**
+     * @var Dispatcher
+     */
+    protected $signalSlotDispatcher;
 
     /**
      * @var ConfigurationObjectInstance[]
@@ -108,9 +116,48 @@ class ConfigurationFactory implements SingletonInterface
 
         /** @var Configuration $instanceObject */
         $instanceObject = $instance->getObject(true);
+
+        $this->callPostConfigurationProcessSignal($instanceObject);
+
         $instanceObject->calculateHash();
 
         return $instance;
+    }
+
+    /**
+     * If you need to modify the configuration object after it has been built
+     * using the TypoScript configuration, you can connect a slot on the signal
+     * below.
+     *
+     * Note that the signal will be dispatched only once, as the configuration
+     * object is latter put in cache. Therefore, your slots will be called only
+     * once too and need to be aware of it.
+     *
+     * Example (`ext_localconf.php`):
+     *
+     * $signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+     *     \TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class
+     * );
+     * $signalSlotDispatcher->connect(
+     *     \Romm\Formz\Configuration\ConfigurationFactory::class,
+     *     \Romm\Formz\Configuration\ConfigurationFactory::POST_CONFIGURATION_PROCESS_SIGNAL,
+     *     function (\Romm\Formz\Configuration\Configuration $configuration) {
+     *         $configuration->getView()->setPartialRootPath(
+     *             50,
+     *             'EXT:my_extension/Resources/Private/Partials/FormZ/'
+     *         );
+     *     }
+     * );
+     *
+     * @param Configuration $configuration
+     */
+    protected function callPostConfigurationProcessSignal(Configuration $configuration)
+    {
+        $this->signalSlotDispatcher->dispatch(
+            __CLASS__,
+            self::POST_CONFIGURATION_PROCESS_SIGNAL,
+            [$configuration]
+        );
     }
 
     /**
@@ -135,5 +182,13 @@ class ConfigurationFactory implements SingletonInterface
     public function injectTypoScriptService(TypoScriptService $typoScriptService)
     {
         $this->typoScriptService = $typoScriptService;
+    }
+
+    /**
+     * @param Dispatcher $signalSlotDispatcher
+     */
+    public function injectSignalSlotDispatcher(Dispatcher $signalSlotDispatcher)
+    {
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
     }
 }

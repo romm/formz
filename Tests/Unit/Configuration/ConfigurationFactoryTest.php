@@ -7,6 +7,7 @@ use Romm\Formz\Configuration\ConfigurationFactory;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class ConfigurationFactoryTest extends AbstractUnitTest
 {
@@ -21,6 +22,7 @@ class ConfigurationFactoryTest extends AbstractUnitTest
     {
         $configurationFactory = new ConfigurationFactory;
         $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
+        $configurationFactory->injectSignalSlotDispatcher(new Dispatcher);
         $formzConfiguration = $configurationFactory->getFormzConfiguration();
 
         $this->assertInstanceOf(ConfigurationObjectInstance::class, $formzConfiguration);
