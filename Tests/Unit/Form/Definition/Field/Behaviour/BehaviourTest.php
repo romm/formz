@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Form\Definition;
 
-use Romm\Formz\Behaviours\BehaviourInterface;
+use Romm\Formz\Behaviours\ToLowerCaseBehaviour;
 use Romm\Formz\Form\Definition\Field\Behaviour\Behaviour;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
@@ -10,15 +10,13 @@ class BehaviourTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function setClassNamesSetsClassName()
+    public function initializationDoneProperly()
     {
-        $behaviour = new Behaviour;
+        $behaviourName = 'my-behaviour';
+        $behaviourClassName = ToLowerCaseBehaviour::class;
+        $behaviour = new Behaviour($behaviourName, $behaviourClassName);
 
-        $behaviourInstance = $this->getMockBuilder(BehaviourInterface::class)
-            ->getMockForAbstractClass();
-        $behaviourClass = get_class($behaviourInstance);
-
-        $behaviour->setClassName($behaviourClass);
-        $this->assertEquals($behaviourClass, $behaviour->getClassName());
+        $this->assertSame($behaviourName, $behaviour->getName());
+        $this->assertSame($behaviourClassName, $behaviour->getClassName());
     }
 }

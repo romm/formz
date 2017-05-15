@@ -2,7 +2,6 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use Romm\Formz\Validation\Validator\RequiredValidator;
@@ -20,20 +19,20 @@ class FieldsValidationJavaScriptAssetHandlerTest extends AbstractUnitTest
     public function checkJavaScriptCode()
     {
         $expectedResult = <<<TXT
-(function(){Fz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('validation-name','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-validation-name-default"},"settings":{"className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":{"expression":null,"conditions":[]},"useAjax":false,"name":"validation-name"},"acceptsEmptyValues":false});}});})();
+(function(){Fz.Form.get('foo',function(form){varfield=null;field=form.getFieldByName('foo');if(null!==field){field.addValidation('validation-name','Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator',{"options":[],"messages":{"default":"RommFormzTestsFixtureFormDefaultForm-foo-validation-name-default"},"settings":{"name":"validation-name","className":"Romm\\\\Formz\\\\Validation\\\\Validator\\\\RequiredValidator","priority":null,"options":[],"messages":[],"activation":null,"useAjax":false},"acceptsEmptyValues":false});}});})();
 TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
         /** @var FieldsValidationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
         $assetHandler = $this->getMockBuilder(FieldsValidationJavaScriptAssetHandler::class)
-            ->setMethods(['handleValidationConfiguration'])
+            ->setMethods(['handleValidatorConfiguration'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
 
         $jsonValidationConfiguration = '';
         $assetHandler->expects($this->once())
-            ->method('handleValidationConfiguration')
+            ->method('handleValidatorConfiguration')
             ->willReturnCallback(
                 function ($validationConfiguration) use (&$jsonValidationConfiguration) {
                     $jsonValidationConfiguration = $validationConfiguration;
@@ -43,10 +42,7 @@ TXT;
             );
 
         $field = $assetHandlerFactory->getFormObject()->getDefinition()->getField('foo');
-        $validation = new Validation;
-        $validation->setClassName(RequiredValidator::class);
-        $validation->setName('validation-name');
-        $field->addValidation($validation);
+        $field->addValidator('validation-name', RequiredValidator::class);
 
         $this->assertEquals(RequiredValidator::getJavaScriptValidationFiles(), $assetHandler->getJavaScriptValidationFiles());
 

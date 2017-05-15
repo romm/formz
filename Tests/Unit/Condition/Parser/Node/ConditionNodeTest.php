@@ -5,7 +5,7 @@ use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Form\Definition\Condition\ActivationUsageInterface;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class ConditionNodeTest extends AbstractUnitTest

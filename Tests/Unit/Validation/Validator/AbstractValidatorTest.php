@@ -2,7 +2,7 @@
 namespace Romm\Formz\Tests\Unit\Validation\Validator;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -26,14 +26,16 @@ class AbstractValidatorTest extends AbstractUnitTest
             $this->setExpectedException($expectedException);
         }
 
-        $validation = new Validation;
-        $validation->setArrayIndex('foo');
-        $validation->setMessages($messages);
+        $validator = new Validator('foo', DummyValidator::class);
+
+        foreach ($messages as $message) {
+            $validator->addMessage($message[0])->setValue($message[1]);
+        }
 
         $formObject = $this->getDefaultFormObject();
         $formObject->setForm(new DefaultForm);
 
-        $validatorDataObject = new ValidatorDataObject($formObject, $validation);
+        $validatorDataObject = new ValidatorDataObject($formObject, $validator);
 
         $validator = new DummyValidator([], $validatorDataObject);
         if (is_callable($callback)) {
@@ -110,11 +112,7 @@ class AbstractValidatorTest extends AbstractUnitTest
              */
             [
                 'value'    => 'foo',
-                'messages' => [
-                    DummyValidator::MESSAGE_1 => [
-                        'value' => 'hello world!'
-                    ]
-                ],
+                'messages' => [[DummyValidator::MESSAGE_1, 'hello world!']],
                 'callback' => function (DummyValidator $validator) {
                     $validator->addNewError(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
@@ -152,11 +150,7 @@ class AbstractValidatorTest extends AbstractUnitTest
              */
             [
                 'value'    => 'foo',
-                'messages' => [
-                    DummyValidator::MESSAGE_1 => [
-                        'value' => 'hello world!'
-                    ]
-                ],
+                'messages' => [[DummyValidator::MESSAGE_1, 'hello world!']],
                 'callback' => function (DummyValidator $validator) {
                     $validator->addNewWarning(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
@@ -194,11 +188,7 @@ class AbstractValidatorTest extends AbstractUnitTest
              */
             [
                 'value'    => 'foo',
-                'messages' => [
-                    DummyValidator::MESSAGE_1 => [
-                        'value' => 'hello world!'
-                    ]
-                ],
+                'messages' => [[DummyValidator::MESSAGE_1, 'hello world!']],
                 'callback' => function (DummyValidator $validator) {
                     $validator->addNewNotice(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },

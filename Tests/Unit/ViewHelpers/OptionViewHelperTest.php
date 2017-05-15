@@ -22,7 +22,7 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
             ->method('setFieldOption')
             ->with('foo', 'bar');
 
-        $fieldService->setCurrentField(new Field);
+        $fieldService->setCurrentField(new Field('foo'));
 
         UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
 

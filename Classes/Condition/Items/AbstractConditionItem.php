@@ -13,10 +13,10 @@
 
 namespace Romm\Formz\Condition\Items;
 
-use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ArrayService;
@@ -45,10 +45,8 @@ use Romm\Formz\Service\ArrayService;
  * @see \Romm\Formz\Condition\Items\FieldHasErrorCondition
  * @see \Romm\Formz\Condition\Items\FieldIsValidCondition
  */
-abstract class AbstractConditionItem implements ConditionItemInterface
+abstract class AbstractConditionItem extends AbstractFormDefinitionComponent implements ConditionItemInterface
 {
-    use MagicMethodsTrait;
-
     /**
      * Contains a list of JavaScript files which will be included whenever this
      * condition is used.

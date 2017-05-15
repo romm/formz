@@ -193,25 +193,15 @@ class FormObjectFactory implements SingletonInterface
                 }
             }
 
-            $this->addToGlobalConfiguration($static);
+            $static->getDefinition()->attachParent($this->getRootConfiguration());
+
+            // The definition is frozen: no modification will be allowed after that.
+            $static->getDefinition()->getState()->markAsFrozen();
 
             $this->static[$cacheIdentifier] = $static;
         }
 
         return $this->static[$cacheIdentifier];
-    }
-
-    /**
-     * Adds the given form configuration to the global FormZ configuration
-     * object.
-     *
-     * @param FormObjectStatic $static
-     */
-    protected function addToGlobalConfiguration(FormObjectStatic $static)
-    {
-        if (false === $this->getGlobalConfiguration()->hasForm($static->getClassName())) {
-            $this->getGlobalConfiguration()->addForm($static);
-        }
     }
 
     /**
@@ -258,9 +248,9 @@ class FormObjectFactory implements SingletonInterface
     /**
      * @return Configuration|ConfigurationObjectInterface
      */
-    protected function getGlobalConfiguration()
+    protected function getRootConfiguration()
     {
-        return ConfigurationFactory::get()->getFormzConfiguration()->getObject(true);
+        return ConfigurationFactory::get()->getRootConfiguration()->getObject(true);
     }
 
     /**

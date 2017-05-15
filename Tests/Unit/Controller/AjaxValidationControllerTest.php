@@ -10,7 +10,6 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -18,6 +17,7 @@ use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Fixture\Validation\Validator\ExceptionDummyValidator;
 use Romm\Formz\Tests\Fixture\Validation\Validator\MessagesValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Validation\Validator\RequiredValidator;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\View\JsonView;
@@ -113,11 +113,8 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     public function exceptionCatchInProtectedRequestWithDebugModeShouldCustomizeResultMessage()
     {
         $formObject = $this->getDefaultFormObject();
-        $validation = new Validation;
-        $validation->setClassName(ExceptionDummyValidator::class);
-        $validation->setName('bar');
-        $validation->activateAjaxUsage();
-        $formObject->getDefinition()->getField('foo')->addValidation($validation);
+        $validator = $formObject->getDefinition()->getField('foo')->addValidator('bar', ExceptionDummyValidator::class);
+        $validator->activateAjaxUsage();
 
         $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
@@ -294,9 +291,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $this->setExpectedException(InvalidConfigurationException::class, '', 1487673434);
 
         $formObject = $this->getDefaultFormObject();
-        $validation = new Validation;
-        $validation->setName('bar');
-        $formObject->getDefinition()->getField('foo')->addValidation($validation);
+        $formObject->getDefinition()->getField('foo')->addValidator('bar', RequiredValidator::class);
 
         $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
@@ -320,11 +315,8 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         ];
 
         $formObject = $this->getDefaultFormObject();
-        $validation = new Validation;
-        $validation->setClassName(DummyValidator::class);
-        $validation->setName('bar');
-        $validation->activateAjaxUsage();
-        $formObject->getDefinition()->getField('foo')->addValidation($validation);
+        $validator = $formObject->getDefinition()->getField('foo')->addValidator('bar', DummyValidator::class);
+        $validator->activateAjaxUsage();
 
         $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
@@ -358,11 +350,8 @@ class AjaxValidationControllerTest extends AbstractUnitTest
 
         $formObject = $this->getDefaultFormObject();
 
-        $messagesValidator = new Validation;
-        $messagesValidator->setClassName(MessagesValidator::class);
-        $messagesValidator->setName('bar');
-        $messagesValidator->activateAjaxUsage();
-        $formObject->getDefinition()->getField('foo')->addValidation($messagesValidator);
+        $validator = $formObject->getDefinition()->getField('foo')->addValidator('bar', MessagesValidator::class);
+        $validator->activateAjaxUsage();
 
         $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 

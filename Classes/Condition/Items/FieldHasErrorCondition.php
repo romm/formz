@@ -27,7 +27,7 @@ use Romm\Formz\Form\Definition\FormDefinition;
  */
 class FieldHasErrorCondition extends AbstractConditionItem
 {
-    const CONDITION_NAME = 'fieldHasError';
+    const CONDITION_IDENTIFIER = 'fieldHasError';
 
     /**
      * @inheritdoc
@@ -53,7 +53,19 @@ class FieldHasErrorCondition extends AbstractConditionItem
      * @var string
      * @validate NotEmpty
      */
-    protected $errorName = 'default';
+    protected $errorName;
+
+    /**
+     * @param string $fieldName
+     * @param string $validationName
+     * @param string $errorName
+     */
+    public function __construct($fieldName, $validationName, $errorName = 'default')
+    {
+        $this->fieldName = $fieldName;
+        $this->validationName = $validationName;
+        $this->errorName = $errorName;
+    }
 
     /**
      * @inheritdoc
@@ -117,7 +129,7 @@ class FieldHasErrorCondition extends AbstractConditionItem
             throw InvalidConditionException::conditionFieldHasErrorFieldNotFound($this->fieldName);
         }
 
-        if (false === $formDefinition->getField($this->fieldName)->hasValidation($this->validationName)) {
+        if (false === $formDefinition->getField($this->fieldName)->hasValidator($this->validationName)) {
             throw InvalidConditionException::conditionFieldHasErrorValidationNotFound($this->validationName, $this->fieldName);
         }
     }

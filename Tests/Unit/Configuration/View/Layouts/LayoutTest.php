@@ -20,7 +20,17 @@ class LayoutTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function setTemplateFilesSetsTemplateFiles()
+    public function setLayoutOnFrozenConfigurationIsChecked()
+    {
+        $layout = $this->getLayoutWithConfigurationFreezeStateCheck();
+
+        $layout->setLayout('foo');
+    }
+
+    /**
+     * @test
+     */
+    public function setTemplateFileSetsTemplateFile()
     {
         $path = 'foo/bar';
         $absolutePath = 'foo/bar/baz';
@@ -57,10 +67,36 @@ class LayoutTest extends AbstractUnitTest
             ->with($path)
             ->willReturn($absolutePath);
 
-        $layoutGroup = new LayoutGroup;
+        $layoutGroup = new LayoutGroup('foo');
         $layoutGroup->setTemplateFile($path);
-        $layout->setParents([$layoutGroup]);
+        $layout->attachParent($layoutGroup);
 
         $this->assertEquals($absolutePath, $layout->getTemplateFile());
+    }
+
+    /**
+     * @test
+     */
+    public function setTemplateFileOnFrozenConfigurationIsChecked()
+    {
+        $layout = $this->getLayoutWithConfigurationFreezeStateCheck();
+
+        $layout->setTemplateFile('foo/bar');
+    }
+
+    /**
+     * @return Layout|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLayoutWithConfigurationFreezeStateCheck()
+    {
+        /** @var Layout|\PHPUnit_Framework_MockObject_MockObject $layout */
+        $layout = $this->getMockBuilder(Layout::class)
+            ->setMethods(['checkConfigurationFreezeState'])
+            ->getMock();
+
+        $layout->expects($this->once())
+            ->method('checkConfigurationFreezeState');
+
+        return $layout;
     }
 }

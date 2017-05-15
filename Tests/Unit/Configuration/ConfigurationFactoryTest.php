@@ -18,15 +18,15 @@ class ConfigurationFactoryTest extends AbstractUnitTest
      *
      * @test
      */
-    public function canGetFormzConfiguration()
+    public function canGetRootConfiguration()
     {
         $configurationFactory = new ConfigurationFactory;
         $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
         $configurationFactory->injectSignalSlotDispatcher(new Dispatcher);
-        $formzConfiguration = $configurationFactory->getFormzConfiguration();
+        $rootConfiguration = $configurationFactory->getRootConfiguration();
 
-        $this->assertInstanceOf(ConfigurationObjectInstance::class, $formzConfiguration);
-        $this->assertInstanceOf(Configuration::class, $formzConfiguration->getObject(true));
+        $this->assertInstanceOf(ConfigurationObjectInstance::class, $rootConfiguration);
+        $this->assertInstanceOf(Configuration::class, $rootConfiguration->getObject(true));
 
         unset($configurationFactory);
     }
@@ -37,11 +37,11 @@ class ConfigurationFactoryTest extends AbstractUnitTest
      *
      * @test
      */
-    public function localCacheIsUsedForFormzConfiguration()
+    public function localCacheIsUsedForRootConfiguration()
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
         $configurationFactory = $this->getMockBuilder(ConfigurationFactory::class)
-            ->setMethods(['getFormzConfigurationFromCache'])
+            ->setMethods(['getRootConfigurationFromCache'])
             ->getMock();
         $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
@@ -50,11 +50,11 @@ class ConfigurationFactoryTest extends AbstractUnitTest
         $configurationObjectInstance = new ConfigurationObjectInstance($configurationInstance, $configurationResult);
 
         $configurationFactory->expects($this->once())
-            ->method('getFormzConfigurationFromCache')
+            ->method('getRootConfigurationFromCache')
             ->willReturn($configurationObjectInstance);
 
         for ($i = 0; $i < 3; $i++) {
-            $configurationObjectInstanceFromFactory = $configurationFactory->getFormzConfiguration();
+            $configurationObjectInstanceFromFactory = $configurationFactory->getRootConfiguration();
             $this->assertSame($configurationObjectInstanceFromFactory, $configurationObjectInstance);
         }
 
@@ -68,17 +68,17 @@ class ConfigurationFactoryTest extends AbstractUnitTest
      *
      * @test
      */
-    public function builtFormzConfigurationIsNotStoredInSystemCacheWhenItDoesHaveErrors()
+    public function builtRootConfigurationIsNotStoredInSystemCacheWhenItDoesHaveErrors()
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
         $configurationFactory = $this->getMockBuilder(ConfigurationFactory::class)
-            ->setMethods(['buildFormzConfiguration'])
+            ->setMethods(['buildRootConfiguration'])
             ->getMock();
         $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory2 */
         $configurationFactory2 = $this->getMockBuilder(ConfigurationFactory::class)
-            ->setMethods(['buildFormzConfiguration'])
+            ->setMethods(['buildRootConfiguration'])
             ->getMock();
         $configurationFactory2->injectTypoScriptService($this->getMockedTypoScriptService());
 
@@ -89,17 +89,17 @@ class ConfigurationFactoryTest extends AbstractUnitTest
         $configurationObjectInstance->refreshValidationResult();
 
         $configurationFactory->expects($this->exactly(1))
-            ->method('buildFormzConfiguration')
+            ->method('buildRootConfiguration')
             ->willReturn($configurationObjectInstance);
 
         $configurationFactory2->expects($this->exactly(1))
-            ->method('buildFormzConfiguration')
+            ->method('buildRootConfiguration')
             ->willReturn($configurationObjectInstance);
 
-        $configurationObjectInstanceFromFactory = $configurationFactory->getFormzConfiguration();
+        $configurationObjectInstanceFromFactory = $configurationFactory->getRootConfiguration();
         $this->assertSame($configurationObjectInstanceFromFactory, $configurationObjectInstance);
 
-        $configurationObjectInstanceFromFactory = $configurationFactory2->getFormzConfiguration();
+        $configurationObjectInstanceFromFactory = $configurationFactory2->getRootConfiguration();
         $this->assertSame($configurationObjectInstanceFromFactory, $configurationObjectInstance);
 
         unset($configurationInstance);
@@ -112,17 +112,17 @@ class ConfigurationFactoryTest extends AbstractUnitTest
      *
      * @test
      */
-    public function builtFormzConfigurationIsStoredInSystemCacheWhenItDoesNotHaveErrors()
+    public function builtRootConfigurationIsStoredInSystemCacheWhenItDoesNotHaveErrors()
     {
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory */
         $configurationFactory = $this->getMockBuilder(ConfigurationFactory::class)
-            ->setMethods(['buildFormzConfiguration'])
+            ->setMethods(['buildRootConfiguration'])
             ->getMock();
         $configurationFactory->injectTypoScriptService($this->getMockedTypoScriptService());
 
         /** @var ConfigurationFactory|\PHPUnit_Framework_MockObject_MockObject $configurationFactory2 */
         $configurationFactory2 = $this->getMockBuilder(ConfigurationFactory::class)
-            ->setMethods(['buildFormzConfiguration'])
+            ->setMethods(['buildRootConfiguration'])
             ->getMock();
         $configurationFactory2->injectTypoScriptService($this->getMockedTypoScriptService());
 
@@ -132,16 +132,16 @@ class ConfigurationFactoryTest extends AbstractUnitTest
         $configurationObjectInstance->refreshValidationResult();
 
         $configurationFactory->expects($this->exactly(1))
-            ->method('buildFormzConfiguration')
+            ->method('buildRootConfiguration')
             ->willReturn($configurationObjectInstance);
 
         $configurationFactory2->expects($this->never())
-            ->method('buildFormzConfiguration');
+            ->method('buildRootConfiguration');
 
-        $configurationObjectInstanceFromFactory = $configurationFactory->getFormzConfiguration();
+        $configurationObjectInstanceFromFactory = $configurationFactory->getRootConfiguration();
         $this->assertSame($configurationObjectInstanceFromFactory, $configurationObjectInstance);
 
-        $configurationFactory2->getFormzConfiguration();
+        $configurationFactory2->getRootConfiguration();
         $this->assertEquals(serialize($configurationObjectInstanceFromFactory), serialize($configurationObjectInstance));
 
         unset($configurationInstance);

@@ -24,7 +24,7 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class FieldHasValueCondition extends AbstractConditionItem
 {
-    const CONDITION_NAME = 'fieldHasValue';
+    const CONDITION_IDENTIFIER = 'fieldHasValue';
 
     /**
      * @inheritdoc
@@ -44,6 +44,16 @@ class FieldHasValueCondition extends AbstractConditionItem
      * @var string
      */
     protected $fieldValue;
+
+    /**
+     * @param string $fieldName
+     * @param string $fieldValue
+     */
+    public function __construct($fieldName, $fieldValue)
+    {
+        $this->fieldName = $fieldName;
+        $this->fieldValue = $fieldValue;
+    }
 
     /**
      * @inheritdoc

@@ -15,35 +15,16 @@ namespace Romm\Formz\Configuration\View\Classes;
 
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Configuration\AbstractConfiguration;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 
-class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorInterface
+class ViewClass extends AbstractConfiguration implements DataPreProcessorInterface
 {
 
     /**
      * @var array
      */
     protected $items = [];
-
-    /**
-     * This function is called before the TypoScript data is injected in this
-     * class. We use it to put all the array data in the key `items`, so it can
-     * be properly injected in the `$items` property.
-     *
-     * @param DataPreProcessor $processor
-     */
-    public static function dataPreProcessor(DataPreProcessor $processor)
-    {
-        $finalData = [];
-        $data = $processor->getData();
-
-        foreach ($data as $key => $value) {
-            $finalData[$key] = (string)$value;
-        }
-
-        $processor->setData(['items' => $finalData]);
-    }
 
     /**
      * @return array
@@ -80,8 +61,29 @@ class ViewClass extends AbstractFormzConfiguration implements DataPreProcessorIn
      * @param string $name
      * @param string $value
      */
-    public function addItem($name, $value)
+    public function setItem($name, $value)
     {
+        $this->checkConfigurationFreezeState();
+
         $this->items[$name] = $value;
+    }
+
+    /**
+     * This function is called before the TypoScript data is injected in this
+     * class. We use it to put all the array data in the key `items`, so it can
+     * be properly injected in the `$items` property.
+     *
+     * @param DataPreProcessor $processor
+     */
+    public static function dataPreProcessor(DataPreProcessor $processor)
+    {
+        $finalData = [];
+        $data = $processor->getData();
+
+        foreach ($data as $key => $value) {
+            $finalData[$key] = (string)$value;
+        }
+
+        $processor->setData(['items' => $finalData]);
     }
 }

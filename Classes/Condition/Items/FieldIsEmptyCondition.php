@@ -25,7 +25,7 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class FieldIsEmptyCondition extends AbstractConditionItem
 {
-    const CONDITION_NAME = 'fieldIsEmpty';
+    const CONDITION_IDENTIFIER = 'fieldIsEmpty';
 
     /**
      * @inheritdoc
@@ -40,6 +40,14 @@ class FieldIsEmptyCondition extends AbstractConditionItem
      * @validate NotEmpty
      */
     protected $fieldName;
+
+    /**
+     * @param string $fieldName
+     */
+    public function __construct($fieldName)
+    {
+        $this->fieldName = $fieldName;
+    }
 
     /**
      * @inheritdoc

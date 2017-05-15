@@ -2,6 +2,7 @@
 namespace Romm\Formz\Tests\Unit\Validation\Validator\Form;
 
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\Form\DummyFormValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -30,9 +31,13 @@ class AbstractFormValidatorTest extends AbstractUnitTest
      */
     public function validatorExecutorMethodsAreCalledInRightOrder()
     {
+        $form = new DefaultForm;
+        $formObject = $this->getDefaultFormObject();
+        $formObject->setForm($form);
+
         /** @var DummyFormValidator|\PHPUnit_Framework_MockObject_MockObject $validatorMock */
         $validatorMock = $this->getMockBuilder(DummyFormValidator::class)
-            ->setMethods(['getFormValidatorExecutor'])
+            ->setMethods(['getFormObject', 'getProxy', 'getFormValidatorExecutor'])
             ->setConstructorArgs([['name' => 'foo']])
             ->getMock();
 
@@ -41,6 +46,14 @@ class AbstractFormValidatorTest extends AbstractUnitTest
             ->setMethods(['applyBehaviours', 'checkFieldsActivation', 'validateFields'])
             ->disableOriginalConstructor()
             ->getMock();
+
+        $validatorMock->method('getFormObject')
+            ->willReturn($formObject);
+
+        $validatorMock->expects($this->once())
+            ->method('getProxy')
+            ->with($form)
+            ->willReturn(new FormObjectProxy($formObject, $form));
 
         $validatorMock->expects($this->once())
             ->method('getFormValidatorExecutor')
@@ -68,6 +81,6 @@ class AbstractFormValidatorTest extends AbstractUnitTest
                 $this->assertEquals(2, $counter);
             });
 
-        $validatorMock->validate(new DefaultForm);
+        $validatorMock->validate($form);
     }
 }

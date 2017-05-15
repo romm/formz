@@ -1,13 +1,12 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
-use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\AssetHandler\JavaScript\LocalizationJavaScriptAssetHandler;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 use Romm\Formz\Validation\Validator\RequiredValidator;
 
-class FormzLocalizationJavaScriptAssetHandlerTest extends AbstractUnitTest
+class LocalizationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
     use AssetHandlerTestTrait;
 
@@ -25,13 +24,10 @@ TXT;
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
         $field = $assetHandlerFactory->getFormObject()->getDefinition()->getField('foo');
-        $validation = new Validation;
-        $validation->setName('validation-name');
-        $validation->setClassName(RequiredValidator::class);
-        $field->addValidation($validation);
+        $validator = $field->addValidator('validation-name', RequiredValidator::class);
 
-            /** @var FormzLocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
-        $assetHandler = $this->getMockBuilder(FormzLocalizationJavaScriptAssetHandler::class)
+            /** @var LocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        $assetHandler = $this->getMockBuilder(LocalizationJavaScriptAssetHandler::class)
             ->setMethods(['handleRealTranslations', 'handleTranslationsBinding'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
@@ -53,9 +49,9 @@ TXT;
                 return $translationsBinding;
             });
 
-        $assetHandler->injectTranslationsForFormFieldsValidation();
+        $assetHandler->injectTranslationsForFormFieldsValidator();
 
-        $translationKeys = $assetHandler->getTranslationKeysForFieldValidation($field, 'validation-name');
+        $translationKeys = $assetHandler->getTranslationKeysForFieldValidator($field, $validator);
 
         $javaScriptCode = $assetHandler->getJavaScriptCode();
 

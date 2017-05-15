@@ -6,11 +6,7 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
-use Romm\Formz\Configuration\View\Classes\ViewClass;
-use Romm\Formz\Configuration\View\Layouts\Layout;
-use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Core\Core;
-use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Form\FormObject\FormObject;
@@ -169,7 +165,8 @@ trait FormzUnitTestUtility
     protected function createFormObject(array $fields = [], callable $proxyCallback = null)
     {
         $formDefinition = new FormDefinition;
-        $formObjectStatic = new FormObjectStatic(AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME, new FormDefinitionObject($formDefinition));
+        $formDefinitionObject = new FormDefinitionObject($formDefinition, new Result);
+        $formObjectStatic = new FormObjectStatic(AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME, $formDefinitionObject);
 
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
@@ -192,33 +189,18 @@ trait FormzUnitTestUtility
             });
 
         foreach ($fields as $fieldName) {
-            $field = new Field;
-            $field->setName($fieldName);
-            $field->setParents([$formDefinition]);
-            $formDefinition->addField($field);
+            $formDefinition->addField($fieldName);
         }
 
         $rootConfiguration = new Configuration();
 
-        $rootConfiguration->getSettings()->getDefaultFieldSettings()->setMessageContainerSelector('[fz-field-message-container="#FIELD#"]');
-        $rootConfiguration->getSettings()->getDefaultFieldSettings()->setFieldContainerSelector('[fz-field-container="#FIELD#"]');
-        $rootConfiguration->getSettings()->getDefaultFieldSettings()->setMessageTemplate('<span class="js-validation-rule-#VALIDATOR# js-validation-type-#TYPE# js-validation-message-#KEY#">#MESSAGE#</span>');
+        $defaultFieldSettings = $rootConfiguration->getSettings()->getDefaultFieldSettings();
 
-        $errors = new ViewClass;
-        $errors->addItem('foo', 'foo');
-        /** @noinspection PhpUndefinedMethodInspection */
-        $rootConfiguration->getView()->getClasses()->setErrors($errors);
+        $defaultFieldSettings->setMessageContainerSelector('[fz-field-message-container="#FIELD#"]');
+        $defaultFieldSettings->setFieldContainerSelector('[fz-field-container="#FIELD#"]');
+        $defaultFieldSettings->setMessageTemplate('<span class="js-validation-rule-#VALIDATOR# js-validation-type-#TYPE# js-validation-message-#KEY#">#MESSAGE#</span>');
 
-        $valid = new ViewClass;
-        $valid->addItem('bar', 'bar');
-        /** @noinspection PhpUndefinedMethodInspection */
-        $rootConfiguration->getView()->getClasses()->setValid($valid);
-
-        $layout = new Layout;
-        $layout->setTemplateFile('EXT:formz/Tests/Fixture/ViewHelpers/StandaloneViewFixture.html');
-        $layoutGroup = new LayoutGroup;
-        $layoutGroup->addItem('default', $layout);
-        $rootConfiguration->getView()->setLayout('foo', $layoutGroup);
+        $rootConfiguration->getView()->addLayout('foo')->addItem('default');
 
         $formDefinition->attachParent($rootConfiguration);
 
@@ -248,13 +230,12 @@ trait FormzUnitTestUtility
         $formDefinition = new FormDefinition;
 
         foreach ($fields as $fieldName) {
-            $field = new Field;
-            $field->setName($fieldName);
-            $field->setParents([$formDefinition]);
-            $formDefinition->addField($field);
+            $formDefinition->addField($fieldName);
         }
 
-        return new FormObjectStatic(AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME, new FormDefinitionObject($formDefinition));
+        $formDefinitionObject = new FormDefinitionObject($formDefinition, new Result);
+
+        return new FormObjectStatic(AbstractUnitTest::FORM_OBJECT_DEFAULT_CLASS_NAME, $formDefinitionObject);
     }
 
     /**

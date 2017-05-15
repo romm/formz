@@ -67,12 +67,12 @@ class ConfigurationFactory implements SingletonInterface
      *
      * @return ConfigurationObjectInstance
      */
-    public function getFormzConfiguration()
+    public function getRootConfiguration()
     {
         $cacheIdentifier = $this->getCacheIdentifier();
 
         if (false === array_key_exists($cacheIdentifier, $this->instances)) {
-            $this->instances[$cacheIdentifier] = $this->getFormzConfigurationFromCache($cacheIdentifier);
+            $this->instances[$cacheIdentifier] = $this->getRootConfigurationFromCache($cacheIdentifier);
         }
 
         return $this->instances[$cacheIdentifier];
@@ -86,14 +86,14 @@ class ConfigurationFactory implements SingletonInterface
      * @param string $cacheIdentifier
      * @return ConfigurationObjectInstance
      */
-    protected function getFormzConfigurationFromCache($cacheIdentifier)
+    protected function getRootConfigurationFromCache($cacheIdentifier)
     {
         $cacheInstance = CacheService::get()->getCacheInstance();
 
         if ($cacheInstance->has($cacheIdentifier)) {
             $instance = $cacheInstance->get($cacheIdentifier);
         } else {
-            $instance = $this->buildFormzConfiguration();
+            $instance = $this->buildRootConfiguration();
 
             if (false === $instance->getValidationResult()->hasErrors()) {
                 $cacheInstance->set($cacheIdentifier, $instance);
@@ -104,15 +104,14 @@ class ConfigurationFactory implements SingletonInterface
     }
 
     /**
-     * @see getFormzConfiguration()
+     * @see getRootConfiguration()
      *
      * @return ConfigurationObjectInstance
      */
-    protected function buildFormzConfiguration()
+    protected function buildRootConfiguration()
     {
         $configuration = $this->typoScriptService->getFormzConfiguration();
-        $instance = ConfigurationObjectFactory::getInstance()
-            ->get(Configuration::class, $configuration);
+        $instance = ConfigurationObjectFactory::convert(Configuration::class, $configuration);
 
         /** @var Configuration $instanceObject */
         $instanceObject = $instance->getObject(true);
@@ -120,6 +119,7 @@ class ConfigurationFactory implements SingletonInterface
         $this->callPostConfigurationProcessSignal($instanceObject);
 
         $instanceObject->calculateHash();
+        $instanceObject->getState()->markAsFrozen();
 
         return $instance;
     }

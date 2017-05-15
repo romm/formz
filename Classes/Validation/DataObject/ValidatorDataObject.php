@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Validation\DataObject;
 
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;
 
 class ValidatorDataObject
@@ -24,18 +24,18 @@ class ValidatorDataObject
     protected $formObject;
 
     /**
-     * @var Validation
+     * @var Validator
      */
-    protected $validation;
+    protected $validator;
 
     /**
-     * @param FormObject    $formObject
-     * @param Validation    $validation
+     * @param FormObject $formObject
+     * @param Validator  $validator
      */
-    public function __construct(FormObject $formObject, Validation $validation)
+    public function __construct(FormObject $formObject, Validator $validator)
     {
         $this->formObject = $formObject;
-        $this->validation = $validation;
+        $this->validator = $validator;
     }
 
     /**
@@ -47,10 +47,10 @@ class ValidatorDataObject
     }
 
     /**
-     * @return Validation
+     * @return Validator
      */
-    public function getValidation()
+    public function getValidator()
     {
-        return $this->validation;
+        return $this->validator;
     }
 }

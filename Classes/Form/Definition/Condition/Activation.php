@@ -11,21 +11,21 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Form\Definition\Field\Activation;
+namespace Romm\Formz\Form\Definition\Condition;
 
-use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
+use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
 use Romm\Formz\Form\Definition\FormDefinition;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 
-abstract class AbstractActivation extends AbstractFormzConfiguration implements ActivationInterface
+class Activation extends AbstractFormDefinitionComponent implements ActivationInterface
 {
-    use ParentsTrait;
-
     /**
      * @var string
+     * @validate NotEmpty
      */
     protected $expression;
 
@@ -34,11 +34,6 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
      * @mixedTypesResolver \Romm\Formz\Form\Definition\Condition\ConditionItemResolver
      */
     protected $conditions = [];
-
-    /**
-     * @var ActivationUsageInterface
-     */
-    private $rootObject;
 
     /**
      * @return string
@@ -53,6 +48,8 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
      */
     public function setExpression($expression)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->expression = $expression;
     }
 
@@ -65,7 +62,8 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     }
 
     /**
-     * Will merge the conditions with the condition list of the parent form.
+     * Returns the merged list of the conditions of this object and the
+     * conditions of the parent form.
      *
      * @return ConditionItemInterface[]
      */
@@ -114,12 +112,32 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
     }
 
     /**
-     * @param string                 $name
-     * @param ConditionItemInterface $condition
+     * @param string $name
+     * @param string $identifier
+     * @param array  $arguments
+     * @return ConditionItemInterface
+     * @throws DuplicateEntryException
+     * @throws EntryNotFoundException
      */
-    public function addCondition($name, ConditionItemInterface $condition)
+    public function addCondition($name, $identifier, $arguments = [])
     {
+        $this->checkDefinitionFreezeState();
+
+        if (true === isset($this->conditions[$name])) {
+            throw DuplicateEntryException::activationConditionAlreadyAdded($name);
+        }
+
+        $conditionFactory = ConditionFactory::get();
+
+        if (false === $conditionFactory->hasCondition($identifier)) {
+            throw EntryNotFoundException::activationAddConditionNotFound($identifier, $conditionFactory->getConditions());
+        }
+
+        $condition = $conditionFactory->instantiateCondition($identifier, $arguments);
+        $condition->attachParent($this);
         $this->conditions[$name] = $condition;
+
+        return $condition;
     }
 
     /**
@@ -127,14 +145,9 @@ abstract class AbstractActivation extends AbstractFormzConfiguration implements 
      */
     public function getRootObject()
     {
-        return $this->rootObject;
-    }
+        /** @var ActivationUsageInterface $rootObject */
+        $rootObject = $this->getFirstParent(ActivationUsageInterface::class);
 
-    /**
-     * @param ActivationUsageInterface $rootObject
-     */
-    public function setRootObject(ActivationUsageInterface $rootObject)
-    {
-        $this->rootObject = $rootObject;
+        return $rootObject;
     }
 }

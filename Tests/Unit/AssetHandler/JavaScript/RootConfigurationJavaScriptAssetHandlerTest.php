@@ -1,11 +1,11 @@
 <?php
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
-use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\RootConfigurationJavaScriptAssetHandler;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 
-class FormzConfigurationJavaScriptAssetHandlerTest extends AbstractUnitTest
+class RootConfigurationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
     use AssetHandlerTestTrait;
 
@@ -22,27 +22,27 @@ TXT;
 
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
-        /** @var FormzConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
-        $assetHandler = $this->getMockBuilder(FormzConfigurationJavaScriptAssetHandler::class)
-            ->setMethods(['handleFormzConfiguration'])
+        /** @var RootConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        $assetHandler = $this->getMockBuilder(RootConfigurationJavaScriptAssetHandler::class)
+            ->setMethods(['handleRootConfiguration'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
 
-        $jsonFormzConfiguration = '';
-        $assetHandler->method('handleFormzConfiguration')
+        $jsonRootConfiguration = '';
+        $assetHandler->method('handleRootConfiguration')
             ->willReturnCallback(
-                function ($formzConfiguration) use (&$jsonFormzConfiguration) {
-                    $jsonFormzConfiguration = $formzConfiguration;
+                function ($rootConfiguration) use (&$jsonRootConfiguration) {
+                    $jsonRootConfiguration = $rootConfiguration;
 
-                    return $formzConfiguration;
+                    return $rootConfiguration;
                 }
             );
 
         $javaScriptCode = $assetHandler->getJavaScriptCode();
 
-        $this->assertNotNull($jsonFormzConfiguration);
+        $this->assertNotNull($jsonRootConfiguration);
         $this->assertEquals(
-            str_replace('#CONFIGURATION#', $this->trimString($jsonFormzConfiguration), $expectedResult),
+            str_replace('#CONFIGURATION#', $this->trimString($jsonRootConfiguration), $expectedResult),
             $this->removeMultiLinesComments($this->trimString($javaScriptCode))
         );
 

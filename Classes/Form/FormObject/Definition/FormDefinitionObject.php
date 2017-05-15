@@ -26,10 +26,11 @@ class FormDefinitionObject extends ConfigurationObjectInstance
 
     /**
      * @param FormDefinition $objectInstance
+     * @param Result         $mapperResult
      */
-    public function __construct(FormDefinition $objectInstance)
+    public function __construct(FormDefinition $objectInstance, Result $mapperResult)
     {
-        parent::__construct($objectInstance, new Result);
+        parent::__construct($objectInstance, $mapperResult);
     }
 
     /**

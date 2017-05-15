@@ -13,10 +13,10 @@
 
 namespace Romm\Formz\Configuration\View\Classes;
 
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Configuration\AbstractConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Classes extends AbstractFormzConfiguration
+class Classes extends AbstractConfiguration
 {
     /**
      * @var \Romm\Formz\Configuration\View\Classes\ViewClass
@@ -34,13 +34,16 @@ class Classes extends AbstractFormzConfiguration
     public function __construct()
     {
         $this->errors = GeneralUtility::makeInstance(ViewClass::class);
+        $this->errors->attachParent($this);
+
         $this->valid = GeneralUtility::makeInstance(ViewClass::class);
+        $this->valid->attachParent($this);
     }
 
     /**
      * @return ViewClass
      */
-    public function getErrors()
+    public function getErrorsClasses()
     {
         return $this->errors;
     }
@@ -48,7 +51,7 @@ class Classes extends AbstractFormzConfiguration
     /**
      * @return ViewClass
      */
-    public function getValid()
+    public function getValidClasses()
     {
         return $this->valid;
     }

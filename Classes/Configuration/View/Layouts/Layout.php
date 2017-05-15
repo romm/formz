@@ -13,15 +13,10 @@
 
 namespace Romm\Formz\Configuration\View\Layouts;
 
-use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
-use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Configuration\AbstractConfiguration;
 
-class Layout extends AbstractFormzConfiguration
+class Layout extends AbstractConfiguration
 {
-    use StoreArrayIndexTrait;
-    use ParentsTrait;
-
     /**
      * @var string
      * @validate NotEmpty
@@ -38,18 +33,15 @@ class Layout extends AbstractFormzConfiguration
      */
     public function getTemplateFile()
     {
-        if (null === $this->templateFile
+        $templateFile = $this->templateFile;
+
+        if (null === $templateFile
             && $this->hasParent(LayoutGroup::class)
         ) {
-            $this->templateFile = $this->withFirstParent(
-                LayoutGroup::class,
-                function (LayoutGroup $parent) {
-                    return $parent->getTemplateFile();
-                }
-            );
+            $templateFile = $this->getFirstParent(LayoutGroup::class)->getTemplateFile();
         }
 
-        return $this->getAbsolutePath($this->templateFile);
+        return $this->getAbsolutePath($templateFile);
     }
 
     /**
@@ -57,6 +49,8 @@ class Layout extends AbstractFormzConfiguration
      */
     public function setTemplateFile($templateFile)
     {
+        $this->checkConfigurationFreezeState();
+
         $this->templateFile = $templateFile;
     }
 
@@ -73,6 +67,8 @@ class Layout extends AbstractFormzConfiguration
      */
     public function setLayout($layout)
     {
+        $this->checkConfigurationFreezeState();
+
         $this->layout = $layout;
     }
 }

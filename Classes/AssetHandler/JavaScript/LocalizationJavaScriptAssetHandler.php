@@ -15,6 +15,7 @@ namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\HashService;
 use Romm\Formz\Service\MessageService;
@@ -24,9 +25,9 @@ use Romm\Formz\Service\ValidatorService;
  * This asset handler will manage the translations which will be sent to FormZ
  * in JavaScript (`Formz.Localization`).
  *
- * The validation messages of the fields are handled in this class.
+ * The validator messages of the fields are handled in this class.
  */
-class FormzLocalizationJavaScriptAssetHandler extends AbstractAssetHandler
+class LocalizationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**
@@ -38,20 +39,20 @@ class FormzLocalizationJavaScriptAssetHandler extends AbstractAssetHandler
 
     /**
      * Contains the list of keys which are bound to translations, for a field
-     * validation. The value is an array of keys, because a validation rule may
-     * have several messages.
+     * validator. The value is an array of keys, because a validator may have
+     * several messages.
      *
      * @var array
      */
-    protected $translationKeysForFieldValidation = [];
+    protected $translationKeysForFieldValidator = [];
 
     /**
-     * Contains the list of fields validations which were already processed by
+     * Contains the list of fields validators which were already processed by
      * this asset handler.
      *
      * @var array
      */
-    protected $injectedTranslationKeysForFieldValidation = [];
+    protected $injectedTranslationKeysForFieldValidator = [];
 
     /**
      * Will generate and return the JavaScript code which add all registered
@@ -80,71 +81,65 @@ JS;
 
     /**
      * Returns the keys which are bound to translations, for a given field
-     * validation rule.
+     * validator.
      *
-     * @param Field  $field
-     * @param string $validationName
+     * @param Field     $field
+     * @param Validator $validator
      * @return array
      */
-    public function getTranslationKeysForFieldValidation(Field $field, $validationName)
+    public function getTranslationKeysForFieldValidator(Field $field, Validator $validator)
     {
-        $result = [];
+        $key = $field->getName() . '-' . $validator->getName();
 
-        if (true === $field->hasValidation($validationName)) {
-            $key = $field->getName() . '-' . $validationName;
+        $this->storeTranslationsForFieldValidator($field);
 
-            $this->storeTranslationsForFieldValidation($field);
-
-            $result = $this->translationKeysForFieldValidation[$key];
-        }
-
-        return $result;
+        return $this->translationKeysForFieldValidator[$key];
     }
 
     /**
      * Will loop on each field of the given form, and get every translations for
-     * the validation rules messages.
+     * the validator rules messages.
      *
      * @return $this
      */
-    public function injectTranslationsForFormFieldsValidation()
+    public function injectTranslationsForFormFieldsValidator()
     {
         $formConfiguration = $this->getFormObject()->getDefinition();
 
         foreach ($formConfiguration->getFields() as $field) {
-            $this->storeTranslationsForFieldValidation($field);
+            $this->storeTranslationsForFieldValidator($field);
         }
 
         return $this;
     }
 
     /**
-     * Will loop on each validation rule of the given field, and get the
+     * Will loop on each validator rule of the given field, and get the
      * translations of the rule messages.
      *
      * @param Field $field
      * @return $this
      */
-    protected function storeTranslationsForFieldValidation(Field $field)
+    protected function storeTranslationsForFieldValidator(Field $field)
     {
-        if (false === $this->translationsForFieldValidationWereInjected($field)) {
+        if (false === $this->translationsForFieldValidatorWereInjected($field)) {
             $fieldName = $field->getName();
 
-            foreach ($field->getValidation() as $validationName => $validation) {
-                $messages = ValidatorService::get()->getValidatorMessages($validation->getClassName(), $validation->getMessages());
+            foreach ($field->getValidators() as $validator) {
+                $messages = ValidatorService::get()->getValidatorMessages($validator);
 
                 foreach ($messages as $key => $message) {
                     $message = MessageService::get()->parseMessageArray($message, ['{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}']);
 
-                    $localizationKey = $this->getIdentifierForFieldValidationName($field, $validationName, $key);
+                    $localizationKey = $this->getIdentifierForFieldValidator($field, $validator, $key);
                     $this->addTranslation($localizationKey, $message);
                     $messages[$key] = $localizationKey;
                 }
 
-                $this->translationKeysForFieldValidation[$fieldName . '-' . $validationName] = $messages;
+                $this->translationKeysForFieldValidator[$fieldName . '-' . $validator->getName()] = $messages;
 
                 $key = $this->getFormObject()->getClassName() . '-' . $field->getName();
-                $this->injectedTranslationKeysForFieldValidation[$key] = true;
+                $this->injectedTranslationKeysForFieldValidator[$key] = true;
             }
         }
 
@@ -164,28 +159,28 @@ JS;
     }
 
     /**
-     * Checks if the given field validation rules were already handled by this
+     * Checks if the given field validator were already handled by this
      * asset handler.
      *
      * @param Field $field
      * @return bool
      */
-    protected function translationsForFieldValidationWereInjected(Field $field)
+    protected function translationsForFieldValidatorWereInjected(Field $field)
     {
         $key = $this->getFormObject()->getClassName() . '-' . $field->getName();
 
-        return true === isset($this->injectedTranslationKeysForFieldValidation[$key]);
+        return true === isset($this->injectedTranslationKeysForFieldValidator[$key]);
     }
 
     /**
-     * @param Field  $field
-     * @param string $validationName
-     * @param string $messageKey
+     * @param Field     $field
+     * @param Validator $validator
+     * @param string    $messageKey
      * @return string
      */
-    protected function getIdentifierForFieldValidationName(Field $field, $validationName, $messageKey)
+    protected function getIdentifierForFieldValidator(Field $field, Validator $validator, $messageKey)
     {
-        return str_replace(['\\', '_'], '', $this->getFormObject()->getClassName()) . '-' . $field->getName() . '-' . $validationName . '-' . $messageKey;
+        return str_replace(['\\', '_'], '', $this->getFormObject()->getClassName()) . '-' . $field->getName() . '-' . $validator->getName() . '-' . $messageKey;
     }
 
     /**

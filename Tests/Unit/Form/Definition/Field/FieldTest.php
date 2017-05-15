@@ -1,13 +1,14 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Configuration\Field;
 
+use Romm\Formz\Behaviours\ToLowerCaseBehaviour;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
-use Romm\Formz\Form\Definition\Field\Behaviour\Behaviour;
+use Romm\Formz\Exceptions\SilentException;
+use Romm\Formz\Form\Definition\Condition\Activation;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Settings\FieldSettings;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
-use Romm\Formz\Form\Definition\FormDefinition;
+use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class FieldTest extends AbstractUnitTest
@@ -17,49 +18,61 @@ class FieldTest extends AbstractUnitTest
      */
     public function initializationDoneProperly()
     {
-        $field = new Field;
+        $fieldName = 'my-field';
+        $field = new Field($fieldName);
 
+        $this->assertSame($fieldName, $field->getName());
         $this->assertInstanceOf(FieldSettings::class, $field->getSettings());
-        $this->assertInstanceOf(ActivationInterface::class, $field->getActivation());
     }
 
     /**
      * @test
      */
-    public function parentFormIsFetched()
+    public function addValidatorAddsValidator()
     {
-        $field = new Field;
-        $form = new FormDefinition;
+        $validatorName = 'my-validator';
+        $field = new Field('foo');
 
-        $field->setParents([$form]);
-        $this->assertSame($form, $field->getForm());
+        $this->assertFalse($field->hasValidator($validatorName));
+        $validator = $field->addValidator($validatorName, DummyValidator::class);
+        $this->assertTrue($field->hasValidator($validatorName));
+        $this->assertSame($validator, $field->getValidator($validatorName));
+        $this->assertSame([$validatorName => $validator], $field->getValidators());
     }
 
     /**
      * @test
      */
-    public function addValidationAddsValidation()
+    public function addValidatorOnFrozenDefinitionIsChecked()
     {
-        $field = new Field;
-        $validation = new Validation;
-        $validation->setName('foo');
+        $field = $this->getFieldWithDefinitionFreezeStateCheck();
 
-        $this->assertFalse($field->hasValidation('foo'));
-        $field->addValidation($validation);
-        $this->assertTrue($field->hasValidation('foo'));
-        $this->assertSame($validation, $field->getValidationByName('foo'));
-        $this->assertSame(['foo' => $validation], $field->getValidation());
+        $field->addValidator('my-validator', DummyValidator::class);
     }
 
     /**
      * @test
      */
-    public function validationNotFoundThrowsException()
+    public function addExistingValidatorThrowsException()
+    {
+        $this->setExpectedException(DuplicateEntryException::class);
+
+        $validatorName = 'my-validator';
+        $field = new Field('foo');
+
+        $field->addValidator($validatorName, DummyValidator::class);
+        $field->addValidator($validatorName, DummyValidator::class);
+    }
+
+    /**
+     * @test
+     */
+    public function getNotExistingValidatorThrowsException()
     {
         $this->setExpectedException(EntryNotFoundException::class);
 
-        $field = new Field;
-        $field->getValidationByName('nope');
+        $field = new Field('foo');
+        $field->getValidator('nope');
     }
 
     /**
@@ -67,43 +80,99 @@ class FieldTest extends AbstractUnitTest
      */
     public function addBehaviourAddsBehaviour()
     {
-        $field = new Field;
-        $behaviour = new Behaviour;
+        $behaviourName = 'my-behaviour';
+        $field = new Field('foo');
 
-        $this->assertEmpty($field->getBehaviours());
-        $field->addBehaviour('foo', $behaviour);
-        $this->assertEquals(['foo' => $behaviour], $field->getBehaviours());
+        $this->assertFalse($field->hasBehaviour($behaviourName));
+        $behaviour = $field->addBehaviour($behaviourName, ToLowerCaseBehaviour::class);
+        $this->assertTrue($field->hasBehaviour($behaviourName));
+        $this->assertSame($behaviour, $field->getBehaviour($behaviourName));
+        $this->assertSame([$behaviourName => $behaviour], $field->getBehaviours());
     }
 
     /**
      * @test
      */
-    public function setActivationSetsActivation()
+    public function addBehaviourOnFrozenDefinitionIsChecked()
     {
-        $field = new Field;
-        /** @var ActivationInterface|\PHPUnit_Framework_MockObject_MockObject $activation */
-        $activation = $this->getMockBuilder(ActivationInterface::class)
-            ->setMethods(['setRootObject'])
-            ->getMockForAbstractClass();
+        $field = $this->getFieldWithDefinitionFreezeStateCheck();
 
-        $activation->expects($this->once())
-            ->method('setRootObject')
-            ->with($field);
+        $field->addBehaviour('my-behaviour', ToLowerCaseBehaviour::class);
+    }
+
+    /**
+     * @test
+     */
+    public function addExistingBehaviourThrowsException()
+    {
+        $this->setExpectedException(DuplicateEntryException::class);
+
+        $behaviourName = 'my-behaviour';
+        $field = new Field('foo');
+
+        $field->addBehaviour($behaviourName, ToLowerCaseBehaviour::class);
+        $field->addBehaviour($behaviourName, ToLowerCaseBehaviour::class);
+    }
+
+    /**
+     * @test
+     */
+    public function getNotExistingBehaviourThrowsException()
+    {
+        $this->setExpectedException(EntryNotFoundException::class);
+
+        $field = new Field('foo');
+        $field->getBehaviour('nope');
+    }
+
+    /**
+     * @test
+     */
+    public function addActivationAddsActivation()
+    {
+        $field = new Field('foo');
 
         $this->assertFalse($field->hasActivation());
-        $field->setActivation($activation);
+        $field->addActivation();
         $this->assertTrue($field->hasActivation());
-        $this->assertSame($activation, $field->getActivation());
+        $this->assertInstanceOf(Activation::class, $field->getActivation());
     }
 
     /**
      * @test
      */
-    public function setNameSetsName()
+    public function addActivationOnFrozenDefinitionIsChecked()
     {
-        $field = new Field;
+        $field = $this->getFieldWithDefinitionFreezeStateCheck();
 
-        $field->setName('foo');
-        $this->assertEquals('foo', $field->getName());
+        $field->addActivation();
+    }
+
+    /**
+     * @test
+     */
+    public function getUninitializedActivationThrowsException()
+    {
+        $this->setExpectedException(SilentException::class);
+
+        $field = new Field('foo');
+        $field->getActivation();
+    }
+
+    /**
+     * @return Field|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getFieldWithDefinitionFreezeStateCheck()
+    {
+        /** @var Field|\PHPUnit_Framework_MockObject_MockObject $field */
+        $field = $this->getMockBuilder(Field::class)
+            ->setConstructorArgs(['foo'])
+            ->setMethods(['checkDefinitionFreezeState'])
+            ->getMock();
+
+        $field->expects($this->once())
+            ->method('checkDefinitionFreezeState');
+
+        return $field;
     }
 }

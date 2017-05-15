@@ -20,8 +20,8 @@ use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAsset
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
-use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
-use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\LocalizationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\RootConfigurationJavaScriptAssetHandler;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
@@ -118,7 +118,7 @@ class JavaScriptAssetHandlerConnector
             $filePath,
             function () {
                 return $this->getFormzLocalizationJavaScriptAssetHandler()
-                    ->injectTranslationsForFormFieldsValidation()
+                    ->injectTranslationsForFormFieldsValidator()
                     ->getJavaScriptCode();
             }
         );
@@ -333,11 +333,11 @@ JS;
     }
 
     /**
-     * @return FormzConfigurationJavaScriptAssetHandler|AbstractAssetHandler
+     * @return RootConfigurationJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFormzConfigurationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerFactory->getAssetHandler(FormzConfigurationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(RootConfigurationJavaScriptAssetHandler::class);
     }
 
     /**
@@ -381,11 +381,11 @@ JS;
     }
 
     /**
-     * @return FormzLocalizationJavaScriptAssetHandler|AbstractAssetHandler
+     * @return LocalizationJavaScriptAssetHandler|AbstractAssetHandler
      */
     protected function getFormzLocalizationJavaScriptAssetHandler()
     {
-        return $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+        return $this->assetHandlerFactory->getAssetHandler(LocalizationJavaScriptAssetHandler::class);
     }
 
     /**

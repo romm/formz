@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Validation\Validator\Internal;
 
-use Romm\Formz\Form\Definition\Field\Activation\AbstractActivation;
+use Romm\Formz\Form\Definition\Condition\Activation;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\Validator\Internal\ConditionIsValidValidator;
 
@@ -19,10 +19,10 @@ class ConditionIsValidValidatorTest extends AbstractUnitTest
             ->setMethods(['translateErrorMessage'])
             ->getMock();
 
-        /** @var AbstractActivation|\PHPUnit_Framework_MockObject_MockObject $condition */
-        $condition = $this->getMockBuilder(AbstractActivation::class)
+        /** @var Activation|\PHPUnit_Framework_MockObject_MockObject $condition */
+        $condition = $this->getMockBuilder(Activation::class)
             ->setMethods(['getExpression'])
-            ->getMockForAbstractClass();
+            ->getMock();
 
         $condition->method('getExpression')
             ->willReturn('invalid condition expression');

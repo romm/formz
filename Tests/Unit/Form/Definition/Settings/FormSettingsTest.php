@@ -22,6 +22,22 @@ class FormSettingsTest extends AbstractUnitTest
     /**
      * @test
      */
+    public function setDefaultClassOnFrozenDefinitionIsChecked()
+    {
+        /** @var FormSettings|\PHPUnit_Framework_MockObject_MockObject $formSettings */
+        $formSettings = $this->getMockBuilder(FormSettings::class)
+            ->setMethods(['checkDefinitionFreezeState'])
+            ->getMock();
+
+        $formSettings->expects($this->once())
+            ->method('checkDefinitionFreezeState');
+
+        $formSettings->setDefaultClass('foo');
+    }
+
+    /**
+     * @test
+     */
     public function defaultClassIsFetchedFromParent()
     {
         $formSettings = new FormSettings;
@@ -42,6 +58,22 @@ class FormSettingsTest extends AbstractUnitTest
 
         $formSettings->setDefaultErrorMessage('hello.world');
         $this->assertEquals('LLL::hello.world', $formSettings->getDefaultErrorMessage());
+    }
+
+    /**
+     * @test
+     */
+    public function setDefaultErrorMessageOnFrozenDefinitionIsChecked()
+    {
+        /** @var FormSettings|\PHPUnit_Framework_MockObject_MockObject $formSettings */
+        $formSettings = $this->getMockBuilder(FormSettings::class)
+            ->setMethods(['checkDefinitionFreezeState'])
+            ->getMock();
+
+        $formSettings->expects($this->once())
+            ->method('checkDefinitionFreezeState');
+
+        $formSettings->setDefaultErrorMessage('foo');
     }
 
     /**

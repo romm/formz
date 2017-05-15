@@ -11,13 +11,22 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Form\Definition\Field\Activation;
+namespace Romm\Formz\Form\Definition\Condition;
 
-class Activation extends AbstractActivation
+interface ActivationUsageInterface
 {
     /**
-     * @var string
-     * @validate NotEmpty
+     * @return ActivationInterface
      */
-    protected $expression;
+    public function getActivation();
+
+    /**
+     * @return bool
+     */
+    public function hasActivation();
+
+    /**
+     * @return ActivationInterface
+     */
+    public function addActivation();
 }

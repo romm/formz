@@ -18,8 +18,8 @@ use Romm\Formz\Condition\Parser\Node\BooleanNode;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Parser\Node\NullNode;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
-use Romm\Formz\Form\Definition\Field\Activation\EmptyActivation;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -85,13 +85,11 @@ class ConditionParser implements SingletonInterface
         $rootNode = null;
         $this->resetParser($condition);
 
-        if (false === $condition instanceof EmptyActivation) {
-            try {
-                $rootNode = $this->getNodeRecursive();
-            } catch (ConditionParserException $exception) {
-                $error = new Error($exception->getMessage(), $exception->getCode());
-                $this->result->addError($error);
-            }
+        try {
+            $rootNode = $this->getNodeRecursive();
+        } catch (ConditionParserException $exception) {
+            $error = new Error($exception->getMessage(), $exception->getCode());
+            $this->result->addError($error);
         }
 
         $rootNode = $rootNode ?: NullNode::get();

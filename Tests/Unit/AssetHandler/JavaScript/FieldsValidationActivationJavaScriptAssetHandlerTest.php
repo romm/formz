@@ -2,10 +2,10 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAssetHandler;
-use Romm\Formz\Condition\Parser\ConditionTree;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
+use Romm\Formz\Validation\Validator\RequiredValidator;
 
 class FieldsValidationActivationJavaScriptAssetHandlerTest extends AbstractUnitTest
 {
@@ -25,18 +25,16 @@ TXT;
         $assetHandlerFactory = $this->getAssetHandlerFactoryInstance();
 
         $field = $assetHandlerFactory->getFormObject()->getDefinition()->getField('foo');
-        $validation = new Validation;
-        $validation->setName('validation-name');
-        $field->addValidation($validation);
+        $field->addValidator('validation-name', RequiredValidator::class);
 
         /** @var FieldsValidationActivationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
         $assetHandler = $this->getMockBuilder(FieldsValidationActivationJavaScriptAssetHandler::class)
-            ->setMethods(['getConditionTreeForValidation'])
+            ->setMethods(['getConditionTreeForValidator'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
 
         $assetHandler->expects($this->once())
-            ->method('getConditionTreeForValidation')
+            ->method('getConditionTreeForValidator')
             ->willReturnCallback(function () {
                 $tree = $this->getMockBuilder(ConditionTree::class)
                     ->disableOriginalConstructor()

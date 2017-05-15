@@ -13,13 +13,16 @@
 
 namespace Romm\Formz\Configuration\View;
 
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
+use Romm\Formz\Configuration\AbstractConfiguration;
 use Romm\Formz\Configuration\View\Classes\Classes;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class View extends AbstractFormzConfiguration
+class View extends AbstractConfiguration implements DataPreProcessorInterface
 {
 
     /**
@@ -61,15 +64,6 @@ class View extends AbstractFormzConfiguration
     }
 
     /**
-     * @param string      $name
-     * @param LayoutGroup $layout
-     */
-    public function setLayout($name, LayoutGroup $layout)
-    {
-        $this->layouts[$name] = $layout;
-    }
-
-    /**
      * @return LayoutGroup[]
      */
     public function getLayouts()
@@ -101,11 +95,35 @@ class View extends AbstractFormzConfiguration
     }
 
     /**
+     * @param string $name
+     * @return LayoutGroup
+     * @throws DuplicateEntryException
+     */
+    public function addLayout($name)
+    {
+        $this->checkConfigurationFreezeState();
+
+        if ($this->hasLayout($name)) {
+            throw DuplicateEntryException::viewLayoutAlreadyAdded($name);
+        }
+
+        /** @var LayoutGroup $layout */
+        $layout = GeneralUtility::makeInstance(LayoutGroup::class, $name);
+        $layout->attachParent($this);
+
+        $this->layouts[$name] = $layout;
+
+        return $layout;
+    }
+
+    /**
      * @param string $key
      * @param string $path
      */
     public function setLayoutRootPath($key, $path)
     {
+        $this->checkConfigurationFreezeState();
+
         $this->layoutRootPaths[$key] = $path;
     }
 
@@ -137,6 +155,8 @@ class View extends AbstractFormzConfiguration
      */
     public function setPartialRootPath($key, $path)
     {
+        $this->checkConfigurationFreezeState();
+
         $this->partialRootPaths[$key] = $path;
     }
 
@@ -160,5 +180,23 @@ class View extends AbstractFormzConfiguration
         }
 
         return $paths;
+    }
+
+    /**
+     * @param DataPreProcessor $processor
+     */
+    public static function dataPreProcessor(DataPreProcessor $processor)
+    {
+        $data = $processor->getData();
+
+        /*
+         * Forcing the names of the layouts: they are the keys of the array
+         * entries.
+         */
+        foreach ($data['layouts'] as $key => $field) {
+            $data['layouts'][$key]['name'] = $key;
+        }
+
+        $processor->setData($data);
     }
 }

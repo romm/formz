@@ -13,13 +13,17 @@
 
 namespace Romm\Formz\Configuration\View\Layouts;
 
-use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Configuration\AbstractConfiguration;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class LayoutGroup extends AbstractFormzConfiguration
+class LayoutGroup extends AbstractConfiguration
 {
-    use StoreArrayIndexTrait;
+    /**
+     * @var string
+     */
+    protected $name;
 
     /**
      * @var \Romm\Formz\Configuration\View\Layouts\Layout[]
@@ -33,11 +37,19 @@ class LayoutGroup extends AbstractFormzConfiguration
     protected $templateFile;
 
     /**
+     * @param string $name
+     */
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
      * @return string
      */
     public function getName()
     {
-        return $this->getArrayIndex();
+        return $this->name;
     }
 
     /**
@@ -73,13 +85,24 @@ class LayoutGroup extends AbstractFormzConfiguration
 
     /**
      * @param string $name
-     * @param Layout $layout
+     * @return Layout
+     * @throws DuplicateEntryException
      */
-    public function addItem($name, Layout $layout)
+    public function addItem($name)
     {
-        $layout->setParents([$this]);
+        $this->checkConfigurationFreezeState();
+
+        if ($this->hasItem($name)) {
+            throw DuplicateEntryException::layoutItemAlreadyAdded($name, $this);
+        }
+
+        /** @var Layout $layout */
+        $layout = GeneralUtility::makeInstance(Layout::class);
+        $layout->attachParent($this);
 
         $this->items[$name] = $layout;
+
+        return $layout;
     }
 
     /**
@@ -95,6 +118,8 @@ class LayoutGroup extends AbstractFormzConfiguration
      */
     public function setTemplateFile($templateFile)
     {
+        $this->checkConfigurationFreezeState();
+
         $this->templateFile = $templateFile;
     }
 }

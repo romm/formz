@@ -21,14 +21,11 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\DefaultConfigurationObjectTrait;
 use Romm\Formz\Configuration\Settings\Settings;
 use Romm\Formz\Configuration\View\View;
-use Romm\Formz\Exceptions\DuplicateEntryException;
-use Romm\Formz\Exceptions\EntryNotFoundException;
-use Romm\Formz\Form\FormObject\FormObjectStatic;
 use Romm\Formz\Service\CacheService as InternalCacheService;
 use Romm\Formz\Service\HashService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Configuration extends AbstractFormzConfiguration implements ConfigurationObjectInterface
+class Configuration extends AbstractConfiguration implements ConfigurationObjectInterface
 {
     use DefaultConfigurationObjectTrait;
     use ArrayConversionTrait;
@@ -37,11 +34,6 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      * @var \Romm\Formz\Configuration\Settings\Settings
      */
     protected $settings;
-
-    /**
-     * @var FormObjectStatic[]
-     */
-    protected $forms = [];
 
     /**
      * @var \Romm\Formz\Configuration\View\View
@@ -54,29 +46,22 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     protected $hash;
 
     /**
+     * @var ConfigurationState
+     */
+    private $state;
+
+    /**
      * Constructor.
      */
     public function __construct()
     {
         $this->settings = GeneralUtility::makeInstance(Settings::class);
-        $this->view = GeneralUtility::makeInstance(View::class);
-    }
+        $this->settings->attachParent($this);
 
-    /**
-     * Will initialize correctly the configuration object settings.
-     *
-     * @return ServiceFactory
-     */
-    public static function getConfigurationObjectServices()
-    {
-        return ServiceFactory::getInstance()
-            ->attach(ServiceInterface::SERVICE_CACHE)
-            ->with(ServiceInterface::SERVICE_CACHE)
-            ->setOption(CacheService::OPTION_CACHE_NAME, InternalCacheService::CONFIGURATION_OBJECT_CACHE_IDENTIFIER)
-            ->setOption(CacheService::OPTION_CACHE_BACKEND, InternalCacheService::get()->getBackendCache())
-            ->attach(ServiceInterface::SERVICE_PARENTS)
-            ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
-            ->attach(ServiceInterface::SERVICE_MIXED_TYPES);
+        $this->view = GeneralUtility::makeInstance(View::class);
+        $this->view->attachParent($this);
+
+        $this->state = GeneralUtility::makeInstance(ConfigurationState::class);
     }
 
     /**
@@ -85,48 +70,6 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
     public function getSettings()
     {
         return $this->settings;
-    }
-
-    /**
-     * Adds a form to the forms list of this FormZ configuration. Note that this
-     * function will also handle the parent service from the
-     * `configuration_object` extension.
-     *
-     * @param FormObjectStatic $form
-     * @throws DuplicateEntryException
-     */
-    public function addForm(FormObjectStatic $form)
-    {
-        if (true === $this->hasForm($form->getClassName())) {
-            throw DuplicateEntryException::formWasAlreadyRegistered($form);
-        }
-
-        $form->getDefinition()->setParents([$this]);
-
-        $this->forms[$form->getClassName()] = $form;
-    }
-
-    /**
-     * @param string $className
-     * @return bool
-     */
-    public function hasForm($className)
-    {
-        return true === isset($this->forms[$className]);
-    }
-
-    /**
-     * @param string $className
-     * @return FormObjectStatic
-     * @throws EntryNotFoundException
-     */
-    public function getForm($className)
-    {
-        if (false === $this->hasForm($className)) {
-            throw EntryNotFoundException::formConfigurationNotFound();
-        }
-
-        return $this->forms[$className];
     }
 
     /**
@@ -145,13 +88,7 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public function calculateHash()
     {
-        $fullArray = $this->toArray();
-        $configurationArray = [
-            'view'     => $fullArray['view'],
-            'settings' => $fullArray['settings']
-        ];
-
-        $this->hash = HashService::get()->getHash(serialize($configurationArray));
+        return $this->hash = HashService::get()->getHash(serialize($this));
     }
 
     /**
@@ -159,6 +96,35 @@ class Configuration extends AbstractFormzConfiguration implements ConfigurationO
      */
     public function getHash()
     {
+        if (null === $this->hash) {
+            $this->hash = $this->calculateHash();
+        }
+
         return $this->hash;
+    }
+
+    /**
+     * @return ConfigurationState
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * Will initialize correctly the configuration object settings.
+     *
+     * @return ServiceFactory
+     */
+    public static function getConfigurationObjectServices()
+    {
+        return ServiceFactory::getInstance()
+            ->attach(ServiceInterface::SERVICE_CACHE)
+            ->with(ServiceInterface::SERVICE_CACHE)
+            ->setOption(CacheService::OPTION_CACHE_NAME, InternalCacheService::CONFIGURATION_OBJECT_CACHE_IDENTIFIER)
+            ->setOption(CacheService::OPTION_CACHE_BACKEND, InternalCacheService::get()->getBackendCache())
+            ->attach(ServiceInterface::SERVICE_PARENTS)
+            ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
+            ->attach(ServiceInterface::SERVICE_MIXED_TYPES);
     }
 }

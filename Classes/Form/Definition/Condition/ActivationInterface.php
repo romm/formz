@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Form\Definition\Field\Activation;
+namespace Romm\Formz\Form\Definition\Condition;
 
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 
@@ -70,10 +70,4 @@ interface ActivationInterface
      * @return ActivationUsageInterface
      */
     public function getRootObject();
-
-    /**
-     * @param ActivationUsageInterface $rootObject
-     * @return void
-     */
-    public function setRootObject(ActivationUsageInterface $rootObject);
 }

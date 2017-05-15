@@ -408,8 +408,15 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     protected function getMockedFieldService()
     {
         $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
-            ->setMethods(['setCurrentField'])
+            ->setMethods(['setCurrentField', 'getView'])
             ->getMock();
+
+        $view = $this->getMockBuilder(StandaloneView::class)
+            ->setMethods(['render'])
+            ->getMock();
+
+        $fieldService->method('getView')
+            ->willReturn($view);
 
         return $fieldService;
     }

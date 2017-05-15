@@ -16,7 +16,7 @@ namespace Romm\Formz\Condition\Items;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 
@@ -72,4 +72,10 @@ interface ConditionItemInterface
      * @return array
      */
     public function getJavaScriptFiles();
+
+    /**
+     * @param object $parent
+     * @return void
+     */
+    public function attachParent($parent);
 }

@@ -17,6 +17,8 @@ class MissingArgumentException extends FormzException
 {
     const ARGUMENT_MISSING = 'The argument "%s" was not found in the request.';
 
+    const CONDITION_CONSTRUCTOR_ARGUMENT_MISSING = 'Error while instantiating the condition "%s" of type "%s": a constructor argument is missing. Given arguments were: "%s".';
+
     /**
      * @code 1490179179
      *
@@ -44,6 +46,25 @@ class MissingArgumentException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::ARGUMENT_MISSING,
             ['className']
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1494850270
+     *
+     * @param string $conditionName
+     * @param string $conditionClassName
+     * @param array  $arguments
+     * @return self
+     */
+    final public static function conditionConstructorArgumentMissing($conditionName, $conditionClassName, array $arguments)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONDITION_CONSTRUCTOR_ARGUMENT_MISSING,
+            [$conditionName, $conditionClassName, implode('", "', array_keys($arguments))]
         );
 
         return $exception;

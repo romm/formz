@@ -13,14 +13,17 @@
 
 namespace Romm\Formz\Condition;
 
+use InvalidArgumentException;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Condition\Items\FieldHasErrorCondition;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
 use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -63,55 +66,89 @@ class ConditionFactory implements SingletonInterface
      * The condition class must implement the interface
      * `ConditionItemInterface`.
      *
-     * @param string $name      The name of the condition, which will then be available for TypoScript conditions.
-     * @param string $className Class which will process the condition.
+     * @param string $identifier The identifier of the condition, which will then be available for TypoScript conditions.
+     * @param string $className  Class which will process the condition.
      * @return $this
      * @throws ClassNotFoundException
      * @throws InvalidArgumentTypeException
      */
-    public function registerCondition($name, $className)
+    public function registerCondition($identifier, $className)
     {
-        if (false === is_string($name)) {
-            throw InvalidArgumentTypeException::conditionNameNotString($name);
+        if (false === is_string($identifier)) {
+            throw InvalidArgumentTypeException::conditionNameNotString($identifier);
         }
 
         if (false === class_exists($className)) {
-            throw ClassNotFoundException::conditionClassNameNotFound($name, $className);
+            throw ClassNotFoundException::conditionClassNameNotFound($identifier, $className);
         }
 
         if (false === in_array(ConditionItemInterface::class, class_implements($className))) {
             throw InvalidArgumentTypeException::conditionClassNameNotValid($className);
         }
 
-        $this->conditions[$name] = $className;
+        $this->conditions[$identifier] = $className;
 
         return $this;
     }
 
     /**
-     * @param string $conditionName
+     * @param string $identifier
      * @return bool
      */
-    public function hasCondition($conditionName)
+    public function hasCondition($identifier)
     {
-        return true === array_key_exists($conditionName, $this->conditions);
+        return true === array_key_exists($identifier, $this->conditions);
     }
 
     /**
      * Returns the wanted condition. A check should be done before calling this
      * function, with `hasCondition()`.
      *
-     * @param $conditionName
+     * @param $identifier
      * @return mixed
      * @throws EntryNotFoundException
      */
-    public function getCondition($conditionName)
+    public function getCondition($identifier)
     {
-        if (false === $this->hasCondition($conditionName)) {
-            throw EntryNotFoundException::conditionNotFound($conditionName, $this->conditions);
+        if (false === $this->hasCondition($identifier)) {
+            throw EntryNotFoundException::conditionNotFound($identifier, $this->conditions);
         }
 
-        return $this->conditions[$conditionName];
+        return $this->conditions[$identifier];
+    }
+
+    /**
+     * @return array
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    /**
+     * @param string $identifier
+     * @param array  $arguments
+     * @return ConditionItemInterface
+     * @throws EntryNotFoundException
+     * @throws MissingArgumentException
+     */
+    public function instantiateCondition($identifier, array $arguments = [])
+    {
+        if (false === $this->hasCondition($identifier)) {
+            throw EntryNotFoundException::instantiateConditionNotFound($identifier, $this->conditions);
+        }
+
+        try {
+            /** @var ConditionItemInterface $condition */
+            $condition = call_user_func_array(
+                [Core::class, 'instantiate'],
+                array_merge([$this->conditions[$identifier]], $arguments)
+            );
+        } catch (InvalidArgumentException $exception) {
+            throw MissingArgumentException::conditionConstructorArgumentMissing($identifier, $this->conditions[$identifier], $arguments);
+        }
+
+        return $condition;
     }
 
     /**
@@ -123,16 +160,16 @@ class ConditionFactory implements SingletonInterface
             $this->defaultConditionsWereRegistered = true;
 
             $this->registerCondition(
-                FieldHasValueCondition::CONDITION_NAME,
+                FieldHasValueCondition::CONDITION_IDENTIFIER,
                 FieldHasValueCondition::class
             )->registerCondition(
-                FieldHasErrorCondition::CONDITION_NAME,
+                FieldHasErrorCondition::CONDITION_IDENTIFIER,
                 FieldHasErrorCondition::class
             )->registerCondition(
-                FieldIsValidCondition::CONDITION_NAME,
+                FieldIsValidCondition::CONDITION_IDENTIFIER,
                 FieldIsValidCondition::class
             )->registerCondition(
-                FieldIsEmptyCondition::CONDITION_NAME,
+                FieldIsEmptyCondition::CONDITION_IDENTIFIER,
                 FieldIsEmptyCondition::class
             );
         }

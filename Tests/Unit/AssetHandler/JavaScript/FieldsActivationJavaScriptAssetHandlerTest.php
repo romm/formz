@@ -2,7 +2,7 @@
 namespace Romm\Formz\Tests\Unit\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\JavaScript\FieldsActivationJavaScriptAssetHandler;
-use Romm\Formz\Condition\Parser\ConditionTree;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\AssetHandler\AssetHandlerTestTrait;
 

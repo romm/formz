@@ -14,12 +14,13 @@
 namespace Romm\Formz\Condition\Processor;
 
 use Romm\Formz\Condition\Parser\ConditionParserFactory;
-use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
+use Romm\Formz\Condition\Parser\Tree\EmptyConditionTree;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;
 
 class ConditionProcessor
@@ -37,7 +38,7 @@ class ConditionProcessor
     /**
      * @var ConditionTree[]
      */
-    private $validationsTrees = [];
+    private $conditionTrees = [];
 
     /**
      * @var array
@@ -64,37 +65,44 @@ class ConditionProcessor
         $key = $field->getName();
 
         if (false === array_key_exists($key, $this->fieldsTrees)) {
-            $this->fieldsTrees[$key] = $this->getConditionTree($field->getActivation());
+            $this->fieldsTrees[$key] = $field->hasActivation()
+                ? $this->getConditionTree($field->getActivation())
+                : EmptyConditionTree::get();
         }
 
-        $this->fieldsTrees[$key]->injectDependencies($this, $field->getActivation());
+        if ($field->hasActivation()) {
+            $this->fieldsTrees[$key]->injectDependencies($this, $field->getActivation());
+        }
 
         return $this->fieldsTrees[$key];
     }
 
     /**
-     * Returns the condition tree for a given validation instance, giving access
+     * Returns the condition tree for a given validator instance, giving access
      * to CSS, JavaScript and PHP transpiled results.
      *
-     * @param Validation $validation
+     * @param Validator $validator
      * @return ConditionTree
      */
-    public function getActivationConditionTreeForValidation(Validation $validation)
+    public function getActivationConditionTreeForValidator(Validator $validator)
     {
-        $key = $validation->getParentField()->getName() . '->' . $validation->getName();
+        $key = $validator->getParentField()->getName() . '->' . $validator->getName();
 
-        if (false === array_key_exists($key, $this->validationsTrees)) {
-            $this->validationsTrees[$key] = $this->getConditionTree($validation->getActivation());
+        if (false === array_key_exists($key, $this->conditionTrees)) {
+            $this->conditionTrees[$key] = $validator->hasActivation()
+                ? $this->getConditionTree($validator->getActivation())
+                : EmptyConditionTree::get();
         }
 
-        $this->validationsTrees[$key]->injectDependencies($this, $validation->getActivation());
+        if ($validator->hasActivation()) {
+            $this->conditionTrees[$key]->injectDependencies($this, $validator->getActivation());
+        }
 
-        return $this->validationsTrees[$key];
+        return $this->conditionTrees[$key];
     }
 
     /**
-     * Function that will calculate all trees from fields and their validation
-     * rules.
+     * Function that will calculate all trees from fields and their validators.
      *
      * This is useful to be able to store this instance in cache.
      */
@@ -105,8 +113,8 @@ class ConditionProcessor
         foreach ($fields as $field) {
             $this->getActivationConditionTreeForField($field);
 
-            foreach ($field->getValidation() as $validation) {
-                $this->getActivationConditionTreeForValidation($validation);
+            foreach ($field->getValidators() as $validator) {
+                $this->getActivationConditionTreeForValidator($validator);
             }
         }
     }
@@ -180,6 +188,6 @@ class ConditionProcessor
      */
     public function __sleep()
     {
-        return ['fieldsTrees', 'validationsTrees', 'javaScriptFiles'];
+        return ['fieldsTrees', 'conditionTrees', 'javaScriptFiles'];
     }
 }

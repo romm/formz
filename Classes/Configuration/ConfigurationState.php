@@ -13,19 +13,29 @@
 
 namespace Romm\Formz\Configuration;
 
-use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
-class AbstractFormzConfiguration
+class ConfigurationState
 {
-    use MagicMethodsTrait;
+    /**
+     * @var bool
+     */
+    protected $isFrozen = false;
 
     /**
-     * @param string $path
-     * @return string
+     * @return bool
      */
-    protected function getAbsolutePath($path)
+    public function isFrozen()
     {
-        return GeneralUtility::getFileAbsFileName($path);
+        return $this->isFrozen;
+    }
+
+    /**
+     * Marks the configuration as frozen, meaning recursive properties cannot be
+     * edited anymore.
+     *
+     * @internal
+     */
+    public function markAsFrozen()
+    {
+        $this->isFrozen = true;
     }
 }

@@ -9,36 +9,41 @@ use Romm\Formz\Tests\Unit\AbstractUnitTest;
 abstract class AbstractConditionItemUnitTest extends AbstractUnitTest
 {
     /**
-     * @param $className
-     * @param $errorCode
+     * @param       $className
+     * @param array $arguments
+     * @param       $errorCode
      * @return ConditionItemInterface
      */
-    protected function getConditionItemWithFailedConfigurationValidation($className, $errorCode)
+    protected function getConditionItemWithFailedConfigurationValidation($className, array $arguments = [], $errorCode)
     {
         $this->setExpectedException(InvalidConditionException::class, '', $errorCode);
 
-        return $this->getConditionItem($className);
+        return $this->getConditionItem($className, $arguments);
     }
 
     /**
      * @param string     $className
+     * @param array      $arguments
      * @param FormObject $formObject
      * @return ConditionItemInterface
      */
-    protected function getConditionItemWithValidConfigurationValidation($className, FormObject $formObject = null)
+    protected function getConditionItemWithValidConfigurationValidation($className, array $arguments = [], FormObject $formObject = null)
     {
-        return $this->getConditionItem($className, $formObject);
+        return $this->getConditionItem($className, $arguments, $formObject);
     }
 
     /**
      * @param string     $className
+     * @param array      $arguments
      * @param FormObject $formObject
      * @return ConditionItemInterface
      */
-    private function getConditionItem($className, FormObject $formObject = null)
+    private function getConditionItem($className, array $arguments = [], FormObject $formObject = null)
     {
+        $reflection = new \ReflectionClass($className);
+
         /** @var ConditionItemInterface $conditionItem */
-        $conditionItem = new $className;
+        $conditionItem = $reflection->newInstanceArgs($arguments);
 
         $formObject = $formObject ?: $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);

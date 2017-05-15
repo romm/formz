@@ -17,7 +17,8 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Configuration\View\View;
-use Romm\Formz\Form\Definition\Field\Activation\AbstractActivation;
+use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
@@ -33,11 +34,21 @@ class EntryNotFoundException extends FormzException
 
     const CONDITION_NOT_FOUND = 'Trying to access a condition which is not registered: "%s". Here is a list of all currently registered conditions: "%s".';
 
+    const FORM_ADD_CONDITION_NOT_FOUND = 'Trying to add a condition "%s" which is not registered to the form definition. Here is a list of all currently registered conditions: "%s".';
+
+    const ACTIVATION_ADD_CONDITION_NOT_FOUND = 'Trying to add a condition "%s" which is not registered to the activation. Here is a list of all currently registered conditions: "%s".';
+
+    const INSTANTIATE_CONDITION_NOT_FOUND = 'Trying to instantiate a condition which is not registered: "%s". Here is a list of all currently registered conditions: "%s".';
+
     const ACTIVATION_CONDITION_NOT_FOUND = 'No condition "%s" was found.';
 
     const CONFIGURATION_FIELD_NOT_FOUND = 'The field "%s" was not found. Please use the function `%s::hasField()` before.';
 
-    const VALIDATION_NOT_FOUND = 'The validation "%s" was not found. Please use the function `%s::hasValidation()` before.';
+    const VALIDATOR_NOT_FOUND = 'The validation "%s" was not found. Please use the function `%s::hasValidator()` before.';
+
+    const BEHAVIOUR_NOT_FOUND = 'The behaviour "%s" was not found. Please use the function `%s::hasBehaviour()` before.';
+
+    const MESSAGE_NOT_FOUND = 'The message "%s" was not found. Please use the function `%s::hasMessage()` before.';
 
     const VIEW_LAYOUT_NOT_FOUND = 'The layout "%s" was not found. Please use the function `%s::hasLayout()` before.';
 
@@ -49,7 +60,7 @@ class EntryNotFoundException extends FormzException
 
     const ERROR_KEY_NOT_FOUND_FOR_VALIDATOR = 'The error key "%s" does not exist for the validator "%s".';
 
-    const VIEW_HELPER_FIELD_NOT_FOUND = 'The field "%s" could not be fetched for the view helper "%s": please either use this view helper inside the view helper "%s", or fill the parameter `field` of this view helper with the field name you want.';
+    const VIEW_HELPER_FIELD_NOT_FOUND = 'The field could not be fetched for the view helper "%s": please either use this view helper inside the view helper "%s", or fill the parameter `field` of this view helper with the field name you want.';
 
     const FIELD_VIEW_HELPER_LAYOUT_NOT_FOUND = 'The layout "%s" could not be found. Please check your TypoScript configuration.';
 
@@ -61,22 +72,89 @@ class EntryNotFoundException extends FormzException
 
     const FORM_CONFIGURATION_NOT_FOUND = 'The configuration for form of class "%s" was not found. Please use the function `%s::hasForm()` before.';
 
+    const CONDITION_NOT_FOUND_IN_DEFINITION = 'The condition "%s" was not found in the form definition. Please use the function `%s::hasCondition()` before.';
+
+    const CONDITION_DOES_NOT_EXIST = 'The condition "%s" does not exist';
+
     const FORM_OBJECT_INSTANCE_NOT_FOUND = 'The form instance for the object of type "%s" was not found. Please take care of registering it before with "%s::registerFormInstance()".';
 
     /**
      * @code 1472650209
      *
-     * @param string $name
+     * @param string $identifier
      * @param array  $list
      * @return self
      */
-    final public static function conditionNotFound($name, array $list)
+    final public static function conditionNotFound($identifier, array $list)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONDITION_NOT_FOUND,
             [
-                $name,
+                $identifier,
+                implode('" ,"', array_keys($list))
+            ]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1493890438
+     *
+     * @param string $identifier
+     * @param array  $list
+     * @return self
+     */
+    final public static function formAddConditionNotFound($identifier, array $list)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_ADD_CONDITION_NOT_FOUND,
+            [
+                $identifier,
+                implode('" ,"', array_keys($list))
+            ]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1494329341
+     *
+     * @param string $identifier
+     * @param array  $list
+     * @return self
+     */
+    final public static function activationAddConditionNotFound($identifier, array $list)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::ACTIVATION_ADD_CONDITION_NOT_FOUND,
+            [
+                $identifier,
+                implode('" ,"', array_keys($list))
+            ]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1493890825
+     *
+     * @param string $identifier
+     * @param array  $list
+     * @return self
+     */
+    final public static function instantiateConditionNotFound($identifier, array $list)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::INSTANTIATE_CONDITION_NOT_FOUND,
+            [
+                $identifier,
                 implode('" ,"', array_keys($list))
             ]
         );
@@ -124,12 +202,46 @@ class EntryNotFoundException extends FormzException
      * @param string $name
      * @return self
      */
-    final public static function validationNotFound($name)
+    final public static function validatorNotFound($name)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
-            self::VALIDATION_NOT_FOUND,
-            [$name, AbstractActivation::class]
+            self::VALIDATOR_NOT_FOUND,
+            [$name, Field::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1494685753
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function behaviourNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::BEHAVIOUR_NOT_FOUND,
+            [$name, Field::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1494694474
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function messageNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MESSAGE_NOT_FOUND,
+            [$name, Validator::class]
         );
 
         return $exception;
@@ -261,15 +373,14 @@ class EntryNotFoundException extends FormzException
     /**
      * @code 1467623761
      *
-     * @param string $fieldName
      * @return self
      */
-    final public static function classViewHelperFieldNotFound($fieldName)
+    final public static function classViewHelperFieldNotFound()
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_HELPER_FIELD_NOT_FOUND,
-            [$fieldName, ClassViewHelper::class, FieldViewHelper::class]
+            [ClassViewHelper::class, FieldViewHelper::class]
         );
 
         return $exception;
@@ -409,6 +520,23 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_CONFIGURATION_NOT_FOUND,
             [Configuration::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1493881671
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function conditionNotFoundInDefinition($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::CONDITION_NOT_FOUND_IN_DEFINITION,
+            [$name, Configuration::class]
         );
 
         return $exception;

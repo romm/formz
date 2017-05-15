@@ -13,25 +13,30 @@
 
 namespace Romm\Formz\Form\Definition\Field;
 
-use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
-use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationUsageInterface;
-use Romm\Formz\Form\Definition\Field\Activation\EmptyActivation;
+use Romm\Formz\Exceptions\SilentException;
+use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
+use Romm\Formz\Form\Definition\Condition\Activation;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
+use Romm\Formz\Form\Definition\Condition\ActivationUsageInterface;
 use Romm\Formz\Form\Definition\Field\Behaviour\Behaviour;
 use Romm\Formz\Form\Definition\Field\Settings\FieldSettings;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
-use Romm\Formz\Form\Definition\FormDefinition;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Field extends AbstractFormzConfiguration implements ActivationUsageInterface
+class Field extends AbstractFormDefinitionComponent implements ActivationUsageInterface, DataPreProcessorInterface
 {
-    use StoreArrayIndexTrait;
-    use ParentsTrait;
+    /**
+     * @var string
+     * @validate NotEmpty
+     */
+    private $name;
 
     /**
-     * @var \Romm\Formz\Form\Definition\Field\Validation\Validation[]
+     * @var \Romm\Formz\Form\Definition\Field\Validation\Validator[]
      */
     protected $validation = [];
 
@@ -41,8 +46,7 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     protected $behaviours = [];
 
     /**
-     * @var \Romm\Formz\Form\Definition\Field\Activation\ActivationInterface
-     * @mixedTypesResolver \Romm\Formz\Form\Definition\Field\Activation\ActivationResolver
+     * @var \Romm\Formz\Form\Definition\Condition\Activation
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;
@@ -50,76 +54,79 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     /**
      * @var \Romm\Formz\Form\Definition\Field\Settings\FieldSettings
      */
-    protected $settings;
+    private $settings;
 
     /**
-     * Name of the field. By default, it is the key of this field in the array
-     * containing all the fields for the parent form.
-     *
-     * @var string
+     * @param string $name
      */
-    private $name;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
+    public function __construct($name)
     {
-        $this->settings = new FieldSettings;
-        $this->settings->setParents([$this]);
+        $this->name = $name;
 
-        $this->activation = EmptyActivation::get();
+        $this->settings = GeneralUtility::makeInstance(FieldSettings::class);
+        $this->settings->attachParent($this);
     }
 
     /**
-     * @return FormDefinition
+     * @return string
      */
-    public function getForm()
+    public function getName()
     {
-        /** @var FormDefinition $form */
-        $form = $this->getFirstParent(FormDefinition::class);
-
-        return $form;
+        return $this->name;
     }
 
     /**
-     * @return Validation[]
+     * @return Validator[]
      */
-    public function getValidation()
+    public function getValidators()
     {
         return $this->validation;
     }
 
     /**
-     * @param string $validationName
+     * @param string $name
      * @return bool
      */
-    public function hasValidation($validationName)
+    public function hasValidator($name)
     {
-        return true === isset($this->validation[$validationName]);
+        return true === isset($this->validation[$name]);
     }
 
     /**
-     * @param Validation $validation
-     */
-    public function addValidation(Validation $validation)
-    {
-        $this->validation[$validation->getName()] = $validation;
-        $validation->setParents([$this]);
-    }
-
-    /**
-     * @param string $validationName
-     * @return Validation
+     * @param string $name
+     * @return Validator
      * @throws EntryNotFoundException
      */
-    public function getValidationByName($validationName)
+    public function getValidator($name)
     {
-        if (false === $this->hasValidation($validationName)) {
-            throw EntryNotFoundException::validationNotFound($validationName);
+        if (false === $this->hasValidator($name)) {
+            throw EntryNotFoundException::validatorNotFound($name);
         }
 
-        return $this->validation[$validationName];
+        return $this->validation[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param string $className
+     * @return Validator
+     * @throws DuplicateEntryException
+     */
+    public function addValidator($name, $className)
+    {
+        $this->checkDefinitionFreezeState();
+
+        if ($this->hasValidator($name)) {
+            throw DuplicateEntryException::fieldValidatorAlreadyAdded($name, $this->getName());
+        }
+
+        /** @var Validator $validator */
+        $validator = GeneralUtility::makeInstance(Validator::class, $name, $className);
+        $validator->attachParent($this);
+
+        $this->validation[$name] = $validator;
+
+        return $validator;
     }
 
     /**
@@ -131,19 +138,61 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
-     * @param string    $name
-     * @param Behaviour $behaviour
+     * @param string $name
+     * @return bool
      */
-    public function addBehaviour($name, Behaviour $behaviour)
+    public function hasBehaviour($name)
     {
+        return true === isset($this->behaviours[$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return Behaviour
+     * @throws EntryNotFoundException
+     */
+    public function getBehaviour($name)
+    {
+        if (false === $this->hasBehaviour($name)) {
+            throw EntryNotFoundException::behaviourNotFound($name);
+        }
+
+        return $this->behaviours[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param string $className
+     * @return Behaviour
+     * @throws DuplicateEntryException
+     */
+    public function addBehaviour($name, $className)
+    {
+        $this->checkDefinitionFreezeState();
+
+        if ($this->hasBehaviour($name)) {
+            throw DuplicateEntryException::fieldBehaviourAlreadyAdded($name, $this);
+        }
+
+        /** @var Behaviour $behaviour */
+        $behaviour = GeneralUtility::makeInstance(Behaviour::class, $name, $className);
+        $behaviour->attachParent($this);
+
         $this->behaviours[$name] = $behaviour;
+
+        return $behaviour;
     }
 
     /**
      * @return ActivationInterface
+     * @throws SilentException
      */
     public function getActivation()
     {
+        if (false === $this->hasActivation()) {
+            throw SilentException::fieldHasNoActivation($this);
+        }
+
         return $this->activation;
     }
 
@@ -152,17 +201,22 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
      */
     public function hasActivation()
     {
-        return !($this->activation instanceof EmptyActivation);
+        return $this->activation instanceof ActivationInterface;
     }
 
     /**
-     * @param ActivationInterface $activation
+     * @return ActivationInterface
      */
-    public function setActivation(ActivationInterface $activation)
+    public function addActivation()
     {
-        $activation->setRootObject($this);
+        $this->checkDefinitionFreezeState();
 
-        $this->activation = $activation;
+        if (null === $this->activation) {
+            $this->activation = GeneralUtility::makeInstance(Activation::class);
+            $this->activation->attachParent($this);
+        }
+
+        return $this->activation;
     }
 
     /**
@@ -174,22 +228,19 @@ class Field extends AbstractFormzConfiguration implements ActivationUsageInterfa
     }
 
     /**
-     * @return string
+     * @param DataPreProcessor $processor
      */
-    public function getName()
+    public static function dataPreProcessor(DataPreProcessor $processor)
     {
-        if (null === $this->name) {
-            $this->name = $this->getArrayIndex();
-        }
+        $data = $processor->getData();
 
-        return $this->name;
-    }
+        /*
+         * Forcing the names of the validators and the behaviours: they are the
+         * keys of the array entries.
+         */
+        self::forceNameForProperty($data, 'validation');
+        self::forceNameForProperty($data, 'behaviours');
 
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
+        $processor->setData($data);
     }
 }

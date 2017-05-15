@@ -39,10 +39,7 @@ abstract class AbstractFormObjectBuilder implements FormObjectBuilderInterface
     {
         $this->className = $className;
 
-        $formDefinition = $this->getFormDefinition();
-
-        /** @var FormDefinitionObject $formDefinitionObject */
-        $formDefinitionObject = GeneralUtility::makeInstance(FormDefinitionObject::class, $formDefinition);
+        $formDefinitionObject = $this->getFormDefinitionObject();
 
         $this->static = Core::instantiate(
             FormObjectStatic::class,
@@ -52,9 +49,20 @@ abstract class AbstractFormObjectBuilder implements FormObjectBuilderInterface
 
         $this->process();
 
-        $formDefinitionObject->getDefinition();
+        $formDefinitionObject->refreshValidationResult();
 
         return $this->static;
+    }
+
+    /**
+     * @return FormDefinitionObject
+     */
+    protected function getFormDefinitionObject()
+    {
+        /** @var FormDefinitionObject $formDefinitionObject */
+        $formDefinitionObject = GeneralUtility::makeInstance(FormDefinitionObject::class, $this->getFormDefinition());
+
+        return $formDefinitionObject;
     }
 
     /**

@@ -2,12 +2,12 @@
 
 namespace Romm\Formz\Tests\Unit\Form\FormObject;
 
-use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use TYPO3\CMS\Extbase\Error\Result;
 
 class FormObjectStaticTest extends AbstractUnitTest
 {
@@ -86,10 +86,10 @@ class FormObjectStaticTest extends AbstractUnitTest
     {
         $formDefinition1 = new FormDefinition;
         $formDefinition2 = new FormDefinition;
-        $formDefinition2->addField(new Field);
+        $formDefinition2->addField('foo');
 
-        $formDefinitionObject1 = new FormDefinitionObject($formDefinition1);
-        $formDefinitionObject2 = new FormDefinitionObject($formDefinition2);
+        $formDefinitionObject1 = new FormDefinitionObject($formDefinition1, new Result);
+        $formDefinitionObject2 = new FormDefinitionObject($formDefinition2, new Result);
 
         $static1 = new FormObjectStatic(DefaultForm::class, $formDefinitionObject1);
         $static2 = new FormObjectStatic(DefaultForm::class, $formDefinitionObject1);

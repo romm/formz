@@ -14,8 +14,8 @@
 namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
-use Romm\Formz\Condition\Parser\ConditionTree;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -37,16 +37,16 @@ class FieldsValidationActivationJavaScriptAssetHandler extends AbstractAssetHand
         $formConfiguration = $this->getFormObject()->getDefinition();
 
         foreach ($formConfiguration->getFields() as $field) {
-            foreach ($field->getValidation() as $validation) {
+            foreach ($field->getValidators() as $validator) {
                 $fieldConditionExpression = [];
-                $javaScriptTree = $this->getConditionTreeForValidation($validation)->getJavaScriptConditions();
+                $javaScriptTree = $this->getConditionTreeForValidator($validator)->getJavaScriptConditions();
 
                 if (false === empty($javaScriptTree)) {
                     foreach ($javaScriptTree as $node) {
                         $fieldConditionExpression[] = 'flag = flag || (' . $node . ');';
                     }
 
-                    $javaScriptBlocks[] = $this->getSingleFieldActivationConditionFunction($validation, $fieldConditionExpression);
+                    $javaScriptBlocks[] = $this->getSingleFieldActivationConditionFunction($validator, $fieldConditionExpression);
                 }
             }
         }
@@ -73,11 +73,11 @@ JS;
     /**
      * This function is just here to make the class more readable.
      *
-     * @param Validation $validation
-     * @param array      $fieldConditionExpression Array containing the JavaScript condition expression for the field.
+     * @param Validator $validation
+     * @param array     $fieldConditionExpression Array containing the JavaScript condition expression for the field.
      * @return string
      */
-    protected function getSingleFieldActivationConditionFunction(Validation $validation, $fieldConditionExpression)
+    protected function getSingleFieldActivationConditionFunction(Validator $validation, $fieldConditionExpression)
     {
         $fieldName = GeneralUtility::quoteJSvalue($validation->getParentField()->getName());
         $validationName = GeneralUtility::quoteJSvalue($validation->getName());
@@ -101,11 +101,11 @@ JS;
     }
 
     /**
-     * @param Validation $valid
+     * @param Validator $validator
      * @return ConditionTree
      */
-    protected function getConditionTreeForValidation(Validation $valid)
+    protected function getConditionTreeForValidator(Validator $validator)
     {
-        return $this->conditionProcessor->getActivationConditionTreeForValidation($valid);
+        return $this->conditionProcessor->getActivationConditionTreeForValidator($validator);
     }
 }

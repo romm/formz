@@ -150,7 +150,7 @@ class ClassViewHelper extends AbstractViewHelper
         }
 
         if (null === $this->fieldName) {
-            throw EntryNotFoundException::classViewHelperFieldNotFound($this->arguments['name']);
+            throw EntryNotFoundException::classViewHelperFieldNotFound();
         }
     }
 

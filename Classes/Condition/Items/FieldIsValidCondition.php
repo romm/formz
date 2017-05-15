@@ -24,7 +24,7 @@ use Romm\Formz\Form\Definition\FormDefinition;
  */
 class FieldIsValidCondition extends AbstractConditionItem
 {
-    const CONDITION_NAME = 'fieldIsValid';
+    const CONDITION_IDENTIFIER = 'fieldIsValid';
 
     /**
      * @inheritdoc
@@ -39,6 +39,14 @@ class FieldIsValidCondition extends AbstractConditionItem
      * @validate NotEmpty
      */
     protected $fieldName;
+
+    /**
+     * @param string $fieldName
+     */
+    public function __construct($fieldName)
+    {
+        $this->fieldName = $fieldName;
+    }
 
     /**
      * @inheritdoc

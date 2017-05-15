@@ -14,6 +14,7 @@
 namespace Romm\Formz\Validation\Validator\Internal;
 
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\FormDefinition;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
@@ -34,7 +35,6 @@ class FormDefinitionValidator extends AbstractValidator
 
         $this->validateConditionList();
         $this->validateFieldsConditions();
-        $this->validateFieldsValidationConditions();
     }
 
     /**
@@ -58,6 +58,12 @@ class FormDefinitionValidator extends AbstractValidator
     protected function validateFieldsConditions()
     {
         foreach ($this->definition->getFields() as $field) {
+            $this->validateFieldsValidatorsConditions($field);
+
+            if (false === $field->hasActivation()) {
+                continue;
+            }
+
             foreach ($field->getActivation()->getConditions() as $conditionName => $condition) {
                 try {
                     $condition->validateConditionConfiguration($this->definition);
@@ -70,19 +76,23 @@ class FormDefinitionValidator extends AbstractValidator
     }
 
     /**
-     * Loops on each field validation, and validates every condition.
+     * Loops on each field validator, and validates every condition.
+     *
+     * @param Field $field
      */
-    protected function validateFieldsValidationConditions()
+    protected function validateFieldsValidatorsConditions(Field $field)
     {
-        foreach ($this->definition->getFields() as $field) {
-            foreach ($field->getValidation() as $validation) {
-                foreach ($validation->getActivation()->getConditions() as $conditionName => $condition) {
-                    try {
-                        $condition->validateConditionConfiguration($this->definition);
-                    } catch (InvalidConditionException $exception) {
-                        $property = "fields.{$field->getName()}.validation.{$validation->getName()}.activation.conditions.{$conditionName}";
-                        $this->addPropertyError($property, $exception->getMessage(), $exception->getCode());
-                    }
+        foreach ($field->getValidators() as $validator) {
+            if (false === $validator->hasActivation()) {
+                continue;
+            }
+
+            foreach ($validator->getActivation()->getConditions() as $conditionName => $condition) {
+                try {
+                    $condition->validateConditionConfiguration($this->definition);
+                } catch (InvalidConditionException $exception) {
+                    $property = "fields.{$field->getName()}.validation.{$validator->getName()}.activation.conditions.{$conditionName}";
+                    $this->addPropertyError($property, $exception->getMessage(), $exception->getCode());
                 }
             }
         }

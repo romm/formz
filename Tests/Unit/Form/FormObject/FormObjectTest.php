@@ -108,7 +108,16 @@ class FormObjectTest extends AbstractUnitTest
     {
         $this->setExpectedException(DuplicateEntryException::class);
 
-        $formObject = new FormObject('foo', $this->getEmptyFormObjectStaticMock());
+        /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
+        $formObject = $this->getMockBuilder(FormObject::class)
+            ->setConstructorArgs(['foo', $this->getEmptyFormObjectStaticMock()])
+            ->setMethods(['createProxy'])
+            ->getMock();
+
+        $formObject->expects($this->once())
+            ->method('createProxy')
+            ->willReturn($this->prophesize(FormObjectProxy::class)->reveal());
+
         $form = new DefaultForm;
 
         $formObject->setForm($form);

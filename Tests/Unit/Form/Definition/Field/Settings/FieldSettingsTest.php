@@ -14,9 +14,8 @@ class FieldSettingsTest extends AbstractUnitTest
     public function setFieldContainerSelectorSetsFieldContainerSelector()
     {
         $settings = new FieldSettings;
-        $field = new Field;
-        $field->setName('foo');
-        $settings->setParents([$field]);
+        $field = new Field('foo');
+        $settings->attachParent($field);
 
         $settings->setFieldContainerSelector('bar-' . FieldSettings::FIELD_MARKER);
         $this->assertEquals('bar-foo', $settings->getFieldContainerSelector());
@@ -25,12 +24,21 @@ class FieldSettingsTest extends AbstractUnitTest
     /**
      * @test
      */
+    public function setFieldContainerSelectorOnFrozenDefinitionIsChecked()
+    {
+        $settings = $this->getFieldSettingsWithDefinitionFreezeStateCheck();
+
+        $settings->setFieldContainerSelector('bar-' . FieldSettings::FIELD_MARKER);
+    }
+
+    /**
+     * @test
+     */
     public function setMessageContainerSelectorSetsMessageContainerSelector()
     {
         $settings = new FieldSettings;
-        $field = new Field;
-        $field->setName('foo');
-        $settings->setParents([$field]);
+        $field = new Field('foo');
+        $settings->attachParent($field);
 
         $settings->setMessageContainerSelector('bar-' . FieldSettings::FIELD_MARKER);
         $this->assertEquals('bar-foo', $settings->getMessageContainerSelector());
@@ -39,12 +47,21 @@ class FieldSettingsTest extends AbstractUnitTest
     /**
      * @test
      */
+    public function setMessageContainerSelectorOnFrozenDefinitionIsChecked()
+    {
+        $settings = $this->getFieldSettingsWithDefinitionFreezeStateCheck();
+
+        $settings->setMessageContainerSelector('bar-' . FieldSettings::FIELD_MARKER);
+    }
+
+    /**
+     * @test
+     */
     public function setMessageListSelectorSetsMessageListSelector()
     {
         $settings = new FieldSettings;
-        $field = new Field;
-        $field->setName('foo');
-        $settings->setParents([$field]);
+        $field = new Field('foo');
+        $settings->attachParent($field);
 
         $settings->setMessageListSelector('bar-' . FieldSettings::FIELD_MARKER);
         $this->assertEquals('bar-foo', $settings->getMessageListSelector());
@@ -53,15 +70,34 @@ class FieldSettingsTest extends AbstractUnitTest
     /**
      * @test
      */
+    public function setMessageListSelectorOnFrozenDefinitionIsChecked()
+    {
+        $settings = $this->getFieldSettingsWithDefinitionFreezeStateCheck();
+
+        $settings->setMessageListSelector('bar-' . FieldSettings::FIELD_MARKER);
+    }
+
+    /**
+     * @test
+     */
     public function setMessageTemplateSetsMessageTemplate()
     {
         $settings = new FieldSettings;
-        $field = new Field;
-        $field->setName('foo');
-        $settings->setParents([$field]);
+        $field = new Field('foo');
+        $settings->attachParent($field);
 
         $settings->setMessageTemplate('bar-' . FieldSettings::FIELD_MARKER);
         $this->assertEquals('bar-foo', $settings->getMessageTemplate());
+    }
+
+    /**
+     * @test
+     */
+    public function setMessageTemplateOnFrozenDefinitionIsChecked()
+    {
+        $settings = $this->getFieldSettingsWithDefinitionFreezeStateCheck();
+
+        $settings->setMessageTemplate('bar-' . FieldSettings::FIELD_MARKER);
     }
 
     /**
@@ -74,10 +110,9 @@ class FieldSettingsTest extends AbstractUnitTest
         $configuration = new Configuration;
         $defaultSettings = $configuration->getSettings()->getDefaultFieldSettings();
 
-        $field = new Field;
-        $field->setName('foo');
+        $field = new Field('foo');
 
-        $settings->setParents([$configuration, $field]);
+        $settings->attachParents([$configuration, $field]);
 
         $defaultSettings->setFieldContainerSelector('field-container-selector-' . FieldSettings::FIELD_MARKER);
         $defaultSettings->setMessageContainerSelector('message-container-selector-' . FieldSettings::FIELD_MARKER);
@@ -88,5 +123,21 @@ class FieldSettingsTest extends AbstractUnitTest
         $this->assertEquals('message-container-selector-foo', $settings->getMessageContainerSelector());
         $this->assertEquals('message-list-selector-foo', $settings->getMessageListSelector());
         $this->assertEquals('message-template-foo', $settings->getMessageTemplate());
+    }
+
+    /**
+     * @return FieldSettings|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getFieldSettingsWithDefinitionFreezeStateCheck()
+    {
+        /** @var FieldSettings|\PHPUnit_Framework_MockObject_MockObject $fieldSettings */
+        $fieldSettings = $this->getMockBuilder(FieldSettings::class)
+            ->setMethods(['checkDefinitionFreezeState'])
+            ->getMock();
+
+        $fieldSettings->expects($this->once())
+            ->method('checkDefinitionFreezeState');
+
+        return $fieldSettings;
     }
 }

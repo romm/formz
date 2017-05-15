@@ -21,7 +21,7 @@ use Romm\Formz\Service\CacheService;
  * This asset handler generates the JavaScript code which will inject the FormZ
  * TypoScript configuration.
  */
-class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
+class RootConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
 {
 
     /**
@@ -32,7 +32,8 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
         $hash = sha1($this->getFormObject()
             ->getDefinition()
             ->getRootConfiguration()
-            ->getHash());
+            ->getHash()
+        );
 
         return CacheService::GENERATED_FILES_PATH . 'fz-config-' . $hash . '.js';
     }
@@ -42,11 +43,11 @@ class FormzConfigurationJavaScriptAssetHandler extends AbstractAssetHandler
      */
     public function getJavaScriptCode()
     {
-        $jsonFormzConfiguration = $this->handleFormzConfiguration($this->getFormzConfiguration());
+        $jsonRootConfiguration = $this->handleRootConfiguration($this->getRootConfiguration());
 
         return <<<JS
 (function() {
-    Fz.setConfiguration($jsonFormzConfiguration);
+    Fz.setConfiguration($jsonRootConfiguration);
 })();
 JS;
     }
@@ -54,30 +55,30 @@ JS;
     /**
      * This function is here to help unit tests mocking.
      *
-     * @param string $formzConfiguration
+     * @param string $rootConfiguration
      * @return string
      */
-    protected function handleFormzConfiguration($formzConfiguration)
+    protected function handleRootConfiguration($rootConfiguration)
     {
-        return $formzConfiguration;
+        return $rootConfiguration;
     }
 
     /**
-     * Returns a JSON array containing the FormZ configuration.
+     * Returns a JSON array containing the root configuration.
      *
      * @return string
      */
-    protected function getFormzConfiguration()
+    protected function getRootConfiguration()
     {
         $rootConfigurationArray = $this->getFormObject()
             ->getDefinition()
             ->getRootConfiguration()
             ->toArray();
 
-        $cleanFormzConfigurationArray = [
+        $cleanRootConfigurationArray = [
             'view' => $rootConfigurationArray['view']
         ];
 
-        return ArrayService::get()->arrayToJavaScriptJson($cleanFormzConfigurationArray);
+        return ArrayService::get()->arrayToJavaScriptJson($cleanRootConfigurationArray);
     }
 }

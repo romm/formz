@@ -15,7 +15,7 @@ namespace Romm\Formz\Condition\Exceptions;
 
 use Romm\Formz\Exceptions\FormzException;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 
 class InvalidConditionException extends FormzException
 {
@@ -57,12 +57,12 @@ class InvalidConditionException extends FormzException
      * @code 1488653713
      *
      * @param string     $conditionName
-     * @param Validation $validation
+     * @param Validator  $validation
      * @param string     $formClassName
      * @param \Exception $exception
      * @return InvalidConditionException
      */
-    final public static function invalidValidationConditionConfiguration($conditionName, Validation $validation, $formClassName, \Exception $exception)
+    final public static function invalidValidationConditionConfiguration($conditionName, Validator $validation, $formClassName, \Exception $exception)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(

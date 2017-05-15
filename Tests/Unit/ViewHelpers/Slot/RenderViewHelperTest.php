@@ -92,7 +92,7 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $viewHelper->initializeArguments();
 
         $fieldService = new FieldViewHelperService;
-        $fieldService->setCurrentField(new Field);
+        $fieldService->setCurrentField(new Field('foo'));
         $viewHelper->injectFieldService($fieldService);
 
         $viewHelper->render();

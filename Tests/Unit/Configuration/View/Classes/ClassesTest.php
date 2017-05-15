@@ -10,10 +10,10 @@ class ClassesTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function initializationProperlySet()
+    public function initializationDoneProperly()
     {
         $classes = new Classes;
-        $this->assertInstanceOf(ViewClass::class, $classes->getErrors());
-        $this->assertInstanceOf(ViewClass::class, $classes->getValid());
+        $this->assertInstanceOf(ViewClass::class, $classes->getErrorsClasses());
+        $this->assertInstanceOf(ViewClass::class, $classes->getValidClasses());
     }
 }

@@ -14,7 +14,7 @@
 namespace Romm\Formz\Condition\Parser\Node;
 
 use Romm\Formz\Condition\Processor\ConditionProcessor;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 
 interface ActivationDependencyAwareInterface
 {

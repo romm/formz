@@ -14,7 +14,7 @@
 namespace Romm\Formz\AssetHandler\Css;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
-use Romm\Formz\Condition\Parser\ConditionTree;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
 use Romm\Formz\Form\Definition\Field\Field;
 
 /**

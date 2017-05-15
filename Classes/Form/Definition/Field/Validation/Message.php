@@ -14,11 +14,17 @@
 namespace Romm\Formz\Form\Definition\Field\Validation;
 
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
 
-class Message extends AbstractFormzConfiguration
+class Message extends AbstractFormDefinitionComponent
 {
     use ArrayConversionTrait;
+
+    /**
+     * @var string
+     * @validate NotEmpty
+     */
+    private $identifier;
 
     /**
      * @var string
@@ -36,6 +42,22 @@ class Message extends AbstractFormzConfiguration
     protected $value;
 
     /**
+     * @param string $identifier
+     */
+    public function __construct($identifier)
+    {
+        $this->identifier = $identifier;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
+    /**
      * @return string
      */
     public function getKey()
@@ -48,6 +70,8 @@ class Message extends AbstractFormzConfiguration
      */
     public function setKey($key)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->key = $key;
     }
 
@@ -64,6 +88,8 @@ class Message extends AbstractFormzConfiguration
      */
     public function setExtension($extension)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->extension = $extension;
     }
 
@@ -80,6 +106,8 @@ class Message extends AbstractFormzConfiguration
      */
     public function setValue($value)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->value = $value;
     }
 }

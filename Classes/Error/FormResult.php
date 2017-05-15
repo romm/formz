@@ -14,7 +14,7 @@
 namespace Romm\Formz\Error;
 
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Service\Traits\StoreDataTrait;
 use TYPO3\CMS\Extbase\Error\Result;
 
@@ -32,9 +32,9 @@ class FormResult extends Result
     protected $deactivatedFields = [];
 
     /**
-     * @var Validation[]
+     * @var Validator[]
      */
-    protected $deactivatedFieldsValidation = [];
+    protected $deactivatedFieldsValidators = [];
 
     /**
      * Flags the given field as deactivated.
@@ -66,36 +66,36 @@ class FormResult extends Result
     }
 
     /**
-     * @param Validation $validation
+     * @param Validator $validator
      */
-    public function deactivateValidation(Validation $validation)
+    public function deactivateValidator(Validator $validator)
     {
-        $fieldName = $validation->getParentField()->getName();
+        $fieldName = $validator->getParentField()->getName();
 
-        if (false === isset($this->deactivatedFieldsValidation[$fieldName])) {
-            $this->deactivatedFieldsValidation[$fieldName] = [];
+        if (false === isset($this->deactivatedFieldsValidators[$fieldName])) {
+            $this->deactivatedFieldsValidators[$fieldName] = [];
         }
 
-        $this->deactivatedFieldsValidation[$fieldName][$validation->getName()] = $validation;
+        $this->deactivatedFieldsValidators[$fieldName][$validator->getName()] = $validator;
     }
 
     /**
-     * @param Validation $validation
+     * @param Validator $validator
      * @return bool
      */
-    public function validationIsDeactivated(Validation $validation)
+    public function validatorIsDeactivated(Validator $validator)
     {
-        $fieldName = $validation->getParentField()->getName();
+        $fieldName = $validator->getParentField()->getName();
 
-        return array_key_exists($fieldName, $this->deactivatedFieldsValidation)
-            && array_key_exists($validation->getName(), $this->deactivatedFieldsValidation[$fieldName]);
+        return array_key_exists($fieldName, $this->deactivatedFieldsValidators)
+            && array_key_exists($validator->getName(), $this->deactivatedFieldsValidators[$fieldName]);
     }
 
     /**
-     * @return Validation[]
+     * @return Validator[]
      */
-    public function getDeactivatedValidations()
+    public function getDeactivatedValidators()
     {
-        return $this->deactivatedFieldsValidation;
+        return $this->deactivatedFieldsValidators;
     }
 }

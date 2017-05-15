@@ -15,7 +15,7 @@ namespace Romm\Formz\AssetHandler\JavaScript;
 
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\ValidatorService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -78,11 +78,11 @@ JS;
         $javaScriptCode = [];
         $fieldName = $field->getName();
 
-        foreach ($field->getValidation() as $validationName => $validationConfiguration) {
-            $validatorClassName = $validationConfiguration->getClassName();
+        foreach ($field->getValidators() as $validator) {
+            $validatorClassName = $validator->getClassName();
 
             if (in_array(AbstractValidator::class, class_parents($validatorClassName))) {
-                $javaScriptCode[] = (string)$this->getInlineJavaScriptValidationCode($field, $validationName, $validationConfiguration);
+                $javaScriptCode[] = (string)$this->getInlineJavaScriptValidatorCode($field, $validator);
             }
         }
 
@@ -105,60 +105,58 @@ JS;
     /**
      * Generates the JavaScript code to add a validation rule to a field.
      *
-     * @param Field      $field
-     * @param string     $validationName         The name of the validation rule.
-     * @param Validation $validatorConfiguration Contains the current validator configuration.
+     * @param Field     $field
+     * @param Validator $validator      Contains the current validator configuration.
      * @return string
      */
-    protected function getInlineJavaScriptValidationCode(Field $field, $validationName, Validation $validatorConfiguration)
+    protected function getInlineJavaScriptValidatorCode(Field $field, Validator $validator)
     {
-        $javaScriptValidationName = GeneralUtility::quoteJSvalue($validationName);
-        $validatorName = addslashes($validatorConfiguration->getClassName());
-        $validatorConfigurationFinal = $this->getValidationConfiguration($field, $validationName, $validatorConfiguration);
-        $validatorConfigurationFinal = $this->handleValidationConfiguration($validatorConfigurationFinal);
+        $javaScriptValidatorName = GeneralUtility::quoteJSvalue($validator->getName());
+        $validatorClassName = addslashes($validator->getClassName());
+        $validatorConfigurationFinal = $this->getValidatorConfiguration($field, $validator);
+        $validatorConfigurationFinal = $this->handleValidatorConfiguration($validatorConfigurationFinal);
 
         return <<<JS
                 /*
-                 * Validation rule "$validationName"
+                 * Validation rule "{$validator->getName()}"
                  */
-                field.addValidation($javaScriptValidationName, '$validatorName', $validatorConfigurationFinal);
+                field.addValidation($javaScriptValidatorName, '$validatorClassName', $validatorConfigurationFinal);
 
 JS;
     }
 
     /**
-     * This function is here to help unit tests mocking.
+     * Wrapper for unit tests.
      *
      * @param string $jsonValidationConfiguration
      * @return string
      */
-    protected function handleValidationConfiguration($jsonValidationConfiguration)
+    protected function handleValidatorConfiguration($jsonValidationConfiguration)
     {
         return $jsonValidationConfiguration;
     }
 
     /**
-     * Returns a JSON array containing the validation configuration needed by
+     * Returns a JSON array containing the validator configuration needed by
      * JavaScript.
      *
-     * @param Field      $field
-     * @param string     $validationName
-     * @param Validation $validatorConfiguration
+     * @param Field     $field
+     * @param Validator $validator
      * @return string
      */
-    protected function getValidationConfiguration(Field $field, $validationName, Validation $validatorConfiguration)
+    protected function getValidatorConfiguration(Field $field, Validator $validator)
     {
-        $acceptsEmptyValues = ValidatorService::get()->validatorAcceptsEmptyValues($validatorConfiguration->getClassName());
+        $acceptsEmptyValues = ValidatorService::get()->validatorAcceptsEmptyValues($validator);
 
-        /** @var FormzLocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
-        $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(FormzLocalizationJavaScriptAssetHandler::class);
+        /** @var LocalizationJavaScriptAssetHandler $formzLocalizationJavaScriptAssetHandler */
+        $formzLocalizationJavaScriptAssetHandler = $this->assetHandlerFactory->getAssetHandler(LocalizationJavaScriptAssetHandler::class);
 
-        $messages = $formzLocalizationJavaScriptAssetHandler->getTranslationKeysForFieldValidation($field, $validationName);
+        $messages = $formzLocalizationJavaScriptAssetHandler->getTranslationKeysForFieldValidator($field, $validator);
 
         return ArrayService::get()->arrayToJavaScriptJson([
-            'options'            => $validatorConfiguration->getOptions(),
+            'options'            => $validator->getOptions(),
             'messages'           => $messages,
-            'settings'           => $validatorConfiguration->toArray(),
+            'settings'           => $validator->toArray(),
             'acceptsEmptyValues' => $acceptsEmptyValues
         ]);
     }
@@ -174,11 +172,11 @@ JS;
             $formConfiguration = $this->getFormObject()->getDefinition();
 
             foreach ($formConfiguration->getFields() as $field) {
-                foreach ($field->getValidation() as $validationConfiguration) {
-                    /** @var AbstractValidator $validatorClassName */
-                    $validatorClassName = $validationConfiguration->getClassName();
+                foreach ($field->getValidators() as $validator) {
+                    $validatorClassName = $validator->getClassName();
 
                     if (in_array(AbstractValidator::class, class_parents($validatorClassName))) {
+                        /** @var AbstractValidator $validatorClassName */
                         $this->javaScriptValidationFiles = array_merge($this->javaScriptValidationFiles, $validatorClassName::getJavaScriptValidationFiles());
                     }
                 }

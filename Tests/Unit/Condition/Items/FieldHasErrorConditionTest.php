@@ -1,13 +1,14 @@
 <?php
+
 namespace Romm\Formz\Tests\Unit\Condition\Items;
 
 use Romm\Formz\Condition\Items\FieldHasErrorCondition;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Validator\RequiredValidator;
 
 class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
 {
@@ -17,8 +18,14 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
     public function wrongFieldNameThrowsException()
     {
         /** @var FieldHasErrorCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldHasErrorCondition::class, 1488192037);
-        $conditionItem->setFieldName('baz');
+        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(
+            FieldHasErrorCondition::class,
+            [
+                'fieldName'      => 'baz',
+                'validationName' => 'baz'
+            ],
+            1488192037
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -28,9 +35,14 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
     public function wrongValidationNameThrowsException()
     {
         /** @var FieldHasErrorCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldHasErrorCondition::class, 1488192055);
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setValidationName('baz');
+        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(
+            FieldHasErrorCondition::class,
+            [
+                'fieldName'      => 'foo',
+                'validationName' => 'baz'
+            ],
+            1488192055
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -39,15 +51,18 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
      */
     public function validConfiguration()
     {
-        $validation = new Validation;
-        $validation->setName('bar');
         $formObject = $this->getDefaultFormObject();
-        $formObject->getDefinition()->getField('foo')->addValidation($validation);
+        $formObject->getDefinition()->getField('foo')->addValidator('bar', RequiredValidator::class);
 
         /** @var FieldHasErrorCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldHasErrorCondition::class, $formObject);
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setValidationName('bar');
+        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(
+            FieldHasErrorCondition::class,
+            [
+                'fieldName'      => 'foo',
+                'validationName' => 'bar'
+            ],
+            $formObject
+        );
         $conditionItem->validateConditionConfiguration($formObject->getDefinition());
     }
 
@@ -58,9 +73,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsNotVerifiedWithWrongValidationName()
     {
-        $conditionItem = new FieldHasErrorCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setValidationName('not defined');
+        $conditionItem = new FieldHasErrorCondition('foo', 'not defined');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -95,10 +108,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsNotVerifiedWithWrongErrorName()
     {
-        $conditionItem = new FieldHasErrorCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setValidationName('bar');
-        $conditionItem->setErrorName('not defined');
+        $conditionItem = new FieldHasErrorCondition('foo', 'bar', 'not defined');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -137,10 +147,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsVerified()
     {
-        $conditionItem = new FieldHasErrorCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setValidationName('bar');
-        $conditionItem->setErrorName('baz');
+        $conditionItem = new FieldHasErrorCondition('foo', 'bar', 'baz');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -177,10 +184,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
      */
     public function getCssResult()
     {
-        $conditionItem = new FieldHasErrorCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setValidationName('bar');
-        $conditionItem->setErrorName('baz');
+        $conditionItem = new FieldHasErrorCondition('foo', 'bar', 'baz');
 
         $this->assertEquals('[fz-error-foo-bar-baz="1"]', $conditionItem->getCssResult());
     }
@@ -192,10 +196,7 @@ class FieldHasErrorConditionTest extends AbstractConditionItemUnitTest
     {
         $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasErrorCondition\', form, {"fieldName":"foo","validationName":"bar","errorName":"baz"})';
 
-        $conditionItem = new FieldHasErrorCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setValidationName('bar');
-        $conditionItem->setErrorName('baz');
+        $conditionItem = new FieldHasErrorCondition('foo', 'bar', 'baz');
 
         $this->assertEquals($assert, $conditionItem->getJavaScriptResult());
     }

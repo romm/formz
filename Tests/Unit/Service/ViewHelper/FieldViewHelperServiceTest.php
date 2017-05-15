@@ -14,7 +14,7 @@ class FieldViewHelperServiceTest extends AbstractUnitTest
     public function formContextActivatedTwiceThrowsException()
     {
         $fieldService = new FieldViewHelperService;
-        $field = new Field;
+        $field = new Field('foo');
 
         $this->assertFalse($fieldService->fieldContextExists());
         $fieldService->setCurrentField($field);
@@ -60,7 +60,7 @@ class FieldViewHelperServiceTest extends AbstractUnitTest
     public function resetStateResetsState()
     {
         $fieldService = new FieldViewHelperService;
-        $field = new Field;
+        $field = new Field('foo');
 
         $fieldService->setCurrentField($field);
         $fieldService->setFieldOption('foo', 'bar');

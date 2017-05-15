@@ -1,4 +1,5 @@
 <?php
+
 namespace Romm\Formz\Tests\Unit\Condition\Processor;
 
 use Prophecy\Argument;
@@ -6,17 +7,16 @@ use Prophecy\Argument\Token\TokenInterface;
 use Prophecy\Prophecy\ObjectProphecy;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
 use Romm\Formz\Condition\Parser\ConditionParserFactory;
-use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
-use Romm\Formz\Form\Definition\Field\Activation\Activation;
-use Romm\Formz\Form\Definition\Field\Activation\EmptyActivation;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
+use Romm\Formz\Validation\Validator\RequiredValidator;
 use TYPO3\CMS\Extbase\Error\Result;
 
 class ConditionProcessorTest extends AbstractUnitTest
@@ -31,11 +31,10 @@ class ConditionProcessorTest extends AbstractUnitTest
     {
         $conditionProcessor = new ConditionProcessor($this->getDefaultFormObject());
 
-        $field1 = new Field;
-        $field1->setName('foo');
-        $field2 = new Field;
-        $field2->setName('bar');
-        $field2->setActivation(new Activation);
+        $field1 = new Field('foo');
+        $field1->addActivation();
+        $field2 = new Field('bar');
+        $field2->addActivation();
 
         $conditionParserFactoryProphecy = $this->getConditionParserProphecy(
             Argument::that(function ($activation) use ($field1, $field2) {
@@ -66,16 +65,12 @@ class ConditionProcessorTest extends AbstractUnitTest
     {
         $conditionProcessor = new ConditionProcessor($this->getDefaultFormObject());
 
-        $field = new Field;
-        $field->setName('foo');
+        $field = new Field('foo');
 
-        $validation1 = new Validation;
-        $validation1->setName('foo');
-        $validation1->setParents([$field]);
-        $validation2 = new Validation;
-        $validation2->setName('bar');
-        $validation2->setParents([$field]);
-        $this->inject($validation2, 'activation', new EmptyActivation);
+        $validation1 = $field->addValidator('foo', RequiredValidator::class);
+        $validation1->addActivation();
+        $validation2 = $field->addValidator('bar', RequiredValidator::class);
+        $validation2->addActivation();
 
         $conditionParserFactoryProphecy = $this->getConditionParserProphecy(
             Argument::that(function ($activation) use ($validation1, $validation2) {
@@ -87,9 +82,9 @@ class ConditionProcessorTest extends AbstractUnitTest
 
         UnitTestContainer::get()->registerMockedInstance(ConditionParserFactory::class, $conditionParserFactoryProphecy->reveal());
 
-        $tree1 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);
-        $tree2 = $conditionProcessor->getActivationConditionTreeForValidation($validation1);
-        $tree3 = $conditionProcessor->getActivationConditionTreeForValidation($validation2);
+        $tree1 = $conditionProcessor->getActivationConditionTreeForValidator($validation1);
+        $tree2 = $conditionProcessor->getActivationConditionTreeForValidator($validation1);
+        $tree3 = $conditionProcessor->getActivationConditionTreeForValidator($validation2);
 
         $this->assertInstanceOf(ConditionTree::class, $tree1);
         $this->assertSame($tree1, $tree2);
@@ -110,7 +105,7 @@ class ConditionProcessorTest extends AbstractUnitTest
 
         /** @var ConditionProcessor|\PHPUnit_Framework_MockObject_MockObject $conditionProcessor */
         $conditionProcessor = $this->getMockBuilder(ConditionProcessor::class)
-            ->setMethods(['getActivationConditionTreeForField', 'getActivationConditionTreeForValidation'])
+            ->setMethods(['getActivationConditionTreeForField', 'getActivationConditionTreeForValidator'])
             ->setConstructorArgs([$formObject])
             ->getMock();
 
@@ -118,7 +113,7 @@ class ConditionProcessorTest extends AbstractUnitTest
             ->method('getActivationConditionTreeForField');
 
         $conditionProcessor->expects($this->exactly(4))
-            ->method('getActivationConditionTreeForValidation');
+            ->method('getActivationConditionTreeForValidator');
 
         $formObject->expects($this->once())
             ->method('getDefinition')
@@ -130,20 +125,13 @@ class ConditionProcessorTest extends AbstractUnitTest
                 $formConfiguration->expects($this->once())
                     ->method('getFields')
                     ->willReturnCallback(function () use ($conditionProcessor) {
-                        $validation1 = new Validation;
-                        $validation1->setName('foo');
-                        $validation2 = new Validation;
-                        $validation2->setName('bar');
+                        $field1 = new Field('foo');
+                        $field1->addValidator('foo', RequiredValidator::class);
+                        $field1->addValidator('bar', RequiredValidator::class);
 
-                        $field1 = new Field;
-                        $field1->setName('foo');
-                        $field1->addValidation($validation1);
-                        $field1->addValidation($validation2);
-
-                        $field2 = new Field;
-                        $field2->setName('bar');
-                        $field2->addValidation($validation1);
-                        $field2->addValidation($validation2);
+                        $field2 = new Field('bar');
+                        $field2->addValidator('foo', RequiredValidator::class);
+                        $field2->addValidator('bar', RequiredValidator::class);
 
                         return [$field1, $field2];
                     });
@@ -161,7 +149,7 @@ class ConditionProcessorTest extends AbstractUnitTest
      */
     public function conditionJavaScriptFilesAreCollected()
     {
-        $condition = new FieldHasValueCondition;
+        $condition = new FieldHasValueCondition('foo', 'bar');
         $conditionNode = new ConditionNode('foo', $condition);
         $tree = new ConditionTree($conditionNode, new Result);
 
@@ -175,9 +163,8 @@ class ConditionProcessorTest extends AbstractUnitTest
             ->method('getNewConditionTreeFromActivation')
             ->willReturn($tree);
 
-        $field = new Field;
-        $field->setName('bar');
-        $this->inject($field, 'activation', new EmptyActivation);
+        $field = new Field('bar');
+        $field->addActivation();
 
         $conditionProcessor->getActivationConditionTreeForField($field);
 
@@ -188,8 +175,8 @@ class ConditionProcessorTest extends AbstractUnitTest
     }
 
     /**
-     * @param TokenInterface     $activations
-     * @param ConditionProcessor $conditionProcessor
+     * @param TokenInterface|ActivationInterface $activations
+     * @param ConditionProcessor                 $conditionProcessor
      * @return ObjectProphecy|ConditionParserFactory
      */
     protected function getConditionParserProphecy(TokenInterface $activations, ConditionProcessor $conditionProcessor)

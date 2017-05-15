@@ -20,6 +20,7 @@ use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
+use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Service\FormService;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 
@@ -112,7 +113,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         }
 
         $this->form = $form;
-        $this->formObject = FormObjectFactory::get()->registerAndGetFormInstance($form, $this->options['name']);
+        $this->formObject = $this->getFormObject();
         $this->formValidatorExecutor = $this->getFormValidatorExecutor();
         $this->result = $this->formObject->getFormResult();
     }
@@ -129,7 +130,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         $this->initializeValidator($form);
 
         if (true !== $this->options['dummy']) {
-            $proxy = FormObjectFactory::get()->getProxy($form);
+            $proxy = $this->getProxy($form);
             $proxy->markFormAsValidated();
             $proxy->markFormAsSubmitted();
         }
@@ -207,5 +208,22 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $this->formObject);
 
         return $formValidatorExecutor;
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getFormObject()
+    {
+        return FormObjectFactory::get()->registerAndGetFormInstance($this->form, $this->options['name']);
+    }
+
+    /**
+     * @param FormInterface $form
+     * @return FormObjectProxy
+     */
+    protected function getProxy(FormInterface $form)
+    {
+        return FormObjectFactory::get()->getProxy($form);
     }
 }

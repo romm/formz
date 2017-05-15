@@ -3,13 +3,13 @@ namespace Romm\Formz\Tests\Unit\Condition\Parser;
 
 use Prophecy\Argument;
 use Romm\Formz\Condition\Parser\ConditionParser;
-use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\BooleanNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Parser\Node\NullNode;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Form\Definition\Field\Activation\Activation;
+use Romm\Formz\Form\Definition\Condition\Activation;
 use Romm\Formz\Tests\Fixture\Condition\Parser\Node\DependencyAwareNode;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Extbase\Error\Result;

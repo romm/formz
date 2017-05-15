@@ -13,16 +13,13 @@
 
 namespace Romm\Formz\Form\Definition\Settings;
 
-use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
+use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Service\ContextService;
 
-class FormSettings extends AbstractFormzConfiguration
+class FormSettings extends AbstractFormDefinitionComponent
 {
-    use ParentsTrait;
-
     const DEFAULT_ERROR_MESSAGE_KEY = 'default_error_message';
 
     /**
@@ -48,6 +45,8 @@ class FormSettings extends AbstractFormzConfiguration
      */
     public function setDefaultClass($defaultClass)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->defaultClass = $defaultClass;
     }
 
@@ -66,6 +65,8 @@ class FormSettings extends AbstractFormzConfiguration
      */
     public function setDefaultErrorMessage($defaultErrorMessage)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->defaultErrorMessage = $defaultErrorMessage;
     }
 

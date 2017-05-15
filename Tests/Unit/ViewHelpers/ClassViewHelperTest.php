@@ -52,13 +52,13 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
             ->getView()
             ->getClasses();
 
-        /** @noinspection PhpUndefinedMethodInspection */
-        $classesObject->getErrors()
-            ->setItems($classes['errors']);
+        foreach ($classes['errors'] as $key => $value) {
+            $classesObject->getErrorsClasses()->setItem($key, $value);
+        }
 
-        /** @noinspection PhpUndefinedMethodInspection */
-        $classesObject->getValid()
-            ->setItems($classes['valid']);
+        foreach ($classes['valid'] as $key => $value) {
+            $classesObject->getValidClasses()->setItem($key, $value);
+        }
 
         $this->assertEquals($expects, $classViewHelper->render());
     }
@@ -230,8 +230,7 @@ class ClassViewHelperTest extends AbstractViewHelperUnitTest
      */
     protected function getFieldServiceWithField()
     {
-        $field = new Field;
-        $field->setName('foo');
+        $field = new Field('foo');
 
         $service = $this->getDefaultFieldService();
         $service->setCurrentField($field);

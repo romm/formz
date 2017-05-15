@@ -19,7 +19,7 @@ use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
@@ -76,6 +76,8 @@ class FormValidatorExecutor
     public function __construct(FormObject $formObject)
     {
         $this->formObject = $formObject;
+        $this->conditionProcessor = $this->getConditionProcessor();
+        $this->phpConditionDataObject = $this->getPhpConditionDataObject();
     }
 
     /**
@@ -127,7 +129,7 @@ class FormValidatorExecutor
             $this->getResult()->deactivateField($field);
         }
 
-        $this->checkFieldValidationActivation($field);
+        $this->checkFieldValidatorActivation($field);
 
         $this->markFieldActivationAsChecked($field);
         $this->markFieldActivationCheckEnd($field);
@@ -136,13 +138,13 @@ class FormValidatorExecutor
     /**
      * @param Field $field
      */
-    protected function checkFieldValidationActivation(Field $field)
+    protected function checkFieldValidatorActivation(Field $field)
     {
-        foreach ($field->getValidation() as $validation) {
-            if (true === $validation->hasActivation()
-                && false === $this->getValidationActivationProcessResult($validation)
+        foreach ($field->getValidators() as $validator) {
+            if (true === $validator->hasActivation()
+                && false === $this->getValidatorActivationProcessResult($validator)
             ) {
-                $this->getResult()->deactivateValidation($validation);
+                $this->getResult()->deactivateValidator($validator);
             }
         }
     }
@@ -156,8 +158,8 @@ class FormValidatorExecutor
         foreach ($this->formObject->getDefinition()->getFields() as $field) {
             $this->validateField($field);
 
-            if ($this->fieldWasValidated($field)
-                && $callback
+            if ($callback
+                && $this->fieldWasValidated($field)
             ) {
                 call_user_func($callback, $field);
             }
@@ -167,8 +169,8 @@ class FormValidatorExecutor
     }
 
     /**
-     * Will loop on each validation rule and apply it of the field.
-     * Errors are stored in `$this->getResult()`.
+     * Will loop on each validator and apply it on the field. The validation
+     * result is merged with the form result.
      *
      * @param Field $field
      */
@@ -180,13 +182,13 @@ class FormValidatorExecutor
             if (false === $this->getResult()->fieldIsDeactivated($field)) {
                 $this->markFieldAsValidated($field);
 
-                // Looping on the field's validation settings...
-                foreach ($field->getValidation() as $validation) {
-                    if ($this->getResult()->validationIsDeactivated($validation)) {
+                // Looping on the field's validators settings...
+                foreach ($field->getValidators() as $validator) {
+                    if ($this->getResult()->validatorIsDeactivated($validator)) {
                         continue;
                     }
 
-                    $validatorResult = $this->processFieldValidation($field, $validation);
+                    $validatorResult = $this->processFieldValidator($field, $validator);
 
                     // Breaking the loop if an error occurred: we stop the validation process for the current field.
                     if ($validatorResult->hasErrors()) {
@@ -198,29 +200,29 @@ class FormValidatorExecutor
     }
 
     /**
-     * @param Field      $field
-     * @param Validation $validation
+     * @param Field     $field
+     * @param Validator $validator
      * @return Result
      */
-    protected function processFieldValidation(Field $field, Validation $validation)
+    protected function processFieldValidator(Field $field, Validator $validator)
     {
         $form = $this->formObject->getForm();
         $fieldName = $field->getName();
         $fieldValue = ObjectAccess::getProperty($form, $fieldName);
-        $validatorDataObject = new ValidatorDataObject($this->formObject, $validation);
+        $validatorDataObject = new ValidatorDataObject($this->formObject, $validator);
 
-        /** @var ValidatorInterface $validator */
-        $validator = GeneralUtility::makeInstance(
-            $validation->getClassName(),
-            $validation->getOptions(),
+        /** @var ValidatorInterface $validatorInstance */
+        $validatorInstance = GeneralUtility::makeInstance(
+            $validator->getClassName(),
+            $validator->getOptions(),
             $validatorDataObject
         );
 
-        $validatorResult = $validator->validate($fieldValue);
-        $validatorResult = MessageService::get()->sanitizeValidatorResult($validatorResult, $validation->getName());
+        $validatorResult = $validatorInstance->validate($fieldValue);
+        $validatorResult = MessageService::get()->sanitizeValidatorResult($validatorResult, $validator->getName());
 
-        if ($validator instanceof AbstractValidator
-            && false === empty($validationData = $validator->getValidationData())
+        if ($validatorInstance instanceof AbstractValidator
+            && false === empty($validationData = $validatorInstance->getValidationData())
         ) {
             $this->validationData[$fieldName] = ($this->validationData[$fieldName]) ?: [];
             $this->validationData[$fieldName] = array_merge(
@@ -251,20 +253,16 @@ class FormValidatorExecutor
      */
     protected function getFieldActivationProcessResult(Field $field)
     {
-        return $this->getConditionProcessor()
-            ->getActivationConditionTreeForField($field)
-            ->getPhpResult($this->getPhpConditionDataObject());
+        return $this->conditionProcessor->getActivationConditionTreeForField($field)->getPhpResult($this->phpConditionDataObject);
     }
 
     /**
-     * @param Validation $validation
+     * @param Validator $validator
      * @return bool
      */
-    protected function getValidationActivationProcessResult(Validation $validation)
+    protected function getValidatorActivationProcessResult(Validator $validator)
     {
-        return $this->getConditionProcessor()
-            ->getActivationConditionTreeForValidation($validation)
-            ->getPhpResult($this->getPhpConditionDataObject());
+        return $this->conditionProcessor->getActivationConditionTreeForValidator($validator)->getPhpResult($this->phpConditionDataObject);
     }
 
     /**
@@ -331,11 +329,7 @@ class FormValidatorExecutor
      */
     protected function getConditionProcessor()
     {
-        if (null === $this->conditionProcessor) {
-            $this->conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->formObject);
-        }
-
-        return $this->conditionProcessor;
+        return ConditionProcessorFactory::getInstance()->get($this->formObject);
     }
 
     /**
@@ -343,10 +337,6 @@ class FormValidatorExecutor
      */
     protected function getPhpConditionDataObject()
     {
-        if (null === $this->phpConditionDataObject) {
-            $this->phpConditionDataObject = new PhpConditionDataObject($this->formObject->getForm(), $this);
-        }
-
-        return $this->phpConditionDataObject;
+        return new PhpConditionDataObject($this->formObject->getForm(), $this);
     }
 }

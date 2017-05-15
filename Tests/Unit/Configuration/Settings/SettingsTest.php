@@ -29,4 +29,31 @@ class SettingsTest extends AbstractUnitTest
         $settings->setDefaultBackendCache('foo');
         $this->assertEquals('foo', $settings->getDefaultBackendCache());
     }
+
+    /**
+     * @test
+     */
+    public function setDefaultBackendCacheOnFrozenConfigurationIsChecked()
+    {
+        $settings = $this->getSettingsWithConfigurationFreezeStateCheck();
+
+        $settings->setDefaultBackendCache('foo');
+    }
+
+    /**
+     * @return Settings|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getSettingsWithConfigurationFreezeStateCheck()
+    {
+        /** @var Settings|\PHPUnit_Framework_MockObject_MockObject $settings */
+        $settings = $this->getMockBuilder(Settings::class)
+            ->setConstructorArgs(['foo'])
+            ->setMethods(['checkConfigurationFreezeState'])
+            ->getMock();
+
+        $settings->expects($this->once())
+            ->method('checkConfigurationFreezeState');
+
+        return $settings;
+    }
 }

@@ -19,6 +19,7 @@ use Romm\Formz\Error\Warning;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\MessageService;
+use Romm\Formz\Service\ValidatorService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 
 abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
@@ -96,8 +97,8 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
 
         $this->dataObject = $dataObject;
         $this->form = $dataObject->getFormObject()->getForm();
-        $this->messages = MessageService::get()->filterMessages(
-            $this->dataObject->getValidation()->getMessages(),
+        $this->messages = ValidatorService::get()->filterMessages(
+            $this->dataObject->getValidator(),
             $this->supportedMessages,
             (bool)$this->supportsAllMessages
         );
@@ -195,7 +196,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
         return new $type(
             $this->getMessage($key, $arguments),
             $code,
-            $this->dataObject->getValidation()->getName(),
+            $this->dataObject->getValidator()->getName(),
             $key,
             [],
             $title

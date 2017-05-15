@@ -13,17 +13,40 @@
 
 namespace Romm\Formz\Form\Definition\Field\Behaviour;
 
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
 
-class Behaviour extends AbstractFormzConfiguration
+class Behaviour extends AbstractFormDefinitionComponent
 {
+    /**
+     * @var string
+     * @validate NotEmpty
+     */
+    private $name;
 
     /**
      * @var string
      * @validate NotEmpty
-     * @validate Romm.ConfigurationObject:ClassExists
+     * @validate Romm.ConfigurationObject:ClassImplements(interface=Romm\Formz\Behaviours\BehaviourInterface)
      */
-    protected $className;
+    private $className;
+
+    /**
+     * @param string $name
+     * @param string $className
+     */
+    public function __construct($name, $className)
+    {
+        $this->name = $name;
+        $this->className = $className;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**
      * @return string
@@ -31,13 +54,5 @@ class Behaviour extends AbstractFormzConfiguration
     public function getClassName()
     {
         return $this->className;
-    }
-
-    /**
-     * @param string $className
-     */
-    public function setClassName($className)
-    {
-        $this->className = $className;
     }
 }

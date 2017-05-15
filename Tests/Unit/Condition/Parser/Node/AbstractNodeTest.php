@@ -1,10 +1,10 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Condition\Parser\Node;
 
-use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\AbstractNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Parser\Node\NullNode;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class AbstractNodeTest extends AbstractUnitTest

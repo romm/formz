@@ -22,7 +22,7 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
@@ -95,7 +95,7 @@ class AjaxValidationController extends ActionController
     protected $result;
 
     /**
-     * @var Validation
+     * @var Validator
      */
     protected $validation;
 
@@ -213,7 +213,7 @@ class AjaxValidationController extends ActionController
     }
 
     /**
-     * @return Validation
+     * @return Validator
      * @throws EntryNotFoundException
      * @throws InvalidConfigurationException
      */
@@ -233,11 +233,11 @@ class AjaxValidationController extends ActionController
 
         $field = $formConfiguration->getField($this->fieldName);
 
-        if (false === $field->hasValidation($this->validatorName)) {
+        if (false === $field->hasValidator($this->validatorName)) {
             throw EntryNotFoundException::ajaxControllerValidationNotFoundForField($this->validatorName, $this->fieldName);
         }
 
-        $fieldValidationConfiguration = $field->getValidationByName($this->validatorName);
+        $fieldValidationConfiguration = $field->getValidator($this->validatorName);
 
         if (false === $fieldValidationConfiguration->doesUseAjax()) {
             throw InvalidConfigurationException::ajaxControllerAjaxValidationNotActivated($this->validatorName, $this->fieldName);
@@ -252,7 +252,7 @@ class AjaxValidationController extends ActionController
      */
     protected function injectResultInResponse()
     {
-        $validationName = $this->validation instanceof Validation
+        $validationName = $this->validation instanceof Validator
             ? $this->validation->getName()
             : 'default';
 

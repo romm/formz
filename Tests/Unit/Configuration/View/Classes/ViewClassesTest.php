@@ -11,17 +11,25 @@ class ViewClassesTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function configurationObjectDataPreProcessed()
+    public function setItemSetsItem()
     {
-        $preProcessor = new DataPreProcessor;
-        $preProcessor->setData(['foo' => 'bar']);
+        $viewClass = new ViewClass;
 
-        ViewClass::dataPreProcessor($preProcessor);
+        $this->assertFalse($viewClass->hasItem('foo'));
+        $viewClass->setItem('foo', 'bar');
+        $this->assertTrue($viewClass->hasItem('foo'));
+        $this->assertEquals('bar', $viewClass->getItem('foo'));
+        $this->assertEquals(['foo' => 'bar'], $viewClass->getItems());
+    }
 
-        $this->assertEquals(
-            ['items' => ['foo' => 'bar']],
-            $preProcessor->getData()
-        );
+    /**
+     * @test
+     */
+    public function setItemOnFrozenConfigurationIsChecked()
+    {
+        $viewClass = $this->getViewClassWithConfigurationFreezeStateCheck();
+
+        $viewClass->setItem('foo', 'bar');
     }
 
     /**
@@ -38,14 +46,32 @@ class ViewClassesTest extends AbstractUnitTest
     /**
      * @test
      */
-    public function itemsAreSet()
+    public function configurationObjectDataPreProcessed()
     {
-        $viewClass = new ViewClass;
+        $preProcessor = new DataPreProcessor;
+        $preProcessor->setData(['foo' => 'bar']);
 
-        $this->assertFalse($viewClass->hasItem('foo'));
-        $viewClass->addItem('foo', 'bar');
-        $this->assertTrue($viewClass->hasItem('foo'));
-        $this->assertEquals('bar', $viewClass->getItem('foo'));
-        $this->assertEquals(['foo' => 'bar'], $viewClass->getItems());
+        ViewClass::dataPreProcessor($preProcessor);
+
+        $this->assertEquals(
+            ['items' => ['foo' => 'bar']],
+            $preProcessor->getData()
+        );
+    }
+
+    /**
+     * @return ViewClass|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getViewClassWithConfigurationFreezeStateCheck()
+    {
+        /** @var ViewClass|\PHPUnit_Framework_MockObject_MockObject $viewClass */
+        $viewClass = $this->getMockBuilder(ViewClass::class)
+            ->setMethods(['checkConfigurationFreezeState'])
+            ->getMock();
+
+        $viewClass->expects($this->once())
+            ->method('checkConfigurationFreezeState');
+
+        return $viewClass;
     }
 }

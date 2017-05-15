@@ -14,8 +14,8 @@
 namespace Romm\Formz\Form\FormObject\Builder;
 
 use Romm\ConfigurationObject\ConfigurationObjectFactory;
-use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\FormDefinition;
+use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -45,16 +45,21 @@ class DefaultFormObjectBuilder extends AbstractFormObjectBuilder
     }
 
     /**
-     * @return FormDefinition
+     * @return FormDefinitionObject
      */
-    public function getFormDefinition()
+    protected function getFormDefinitionObject()
     {
         $configurationArray = TypoScriptService::get()->getFormConfiguration($this->className);
+        $configurationObject = ConfigurationObjectFactory::convert(FormDefinition::class, $configurationArray);
 
-        /** @var FormDefinition $configurationObject */
-        $configurationObject = ConfigurationObjectFactory::getInstance()->get(FormDefinition::class, $configurationArray)->getObject(true);
+        /** @var FormDefinitionObject $formDefinitionObject */
+        $formDefinitionObject = GeneralUtility::makeInstance(
+            FormDefinitionObject::class,
+            $configurationObject->getObject(true),
+            $configurationObject->getValidationResult()
+        );
 
-        return $configurationObject;
+        return $formDefinitionObject;
     }
 
     /**
@@ -70,20 +75,26 @@ class DefaultFormObjectBuilder extends AbstractFormObjectBuilder
         $classReflection = new \ReflectionClass($this->className);
         $publicProperties = $classReflection->getProperties(\ReflectionProperty::IS_PUBLIC);
 
-        foreach ($reflectionProperties as $property) {
-            if (false === in_array($property, self::$ignoredProperties)
-                && false === $reflectionService->isPropertyTaggedWith($this->className, $property, self::IGNORE_PROPERTY)
-                && ((true === in_array($property, $publicProperties))
-                    || $reflectionService->hasMethod($this->className, 'get' . ucfirst($property))
+        foreach ($reflectionProperties as $propertyName) {
+            if (false === in_array($propertyName, self::$ignoredProperties)
+                && false === $reflectionService->isPropertyTaggedWith($this->className, $propertyName, self::IGNORE_PROPERTY)
+                && ((true === in_array($propertyName, $publicProperties))
+                    || $reflectionService->hasMethod($this->className, 'get' . ucfirst($propertyName))
                 )
-                && false === $this->static->getDefinition()->hasField($property)
+                && false === $this->static->getDefinition()->hasField($propertyName)
             ) {
-                $field = new Field();
-                $field->setName($property);
-                $this->static->getDefinition()->addField($field);
+                $this->static->getDefinition()->addField($propertyName);
             }
         }
 
         unset($publicProperties);
+    }
+
+    /**
+     * @return FormDefinition
+     */
+    public function getFormDefinition()
+    {
+        return null;
     }
 }

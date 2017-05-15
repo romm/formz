@@ -13,15 +13,12 @@
 
 namespace Romm\Formz\Form\Definition\Field\Settings;
 
-use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
+use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
 use Romm\Formz\Form\Definition\Field\Field;
 
-class FieldSettings extends AbstractFormzConfiguration
+class FieldSettings extends AbstractFormDefinitionComponent
 {
-    use ParentsTrait;
-
     const FIELD_MARKER = '#FIELD#';
 
     /**
@@ -66,6 +63,8 @@ class FieldSettings extends AbstractFormzConfiguration
      */
     public function setFieldContainerSelector($selector)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->fieldContainerSelector = $selector;
     }
 
@@ -82,6 +81,8 @@ class FieldSettings extends AbstractFormzConfiguration
      */
     public function setMessageContainerSelector($selector)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->messageContainerSelector = $selector;
     }
 
@@ -98,6 +99,8 @@ class FieldSettings extends AbstractFormzConfiguration
      */
     public function setMessageListSelector($messageListSelector)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->messageListSelector = $messageListSelector;
     }
 
@@ -114,6 +117,8 @@ class FieldSettings extends AbstractFormzConfiguration
      */
     public function setMessageTemplate($messageTemplate)
     {
+        $this->checkDefinitionFreezeState();
+
         $this->messageTemplate = $messageTemplate;
     }
 

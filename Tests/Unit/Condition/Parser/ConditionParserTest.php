@@ -1,17 +1,19 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Condition\Parser;
 
+use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use Romm\Formz\Condition\Parser\ConditionParser;
-use Romm\Formz\Condition\Parser\ConditionTree;
 use Romm\Formz\Condition\Parser\Node\BooleanNode;
 use Romm\Formz\Condition\Parser\Node\ConditionNode;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Parser\Node\NullNode;
-use Romm\Formz\Form\Definition\Field\Activation\Activation;
-use Romm\Formz\Form\Definition\Field\Activation\EmptyActivation;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
+use Romm\Formz\Form\Definition\Condition\Activation;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Tests\Unit\UnitTestContainer;
 
 class ConditionParserTest extends AbstractUnitTest
 {
@@ -31,29 +33,20 @@ class ConditionParserTest extends AbstractUnitTest
     }
 
     /**
-     * If an instance of `EmptyActivation` is given to the parser, a tree must
-     * be returned.
-     *
-     * @test
-     */
-    public function parsingEmptyActivationReturnsTree()
-    {
-        $parser = new ConditionParser;
-        $tree = $parser->parse(new EmptyActivation);
-
-        $this->assertInstanceOf(ConditionTree::class, $tree);
-    }
-
-    /**
      * Checks that a new instance of tree is returned at each call.
      *
      * @test
      */
     public function parserReturnsNewInstanceOfTree()
     {
+        /** @var ActivationInterface $activation1 */
+        $activation1 = $this->prophesize(ActivationInterface::class)->reveal();
+        /** @var ActivationInterface $activation2 */
+        $activation2 = $this->prophesize(ActivationInterface::class)->reveal();
+
         $parser = new ConditionParser;
-        $tree1 = $parser->parse(new EmptyActivation);
-        $tree2 = $parser->parse(new EmptyActivation);
+        $tree1 = $parser->parse($activation1);
+        $tree2 = $parser->parse($activation2);
 
         $this->assertNotSame($tree1, $tree2);
     }
@@ -76,8 +69,28 @@ class ConditionParserTest extends AbstractUnitTest
         $parser = new ConditionParser;
         $activation = new Activation;
 
+        $conditionFactoryMock = $this->getMockBuilder(ConditionFactory::class)
+            ->setMethods(['hasCondition', 'instantiateCondition'])
+            ->getMock();
+
+        UnitTestContainer::get()->registerMockedInstance(ConditionFactory::class, $conditionFactoryMock);
+
+        $i = 0;
+
         foreach ($conditions as $name => $condition) {
-            $activation->addCondition($name, $condition);
+            $conditionFactoryMock->expects($this->at($i++))
+                ->method('hasCondition')
+                ->with($name)
+                ->willReturn(true);
+
+            $conditionFactoryMock->expects($this->at($i++))
+                ->method('instantiateCondition')
+                ->with($name)
+                ->willReturn($condition);
+        }
+
+        foreach ($conditions as $name => $condition) {
+            $activation->addCondition($name, $name);
         }
 
         $activation->setExpression($expression);
@@ -340,8 +353,28 @@ class ConditionParserTest extends AbstractUnitTest
         $parser = new ConditionParser;
         $activation = new Activation;
 
+        $conditionFactoryMock = $this->getMockBuilder(ConditionFactory::class)
+            ->setMethods(['hasCondition', 'instantiateCondition'])
+            ->getMock();
+
+        UnitTestContainer::get()->registerMockedInstance(ConditionFactory::class, $conditionFactoryMock);
+
+        $i = 0;
+
         foreach ($conditions as $name => $condition) {
-            $activation->addCondition($name, $condition);
+            $conditionFactoryMock->expects($this->at($i++))
+                ->method('hasCondition')
+                ->with($name)
+                ->willReturn(true);
+
+            $conditionFactoryMock->expects($this->at($i++))
+                ->method('instantiateCondition')
+                ->with($name)
+                ->willReturn($condition);
+        }
+
+        foreach ($conditions as $name => $condition) {
+            $activation->addCondition($name, $name);
         }
 
         $activation->setExpression($expression);
@@ -429,9 +462,9 @@ class ConditionParserTest extends AbstractUnitTest
                 $condition = $node->getCondition();
 
                 if ($condition instanceof FieldHasValueCondition) {
-                    $conditionExpression = $condition::CONDITION_NAME . "({$condition->getFieldName()};{$condition->getFieldValue()})";
+                    $conditionExpression = $condition::CONDITION_IDENTIFIER . "({$condition->getFieldName()};{$condition->getFieldValue()})";
                 } elseif ($condition instanceof FieldIsValidCondition) {
-                    $conditionExpression = $condition::CONDITION_NAME . "({$condition->getFieldName()})";
+                    $conditionExpression = $condition::CONDITION_IDENTIFIER . "({$condition->getFieldName()})";
                 } else {
                     $conditionExpression = 'UNKNOWN-CONDITION';
                 }
@@ -453,8 +486,7 @@ class ConditionParserTest extends AbstractUnitTest
      */
     protected function getFieldIsValidCondition($fieldName)
     {
-        $condition = new FieldIsValidCondition;
-        $condition->setFieldName($fieldName);
+        $condition = new FieldIsValidCondition($fieldName);
 
         return $condition;
     }
@@ -466,9 +498,7 @@ class ConditionParserTest extends AbstractUnitTest
      */
     protected function getFieldHasValueCondition($fieldName, $fieldValue)
     {
-        $condition = new FieldHasValueCondition;
-        $condition->setFieldName($fieldName);
-        $condition->setFieldValue($fieldValue);
+        $condition = new FieldHasValueCondition($fieldName, $fieldValue);
 
         return $condition;
     }

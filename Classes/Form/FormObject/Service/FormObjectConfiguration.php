@@ -75,7 +75,10 @@ class FormObjectConfiguration
 
         $result->merge($this->getGlobalConfigurationValidationResult());
         $result->forProperty($formPropertyName)->merge($this->definition->getValidationResult());
-        $result->forProperty($formPropertyName)->merge($this->getFormDefinitionValidationResult());
+
+        if (false === $result->hasErrors()) {
+            $result->forProperty($formPropertyName)->merge($this->getFormDefinitionValidationResult());
+        }
 
         return $result;
     }
@@ -96,6 +99,6 @@ class FormObjectConfiguration
      */
     protected function getGlobalConfigurationValidationResult()
     {
-        return ConfigurationFactory::get()->getFormzConfiguration()->getValidationResult();
+        return ConfigurationFactory::get()->getRootConfiguration()->getValidationResult();
     }
 }

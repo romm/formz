@@ -14,8 +14,11 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
     public function wrongFieldNameThrowsException()
     {
         /** @var FieldIsEmptyCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldIsEmptyCondition::class, 1488191994);
-        $conditionItem->setFieldName('baz');
+        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(
+            FieldIsEmptyCondition::class,
+            ['fieldName' => 'baz'],
+            1488191994
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -25,8 +28,10 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
     public function validConfiguration()
     {
         /** @var FieldIsEmptyCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldIsEmptyCondition::class);
-        $conditionItem->setFieldName('foo');
+        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(
+            FieldIsEmptyCondition::class,
+            ['fieldName' => 'foo']
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -37,8 +42,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsNotVerifiedWithFilledFieldValue()
     {
-        $conditionItem = new FieldIsEmptyCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsEmptyCondition('foo');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -65,8 +69,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsVerifiedWithGivenFieldValue()
     {
-        $conditionItem = new FieldIsEmptyCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsEmptyCondition('foo');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -91,8 +94,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
      */
     public function getCssResultEmpty()
     {
-        $conditionItem = new FieldIsEmptyCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsEmptyCondition('foo');
 
         $this->assertEquals('[fz-value-foo=""]', $conditionItem->getCssResult());
     }
@@ -104,8 +106,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
     {
         $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsEmptyCondition\', form, {"fieldName":"foo"})';
 
-        $conditionItem = new FieldIsEmptyCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsEmptyCondition('foo');
 
         $this->assertEquals($assert, $conditionItem->getJavaScriptResult());
     }

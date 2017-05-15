@@ -13,9 +13,11 @@
 
 namespace Romm\Formz\Service;
 
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use Romm\Formz\Validation\Validator\AbstractValidator as FormzAbstractValidator;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class ValidatorService implements SingletonInterface
@@ -31,12 +33,12 @@ class ValidatorService implements SingletonInterface
     protected $validatorsData = [];
 
     /**
-     * @param string $validatorClassName
+     * @param Validator $validator
      * @return bool
      */
-    public function validatorAcceptsEmptyValues($validatorClassName)
+    public function validatorAcceptsEmptyValues(Validator $validator)
     {
-        $validatorData = $this->getValidatorData($validatorClassName);
+        $validatorData = $this->getValidatorData($validator);
 
         return (isset($validatorData['acceptsEmptyValues']))
             ? (bool)$validatorData['acceptsEmptyValues']
@@ -44,16 +46,15 @@ class ValidatorService implements SingletonInterface
     }
 
     /**
-     * @param string $validatorClassName
-     * @param array  $messages
+     * @param Validator $validator
      * @return array
      */
-    public function getValidatorMessages($validatorClassName, array $messages)
+    public function getValidatorMessages(Validator $validator)
     {
-        $validatorData = $this->getValidatorData($validatorClassName);
+        $validatorData = $this->getValidatorData($validator);
         $messages = (isset($validatorData['formzValidator']))
-            ? MessageService::get()->filterMessages(
-                $messages,
+            ? $this->filterMessages(
+                $validator,
                 $validatorData['supportedMessages'],
                 $validatorData['supportsAllMessages']
             )
@@ -66,11 +67,13 @@ class ValidatorService implements SingletonInterface
      * Will clone the data of the given validator class name. Please note that
      * it will use reflection to get the default value of the class properties.
      *
-     * @param $validatorClassName
+     * @param Validator $validator
      * @return array
      */
-    protected function getValidatorData($validatorClassName)
+    protected function getValidatorData(Validator $validator)
     {
+        $validatorClassName = $validator->getClassName();
+
         if (false === isset($this->validatorsData[$validatorClassName])) {
             $this->validatorsData[$validatorClassName] = [];
 
@@ -95,5 +98,55 @@ class ValidatorService implements SingletonInterface
         }
 
         return $this->validatorsData[$validatorClassName];
+    }
+
+    /**
+     * Will return an array by considering the supported messages, and filling
+     * the supported ones with the given values.
+     *
+     * @param Validator $validator
+     * @param array     $supportedMessages
+     * @param bool      $canCreateNewMessages
+     * @return array
+     */
+    public function filterMessages(Validator $validator, array $supportedMessages, $canCreateNewMessages = false)
+    {
+        $messagesArray = [];
+
+        foreach ($validator->getMessages() as $message) {
+            $messagesArray[$message->getIdentifier()] = $message->toArray();
+        }
+
+        $this->addValueToMessage($messagesArray);
+        $this->addValueToMessage($supportedMessages);
+
+        $messagesResult = $supportedMessages;
+
+        ArrayUtility::mergeRecursiveWithOverrule(
+            $messagesResult,
+            $messagesArray,
+            (bool)$canCreateNewMessages
+        );
+
+        return $messagesResult;
+    }
+
+    /**
+     * Adding the keys `value` and `extension` to the messages, only if it is
+     * missing.
+     *
+     * @param array $array
+     */
+    private function addValueToMessage(array &$array)
+    {
+        foreach ($array as $key => $value) {
+            if (false === isset($value['value'])) {
+                $array[$key]['value'] = '';
+            }
+
+            if (false === isset($value['extension'])) {
+                $array[$key]['extension'] = '';
+            }
+        }
     }
 }

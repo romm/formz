@@ -1,4 +1,5 @@
 <?php
+
 namespace Romm\Formz\Tests\Unit\Condition\Items;
 
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
@@ -14,8 +15,14 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
     public function wrongFieldNameThrowsException()
     {
         /** @var FieldHasValueCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldHasValueCondition::class, 1488192031);
-        $conditionItem->setFieldName('baz');
+        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(
+            FieldHasValueCondition::class,
+            [
+                'fieldName'  => 'baz',
+                'fieldValue' => 'foo'
+            ],
+            1488192031
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -25,8 +32,13 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
     public function validConfiguration()
     {
         /** @var FieldHasValueCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldHasValueCondition::class);
-        $conditionItem->setFieldName('foo');
+        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(
+            FieldHasValueCondition::class,
+            [
+                'fieldName'  => 'foo',
+                'fieldValue' => 'foo'
+            ]
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -37,9 +49,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsNotVerifiedWithGivenFieldValue()
     {
-        $conditionItem = new FieldHasValueCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setFieldValue('nope');
+        $conditionItem = new FieldHasValueCondition('foo', 'nope');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -66,9 +76,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsVerifiedWithGivenFieldValue()
     {
-        $conditionItem = new FieldHasValueCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setFieldValue('yup');
+        $conditionItem = new FieldHasValueCondition('foo', 'yup');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -93,9 +101,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
      */
     public function getCssResult()
     {
-        $conditionItem = new FieldHasValueCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setFieldValue('bar');
+        $conditionItem = new FieldHasValueCondition('foo', 'bar');
 
         $this->assertEquals('[fz-value-foo~="bar"]', $conditionItem->getCssResult());
     }
@@ -105,8 +111,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
      */
     public function getCssResultEmpty()
     {
-        $conditionItem = new FieldHasValueCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldHasValueCondition('foo', '');
 
         $this->assertEquals('[fz-value-foo=""]', $conditionItem->getCssResult());
     }
@@ -118,9 +123,7 @@ class FieldHasValueConditionTest extends AbstractConditionItemUnitTest
     {
         $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldHasValueCondition\', form, {"fieldName":"foo","fieldValue":"bar"})';
 
-        $conditionItem = new FieldHasValueCondition;
-        $conditionItem->setFieldName('foo');
-        $conditionItem->setFieldValue('bar');
+        $conditionItem = new FieldHasValueCondition('foo', 'bar');
 
         $this->assertEquals($assert, $conditionItem->getJavaScriptResult());
     }

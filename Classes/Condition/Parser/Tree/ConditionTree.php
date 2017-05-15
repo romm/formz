@@ -11,13 +11,13 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Condition\Parser;
+namespace Romm\Formz\Condition\Parser\Tree;
 
 use Romm\Formz\Condition\Parser\Node\ActivationDependencyAwareInterface;
 use Romm\Formz\Condition\Parser\Node\NodeInterface;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -47,10 +47,10 @@ class ConditionTree
      * @param NodeInterface $rootNode
      * @param Result        $validationResult
      */
-    public function __construct(NodeInterface $rootNode, Result $validationResult)
+    public function __construct(NodeInterface $rootNode, Result $validationResult = null)
     {
         $this->rootNode = $rootNode;
-        $this->validationResult = $validationResult;
+        $this->validationResult = $validationResult ?: new Result;
 
         $this->rootNode->setTree($this);
     }

@@ -17,10 +17,10 @@ use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationInterface;
-use Romm\Formz\Form\Definition\Field\Activation\ActivationUsageInterface;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
+use Romm\Formz\Form\Definition\Condition\ActivationUsageInterface;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Form\Definition\Field\Validation\Validation;
+use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;
 
 /**
@@ -129,7 +129,7 @@ class ConditionNode extends AbstractNode implements ActivationDependencyAwareInt
 
         if ($rootObject instanceof Field) {
             throw InvalidConditionException::invalidFieldConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
-        } elseif ($rootObject instanceof Validation) {
+        } elseif ($rootObject instanceof Validator) {
             throw InvalidConditionException::invalidValidationConditionConfiguration($conditionName, $rootObject, $formClassName, $exception);
         } else {
             throw $exception;

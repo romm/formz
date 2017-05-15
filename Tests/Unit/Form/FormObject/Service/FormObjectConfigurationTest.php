@@ -39,7 +39,6 @@ class FormObjectConfigurationTest extends AbstractUnitTest
      * retrieved:
      * - the global configuration validation;
      * - the form configuration mapping validation;
-     * - the form validator result.
      *
      * @test
      */
@@ -61,9 +60,6 @@ class FormObjectConfigurationTest extends AbstractUnitTest
         $formMappingValidationResult = new Result;
         $formMappingValidationResult->forProperty('bar')->addError(new Error('bar', 1337));
 
-        $formDefinitionValidationResult = new Result;
-        $formDefinitionValidationResult->forProperty('baz')->addError(new Error('baz', 404));
-
         $formDefinitionObjectMock->method('getValidationResult')
             ->willReturn($formMappingValidationResult);
 
@@ -71,9 +67,8 @@ class FormObjectConfigurationTest extends AbstractUnitTest
             ->method('getGlobalConfigurationValidationResult')
             ->willReturn($globalConfigurationValidationResult);
 
-        $formObjectConfiguration->expects($this->once())
-            ->method('getFormDefinitionValidationResult')
-            ->willReturn($formDefinitionValidationResult);
+        $formObjectConfiguration->expects($this->never())
+            ->method('getFormDefinitionValidationResult');
 
         $result = $formObjectConfiguration->getConfigurationValidationResult();
 
@@ -86,9 +81,47 @@ class FormObjectConfigurationTest extends AbstractUnitTest
         $barResult = $result->forProperty('forms.' . DefaultForm::class . '.bar');
         $this->assertTrue($barResult->hasErrors());
         $this->assertEquals(1337, $barResult->getFirstError()->getCode());
+    }
+
+    /**
+     * The form definition validation, which is handled by its own validator,
+     * must be returned only if the root configuration *and* the definition
+     * basic validation have no errors.
+     *
+     * @test
+     */
+    public function formDefinitionValidationResultAreReturned()
+    {
+        $formDefinitionObjectMock = $this->getMockBuilder(FormDefinitionObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getValidationResult'])
+            ->getMock();
+
+        $formObjectConfiguration = $this->getFormObjectConfigurationMock(
+            ['getGlobalConfigurationValidationResult', 'getFormDefinitionValidationResult'],
+            $formDefinitionObjectMock
+        );
+
+        $formDefinitionValidationResult = new Result;
+        $formDefinitionValidationResult->forProperty('baz')->addError(new Error('baz', 404));
+
+        $formDefinitionObjectMock->method('getValidationResult')
+            ->willReturn(new Result);
+
+        $formObjectConfiguration->expects($this->once())
+            ->method('getGlobalConfigurationValidationResult')
+            ->willReturn(new Result);
+
+        $formObjectConfiguration->expects($this->once())
+            ->method('getFormDefinitionValidationResult')
+            ->willReturn($formDefinitionValidationResult);
+
+        $result = $formObjectConfiguration->getConfigurationValidationResult();
+
+        $this->assertInstanceOf(Result::class, $result);
 
         $bazResult = $result->forProperty('forms.' . DefaultForm::class . '.baz');
-        $this->assertTrue($barResult->hasErrors());
+        $this->assertTrue($bazResult->hasErrors());
         $this->assertEquals(404, $bazResult->getFirstError()->getCode());
     }
 
@@ -99,7 +132,7 @@ class FormObjectConfigurationTest extends AbstractUnitTest
      */
     protected function getFormObjectConfigurationMock($methods = [], FormDefinitionObject $formDefinitionObject = null)
     {
-        $formDefinitionObject = $formDefinitionObject ?: new FormDefinitionObject(new FormDefinition);
+        $formDefinitionObject = $formDefinitionObject ?: new FormDefinitionObject(new FormDefinition, new Result);
 
         /** @var FormObjectConfiguration|\PHPUnit_Framework_MockObject_MockObject $formObjectConfiguration */
         $formObjectConfiguration = $this->getMockBuilder(FormObjectConfiguration::class)

@@ -14,24 +14,24 @@
 namespace Romm\Formz\Form\Definition;
 
 use Romm\ConfigurationObject\ConfigurationObjectInterface;
-use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
+use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Service\ServiceFactory;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\ArrayConversionTrait;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\DefaultConfigurationObjectTrait;
-use Romm\ConfigurationObject\Traits\ConfigurationObject\StoreArrayIndexTrait;
+use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
 use Romm\Formz\Configuration\Configuration;
+use Romm\Formz\Configuration\ConfigurationState;
+use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class FormDefinition extends AbstractFormzConfiguration implements ConfigurationObjectInterface
+class FormDefinition extends AbstractFormDefinitionComponent implements ConfigurationObjectInterface, DataPreProcessorInterface
 {
     use DefaultConfigurationObjectTrait;
-    use StoreArrayIndexTrait;
-    use ParentsTrait;
     use ArrayConversionTrait;
 
     /**
@@ -52,11 +52,17 @@ class FormDefinition extends AbstractFormzConfiguration implements Configuration
     protected $settings;
 
     /**
+     * @var ConfigurationState
+     */
+    private $state;
+
+    /**
      * Constructor.
      */
     public function __construct()
     {
         $this->settings = GeneralUtility::makeInstance(FormSettings::class);
+        $this->state = GeneralUtility::makeInstance(ConfigurationState::class);
     }
 
     /**
@@ -114,13 +120,25 @@ class FormDefinition extends AbstractFormzConfiguration implements Configuration
     }
 
     /**
-     * @param Field $field
+     * @param string $name
+     * @return Field
+     * @throws DuplicateEntryException
      */
-    public function addField(Field $field)
+    public function addField($name)
     {
-        $field->setParents([$this]);
+        $this->checkDefinitionFreezeState();
 
-        $this->fields[$field->getName()] = $field;
+        if ($this->hasField($name)) {
+            throw DuplicateEntryException::fieldAlreadyAdded($name);
+        }
+
+        /** @var Field $field */
+        $field = GeneralUtility::makeInstance(Field::class, $name);
+        $field->attachParent($this);
+
+        $this->fields[$name] = $field;
+
+        return $field;
     }
 
     /**
@@ -132,12 +150,66 @@ class FormDefinition extends AbstractFormzConfiguration implements Configuration
     }
 
     /**
-     * @param string                 $name
-     * @param ConditionItemInterface $condition
+     * @param string $name
+     * @return bool
      */
-    public function addCondition($name, ConditionItemInterface $condition)
+    public function hasCondition($name)
     {
-        $this->conditionList[$name] = $condition;
+        return true === isset($this->conditionList[$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return ConditionItemInterface
+     * @throws EntryNotFoundException
+     */
+    public function getCondition($name)
+    {
+        if (false === $this->hasCondition($name)) {
+            throw EntryNotFoundException::conditionNotFoundInDefinition($name);
+        }
+
+        return $this->conditionList[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param string $identifier
+     * @param array  $arguments
+     * @return ConditionItemInterface
+     * @throws DuplicateEntryException
+     */
+    public function addCondition($name, $identifier, array $arguments = [])
+    {
+        $this->checkDefinitionFreezeState();
+
+        if ($this->hasCondition($name)) {
+            throw DuplicateEntryException::formConditionAlreadyAdded($name);
+        }
+
+        $this->conditionList[$name] = $this->createCondition($identifier, $arguments);
+
+        return $this->conditionList[$name];
+    }
+
+    /**
+     * @param string $identifier
+     * @param array  $arguments
+     * @return ConditionItemInterface
+     * @throws EntryNotFoundException
+     */
+    protected function createCondition($identifier, array $arguments = [])
+    {
+        $conditionFactory = ConditionFactory::get();
+
+        if (false === $conditionFactory->hasCondition($identifier)) {
+            throw EntryNotFoundException::formAddConditionNotFound($identifier, $conditionFactory->getConditions());
+        }
+
+        $condition = $conditionFactory->instantiateCondition($identifier, $arguments);
+        $condition->attachParent($this);
+
+        return $condition;
     }
 
     /**
@@ -146,5 +218,29 @@ class FormDefinition extends AbstractFormzConfiguration implements Configuration
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @return ConfigurationState
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param DataPreProcessor $processor
+     */
+    public static function dataPreProcessor(DataPreProcessor $processor)
+    {
+        $data = $processor->getData();
+
+        /*
+         * Forcing the names of the fields: they are the keys of the array
+         * entries.
+         */
+        self::forceNameForProperty($data, 'fields');
+
+        $processor->setData($data);
     }
 }

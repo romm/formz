@@ -10,6 +10,7 @@ use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
@@ -184,23 +185,6 @@ class FormObjectFactoryTest extends AbstractUnitTest
     }
 
     /**
-     * Checks that when a static form object is fetched, it is injected in the
-     * global FormZ configuration.
-     *
-     * @test
-     */
-    public function formIsInjectedInGlobalConfiguration()
-    {
-        $formObjectFactory = $this->getFormObjectFactory();
-        $formObjectFactory->expects($this->once())
-            ->method('getGlobalConfiguration');
-
-        $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-        $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-        $formObjectFactory->getInstanceWithClassName(DefaultForm::class, 'foo');
-    }
-
-    /**
      * The proxy instance for a given form instance must always be the same.
      *
      * @test
@@ -225,16 +209,23 @@ class FormObjectFactoryTest extends AbstractUnitTest
     {
         /** @var FormObjectFactory|\PHPUnit_Framework_MockObject_MockObject $formObjectFactory */
         $formObjectFactory = $this->getMockBuilder(FormObjectFactory::class)
-            ->setMethods(['buildStaticInstance', 'getCacheInstance', 'getGlobalConfiguration'])
+            ->setMethods(['buildStaticInstance', 'getCacheInstance', 'getRootConfiguration'])
             ->getMock();
 
         $static = $this->getMockBuilder(FormObjectStatic::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getDefinitionValidationResult'])
+            ->setMethods(['getDefinitionValidationResult', 'getDefinition'])
             ->getMock();
 
         $static->method('getDefinitionValidationResult')
             ->willReturn(new Result);
+
+        $definition = $this->getMockBuilder(FormDefinition::class)
+            ->setMethods(['attachParent'])
+            ->getMock();
+
+        $static->method('getDefinition')
+            ->willReturn($definition);
 
         $formObjectFactory->method('buildStaticInstance')
             ->willReturn($static);
@@ -242,7 +233,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
         $formObjectFactory->method('getCacheInstance')
             ->willReturn($this->getCacheInstance()->reveal());
 
-        $formObjectFactory->method('getGlobalConfiguration')
+        $formObjectFactory->method('getRootConfiguration')
             ->willReturn($this->getMockBuilder(Configuration::class)->getMock());
 
         UnitTestContainer::get()->registerMockedInstance(FormObjectFactory::class, $formObjectFactory);

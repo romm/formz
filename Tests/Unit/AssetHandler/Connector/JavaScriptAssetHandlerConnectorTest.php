@@ -10,8 +10,8 @@ use Romm\Formz\AssetHandler\JavaScript\FieldsValidationActivationJavaScriptAsset
 use Romm\Formz\AssetHandler\JavaScript\FieldsValidationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormInitializationJavaScriptAssetHandler;
 use Romm\Formz\AssetHandler\JavaScript\FormRequestDataJavaScriptAssetHandler;
-use Romm\Formz\AssetHandler\JavaScript\FormzConfigurationJavaScriptAssetHandler;
-use Romm\Formz\AssetHandler\JavaScript\FormzLocalizationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\LocalizationJavaScriptAssetHandler;
+use Romm\Formz\AssetHandler\JavaScript\RootConfigurationJavaScriptAssetHandler;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -114,8 +114,8 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
 
         $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
 
-        /** @var FormzConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzConfigurationJavaScriptAssetHandlerMock */
-        $formzConfigurationJavaScriptAssetHandlerMock = $this->getMockBuilder(FormzConfigurationJavaScriptAssetHandler::class)
+        /** @var RootConfigurationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $formzConfigurationJavaScriptAssetHandlerMock */
+        $formzConfigurationJavaScriptAssetHandlerMock = $this->getMockBuilder(RootConfigurationJavaScriptAssetHandler::class)
             ->setMethods(['getJavaScriptFileName', 'getJavaScriptCode'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
@@ -353,14 +353,14 @@ class JavaScriptAssetHandlerConnectorTest extends AbstractUnitTest
 
         $javaScriptAssetHandlerConnector->injectEnvironmentService($this->getMockedEnvironmentService());
 
-        $formzLocalizationJavaScriptAssetHandlerMock = $this->getMockBuilder(FormzLocalizationJavaScriptAssetHandler::class)
-            ->setMethods(['injectTranslationsForFormFieldsValidation', 'getJavaScriptCode'])
+        $formzLocalizationJavaScriptAssetHandlerMock = $this->getMockBuilder(LocalizationJavaScriptAssetHandler::class)
+            ->setMethods(['injectTranslationsForFormFieldsValidator', 'getJavaScriptCode'])
             ->setConstructorArgs([$assetHandlerFactory])
             ->getMock();
 
         $formzLocalizationJavaScriptAssetHandlerMock
             ->expects($this->once())
-            ->method('injectTranslationsForFormFieldsValidation')
+            ->method('injectTranslationsForFormFieldsValidator')
             ->willReturn($formzLocalizationJavaScriptAssetHandlerMock);
 
         $formzLocalizationJavaScriptAssetHandlerMock

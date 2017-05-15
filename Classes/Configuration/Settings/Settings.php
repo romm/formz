@@ -13,20 +13,14 @@
 
 namespace Romm\Formz\Configuration\Settings;
 
-use Romm\Formz\Configuration\AbstractFormzConfiguration;
+use Romm\Formz\Configuration\AbstractConfiguration;
 use Romm\Formz\Form\Definition\Field\Settings\FieldSettings;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
 use TYPO3\CMS\Core\Cache\Backend\FileBackend;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class Settings extends AbstractFormzConfiguration
+class Settings extends AbstractConfiguration
 {
-
-    /**
-     * @var string
-     * @validate Romm.ConfigurationObject:ClassImplements(interface=TYPO3\CMS\Core\Cache\Backend\BackendInterface)
-     */
-    protected $defaultBackendCache = FileBackend::class;
-
     /**
      * @var \Romm\Formz\Form\Definition\Settings\FormSettings
      */
@@ -37,26 +31,19 @@ class Settings extends AbstractFormzConfiguration
      */
     protected $defaultFieldSettings;
 
+    /**
+     * @var string
+     * @validate Romm.ConfigurationObject:ClassImplements(interface=TYPO3\CMS\Core\Cache\Backend\BackendInterface)
+     */
+    protected $defaultBackendCache = FileBackend::class;
+
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
-        $this->defaultFormSettings = new FormSettings;
-        $this->defaultFieldSettings = new FieldSettings;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultBackendCache()
-    {
-        return $this->defaultBackendCache;
-    }
-
-    /**
-     * @param string $defaultBackendCache
-     */
-    public function setDefaultBackendCache($defaultBackendCache)
-    {
-        $this->defaultBackendCache = $defaultBackendCache;
+        $this->defaultFormSettings = GeneralUtility::makeInstance(FormSettings::class);
+        $this->defaultFieldSettings = GeneralUtility::makeInstance(FieldSettings::class);
     }
 
     /**
@@ -73,5 +60,23 @@ class Settings extends AbstractFormzConfiguration
     public function getDefaultFieldSettings()
     {
         return $this->defaultFieldSettings;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultBackendCache()
+    {
+        return $this->defaultBackendCache;
+    }
+
+    /**
+     * @param string $defaultBackendCache
+     */
+    public function setDefaultBackendCache($defaultBackendCache)
+    {
+        $this->checkConfigurationFreezeState();
+
+        $this->defaultBackendCache = $defaultBackendCache;
     }
 }

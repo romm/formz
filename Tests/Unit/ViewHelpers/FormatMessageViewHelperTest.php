@@ -71,11 +71,8 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelperDataProvider()
     {
-        $barField = new Field;
-        $barField->setName('bar');
-
-        $bazField = new Field;
-        $bazField->setName('baz');
+        $barField = new Field('bar');
+        $bazField = new Field('baz');
 
         return [
             [
@@ -120,7 +117,7 @@ class FormatMessageViewHelperTest extends AbstractViewHelperUnitTest
                 'expected'          => null,
                 'messageTemplate'   => null,
                 'expectedException' => EntryNotFoundException::class,
-                'field'             => new Field
+                'field'             => new Field('hello')
             ]
         ];
     }

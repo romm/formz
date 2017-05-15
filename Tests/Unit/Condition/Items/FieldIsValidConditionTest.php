@@ -16,8 +16,11 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
     public function wrongFieldNameThrowsException()
     {
         /** @var FieldIsValidCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(FieldIsValidCondition::class, 1488183577);
-        $conditionItem->setFieldName('baz');
+        $conditionItem = $this->getConditionItemWithFailedConfigurationValidation(
+            FieldIsValidCondition::class,
+            ['fieldName' => 'baz'],
+            1488183577
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -27,8 +30,10 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
     public function validConfiguration()
     {
         /** @var FieldIsValidCondition $conditionItem */
-        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(FieldIsValidCondition::class);
-        $conditionItem->setFieldName('foo');
+        $conditionItem = $this->getConditionItemWithValidConfigurationValidation(
+            FieldIsValidCondition::class,
+            ['fieldName' => 'foo']
+        );
         $conditionItem->validateConditionConfiguration($this->getDefaultFormObject()->getDefinition());
     }
 
@@ -39,8 +44,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsNotVerifiedWhenFieldHasErrors()
     {
-        $conditionItem = new FieldIsValidCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsValidCondition('foo');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -79,8 +83,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
      */
     public function phpConditionIsVerifiedWhenFieldHasNoErrors()
     {
-        $conditionItem = new FieldIsValidCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsValidCondition('foo');
 
         $formObject = $this->getDefaultFormObject();
         $conditionItem->attachFormObject($formObject);
@@ -113,8 +116,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
      */
     public function getCssResultEmpty()
     {
-        $conditionItem = new FieldIsValidCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsValidCondition('foo');
 
         $this->assertEquals('[fz-valid-foo="1"]', $conditionItem->getCssResult());
     }
@@ -126,8 +128,7 @@ class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
     {
         $assert = 'Fz.Condition.validateCondition(\'Romm\\\\Formz\\\\Condition\\\\Items\\\\FieldIsValidCondition\', form, {"fieldName":"foo"})';
 
-        $conditionItem = new FieldIsValidCondition;
-        $conditionItem->setFieldName('foo');
+        $conditionItem = new FieldIsValidCondition('foo');
 
         $this->assertEquals($assert, $conditionItem->getJavaScriptResult());
     }

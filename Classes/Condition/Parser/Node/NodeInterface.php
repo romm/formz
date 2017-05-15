@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Condition\Parser\Node;
 
-use Romm\Formz\Condition\Parser\ConditionTree;
+use Romm\Formz\Condition\Parser\Tree\ConditionTree;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 
 /**
