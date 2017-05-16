@@ -25,14 +25,17 @@ namespace Romm\Formz\Form;
  */
 interface FormInterface
 {
-
     /**
+     * @deprecated This method is deprecated and will be deleted in FormZ v2.
+     *
      * @param string $key
      * @return array
      */
     public function getValidationData($key = null);
 
     /**
+     * @deprecated This method is deprecated and will be deleted in FormZ v2.
+     *
      * @param array $validationData
      * @internal
      */
