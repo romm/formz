@@ -457,6 +457,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->willReturn($mockRequest);
 
         $view = new StandaloneView;
+        $view->setTemplatePathAndFilename('foo/bar');
         $view->setControllerContext($controllerContextMock);
 
         $viewHelperVariableContainer = new ViewHelperVariableContainer;
