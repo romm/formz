@@ -15,8 +15,8 @@ namespace Romm\Formz\ViewHelpers\Slot;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractConditionViewHelper;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 

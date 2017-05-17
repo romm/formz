@@ -28,7 +28,7 @@ use Romm\Formz\Service\ControllerService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

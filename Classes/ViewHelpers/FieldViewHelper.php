@@ -21,9 +21,9 @@ use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
-use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
@@ -105,6 +105,12 @@ class FieldViewHelper extends AbstractViewHelper
         $this->injectFieldInService($this->arguments['name']);
 
         /*
+         * Activating the slot service, which will be used all along the
+         * rendering of this very field.
+         */
+        $this->slotService->activate($this->renderingContext);
+
+        /*
          * Calling this here will process every view helper beneath this one,
          * allowing options and slots to be used correctly in the field layout.
          */
@@ -131,7 +137,7 @@ class FieldViewHelper extends AbstractViewHelper
         /*
          * Resetting all services data.
          */
-        $this->fieldService->resetState();
+        $this->fieldService->removeCurrentField();
         $this->slotService->resetState();
 
         $viewHelperVariableContainer->setView($currentView);

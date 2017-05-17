@@ -11,59 +11,63 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Service\ViewHelper;
+namespace Romm\Formz\Service\ViewHelper\Slot;
 
 use Closure;
 use Romm\Formz\Exceptions\EntryNotFoundException;
-use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\TemplateVariableContainer;
 
-class SlotViewHelperService implements SingletonInterface
+class SlotContextEntry
 {
+    /**
+     * @var RenderingContextInterface|\TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface
+     */
+    protected $renderingContext;
+
     /**
      * Contains the closures which will render the registered slots. The keys
      * of this array are the names of the slots.
      *
      * @var Closure[]
      */
-    private $closures = [];
+    protected $closures = [];
 
     /**
      * @var array[]
      */
-    private $arguments = [];
-
-    /**
-     * @var RenderingContextInterface|\TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface[]
-     */
-    private $renderingContext = [];
+    protected $arguments = [];
 
     /**
      * @var array[]
      */
-    private $injectedVariables = [];
+    protected $injectedVariables = [];
 
     /**
      * @var array[]
      */
-    private $savedVariables = [];
+    protected $savedVariables = [];
 
     /**
-     * Adds a closure - which will render the slot with the given name - to the
-     * private storage in this class.
-     *
-     * @param string                    $name
-     * @param Closure                   $closure
-     * @param array                     $arguments
      * @param RenderingContextInterface $renderingContext
      */
-    public function addSlot($name, Closure $closure, array $arguments, RenderingContextInterface $renderingContext)
+    public function __construct(RenderingContextInterface $renderingContext)
+    {
+        $this->renderingContext = $renderingContext;
+    }
+
+    /**
+     * Adds a closure - used to render the slot with the given name - to the
+     * private storage in this class.
+     *
+     * @param string $name
+     * @param Closure $closure
+     * @param array $arguments
+     */
+    public function addSlot($name, Closure $closure, array $arguments)
     {
         $this->closures[$name] = $closure;
         $this->arguments[$name] = $arguments;
-        $this->renderingContext[$name] = $renderingContext;
     }
 
     /**
@@ -114,12 +118,12 @@ class SlotViewHelperService implements SingletonInterface
      * Note that the variables that are already defined are first saved before
      * being overridden, so they can be restored later.
      *
-     * @param string                    $slotName
-     * @param array                     $arguments
+     * @param string $slotName
+     * @param array $arguments
      */
     public function addTemplateVariables($slotName, array $arguments)
     {
-        $templateVariableContainer = $this->getTemplateVariableContainer($slotName);
+        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
         $savedArguments = [];
 
         ArrayUtility::mergeRecursiveWithOverrule(
@@ -144,11 +148,11 @@ class SlotViewHelperService implements SingletonInterface
      * Will remove all variables previously injected in the template variable
      * container, and restore the ones that were saved before being overridden.
      *
-     * @param string                    $slotName
+     * @param string $slotName
      */
     public function restoreTemplateVariables($slotName)
     {
-        $templateVariableContainer = $this->getTemplateVariableContainer($slotName);
+        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
         $mergedArguments = (isset($this->injectedVariables[$slotName])) ? $this->injectedVariables[$slotName] : [];
         $savedArguments = (isset($this->savedVariables[$slotName])) ? $this->savedVariables[$slotName] : [];
 
@@ -159,28 +163,5 @@ class SlotViewHelperService implements SingletonInterface
         foreach ($savedArguments as $key => $value) {
             $templateVariableContainer->add($key, $value);
         }
-    }
-
-    /**
-     * @param string $slotName
-     * @return TemplateVariableContainer
-     */
-    protected function getTemplateVariableContainer($slotName)
-    {
-        /** @var TemplateVariableContainer $templateVariableContainer */
-        $templateVariableContainer = $this->renderingContext[$slotName]->getTemplateVariableContainer();
-
-        return $templateVariableContainer;
-    }
-
-    /**
-     * Resets the service variables.
-     */
-    public function resetState()
-    {
-        $this->closures = [];
-        $this->arguments = [];
-        $this->injectedVariables = [];
-        $this->savedVariables = [];
     }
 }

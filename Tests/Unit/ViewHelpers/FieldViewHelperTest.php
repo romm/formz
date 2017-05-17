@@ -11,9 +11,9 @@ use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Form\FormObject;
 use Romm\Formz\Form\FormObjectFactory;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
-use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use TYPO3\CMS\Core\Cache\Backend\NullBackend;
@@ -53,11 +53,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->method('formContextExists')
             ->willReturn(true);
 
-        $fieldServiceMock = $this->getMockedFieldService();
-        $viewHelper->injectFieldService($fieldServiceMock);
-        $fieldServiceMock->expects($this->once())
-            ->method('setCurrentField')
-            ->with($formObject->getConfiguration()->getField($fieldName));
+        $viewHelper->injectFieldService(new FieldViewHelperService);
 
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
@@ -153,7 +149,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['renderChildren'])
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
-        $viewHelper->injectFieldService($this->getMockedFieldService());
+        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
         $viewHelper->setArguments(['name' => 'bar']);
@@ -181,7 +177,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['renderChildren'])
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
-        $viewHelper->injectFieldService($this->getMockedFieldService());
+        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
@@ -212,7 +208,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['renderChildren'])
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
-        $viewHelper->injectFieldService($this->getMockedFieldService());
+        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
@@ -245,7 +241,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['renderChildren'])
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
-        $viewHelper->injectFieldService($this->getMockedFieldService());
+        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
@@ -278,7 +274,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['renderChildren'])
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
-        $viewHelper->injectFieldService($this->getMockedFieldService());
+        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
 
@@ -314,7 +310,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->setMethods(['renderChildren'])
             ->getMock();
         $viewHelper->injectFormService($this->getMockedFormService($formObject));
-        $viewHelper->injectFieldService($this->getMockedFieldService());
+        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->injectSlotService(new SlotViewHelperService);
 
         $renderingContextMock = $this->getMockedRenderingContext();
@@ -427,18 +423,6 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
         $formService->setFormObject($formObject);
 
         return $formService;
-    }
-
-    /**
-     * @return FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getMockedFieldService()
-    {
-        $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
-            ->setMethods(['setCurrentField'])
-            ->getMock();
-
-        return $fieldService;
     }
 
     /**
