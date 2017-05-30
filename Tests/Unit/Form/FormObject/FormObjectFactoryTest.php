@@ -62,7 +62,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
      *
      * @test
      */
-    public function registerFormInstanceThrowsException()
+    public function registerFormInstanceTwiceThrowsException()
     {
         $this->setExpectedException(DuplicateEntryException::class);
 
@@ -214,7 +214,7 @@ class FormObjectFactoryTest extends AbstractUnitTest
 
         $static = $this->getMockBuilder(FormObjectStatic::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getDefinitionValidationResult', 'getDefinition'])
+            ->setMethods(['getDefinitionValidationResult', 'getDefinition', 'getObjectHash'])
             ->getMock();
 
         $static->method('getDefinitionValidationResult')

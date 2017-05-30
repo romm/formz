@@ -17,6 +17,7 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Form\FormObject\Service\FormObjectConfiguration;
+use Romm\Formz\Form\FormObject\Service\FormObjectProperties;
 use Romm\Formz\Service\HashService;
 use TYPO3\CMS\Extbase\Error\Result;
 
@@ -43,6 +44,11 @@ class FormObjectStatic
     protected $configurationService;
 
     /**
+     * @var FormObjectProperties
+     */
+    protected $propertiesService;
+
+    /**
      * @param string               $className
      * @param FormDefinitionObject $definition
      */
@@ -51,6 +57,7 @@ class FormObjectStatic
         $this->className = $className;
         $this->definition = $definition;
         $this->configurationService = Core::instantiate(FormObjectConfiguration::class, $this, $definition);
+        $this->propertiesService = Core::instantiate(FormObjectProperties::class, $this);
     }
 
     /**
@@ -96,6 +103,14 @@ class FormObjectStatic
     }
 
     /**
+     * @return array
+     */
+    public function getProperties()
+    {
+        return $this->propertiesService->getProperties();
+    }
+
+    /**
      * Returns the calculated hash of the form object.
      *
      * @return string
@@ -103,10 +118,11 @@ class FormObjectStatic
     protected function calculateObjectHash()
     {
         /*
-         * Triggering the validation result calculation, to be sure the values
-         * will be in the serialization string.
+         * Triggering the validation result and the properties calculations, to
+         * be sure these values will be in the serialization string.
          */
         $this->getDefinitionValidationResult();
+        $this->getProperties();
 
         return HashService::get()->getHash(serialize($this));
     }

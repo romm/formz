@@ -18,7 +18,6 @@ use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * Default form object builder.
@@ -29,13 +28,6 @@ use TYPO3\CMS\Extbase\Reflection\ReflectionService;
  */
 class DefaultFormObjectBuilder extends AbstractFormObjectBuilder
 {
-    const IGNORE_PROPERTY = 'formz-ignore';
-
-    /**
-     * @var array
-     */
-    private static $ignoredProperties = ['validationData', 'uid', 'pid', '_localizedUid', '_languageUid', '_versionedUid'];
-
     /**
      * @see DefaultFormObjectBuilder
      */
@@ -68,26 +60,11 @@ class DefaultFormObjectBuilder extends AbstractFormObjectBuilder
      */
     protected function insertObjectProperties()
     {
-        /** @var ReflectionService $reflectionService */
-        $reflectionService = GeneralUtility::makeInstance(ReflectionService::class);
-        $reflectionProperties = $reflectionService->getClassPropertyNames($this->className);
-
-        $classReflection = new \ReflectionClass($this->className);
-        $publicProperties = $classReflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-        foreach ($reflectionProperties as $propertyName) {
-            if (false === in_array($propertyName, self::$ignoredProperties)
-                && false === $reflectionService->isPropertyTaggedWith($this->className, $propertyName, self::IGNORE_PROPERTY)
-                && ((true === in_array($propertyName, $publicProperties))
-                    || $reflectionService->hasMethod($this->className, 'get' . ucfirst($propertyName))
-                )
-                && false === $this->static->getDefinition()->hasField($propertyName)
-            ) {
+        foreach ($this->static->getProperties() as $propertyName) {
+            if (false === $this->static->getDefinition()->hasField($propertyName)) {
                 $this->static->getDefinition()->addField($propertyName);
             }
         }
-
-        unset($publicProperties);
     }
 
     /**

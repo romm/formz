@@ -10,6 +10,16 @@ class ExtendedForm extends DefaultForm
     protected $bar;
 
     /**
+     * @var string
+     */
+    public $publicProperty;
+
+    /**
+     * @var string
+     */
+    protected $notAccessibleProperty;
+
+    /**
      * @return array
      */
     public function getBar()

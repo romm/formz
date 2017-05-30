@@ -170,7 +170,7 @@ trait FormzUnitTestUtility
 
         /** @var FormObject|\PHPUnit_Framework_MockObject_MockObject $formObject */
         $formObject = $this->getMockBuilderWrap(FormObject::class)
-            ->setMethods(['createProxy', 'getDefinition', 'getDefinitionValidationResult', 'aze'])
+            ->setMethods(['createProxy', 'getDefinition', 'getDefinitionValidationResult', 'getObjectHash', 'registerFormInstance'])
             ->setConstructorArgs([
                 AbstractUnitTest::FORM_OBJECT_DEFAULT_NAME,
                 $formObjectStatic

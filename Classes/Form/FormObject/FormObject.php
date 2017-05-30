@@ -87,6 +87,14 @@ class FormObject
     }
 
     /**
+     * @return array
+     */
+    public function getProperties()
+    {
+        return $this->static->getProperties();
+    }
+
+    /**
      * @return FormInterface
      */
     public function getForm()
