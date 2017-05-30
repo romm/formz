@@ -41,7 +41,7 @@ trait FormTrait
      */
     public function getMetadata()
     {
-        return $this->getFormObject()->getFormMetadata()->getMetadata();
+        return $this->getFormObject()->getFormMetadata();
     }
 
     /**
