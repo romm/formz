@@ -54,7 +54,7 @@ class Field extends AbstractFormDefinitionComponent implements ActivationUsageIn
     /**
      * @var \Romm\Formz\Form\Definition\Field\Settings\FieldSettings
      */
-    private $settings;
+    protected $settings;
 
     /**
      * @param string $name

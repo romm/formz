@@ -138,7 +138,7 @@ class FormObjectSteps
         // @todo check configuration has steps or fatal error
         if (null === $this->stepPersistence) {
             $objectHash = $this->formObject->getObjectHash();
-            $metadata = $this->formObject->getFormMetadata()->getMetadata();
+            $metadata = $this->formObject->getFormMetadata();
 
             if ($metadata->has(self::METADATA_STEP_PERSISTENCE_KEY)) {
                 $this->stepPersistence = $metadata->get(self::METADATA_STEP_PERSISTENCE_KEY);

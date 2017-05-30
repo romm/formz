@@ -14,7 +14,7 @@
 namespace Romm\Formz\Form\FormObject;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\Domain\Model\FormMetadata;
+use Romm\Formz\Domain\Model\DataObject\FormMetadataObject;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
@@ -170,12 +170,13 @@ class FormObject
     {
         return $this->getProxy()->getRequestData();
     }
+
     /**
-     * @return FormMetadata
+     * @return FormMetadataObject
      */
     public function getFormMetadata()
     {
-        return $this->getProxy()->getFormMetadata();
+        return $this->getProxy()->getFormMetadata()->getMetadata();
     }
 
     /**

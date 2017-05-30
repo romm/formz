@@ -51,7 +51,7 @@ class FormMetadata extends AbstractEntity
     /**
      * @var bool
      */
-    private $objectWasAssigned = false;
+    protected $objectWasAssigned = false;
 
     /**
      * @param string             $hash

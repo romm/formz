@@ -134,7 +134,7 @@ class FormController extends ActionController
             if ($formObject->hasForm()
                 && $formObject->isPersistent()
             ) {
-                $formObject->getFormMetadata()->getMetadata()->persist();
+                $formObject->getFormMetadata()->persist();
             }
         }
     }

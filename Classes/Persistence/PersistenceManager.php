@@ -51,7 +51,8 @@ class PersistenceManager
         $this->initializePersistence();
 
         $form = $this->formObject->getForm();
-        $metadata = $this->formObject->getFormMetadata();
+        $proxy = FormObjectFactory::get()->getProxy($form);
+        $metadata = $proxy->getFormMetadata();
         $identifier = $metadata->getIdentifier();
         $persistenceServices = $this->getSortedPersistenceServices();
 
@@ -60,7 +61,6 @@ class PersistenceManager
         }
 
         if (count($persistenceServices) > 0) {
-            $proxy = FormObjectFactory::get()->getProxy($form);
             $proxy->markFormAsPersistent();
         }
 
