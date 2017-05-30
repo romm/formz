@@ -21,6 +21,8 @@ use Romm\Formz\Condition\Parser\Tree\EmptyConditionTree;
 use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
+use Romm\Formz\Form\Definition\Step\Step\ConditionalStepDefinition;
+use Romm\Formz\Form\Definition\Step\Step\Substep\ConditionalSubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 
 class ConditionProcessor
@@ -39,6 +41,16 @@ class ConditionProcessor
      * @var ConditionTree[]
      */
     private $conditionTrees = [];
+
+    /**
+     * @var ConditionTree[]
+     */
+    private $stepTree = [];
+
+    /**
+     * @var ConditionTree[]
+     */
+    private $substepTree = [];
 
     /**
      * @var array
@@ -99,6 +111,44 @@ class ConditionProcessor
         }
 
         return $this->conditionTrees[$key];
+    }
+
+    /**
+     * @todo
+     *
+     * @param ConditionalStepDefinition $step
+     * @return ConditionTree
+     */
+    public function getActivationConditionTreeForStep(ConditionalStepDefinition $step)
+    {
+        $key = 'step-' . serialize($step);
+
+        if (false === array_key_exists($key, $this->stepTree)) {
+            $this->stepTree[$key] = $this->getConditionTree($step->getActivation());
+        }
+
+        $this->stepTree[$key]->injectDependencies($this, $step->getActivation());
+
+        return $this->stepTree[$key];
+    }
+
+    /**
+     * @todo
+     *
+     * @param ConditionalSubstepDefinition $substep
+     * @return ConditionTree
+     */
+    public function getActivationConditionTreeForSubstep(ConditionalSubstepDefinition $substep)
+    {
+        $key = 'substep-' . serialize($substep);
+
+        if (false === array_key_exists($key, $this->substepTree)) {
+            $this->substepTree[$key] = $this->getConditionTree($substep->getActivation());
+        }
+
+        $this->substepTree[$key]->injectDependencies($this, $substep->getActivation());
+
+        return $this->substepTree[$key];
     }
 
     /**

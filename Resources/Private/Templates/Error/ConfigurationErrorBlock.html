@@ -4,20 +4,7 @@
 <f:layout name="Error/ErrorBlock" />
 
 <f:section name="Main">
-    <p><f:translate key="form.wrong_configuration.error_message" extensionName="formz" /></p>
-
-    <ul>
-        <f:for each="{result.flattenedErrors}" key="property" as="errors">
-            <li>
-                {property}
-                <ul>
-                    <f:for each="{errors}" as="error">
-                        <li>{error}</li>
-                    </f:for>
-                </ul>
-            </li>
-        </f:for>
-    </ul>
+    <f:render partial="Error/ErrorBlock" section="ErrorBlock" arguments="{formObject: formObject, renderingResult: renderingResult}" />
 </f:section>
 
 </html>

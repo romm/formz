@@ -20,8 +20,12 @@ use Romm\Formz\Configuration\View\View;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\Definition\FormDefinition;
+use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
+use Romm\Formz\Form\Definition\Step\Steps;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
+use Romm\Formz\Persistence\Item\Session\SessionPersistence;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
@@ -70,11 +74,27 @@ class EntryNotFoundException extends FormzException
 
     const SLOT_NOT_FOUND = 'No slot "%s" was found.';
 
+    const ARGUMENT_NOT_FOUND = 'Trying to get an argument that does not exist: "%s". Please use function `has()`.';
+
+    const FORM_REQUEST_DATA_NOT_FOUND = 'The data "%s" was not found. Please use the function `%s::hasData()` before.';
+
+    const PERSISTENCE_SESSION_ENTRY_NOT_FOUND = 'The form with identifier "%s" was not found in the session, please use the function `%s::has()` before.';
+
+    const META_DATA_NOT_FOUND = 'The metadata "%s" was not found. Please use the function `%s::has()` before.';
+
     const FORM_CONFIGURATION_NOT_FOUND = 'The configuration for form of class "%s" was not found. Please use the function `%s::hasForm()` before.';
 
     const CONDITION_NOT_FOUND_IN_DEFINITION = 'The condition "%s" was not found in the form definition. Please use the function `%s::hasCondition()` before.';
 
     const CONDITION_DOES_NOT_EXIST = 'The condition "%s" does not exist';
+
+    const MIDDLEWARE_NOT_FOUND = 'The middleware "%s" was not found. Please use the function `%s::hasMiddleware()` before.';
+
+    const STEP_ENTRY_NOT_FOUND = 'The step "%s" was not found. Please use the function `%s::hasEntry()` before.';
+
+    const NEXT_STEPS_NOT_FOUND = 'The step definition for the step "%s" does not have next steps. Please use the function `%s::hasNextSteps()` before.';
+
+    const PREVIOUS_DEFINITION_NOT_FOUND = 'The step definition for the step "%s" does not have a previous definition. Please use the function `%s::hasPreviousDefinition()` before.';
 
     const FORM_OBJECT_INSTANCE_NOT_FOUND = 'The form instance for the object of type "%s" was not found. Please take care of registering it before with "%s::registerFormInstance()".';
 
@@ -510,6 +530,74 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
+     * @code 1490792697
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function argumentNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::ARGUMENT_NOT_FOUND,
+            [$name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490799273
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function formRequestDataNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_REQUEST_DATA_NOT_FOUND,
+            [$name, FormObjectRequestData::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1491293933
+     *
+     * @param FormMetadata $metadata
+     * @return self
+     */
+    final public static function persistenceSessionEntryNotFound(FormMetadata $metadata)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::PERSISTENCE_SESSION_ENTRY_NOT_FOUND,
+            [$metadata->getHash(), SessionPersistence::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1491814768
+     *
+     * @param string $key
+     * @return self
+     */
+    final public static function metadataNotFound($key)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::META_DATA_NOT_FOUND,
+            [$key, FormMetadataObject::class]
+        );
+
+        return $exception;
+    }
+
+    /**
      * @code 1491997168
      *
      * @return self
@@ -537,6 +625,74 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::CONDITION_NOT_FOUND_IN_DEFINITION,
             [$name, Configuration::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1491997309
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function middlewareNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_NOT_FOUND,
+            [$name, FormDefinition::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1492602754
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function stepEntryNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::STEP_ENTRY_NOT_FOUND,
+            [$name, Steps::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1492603394
+     *
+     * @param StepDefinition $stepDefinition
+     * @return EntryNotFoundException
+     */
+    final public static function nextStepsNotFound(StepDefinition $stepDefinition)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::NEXT_STEPS_NOT_FOUND,
+            [$stepDefinition->getStep()->getIdentifier(), get_class($stepDefinition)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1492603656
+     *
+     * @param StepDefinition $stepDefinition
+     * @return EntryNotFoundException
+     */
+    final public static function previousDefinitionNotFound(StepDefinition $stepDefinition)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::PREVIOUS_DEFINITION_NOT_FOUND,
+            [$stepDefinition->getStep()->getIdentifier(), get_class($stepDefinition)]
         );
 
         return $exception;

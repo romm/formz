@@ -14,10 +14,12 @@
 namespace Romm\Formz\Core;
 
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -34,6 +36,11 @@ class Core implements SingletonInterface
      * @var ObjectManagerInterface
      */
     protected $objectManager;
+
+    /**
+     * @var PersistenceManager
+     */
+    protected $persistenceManager;
 
     /**
      * @return Core
@@ -77,11 +84,27 @@ class Core implements SingletonInterface
     }
 
     /**
+     * @return PersistenceManager
+     */
+    public function getPersistenceManager()
+    {
+        return $this->persistenceManager;
+    }
+
+    /**
      * @param ObjectManagerInterface $objectManager
      */
     public function injectObjectManager(ObjectManagerInterface $objectManager)
     {
         $this->objectManager = $objectManager;
+    }
+
+    /**
+     * @param PersistenceManager $persistenceManager
+     */
+    public function injectPersistenceManager(PersistenceManager $persistenceManager)
+    {
+        $this->persistenceManager = $persistenceManager;
     }
 
     /**
@@ -98,5 +121,13 @@ class Core implements SingletonInterface
     public function getBackendUser()
     {
         return $GLOBALS['BE_USER'];
+    }
+
+    /**
+     * @return DatabaseConnection
+     */
+    public function getDatabase()
+    {
+        return $GLOBALS['TYPO3_DB'];
     }
 }

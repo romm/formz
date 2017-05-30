@@ -18,8 +18,8 @@ use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Message;
 use TYPO3\CMS\Extbase\Error\Notice;
@@ -148,8 +148,7 @@ class FormatMessageViewHelper extends AbstractViewHelper
         if (empty($fieldName)
             && $this->fieldService->fieldContextExists()
         ) {
-            $field = $this->fieldService->getCurrentField();
-            $fieldName = $field->getName();
+            $fieldName = $this->fieldService->getCurrentField()->getName();
         }
 
         if (null === $fieldName) {

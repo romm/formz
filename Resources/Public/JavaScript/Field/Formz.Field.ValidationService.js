@@ -214,9 +214,13 @@ Fz.Field.ValidationService = (function () {
                     ? (success.toString() === 'true')
                     : false;
 
-                result = result && success;
+                if (success === false) {
+                    conditionDone = conditionNumber;
+                    result = false;
+                } else {
+                    conditionDone++;
+                }
 
-                conditionDone++;
                 if (conditionNumber === conditionDone) {
                     if (result) {
                         runCallback();
@@ -585,6 +589,10 @@ Fz.Field.ValidationService = (function () {
                 eventsManager.on('activationCondition', callback);
             },
 
+            addSubstepCondition: function (name, callback) {
+                eventsManager.on('substep', callback);
+            },
+
             /**
              * Adds an activation condition to a specific validation rule of
              * this service. There can be as much conditions as needed, and if
@@ -651,11 +659,28 @@ Fz.Field.ValidationService = (function () {
              * @param {Function} runValidationCallback  The callback function called if the validation should run.
              * @param {Function} stopValidationCallback The callback function called if the validation should be cancelled.
              */
-            checkActivationCondition: function (runValidationCallback, stopValidationCallback) {
+            checkActivationCondition: function (runValidationCallback, stopValidationCallback, deactivateCallback) {
                 checkConditionInternal(
-                    eventsManager.getCallbacksForEvent('activationCondition'),
-                    runValidationCallback,
-                    stopValidationCallback
+                    eventsManager.getCallbacksForEvent('substep'),
+                    function () {
+                        checkConditionInternal(
+                            eventsManager.getCallbacksForEvent('activationCondition'),
+                            runValidationCallback,
+                            function () {
+                                if (typeof stopValidationCallback === 'function') {
+                                    stopValidationCallback();
+                                }
+                                if (typeof deactivateCallback === 'function') {
+                                    deactivateCallback();
+                                }
+                            }
+                        );
+                    },
+                    function () {
+                        if (typeof stopValidationCallback === 'function') {
+                            stopValidationCallback();
+                        }
+                    }
                 );
             },
 
@@ -718,7 +743,7 @@ Fz.Field.ValidationService = (function () {
                         }
                     };
 
-                    this.checkActivationCondition(continueCallback, stopValidationCallBack);
+                    this.checkActivationCondition(continueCallback, null, stopValidationCallBack);
                 }
             },
 

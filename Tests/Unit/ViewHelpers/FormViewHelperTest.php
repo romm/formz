@@ -9,7 +9,7 @@ use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ControllerService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper;
 use Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
@@ -215,6 +215,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
     {
         $defaultClass = 'default-class';
         $formObject = $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
 
         $viewHelper = $this->getFormViewHelperMock(
             [
@@ -392,7 +393,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
     protected function getFormViewHelperMock(array $methods = [], FormObject $formObject = null)
     {
         $formObject = $formObject ?: $this->getDefaultFormObject();
-        $defaultMethods = ['getParentRenderResult', 'getFormObject'];
+        $defaultMethods = ['getParentRenderResult', 'getFormObject', 'handleSubsteps'];
         $methods = array_merge($defaultMethods, $methods);
 
         /** @var FormViewHelper|\PHPUnit_Framework_MockObject_MockObject $viewHelper */

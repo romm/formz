@@ -13,6 +13,13 @@
 
 namespace Romm\Formz\Form;
 
+use Romm\Formz\Domain\Model\DataObject\FormMetadataObject;
+use Romm\Formz\Error\FormResult;
+use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This trait should be used by default to implement all the functions required
  * by the interface `FormInterface`.
@@ -22,7 +29,6 @@ namespace Romm\Formz\Form;
  */
 trait FormTrait
 {
-
     /**
      * Contains the optional data returned from the validators of each field.
      *
@@ -31,11 +37,57 @@ trait FormTrait
     protected $validationData = [];
 
     /**
+     * @return FormMetadataObject
+     */
+    public function getMetadata()
+    {
+        return $this->getFormObject()->getFormMetadata()->getMetadata();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormHash()
+    {
+        return $this->getFormObject()->getFormHash();
+    }
+
+    /**
+     * @return FormResult
+     */
+    public function getValidationResult()
+    {
+        return $this->getFormObject()->getFormResult();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPersistent()
+    {
+        return $this->getFormObject()->isPersistent();
+    }
+
+    /**
+     * @return FormObject
+     * @throws EntryNotFoundException
+     */
+    private function getFormObject()
+    {
+        /** @var FormInterface $this */
+        return FormObjectFactory::get()->getInstanceWithFormInstance($this);
+    }
+
+    /**
+     * @deprecated This method is deprecated and will be deleted in FormZ v2.
+     *
      * @param string $key
      * @return array
      */
     public function getValidationData($key = null)
     {
+        GeneralUtility::logDeprecatedFunction();
+
         $result = $this->validationData;
 
         if (null !== $key) {
@@ -48,11 +100,15 @@ trait FormTrait
     }
 
     /**
+     * @deprecated This method is deprecated and will be deleted in FormZ v2.
+     *
      * @param array $validationData
      * @internal
      */
     public function setValidationData(array $validationData)
     {
+        GeneralUtility::logDeprecatedFunction();
+
         $this->validationData = $validationData;
     }
 }

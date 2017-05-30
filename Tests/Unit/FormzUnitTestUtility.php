@@ -6,12 +6,14 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
+use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
@@ -180,6 +182,8 @@ trait FormzUnitTestUtility
         $formObject->method('createProxy')
             ->willReturnCallback(function ($form) use ($formObject, $proxyCallback) {
                 $proxy = new FormObjectProxy($formObject, $form);
+
+                $proxy->injectRequestData(new FormObjectRequestData);
 
                 if (is_callable($proxyCallback)) {
                     call_user_func($proxyCallback, $proxy);

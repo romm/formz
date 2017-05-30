@@ -13,12 +13,19 @@
 
 namespace Romm\Formz\Form\FormObject;
 
+use Romm\Formz\Core\Core;
+use Romm\Formz\Domain\Model\FormMetadata;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Form\Definition\FormDefinition;
+use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
+use Romm\Formz\Persistence\PersistenceManager;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 /**
  * This is the object representation of a form. In here we can manage which
@@ -42,6 +49,11 @@ class FormObject
     protected $proxy;
 
     /**
+     * @var PersistenceManager
+     */
+    protected $persistenceManager;
+
+    /**
      * You should never create a new instance of this class directly, use the
      * `FormObjectFactory->getInstanceFromClassName()` function instead.
      *
@@ -52,6 +64,8 @@ class FormObject
     {
         $this->name = $name;
         $this->static = $static;
+
+        $this->persistenceManager = Core::instantiate(PersistenceManager::class, $this);
     }
 
     /**
@@ -150,6 +164,21 @@ class FormObject
     }
 
     /**
+     * @return FormObjectRequestData
+     */
+    public function getRequestData()
+    {
+        return $this->getProxy()->getRequestData();
+    }
+    /**
+     * @return FormMetadata
+     */
+    public function getFormMetadata()
+    {
+        return $this->getProxy()->getFormMetadata();
+    }
+
+    /**
      * @return string
      */
     public function getFormHash()
@@ -163,6 +192,58 @@ class FormObject
     public function getObjectHash()
     {
         return $this->static->getObjectHash();
+    }
+
+    /**
+     * @return PersistenceManager
+     */
+    public function getPersistenceManager()
+    {
+        return $this->persistenceManager;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPersistent()
+    {
+        return $this->getProxy()->formIsPersistent();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSteps()
+    {
+        return $this->getDefinition()->hasSteps();
+    }
+
+    /**
+     * @return Step|null
+     */
+    public function getCurrentStep()
+    {
+        return $this->getProxy()->getCurrentStep();
+    }
+
+    /**
+     * @param Request $request
+     * @return $this
+     */
+    public function fetchCurrentStep(Request $request)
+    {
+        $this->getProxy()->fetchCurrentStep($request);
+
+        return $this;
+    }
+
+    /**
+     * @return SubstepDefinition
+     */
+    public function getCurrentSubstepDefinition()
+    {
+        return $this->getProxy()->getCurrentSubstepDefinition();
+
     }
 
     /**

@@ -92,10 +92,10 @@ class JavaScriptAssetHandlerConnector
             $this->javaScriptFiles[] = 'Formz.Debug.js';
         }
 
-        foreach ($this->javaScriptFiles as $file) {
+        foreach (array_reverse($this->javaScriptFiles) as $file) {
             $filePath = StringService::get()->getExtensionRelativePath('Resources/Public/JavaScript/' . $file);
 
-            $this->includeJsFile($filePath);
+            $this->includeJsFile($filePath, true);
         }
 
         return $this;
@@ -270,13 +270,14 @@ JS;
      * @see https://forge.typo3.org/issues/60213
      *
      * @param string $path
+     * @param bool   $forceOnTop
      */
-    protected function includeJsFile($path)
+    protected function includeJsFile($path, $forceOnTop = false)
     {
         $pageRenderer = $this->assetHandlerConnectorManager->getPageRenderer();
 
         if ($this->environmentService->isEnvironmentInFrontendMode()) {
-            $pageRenderer->addJsFooterFile($path);
+            $pageRenderer->addJsFooterFile($path, 'text/javascript', true, $forceOnTop);
         } else {
             $pageRenderer->addJsFile($path);
         }

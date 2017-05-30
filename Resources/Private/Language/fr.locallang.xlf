@@ -12,7 +12,10 @@
 				<target>La configuration TypoScript de FormZ semble ne pas être inclue. Veuillez inclure le TypoScript statique « formz » sur cette page.</target>
 			</trans-unit>
 			<trans-unit id="form.wrong_configuration.error_message">
-				<target>La configuration de ce formulaire contient au moins une erreur :</target>
+				<target>La configuration du formulaire "%s" (classe "%s") contient au moins une erreur :</target>
+			</trans-unit>
+			<trans-unit id="form.rendering_error.error_message">
+				<target>Le formulaire "%s" (classe "%s") n'a pas pu être rendu pour les raisons suivantes :</target>
 			</trans-unit>
 
 			<trans-unit id="default_error_message">
@@ -57,6 +60,9 @@
 				<target>La condition « %s » comporte au moins une erreur : « %s ».</target>
 			</trans-unit>
 
+			<trans-unit id="validator.page_exists.error">
+				<target>La page avec l'uid « %s » n'existe pas dans l'arbre TYPO3. Elle a peut-être été supprimée ?</target>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

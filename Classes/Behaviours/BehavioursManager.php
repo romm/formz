@@ -72,16 +72,19 @@ class BehavioursManager implements SingletonInterface
                     && ObjectAccess::isPropertySettable($formInstance, $fieldName)
                 ) {
                     $propertyValue = ObjectAccess::getProperty($formInstance, $fieldName);
+                    $newPropertyValue = $propertyValue;
 
                     foreach ($field->getBehaviours() as $behaviour) {
                         /** @var AbstractBehaviour $behaviourInstance */
                         $behaviourInstance = GeneralUtility::makeInstance($behaviour->getClassName());
 
                         // Applying the behaviour on the field's value.
-                        $propertyValue = $behaviourInstance->applyBehaviour($propertyValue);
+                        $newPropertyValue = $behaviourInstance->applyBehaviour($newPropertyValue);
                     }
 
-                    ObjectAccess::setProperty($formInstance, $fieldName, $propertyValue);
+                    if ($newPropertyValue !== $propertyValue) {
+                        ObjectAccess::setProperty($formInstance, $fieldName, $propertyValue);
+                    }
                 }
             }
         }

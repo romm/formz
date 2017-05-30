@@ -32,9 +32,11 @@ class DuplicateEntryException extends FormzException
 
     const FORM_INSTANCE_ALREADY_ADDED = 'The form instance was already added for the form object of class "%s". You cannot add it twice.';
 
-    const FORM_OBJECT_INSTANCE_ALREADY_REGISTERED = 'The form instance of type "%s" (name "%s") was already registered in the form object factory.';
-
     const FIELD_ALREADY_ADDED = 'The field "%s" already exists in the form definition. Please use the function `%s::hasField()` before.';
+
+    const CONDITION_ALREADY_ADDED = 'The condition "%s" already exists in the form definition. Please use the function `%s::hasCondition()` before.';
+
+    const FORM_OBJECT_INSTANCE_ALREADY_REGISTERED = 'The form instance of type "%s" (name "%s") was already registered in the form object factory.';
 
     const FORM_CONDITION_ALREADY_ADDED = 'The condition "%s" already exists in the form definition. Please use the function `%s::hasCondition()` before.';
 

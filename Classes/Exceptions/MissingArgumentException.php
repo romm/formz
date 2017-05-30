@@ -13,11 +13,16 @@
 
 namespace Romm\Formz\Exceptions;
 
+use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use Romm\Formz\ViewHelpers\FormIdentifierHashViewHelper;
+
 class MissingArgumentException extends FormzException
 {
     const ARGUMENT_MISSING = 'The argument "%s" was not found in the request.';
 
     const CONDITION_CONSTRUCTOR_ARGUMENT_MISSING = 'Error while instantiating the condition "%s" of type "%s": a constructor argument is missing. Given arguments were: "%s".';
+
+    const SIGNAL_NAME_MISSING = 'No signal has been given to the signal dispatcher, used in the middleware "%s". This is because this middleware can dispatch several signals (namely "%s"); so you must indicate which signal to dispatch.';
 
     /**
      * @code 1490179179
@@ -65,6 +70,26 @@ class MissingArgumentException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::CONDITION_CONSTRUCTOR_ARGUMENT_MISSING,
             [$conditionName, $conditionClassName, implode('", "', array_keys($arguments))]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490793826
+     *
+     * @param SendsMiddlewareSignal $middleware
+     * @return self
+     */
+    final public static function signalNameArgumentMissing(SendsMiddlewareSignal $middleware)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::SIGNAL_NAME_MISSING,
+            [
+                get_class($middleware),
+                implode('", "', $middleware->getAllowedSignals())
+            ]
         );
 
         return $exception;

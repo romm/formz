@@ -34,13 +34,13 @@ class FieldsActivationCssAssetHandlerTest extends AbstractUnitTest
                     ->disableOriginalConstructor()
                     ->setMethods(['getCssConditions'])
                     ->getMock();
-
                 $tree->expects($this->once())
                     ->method('getCssConditions')
                     ->willReturn(['CSS-CONDITION']);
 
                 return $tree;
             });
+
 
         $fieldsActivationCss = $assetHandler->getFieldsActivationCss();
 

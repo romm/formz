@@ -13,11 +13,15 @@
 
 namespace Romm\Formz\Exceptions;
 
+use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+
 use Romm\Formz\Form\FormInterface;
 
 class InvalidArgumentValueException extends FormzException
 {
     const FIELD_VIEW_HELPER_EMPTY_LAYOUT = 'The layout name cannot be empty, please fill with a value.';
+
+    const SIGNAL_NOT_ALLOWED = 'Trying to dispatch a signal that was not allowed by the middleware "%s". Authorized signals for this middleware are: "%s".';
 
     const FORM_NAME_EMPTY = 'The name of the form (type: "%s") can not be empty.';
 
@@ -30,6 +34,26 @@ class InvalidArgumentValueException extends FormzException
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_EMPTY_LAYOUT);
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490798201
+     *
+     * @param SendsMiddlewareSignal $middleware
+     * @return InvalidArgumentValueException
+     */
+    final public static function signalNotAllowed(SendsMiddlewareSignal $middleware)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::SIGNAL_NOT_ALLOWED,
+            [
+                get_class($middleware),
+                implode('", "', $middleware->getAllowedSignals())
+            ]
+        );
 
         return $exception;
     }

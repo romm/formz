@@ -1,20 +1,20 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Service\ViewHelper;
+namespace Romm\Formz\Tests\Unit\Service\ViewHelper\Slot;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
-use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\Service\ViewHelper\Slot\SlotContextEntry;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 use TYPO3\CMS\Fluid\Core\ViewHelper\TemplateVariableContainer;
 
-class SlotViewHelperServiceTest extends AbstractUnitTest
+class SlotContextEntryTest extends AbstractUnitTest
 {
     /**
      * @test
      */
     public function addSlotAddsSlot()
     {
-        $slotService = new SlotViewHelperService;
+        $contextEntry = new SlotContextEntry(new RenderingContext);
         $fooClosure = function () {
             return 'foo';
         };
@@ -24,17 +24,17 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
         };
         $barArguments = ['bar' => 'baz'];
 
-        $this->assertFalse($slotService->hasSlot('foo'));
-        $slotService->addSlot('foo', $fooClosure, $fooArguments, new RenderingContext);
-        $this->assertTrue($slotService->hasSlot('foo'));
-        $this->assertSame($fooClosure, $slotService->getSlotClosure('foo'));
-        $this->assertEquals($fooArguments, $slotService->getSlotArguments('foo'));
+        $this->assertFalse($contextEntry->hasSlot('foo'));
+        $contextEntry->addSlot('foo', $fooClosure, $fooArguments);
+        $this->assertTrue($contextEntry->hasSlot('foo'));
+        $this->assertSame($fooClosure, $contextEntry->getSlotClosure('foo'));
+        $this->assertEquals($fooArguments, $contextEntry->getSlotArguments('foo'));
 
-        $this->assertFalse($slotService->hasSlot('bar'));
-        $slotService->addSlot('bar', $barClosure, $barArguments, new RenderingContext);
-        $this->assertTrue($slotService->hasSlot('bar'));
-        $this->assertSame($barClosure, $slotService->getSlotClosure('bar'));
-        $this->assertEquals($barArguments, $slotService->getSlotArguments('bar'));
+        $this->assertFalse($contextEntry->hasSlot('bar'));
+        $contextEntry->addSlot('bar', $barClosure, $barArguments);
+        $this->assertTrue($contextEntry->hasSlot('bar'));
+        $this->assertSame($barClosure, $contextEntry->getSlotClosure('bar'));
+        $this->assertEquals($barArguments, $contextEntry->getSlotArguments('bar'));
     }
 
     /**
@@ -46,6 +46,7 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
      */
     public function templateVariablesAreAdded()
     {
+        /** @var RenderingContext|\PHPUnit_Framework_MockObject_MockObject $renderingContext */
         $renderingContext = $this->getMockBuilder(RenderingContext::class)
             ->setMethods(['getTemplateVariableContainer'])
             ->getMock();
@@ -65,12 +66,12 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
             ->method('getTemplateVariableContainer')
             ->willReturn($templateVariableContainerMock);
 
-        $slotService = new SlotViewHelperService;
+        $contextEntry = new SlotContextEntry($renderingContext);
         $emptyClosure = function () {
         };
-        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'bar'], $renderingContext);
+        $contextEntry->addSlot('foo', $emptyClosure, ['foo' => 'bar']);
 
-        $slotService->addTemplateVariables(
+        $contextEntry->addTemplateVariables(
             'foo',
             ['bar' => 'baz']
         );
@@ -85,6 +86,7 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
      */
     public function templateVariablesAreOverriddenThenAdded()
     {
+        /** @var RenderingContext|\PHPUnit_Framework_MockObject_MockObject $renderingContext */
         $renderingContext = $this->getMockBuilder(RenderingContext::class)
             ->setMethods(['getTemplateVariableContainer'])
             ->getMock();
@@ -101,12 +103,12 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
             ->method('getTemplateVariableContainer')
             ->willReturn($templateVariableContainerMock);
 
-        $slotService = new SlotViewHelperService;
+        $contextEntry = new SlotContextEntry($renderingContext);
         $emptyClosure = function () {
         };
-        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'bar'], $renderingContext);
+        $contextEntry->addSlot('foo', $emptyClosure, ['foo' => 'bar']);
 
-        $slotService->addTemplateVariables(
+        $contextEntry->addTemplateVariables(
             'foo',
             ['foo' => 'baz']
         );
@@ -117,6 +119,7 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
      */
     public function templateVariablesAreProperlyRestored()
     {
+        /** @var RenderingContext|\PHPUnit_Framework_MockObject_MockObject $renderingContext */
         $renderingContext = $this->getMockBuilder(RenderingContext::class)
             ->setMethods(['getTemplateVariableContainer'])
             ->getMock();
@@ -128,10 +131,10 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
             ->method('getTemplateVariableContainer')
             ->willReturn($templateVariableContainer);
 
-        $slotService = new SlotViewHelperService;
+        $contextEntry = new SlotContextEntry($renderingContext);
         $emptyClosure = function () {
         };
-        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'bar'], $renderingContext);
+        $contextEntry->addSlot('foo', $emptyClosure, ['foo' => 'bar']);
 
         $this->assertFalse($templateVariableContainer->exists('bar'));
         $this->assertEquals(
@@ -139,7 +142,7 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
             $templateVariableContainer->get('foo')
         );
 
-        $slotService->addTemplateVariables('foo', ['bar' => 'baz']);
+        $contextEntry->addTemplateVariables('foo', ['bar' => 'baz']);
 
         $this->assertTrue($templateVariableContainer->exists('bar'));
         $this->assertEquals(
@@ -147,29 +150,13 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
             $templateVariableContainer->get('foo')
         );
 
-        $slotService->restoreTemplateVariables('foo');
+        $contextEntry->restoreTemplateVariables('foo');
 
         $this->assertFalse($templateVariableContainer->exists('bar'));
         $this->assertEquals(
             'foo',
             $templateVariableContainer->get('foo')
         );
-    }
-
-    /**
-     * @test
-     */
-    public function resetStateResetsState()
-    {
-        $slotService = new SlotViewHelperService;
-        $fooClosure = function () {
-            return 'foo';
-        };
-
-        $slotService->addSlot('foo', $fooClosure, [], new RenderingContext);
-        $slotService->resetState();
-
-        $this->assertFalse($slotService->hasSlot('foo'));
     }
 
     /**
@@ -179,8 +166,8 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
     {
         $this->setExpectedException(EntryNotFoundException::class);
 
-        $slotService = new SlotViewHelperService;
-        $slotService->getSlotClosure('bar');
+        $contextEntry = new SlotContextEntry(new RenderingContext);
+        $contextEntry->getSlotClosure('bar');
     }
 
     /**
@@ -190,7 +177,7 @@ class SlotViewHelperServiceTest extends AbstractUnitTest
     {
         $this->setExpectedException(EntryNotFoundException::class);
 
-        $slotService = new SlotViewHelperService;
-        $slotService->getSlotArguments('bar');
+        $contextEntry = new SlotContextEntry(new RenderingContext);
+        $contextEntry->getSlotArguments('bar');
     }
 }

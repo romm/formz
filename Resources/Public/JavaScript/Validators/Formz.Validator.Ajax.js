@@ -118,7 +118,7 @@
             if ('' !== key
                 && 'undefined' !== typeof key
                 && false == key in elementsDone
-                && null === key.match(/\[__referrer\]/)
+                && null === key.match(/\[__referrer\]\[arguments\]/)
             ) {
                 var value = getElementValue(form.elements[i]);
                 if (value) {

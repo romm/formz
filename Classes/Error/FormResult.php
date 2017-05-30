@@ -20,7 +20,7 @@ use TYPO3\CMS\Extbase\Error\Result;
 
 /**
  * Result used when validating a form instance; it provides more features than
- * the classic Extbase `Result` instance.
+ * the basic Extbase `Result` instance.
  */
 class FormResult extends Result
 {
@@ -35,6 +35,11 @@ class FormResult extends Result
      * @var Validator[]
      */
     protected $deactivatedFieldsValidators = [];
+
+    /**
+     * @var array
+     */
+    protected $validatedFields = [];
 
     /**
      * Flags the given field as deactivated.
@@ -97,5 +102,21 @@ class FormResult extends Result
     public function getDeactivatedValidators()
     {
         return $this->deactivatedFieldsValidators;
+    }
+
+    /**
+     * @param Field $field
+     */
+    public function markFieldAsValidated(Field $field)
+    {
+        $this->validatedFields[$field->getName()] = true;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidatedFields()
+    {
+        return array_keys($this->validatedFields);
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Service\ViewHelper;
+namespace Romm\Formz\Tests\Unit\Service\ViewHelper\Form;
 
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -7,7 +7,7 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject\FormObjectProxy;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;

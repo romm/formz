@@ -16,8 +16,10 @@ namespace Romm\Formz\Exceptions;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
+use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
 use TYPO3\CMS\Extbase\Error\Message;
 
 class InvalidArgumentTypeException extends FormzException
@@ -37,6 +39,10 @@ class InvalidArgumentTypeException extends FormzException
     const CONDITION_NAME_NOT_STRING = 'The name of the condition must be a correct string (given type: "%s").';
 
     const CONDITION_CLASS_NAME_NOT_VALID = 'The condition class must implement "%s" (given class is "%s").';
+
+    const PERSISTENCE_REPOSITORY_WRONG_FORM_TYPE = 'The given form instance must be an instance of "%s", given type is "%s".';
+
+    const FORM_ARGUMENT_NOT_ARRAY = 'The request argument for the form "%s" (class: "%s") was not an array (found type is "%s"); there must have been a manual overriding of the argument.';
 
     /**
      * @code 1477468571
@@ -188,6 +194,41 @@ class InvalidArgumentTypeException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
             [FormInterface::class, $className]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1491294921
+     *
+     * @param FormInterface $form
+     * @return self
+     */
+    final public static function persistenceRepositoryWrongFormType(FormInterface $form)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::PERSISTENCE_REPOSITORY_WRONG_FORM_TYPE,
+            [DomainObjectInterface::class, get_class($form)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1492612944
+     *
+     * @param FormObject $formObject
+     * @param mixed      $formData
+     * @return self
+     */
+    final public static function formArgumentNotArray(FormObject $formObject, $formData)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_ARGUMENT_NOT_ARRAY,
+            [$formObject->getName(), $formObject->getClassName(), gettype($formData)]
         );
 
         return $exception;

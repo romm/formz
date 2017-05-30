@@ -15,6 +15,7 @@ namespace Romm\Formz\AssetHandler\Connector;
 
 use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
 use Romm\Formz\AssetHandler\Css\MessageContainerDisplayCssAssetHandler;
+use Romm\Formz\AssetHandler\Css\SubstepCssAssetHandler;
 use Romm\Formz\Service\StringService;
 
 class CssAssetHandlerConnector
@@ -77,18 +78,20 @@ class CssAssetHandlerConnector
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
             function () {
+                $assetHandlerFactory = $this->assetHandlerConnectorManager->getAssetHandlerFactory();
+
                 /** @var MessageContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
-                $errorContainerDisplayCssAssetHandler = $this->assetHandlerConnectorManager
-                    ->getAssetHandlerFactory()
-                    ->getAssetHandler(MessageContainerDisplayCssAssetHandler::class);
+                $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(MessageContainerDisplayCssAssetHandler::class);
 
                 /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
-                $fieldsActivationCssAssetHandler = $this->assetHandlerConnectorManager
-                    ->getAssetHandlerFactory()
-                    ->getAssetHandler(FieldsActivationCssAssetHandler::class);
+                $fieldsActivationCssAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsActivationCssAssetHandler::class);
+
+                /** @var SubstepCssAssetHandler $substepCssAssetHandler */
+                $substepCssAssetHandler = $assetHandlerFactory->getAssetHandler(SubstepCssAssetHandler::class);
 
                 $css = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss() . LF;
-                $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss();
+                $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss() . LF;
+                $css .= $substepCssAssetHandler->getSubstepCss();
 
                 return $css;
             }

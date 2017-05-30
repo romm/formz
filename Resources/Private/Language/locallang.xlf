@@ -12,7 +12,10 @@
 				<source>FormZ TypoScript configuration seems not to be included. Please include the "formz" static TypoScript on this page.</source>
 			</trans-unit>
 			<trans-unit id="form.wrong_configuration.error_message">
-				<source>The configuration for this form contains at least one error:</source>
+				<source>The configuration for the form "%s" (class "%") contains at least one error:</source>
+			</trans-unit>
+			<trans-unit id="form.rendering_error.error_message">
+				<source>The form "%s" (class "%s") couldn't be rendered for the following reasons:</source>
 			</trans-unit>
 
 			<trans-unit id="default_error_message">
@@ -58,6 +61,10 @@
 			</trans-unit>
 			<trans-unit id="validator.form.condition_is_valid.error">
 				<source>The condition « %s » has at least one error: « %s ».</source>
+			</trans-unit>
+
+			<trans-unit id="validator.page_exists.error">
+				<source>The page with uid "%s" does not exist in the TYPO3 tree. Maybe is has been deleted?</source>
 			</trans-unit>
 
 		</body>

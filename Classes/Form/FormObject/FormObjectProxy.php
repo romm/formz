@@ -13,9 +13,18 @@
 
 namespace Romm\Formz\Form\FormObject;
 
+use Romm\Formz\Core\Core;
+use Romm\Formz\Domain\Model\FormMetadata;
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\Service\FormObjectMetadata;
+use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
+use Romm\Formz\Form\FormObject\Service\FormObjectSteps;
+use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
 use Romm\Formz\Service\HashService;
+use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 class FormObjectProxy
 {
@@ -43,11 +52,30 @@ class FormObjectProxy
      * @var bool
      */
     protected $formWasValidated = false;
-
     /**
      * @var FormResult
      */
     protected $formResult;
+
+    /**
+     * @var FormObjectRequestData
+     */
+    protected $requestData;
+
+    /**
+     * @var FormObjectMetadata
+     */
+    protected $metadata;
+
+    /**
+     * @var bool
+     */
+    protected $formIsPersistent = false;
+
+    /**
+     * @var FormObjectSteps
+     */
+    protected $stepService;
 
     /**
      * @param FormObject    $formObject
@@ -57,6 +85,7 @@ class FormObjectProxy
     {
         $this->formObject = $formObject;
         $this->form = $form;
+        $this->stepService = Core::instantiate(FormObjectSteps::class, $formObject);
     }
 
     /**
@@ -70,6 +99,8 @@ class FormObjectProxy
     /**
      * Will mark the form as submitted (change the result returned by the
      * function `formWasSubmitted()`).
+     *
+     * @internal
      */
     public function markFormAsSubmitted()
     {
@@ -88,6 +119,8 @@ class FormObjectProxy
 
     /**
      * Marks the form as validated.
+     *
+     * @internal
      */
     public function markFormAsValidated()
     {
@@ -103,6 +136,22 @@ class FormObjectProxy
     }
 
     /**
+     * @internal
+     */
+    public function markFormAsPersistent()
+    {
+        $this->formIsPersistent = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function formIsPersistent()
+    {
+        return $this->formIsPersistent;
+    }
+
+    /**
      * @return FormResult
      */
     public function getFormResult()
@@ -112,6 +161,66 @@ class FormObjectProxy
         }
 
         return $this->formResult;
+    }
+
+    /**
+     * @return FormObjectRequestData
+     */
+    public function getRequestData()
+    {
+        return $this->requestData;
+    }
+
+    /**
+     * @return FormMetadata
+     */
+    public function getFormMetadata()
+    {
+        if (null === $this->metadata) {
+            $this->metadata = Core::instantiate(FormObjectMetadata::class, $this->formObject);
+        }
+
+        return $this->metadata->getMetadata();
+    }
+
+    /**
+     * @return Step|null
+     */
+    public function getCurrentStep()
+    {
+        return $this->stepService->getCurrentStep();
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function fetchCurrentStep(Request $request)
+    {
+        $this->stepService->fetchCurrentStep($request);
+    }
+
+    /**
+     * @return SubstepDefinition
+     */
+    public function getCurrentSubstepDefinition()
+    {
+        return $this->stepService->getCurrentSubstepDefinition();
+    }
+
+    /**
+     * @param SubstepDefinition $currentSubstepDefinition
+     */
+    public function setCurrentSubstepDefinition(SubstepDefinition $currentSubstepDefinition)
+    {
+        $this->stepService->setCurrentSubstepDefinition($currentSubstepDefinition);
+    }
+
+    /**
+     * @return FormStepPersistence
+     */
+    public function getStepPersistence()
+    {
+        return $this->stepService->getStepPersistence();
     }
 
     /**
@@ -132,5 +241,13 @@ class FormObjectProxy
     public function setFormHash($hash)
     {
         $this->formHash = $hash;
+    }
+
+    /**
+     * @param FormObjectRequestData $requestData
+     */
+    public function injectRequestData(FormObjectRequestData $requestData)
+    {
+        $this->requestData = $requestData;
     }
 }
