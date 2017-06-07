@@ -22,7 +22,7 @@ use Romm\Formz\Form\Definition\Step\Steps;
 class StepDefinition extends AbstractFormDefinitionComponent
 {
     /**
-     * @var string
+     * @var stringq
      * @validate NotEmpty
      */
     protected $step;
