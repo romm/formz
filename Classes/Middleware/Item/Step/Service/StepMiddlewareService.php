@@ -107,31 +107,40 @@ class StepMiddlewareService implements SingletonInterface
 
     /**
      * @param StepDefinition $step
+     * @param bool           $removeConditionalSteps
      * @return StepDefinition
      */
-    public function getNextStepDefinition(StepDefinition $step)
+    public function getNextStepDefinition(StepDefinition $step, $removeConditionalSteps = false)
     {
         $nextStep = null;
 
-        if ($step->hasDetour()) {
-            $detourSteps = $step->getDetourSteps();
-            $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
+        if ($step->hasDivergence()) {
+            $divergenceSteps = $step->getDivergenceSteps();
 
-            foreach ($detourSteps as $detourStep) {
-                $tree = $conditionProcessor->getActivationConditionTreeForStep($detourStep);
-                $todo = new FormValidatorExecutor($this->getFormObject(), new FormValidatorDataObject());
-                $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
-                $phpResult = $tree->getPhpResult($dataObject);
-
-                if (true === $phpResult) {
-                    $nextStep = $detourStep;
+            foreach ($divergenceSteps as $divergenceStep) {
+                if (true === $this->getStepDefinitionConditionResult($divergenceStep)) {
+                    $nextStep = $divergenceStep;
                     break;
                 }
             }
         }
 
         if (null === $nextStep) {
-            $nextStep = $step->getNextStep();
+            while ($step->hasNextStep()) {
+                $step = $step->getNextStep();
+
+                if ($step->hasActivation()) {
+                    if (true === $this->getStepDefinitionConditionResult($step)) {
+                        $nextStep = $step;
+                        break;
+                    } elseif (true === $removeConditionalSteps) {
+                        $this->persistence->removeStep($step);
+                    }
+                } else {
+                    $nextStep = $step;
+                    break;
+                }
+            }
         }
 
         return $nextStep;
@@ -143,7 +152,7 @@ class StepMiddlewareService implements SingletonInterface
      */
     public function moveForwardToStep(StepDefinition $stepDefinition, Redirect $redirect)
     {
-        $this->getStepPersistence()->setStepLevel($stepDefinition);
+        $this->persistence->setStepLevel($stepDefinition);
         $this->redirectToStep($stepDefinition->getStep(), $redirect);
     }
 
@@ -177,6 +186,20 @@ class StepMiddlewareService implements SingletonInterface
     }
 
     /**
+     * @param StepDefinition $stepDefinition
+     * @return bool
+     */
+    public function getStepDefinitionConditionResult(StepDefinition $stepDefinition)
+    {
+        $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
+        $tree = $conditionProcessor->getActivationConditionTreeForStep($stepDefinition);
+        $todo = new FormValidatorExecutor($this->getFormObject(), new FormValidatorDataObject()); // @todo
+        $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
+
+        return $tree->getPhpResult($dataObject);
+    }
+
+    /**
      * @param Step           $step
      * @param StepDefinition $stepDefinition
      * @return StepDefinition|null
@@ -192,16 +215,6 @@ class StepMiddlewareService implements SingletonInterface
 
             if ($result instanceof StepDefinition) {
                 return $result;
-            }
-        }
-
-        if ($stepDefinition->hasDetour()) {
-            foreach ($stepDefinition->getDetourSteps() as $detourStep) {
-                $result = $this->findStep($step, $detourStep);
-
-                if ($result instanceof StepDefinition) {
-                    return $result;
-                }
             }
         }
 

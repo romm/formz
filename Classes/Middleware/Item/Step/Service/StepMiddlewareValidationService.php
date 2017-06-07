@@ -143,7 +143,14 @@ class StepMiddlewareValidationService
 
         while ($stepDefinition->hasPreviousDefinition()) {
             $stepDefinition = $stepDefinition->getPreviousDefinition();
-            array_unshift($stepDefinitionsToTest, $stepDefinition);
+
+            if ($stepDefinition->hasActivation()) {
+                if (true === $this->service->getStepDefinitionConditionResult($stepDefinition)) {
+                    array_unshift($stepDefinitionsToTest, $stepDefinition);
+                }
+            } else {
+                array_unshift($stepDefinitionsToTest, $stepDefinition);
+            }
         }
 
         foreach ($stepDefinitionsToTest as $stepDefinition) {

@@ -48,7 +48,7 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
     protected function process()
     {
         $formObject = $this->getFormObject();
-        
+
         if (false === $formObject->getDefinition()->hasSteps()) {
             return;
         }
@@ -78,9 +78,7 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
             $nextStep = null;
 
             if ($currentStepDefinition->hasNextStep()) {
-                $nextStep = $this->service->getNextStepDefinition($currentStepDefinition);
-            } elseif ($currentStepDefinition->isInDetour()) {
-                $nextStep = $currentStepDefinition->getDetourRootStep();
+                $nextStep = $this->service->getNextStepDefinition($currentStepDefinition, true);
             }
 
             if ($nextStep) {

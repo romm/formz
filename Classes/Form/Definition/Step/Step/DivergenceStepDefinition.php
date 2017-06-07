@@ -13,9 +13,7 @@
 
 namespace Romm\Formz\Form\Definition\Step\Step;
 
-use Romm\Formz\Form\Definition\Condition\Activation;
-
-class ConditionalStepDefinition extends StepDefinition
+class DivergenceStepDefinition extends StepDefinition
 {
     /**
      * @var \Romm\Formz\Form\Definition\Condition\Activation
@@ -23,12 +21,4 @@ class ConditionalStepDefinition extends StepDefinition
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;
-
-    /**
-     * @return Activation
-     */
-    public function getActivation()
-    {
-        return $this->activation;
-    }
 }

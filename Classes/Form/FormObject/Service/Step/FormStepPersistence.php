@@ -68,8 +68,21 @@ class FormStepPersistence
     public function markStepAsValidated(StepDefinition $stepDefinition)
     {
         $identifier = $stepDefinition->getStep()->getIdentifier();
+
         $this->validatedSteps[$identifier] = $identifier;
-        $this->stepLevels[$stepDefinition->getStepLevel()] = $stepDefinition->getStep()->getIdentifier();
+        $this->stepLevels[$stepDefinition->getStepLevel()] = $identifier;
+    }
+
+    /**
+     * @param StepDefinition $stepDefinition
+     */
+    public function removeStep(StepDefinition $stepDefinition)
+    {
+        $identifier = $stepDefinition->getStep()->getIdentifier();
+
+        unset($this->validatedSteps[$identifier]);
+        unset($this->stepLevels[$stepDefinition->getStepLevel()]);
+        unset($this->stepsFormValues[$identifier]);
     }
 
     /**

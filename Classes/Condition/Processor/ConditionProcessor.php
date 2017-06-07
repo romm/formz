@@ -21,7 +21,7 @@ use Romm\Formz\Condition\Parser\Tree\EmptyConditionTree;
 use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
-use Romm\Formz\Form\Definition\Step\Step\ConditionalStepDefinition;
+use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Form\Definition\Step\Step\Substep\ConditionalSubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 
@@ -116,18 +116,18 @@ class ConditionProcessor
     /**
      * @todo
      *
-     * @param ConditionalStepDefinition $step
+     * @param StepDefinition $stepDefinition
      * @return ConditionTree
      */
-    public function getActivationConditionTreeForStep(ConditionalStepDefinition $step)
+    public function getActivationConditionTreeForStep(StepDefinition $stepDefinition)
     {
-        $key = 'step-' . serialize($step);
+        $key = 'step-' . serialize($stepDefinition);
 
         if (false === array_key_exists($key, $this->stepTree)) {
-            $this->stepTree[$key] = $this->getConditionTree($step->getActivation());
+            $this->stepTree[$key] = $this->getConditionTree($stepDefinition->getActivation());
         }
 
-        $this->stepTree[$key]->injectDependencies($this, $step->getActivation());
+        $this->stepTree[$key]->injectDependencies($this, $stepDefinition->getActivation());
 
         return $this->stepTree[$key];
     }

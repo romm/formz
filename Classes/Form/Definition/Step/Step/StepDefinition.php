@@ -13,15 +13,14 @@
 
 namespace Romm\Formz\Form\Definition\Step\Step;
 
-use Romm\ConfigurationObject\Service\Items\Parents\ParentsTrait;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
+use Romm\Formz\Form\Definition\Condition\Activation;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\Step\Steps;
 
 class StepDefinition extends AbstractFormDefinitionComponent
 {
-    use ParentsTrait;
-
     /**
      * @var string
      * @validate NotEmpty
@@ -29,17 +28,18 @@ class StepDefinition extends AbstractFormDefinitionComponent
     protected $step;
 
     /**
+     * @var \Romm\Formz\Form\Definition\Condition\Activation
+     * @validate Romm.Formz:Internal\ConditionIsValid
+     */
+    protected $activation;
+
+    /**
      * @var \Romm\Formz\Form\Definition\Step\Step\StepDefinition
      */
     protected $next;
 
     /**
-     * @var \Romm\Formz\Form\Definition\Step\Step\ConditionalStepDefinition[]
-     */
-    protected $detour;
-
-    /**
-     * @var \Romm\Formz\Form\Definition\Step\Step\ConditionalStepDefinition[]
+     * @var \Romm\Formz\Form\Definition\Step\Step\DivergenceStepDefinition[]
      */
     protected $divergence;
 
@@ -54,6 +54,22 @@ class StepDefinition extends AbstractFormDefinitionComponent
                 return $steps->getEntry($this->step);
             }
         );
+    }
+
+    /**
+     * @return Activation
+     */
+    public function getActivation()
+    {
+        return $this->activation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasActivation()
+    {
+        return $this->activation instanceof ActivationInterface;
     }
 
     public function getStepLevel()
@@ -82,9 +98,9 @@ class StepDefinition extends AbstractFormDefinitionComponent
         $weight = 1;
         $childWeight = $this->hasNextStep() ? 1 : 0;
 
-        if ($this->hasDetour()) {
-            foreach ($this->getDetourSteps() as $detourStep) {
-                $childWeight = max($childWeight, $detourStep->getStepWeight());
+        if ($this->hasDivergence()) {
+            foreach ($this->getDivergenceSteps() as $divergenceStep) {
+                $childWeight = max($childWeight, $divergenceStep->getStepWeight());
             }
         }
 
@@ -96,9 +112,7 @@ class StepDefinition extends AbstractFormDefinitionComponent
      */
     public function hasNextStep()
     {
-        return null !== $this->next
-            || false === empty($this->detour)
-            || false === empty($this->divergence);
+        return null !== $this->next;
     }
 
     /**
@@ -139,50 +153,7 @@ class StepDefinition extends AbstractFormDefinitionComponent
     }
 
     /**
-     * @return ConditionalStepDefinition[]
-     */
-    public function getDetourSteps()
-    {
-        return $this->detour;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasDetour()
-    {
-        return false === empty($this->detour);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isInDetour()
-    {
-        return $this instanceof ConditionalStepDefinition
-            || $this->hasParent(ConditionalStepDefinition::class);
-    }
-
-    public function getDetourRootStep()
-    {
-        if (false === $this->isInDetour()) {
-            throw new \Exception('todo'); // @todo
-        }
-
-        $stepDefinition = $this;
-
-        while ($stepDefinition->hasParent(ConditionalStepDefinition::class)) {
-            $stepDefinition = $stepDefinition->getFirstParent(ConditionalStepDefinition::class);
-        }
-
-        /** @var StepDefinition $stepDefinition */
-        $stepDefinition = $stepDefinition->getFirstParent(StepDefinition::class);
-
-        return $stepDefinition->getNextStep();
-    }
-
-    /**
-     * @return ConditionalStepDefinition[]
+     * @return DivergenceStepDefinition[]
      */
     public function getDivergenceSteps()
     {
