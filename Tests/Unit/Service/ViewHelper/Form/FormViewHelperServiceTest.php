@@ -1,8 +1,8 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Service\ViewHelper;
+namespace Romm\Formz\Tests\Unit\Service\ViewHelper\Form;
 
 use Romm\Formz\Exceptions\DuplicateEntryException;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class FormViewHelperServiceTest extends AbstractUnitTest

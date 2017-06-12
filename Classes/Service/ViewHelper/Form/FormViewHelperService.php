@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Service\ViewHelper;
+namespace Romm\Formz\Service\ViewHelper\Form;
 
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Exceptions\DuplicateEntryException;

@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\Form;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This trait should be used by default to implement all the functions required
  * by the interface `FormInterface`.
@@ -22,7 +24,6 @@ namespace Romm\Formz\Form;
  */
 trait FormTrait
 {
-
     /**
      * Contains the optional data returned from the validators of each field.
      *
@@ -31,11 +32,15 @@ trait FormTrait
     protected $validationData = [];
 
     /**
+     * @deprecated This method is deprecated and will be deleted in FormZ v2.
+     *
      * @param string $key
      * @return array
      */
     public function getValidationData($key = null)
     {
+        GeneralUtility::logDeprecatedFunction();
+
         $result = $this->validationData;
 
         if (null !== $key) {
@@ -48,11 +53,15 @@ trait FormTrait
     }
 
     /**
+     * @deprecated This method is deprecated and will be deleted in FormZ v2.
+     *
      * @param array $validationData
      * @internal
      */
     public function setValidationData(array $validationData)
     {
+        GeneralUtility::logDeprecatedFunction();
+
         $this->validationData = $validationData;
     }
 }

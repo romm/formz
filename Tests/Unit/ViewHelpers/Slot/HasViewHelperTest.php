@@ -2,9 +2,9 @@
 namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
 use Romm\Formz\Exceptions\ContextNotFoundException;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\Slot\OldHasViewHelper;
-use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
 use Romm\Formz\ViewHelpers\Slot\HasViewHelper;

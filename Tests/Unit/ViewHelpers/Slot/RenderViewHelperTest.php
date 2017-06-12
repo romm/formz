@@ -3,8 +3,8 @@ namespace Romm\Formz\Tests\Unit\ViewHelpers\Slot;
 
 use Romm\Formz\Configuration\Form\Field\Field;
 use Romm\Formz\Exceptions\ContextNotFoundException;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
 use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
@@ -17,7 +17,7 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderViewHelper()
     {
-        $slotArgument = 'foo-slot';
+        $slotName = 'foo-slot';
 
         /** @var FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject $fieldService */
         $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
@@ -29,21 +29,25 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
 
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
-            ->setMethods(['getSlotClosure', 'getSlotArguments', 'hasSlot', 'getTemplateVariableContainer'])
+            ->setMethods(['getSlotClosure', 'hasSlot', 'addTemplateVariables', 'restoreTemplateVariables'])
             ->getMock();
         $slotService->expects($this->once())
             ->method('hasSlot')
-            ->with($slotArgument)
+            ->with($slotName)
             ->willReturn(true);
         $slotService->expects($this->once())
             ->method('getSlotClosure')
-            ->with($slotArgument)
+            ->with($slotName)
             ->willReturn(function () {
                 return 'foo';
             });
         $slotService->expects($this->once())
-            ->method('getSlotArguments')
-            ->with($slotArgument)
+            ->method('addTemplateVariables')
+            ->with($slotName)
+            ->willReturn([]);
+        $slotService->expects($this->once())
+            ->method('restoreTemplateVariables')
+            ->with($slotName)
             ->willReturn([]);
 
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
@@ -52,7 +56,7 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $this->injectDependenciesIntoViewHelper($viewHelper);
         $viewHelper->injectFieldService($fieldService);
         $viewHelper->setArguments([
-            'slot'      => $slotArgument,
+            'slot'      => $slotName,
             'arguments' => []
         ]);
         $viewHelper->initializeArguments();
@@ -74,7 +78,8 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
             ->getMock();
         $emptyClosure = function () {
         };
-        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'bar'], new RenderingContext);
+        $slotService->activate(new RenderingContext);
+        $slotService->addSlot('foo', $emptyClosure, ['foo' => 'bar']);
 
         $slotService->expects($this->once())
             ->method('addTemplateVariables');

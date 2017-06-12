@@ -21,9 +21,9 @@ use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Service\StringService;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
-use Romm\Formz\Service\ViewHelper\SlotViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
@@ -105,6 +105,12 @@ class FieldViewHelper extends AbstractViewHelper
         $this->injectFieldInService($this->arguments['name']);
 
         /*
+         * Activating the slot service, which will be used all along the
+         * rendering of this very field.
+         */
+        $this->slotService->activate($this->renderingContext);
+
+        /*
          * Calling this here will process every view helper beneath this one,
          * allowing options and slots to be used correctly in the field layout.
          */
@@ -131,7 +137,7 @@ class FieldViewHelper extends AbstractViewHelper
         /*
          * Resetting all services data.
          */
-        $this->fieldService->resetState();
+        $this->fieldService->removeCurrentField();
         $this->slotService->resetState();
 
         $viewHelperVariableContainer->setView($currentView);
@@ -162,6 +168,9 @@ class FieldViewHelper extends AbstractViewHelper
 
         $view = $this->fieldService->getView($layout);
 
+        $layoutPaths = $this->getPaths('layout');
+        $partialPaths = $this->getPaths('partial');
+
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
         } else {
@@ -178,8 +187,8 @@ class FieldViewHelper extends AbstractViewHelper
             }
         }
 
-        $view->setLayoutRootPaths($viewConfiguration->getAbsoluteLayoutRootPaths());
-        $view->setPartialRootPaths($viewConfiguration->getAbsolutePartialRootPaths());
+        $view->setLayoutRootPaths($layoutPaths);
+        $view->setPartialRootPaths($partialPaths);
         $view->assignMultiple($templateArguments);
 
         return $view->render();
@@ -284,6 +293,50 @@ class FieldViewHelper extends AbstractViewHelper
             }
 
             $variableProvider->add($key, $value);
+        }
+    }
+
+    /**
+     * This function will determinate the layout/partial root paths that should
+     * be given to the standalone view. This must be a merge between the paths
+     * given in the TypoScript configuration and the paths of the current view.
+     *
+     * This way, the user can use the layouts/partials from both the form
+     * rendering extension, as well as the ones used by the field layout.
+     *
+     * Please note that TYPO3 v8+ has this behaviour by default, meaning only
+     * the TypoScript configuration paths are needed, however in TYPO3 v7.6- we
+     * need to access the root paths, which is *not* granted by Fluid... We are
+     * then forced to use reflection, please don't do this at home!
+     *
+     * @param string $type `partial` or `layout`
+     * @return array
+     *
+     * @deprecated Must be removed when TYPO3 7.6 is not supported anymore!
+     */
+    protected function getPaths($type)
+    {
+        $viewConfiguration = $this->formService->getFormObject()->getConfiguration()->getRootConfiguration()->getView();
+
+        $paths = $type === 'partial'
+            ? $viewConfiguration->getAbsolutePartialRootPaths()
+            : $viewConfiguration->getAbsoluteLayoutRootPaths();
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '>=')) {
+            return $paths;
+        } else {
+            $currentView = $this->renderingContext->getViewHelperVariableContainer()->getView();
+            $propertyName = $type === 'partial'
+                ? 'getPartialRootPaths'
+                : 'getLayoutRootPaths';
+
+            $reflectionClass = new \ReflectionClass($currentView);
+            $method = $reflectionClass->getMethod($propertyName);
+            $method->setAccessible(true);
+
+            $value = $method->invoke($currentView);
+
+            return array_unique(array_merge($paths, $value));
         }
     }
 
