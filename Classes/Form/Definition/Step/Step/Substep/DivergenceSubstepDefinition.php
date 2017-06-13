@@ -13,9 +13,7 @@
 
 namespace Romm\Formz\Form\Definition\Step\Step\Substep;
 
-use Romm\Formz\Form\Definition\Condition\Activation;
-
-class ConditionalSubstepDefinition extends SubstepDefinition
+class DivergenceSubstepDefinition extends SubstepDefinition
 {
     /**
      * @var \Romm\Formz\Form\Definition\Condition\Activation
@@ -23,12 +21,4 @@ class ConditionalSubstepDefinition extends SubstepDefinition
      * @validate Romm.Formz:Internal\ConditionIsValid
      */
     protected $activation;
-
-    /**
-     * @return Activation
-     */
-    public function getActivation()
-    {
-        return $this->activation;
-    }
 }

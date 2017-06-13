@@ -25,6 +25,7 @@ use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\Builder\DefaultFormObjectBuilder;
 use Romm\Formz\Form\FormObject\Builder\FormObjectBuilderInterface;
+use Romm\Formz\Form\FormObject\Service\FormObjectSteps;
 use Romm\Formz\Service\CacheService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
@@ -57,6 +58,11 @@ class FormObjectFactory implements SingletonInterface
      * @var FormObjectProxy[]
      */
     protected $proxy = [];
+
+    /**
+     * @var FormObjectSteps[]
+     */
+    protected $stepService = [];
 
     /**
      * Returns the form object for the given form instance. The form instance
@@ -159,6 +165,23 @@ class FormObjectFactory implements SingletonInterface
         }
 
         return $this->proxy[$hash];
+    }
+
+    /**
+     * @todo
+     *
+     * @param FormObject $formObject
+     * @return FormObjectSteps
+     */
+    public function getStepService(FormObject $formObject)
+    {
+        $hash = $formObject->getObjectHash();
+
+        if (false === isset($this->stepService[$hash])) {
+            $this->stepService[$hash] = Core::instantiate(FormObjectSteps::class, $formObject);
+        }
+
+        return $this->stepService[$hash];
     }
 
     /**

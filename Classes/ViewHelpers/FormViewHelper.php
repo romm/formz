@@ -19,6 +19,8 @@ use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
+use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\Definition\Step\Step\Substep\Substep;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
@@ -285,10 +287,32 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $result .= '<input type="hidden" name="' . $this->prefixFieldName('formzData') . '" value="' . $value . '" />' . LF;
 
         if ($this->formObject->hasSteps()) {
-            $substepDefinition = $this->formObject->getCurrentSubstepDefinition();
+            $currentStep = $this->getCurrentStep();
 
-            if ($substepDefinition) {
-                $result .= '<input type="hidden" fz-substep-field="1" name="' . $this->prefixFieldName('currentSubstep') . '" value="' . $substepDefinition->getUniqueIdentifier() . '" />' . LF;
+            if ($currentStep->hasSubsteps()) {
+                if ($this->formObject->hasForm()) {
+                    $stepService = FormObjectFactory::get()->getStepService($this->formObject);
+                    
+                    $path = array_map(
+                        function (Substep $substep) {
+                            return $substep->getIdentifier();
+                        },
+                        $stepService->getSubstepsPath()
+                    );
+                    
+                    $substepsPath = [
+                        'current' => $this->formObject->getCurrentSubstepDefinition()->getSubstep()->getIdentifier(),
+                        'path'    => $path
+                    ];
+                } else {
+                    $identifier = $currentStep->getSubsteps()->getFirstSubstepDefinition()->getSubstep()->getIdentifier();
+                    $substepsPath = [
+                        'current' => $identifier,
+                        'path'    => [$identifier]
+                    ];
+                }
+
+                $result .= '<input type="hidden" fz-substep-path="1" name="' . $this->prefixFieldName('substepsPath') . '" value="' . htmlspecialchars(json_encode($substepsPath)) . '" />' . LF;
             }
         }
 
@@ -333,9 +357,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function handleSubsteps()
     {
-        /** @var Request $request */
-        $request = $this->controllerContext->getRequest();
-        $currentStep = $this->formService->getFormObject()->fetchCurrentStep($request)->getCurrentStep();
+        $currentStep = $this->getCurrentStep();
 
         if ($currentStep
             && $currentStep->hasSubsteps()
@@ -548,6 +570,17 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         }
 
         return $form;
+    }
+
+    /**
+     * @return Step|null
+     */
+    protected function getCurrentStep()
+    {
+        /** @var Request $request */
+        $request = $this->controllerContext->getRequest();
+
+        return $this->formService->getFormObject()->fetchCurrentStep($request)->getCurrentStep();
     }
 
     /**

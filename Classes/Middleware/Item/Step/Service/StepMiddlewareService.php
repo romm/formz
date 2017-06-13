@@ -56,8 +56,7 @@ class StepMiddlewareService implements SingletonInterface
     {
         $this->formObject = $formObject;
 
-        $proxy = FormObjectFactory::get()->getProxy($formObject->getForm());
-        $this->persistence = $proxy->getStepPersistence();
+        $this->persistence = FormObjectFactory::get()->getStepService($formObject)->getStepPersistence();
 
         $this->validationService = GeneralUtility::makeInstance(StepMiddlewareValidationService::class, $this);
     }
@@ -177,15 +176,6 @@ class StepMiddlewareService implements SingletonInterface
     }
 
     /**
-     * @param Step $step
-     * @return StepDefinition|null
-     */
-    public function getStepDefinition(Step $step)
-    {
-        return $this->findStep($step, $this->getFirstStepDefinition());
-    }
-
-    /**
      * @param StepDefinition $stepDefinition
      * @return bool
      */
@@ -200,18 +190,27 @@ class StepMiddlewareService implements SingletonInterface
     }
 
     /**
+     * @param Step $step
+     * @return StepDefinition|null
+     */
+    public function getStepDefinition(Step $step)
+    {
+        return $this->findStepDefinition($step, $this->getFirstStepDefinition());
+    }
+
+    /**
      * @param Step           $step
      * @param StepDefinition $stepDefinition
      * @return StepDefinition|null
      */
-    protected function findStep(Step $step, StepDefinition $stepDefinition)
+    protected function findStepDefinition(Step $step, StepDefinition $stepDefinition)
     {
         if ($stepDefinition->getStep() === $step) {
             return $stepDefinition;
         }
 
         if ($stepDefinition->hasNextStep()) {
-            $result = $this->findStep($step, $stepDefinition->getNextStep());
+            $result = $this->findStepDefinition($step, $stepDefinition->getNextStep());
 
             if ($result instanceof StepDefinition) {
                 return $result;
@@ -220,7 +219,7 @@ class StepMiddlewareService implements SingletonInterface
 
         if ($stepDefinition->hasDivergence()) {
             foreach ($stepDefinition->getDivergenceSteps() as $divergenceStep) {
-                $result = $this->findStep($step, $divergenceStep);
+                $result = $this->findStepDefinition($step, $divergenceStep);
 
                 if ($result instanceof StepDefinition) {
                     return $result;

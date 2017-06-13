@@ -14,6 +14,7 @@
 namespace Romm\Formz\Form\FormObject\Service;
 
 use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\Definition\Step\Step\Substep\Substep;
 use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
@@ -49,6 +50,16 @@ class FormObjectSteps
      * @var SubstepDefinition
      */
     protected $currentSubstepDefinition;
+
+    /**
+     * @var Substep[]
+     */
+    protected $substepsPath;
+
+    /**
+     * @var bool
+     */
+    protected $lastSubstepValidated = false;
 
     /**
      * @param FormObject $formObject
@@ -160,7 +171,7 @@ class FormObjectSteps
     }
 
     /**
-     * @return SubstepDefinition
+     * @return SubstepDefinition|null
      */
     public function getCurrentSubstepDefinition()
     {
@@ -169,7 +180,7 @@ class FormObjectSteps
         if (null === $this->currentSubstepDefinition) {
             $currentStep = $this->getCurrentStep();
 
-            $this->currentSubstepDefinition = $currentStep->hasSubsteps()
+            $this->currentSubstepDefinition = ($currentStep && $currentStep->hasSubsteps())
                 ? $currentStep->getSubsteps()->getFirstSubstepDefinition()
                 : false;
         }
@@ -184,5 +195,45 @@ class FormObjectSteps
     {
         // @todo check current step has been set?
         $this->currentSubstepDefinition = $currentSubstepDefinition;
+    }
+
+    /**
+     * @return Substep[]
+     */
+    public function getSubstepsPath()
+    {
+        return $this->substepsPath ?: [$this->getCurrentStep()->getSubsteps()->getFirstSubstepDefinition()->getSubstep()];
+    }
+
+    /**
+     * @param Substep[] $substepsPath
+     */
+    public function setSubstepsPath(array $substepsPath)
+    {
+        $this->substepsPath = $substepsPath;
+    }
+
+    /**
+     * @param Substep $substep
+     */
+    public function addSubstepToPath(Substep $substep)
+    {
+        $this->substepsPath[] = $substep;
+    }
+
+    /**
+     * @todo
+     */
+    public function markLastSubstepAsValidated()
+    {
+        $this->lastSubstepValidated = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function lastSubstepWasValidated()
+    {
+        return $this->lastSubstepValidated;
     }
 }

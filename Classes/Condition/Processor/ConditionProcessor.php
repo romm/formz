@@ -22,7 +22,7 @@ use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
-use Romm\Formz\Form\Definition\Step\Step\Substep\ConditionalSubstepDefinition;
+use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 
 class ConditionProcessor
@@ -135,10 +135,10 @@ class ConditionProcessor
     /**
      * @todo
      *
-     * @param ConditionalSubstepDefinition $substep
+     * @param SubstepDefinition $substep
      * @return ConditionTree
      */
-    public function getActivationConditionTreeForSubstep(ConditionalSubstepDefinition $substep)
+    public function getActivationConditionTreeForSubstep(SubstepDefinition $substep)
     {
         $key = 'substep-' . serialize($substep);
 

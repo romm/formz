@@ -16,15 +16,10 @@ namespace Romm\Formz\Form\FormObject;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Domain\Model\FormMetadata;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Form\Definition\Step\Step\Step;
-use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\Service\FormObjectMetadata;
 use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
-use Romm\Formz\Form\FormObject\Service\FormObjectSteps;
-use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
 use Romm\Formz\Service\HashService;
-use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 class FormObjectProxy
 {
@@ -73,11 +68,6 @@ class FormObjectProxy
     protected $formIsPersistent = false;
 
     /**
-     * @var FormObjectSteps
-     */
-    protected $stepService;
-
-    /**
      * @param FormObject    $formObject
      * @param FormInterface $form
      */
@@ -85,7 +75,6 @@ class FormObjectProxy
     {
         $this->formObject = $formObject;
         $this->form = $form;
-        $this->stepService = Core::instantiate(FormObjectSteps::class, $formObject);
     }
 
     /**
@@ -181,46 +170,6 @@ class FormObjectProxy
         }
 
         return $this->metadata->getMetadata();
-    }
-
-    /**
-     * @return Step|null
-     */
-    public function getCurrentStep()
-    {
-        return $this->stepService->getCurrentStep();
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function fetchCurrentStep(Request $request)
-    {
-        $this->stepService->fetchCurrentStep($request);
-    }
-
-    /**
-     * @return SubstepDefinition
-     */
-    public function getCurrentSubstepDefinition()
-    {
-        return $this->stepService->getCurrentSubstepDefinition();
-    }
-
-    /**
-     * @param SubstepDefinition $currentSubstepDefinition
-     */
-    public function setCurrentSubstepDefinition(SubstepDefinition $currentSubstepDefinition)
-    {
-        $this->stepService->setCurrentSubstepDefinition($currentSubstepDefinition);
-    }
-
-    /**
-     * @return FormStepPersistence
-     */
-    public function getStepPersistence()
-    {
-        return $this->stepService->getStepPersistence();
     }
 
     /**

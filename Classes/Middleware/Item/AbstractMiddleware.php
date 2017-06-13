@@ -199,11 +199,7 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
      */
     final protected function getCurrentStep()
     {
-        $request = ($this->getFormObject()->formWasSubmitted())
-            ? $this->getRequest()->getReferringRequest()
-            : $this->getRequest();
-
-        return $this->getFormObject()->fetchCurrentStep($request)->getCurrentStep();
+        return $this->getFormObject()->getCurrentStep();
     }
 
     /**

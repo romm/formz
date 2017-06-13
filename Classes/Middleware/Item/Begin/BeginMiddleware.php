@@ -16,6 +16,7 @@ namespace Romm\Formz\Middleware\Item\Begin;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\BasicMiddlewareInterface;
+use Romm\Formz\Middleware\Item\Step\Service\SubstepMiddlewareService;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
@@ -33,6 +34,8 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     public function initialize()
     {
         $this->checkFormSubmission();
+        $this->fetchCurrentStep();
+        $this->manageSubstepsPathData();
     }
 
     /**
@@ -43,6 +46,19 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     {
         $signalObject = new SignalObject($this->processor, BeginSignal::class, After::class);
         $signalObject->dispatch();
+    }
+
+    /**
+     * @todo
+     */
+    protected function fetchCurrentStep()
+    {
+        $formObject = $this->processor->getFormObject();
+        $request = ($formObject->formWasSubmitted())
+            ? $this->processor->getRequest()->getReferringRequest()
+            : $this->processor->getRequest();
+
+        $formObject->fetchCurrentStep($request);
     }
 
     /**
@@ -80,45 +96,18 @@ final class BeginMiddleware implements BasicMiddlewareInterface
             $proxy = FormObjectFactory::get()->getProxy($form);
             $proxy->markFormAsSubmitted();
 
-            $this->aze();
-
             $this->injectFormHashInProxy();
         }
     }
 
-    protected function aze()
+    /**
+     * @todo
+     */
+    protected function manageSubstepsPathData()
     {
-        $formObject = $this->processor->getFormObject();
-        $request = $this->processor->getRequest();
-        $proxy = FormObjectFactory::get()->getProxy($formObject->getForm());
-
-        $currentStep = $formObject->fetchCurrentStep($request)->getCurrentStep();
-
-        if ($currentStep
-            && $currentStep->hasSubsteps()
-        ) {
-            $currentSubstepIdentifier = $request->hasArgument('currentSubstep')
-                ? $request->getArgument('currentSubstep')
-                : null;
-
-            if ($currentSubstepIdentifier) {
-                $substepDefinition = $currentStep->getSubsteps()->getFirstSubstepDefinition();
-                $currentSubstepDefinition = null;
-
-                while ($substepDefinition) {
-                    if ($substepDefinition->getUniqueIdentifier() === $currentSubstepIdentifier) {
-                        $currentSubstepDefinition = $substepDefinition;
-                        break;
-                    }
-
-                    $substepDefinition = $substepDefinition->hasNextSubsteps()
-                        ? $substepDefinition->getNextSubsteps()
-                        : null;
-                }
-
-                $proxy->setCurrentSubstepDefinition($currentSubstepDefinition);
-            }
-        }
+        SubstepMiddlewareService::get()
+            ->reset($this->processor->getFormObject(), $this->processor->getRequest())
+            ->manageSubstepPathData();
     }
 
     /**

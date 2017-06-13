@@ -14,6 +14,8 @@
 namespace Romm\Formz\Form\Definition\Step\Step\Substep;
 
 use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
+use Romm\Formz\Form\Definition\Condition\Activation;
+use Romm\Formz\Form\Definition\Condition\ActivationInterface;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 
 class SubstepDefinition extends AbstractFormDefinitionComponent
@@ -25,17 +27,18 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
     protected $substep;
 
     /**
+     * @var \Romm\Formz\Form\Definition\Condition\Activation
+     * @validate Romm.Formz:Internal\ConditionIsValid
+     */
+    protected $activation;
+
+    /**
      * @var \Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition
      */
     protected $next;
 
     /**
-     * @var \Romm\Formz\Form\Definition\Step\Step\Substep\ConditionalSubstepDefinition[]
-     */
-    protected $detour;
-
-    /**
-     * @var \Romm\Formz\Form\Definition\Step\Step\Substep\ConditionalSubstepDefinition[]
+     * @var \Romm\Formz\Form\Definition\Step\Step\Substep\DivergenceSubstepDefinition[]
      */
     protected $divergence;
 
@@ -50,6 +53,22 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
                 return $substeps->getEntry($this->substep);
             }
         );
+    }
+
+    /**
+     * @return Activation
+     */
+    public function getActivation()
+    {
+        return $this->activation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasActivation()
+    {
+        return $this->activation instanceof ActivationInterface;
     }
 
     public function getUniqueIdentifier()
@@ -78,15 +97,14 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
      */
     public function isLast()
     {
-        return false === $this->hasNextSubsteps()
-            && false === $this->hasDetour()
+        return false === $this->hasNextSubstep()
             && false === $this->hasDivergence();
     }
 
     /**
      * @return bool
      */
-    public function hasNextSubsteps()
+    public function hasNextSubstep()
     {
         return null !== $this->next;
     }
@@ -94,9 +112,9 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
     /**
      * @return SubstepDefinition
      */
-    public function getNextSubsteps()
+    public function getNextSubstep()
     {
-        if (false === $this->hasNextSubsteps()) {
+        if (false === $this->hasNextSubstep()) {
             throw new \Exception('todo'); // @todo
         }
 
@@ -104,23 +122,7 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
     }
 
     /**
-     * @return ConditionalSubstepDefinition[]
-     */
-    public function getDetourSubsteps()
-    {
-        return $this->detour;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasDetour()
-    {
-        return false === empty($this->detour);
-    }
-
-    /**
-     * @return ConditionalSubstepDefinition[]
+     * @return DivergenceSubstepDefinition[]
      */
     public function getDivergenceSubsteps()
     {

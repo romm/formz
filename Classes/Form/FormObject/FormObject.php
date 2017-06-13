@@ -23,6 +23,7 @@ use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
+use Romm\Formz\Form\FormObject\Service\FormObjectSteps;
 use Romm\Formz\Persistence\PersistenceManager;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
@@ -49,6 +50,11 @@ class FormObject
     protected $proxy;
 
     /**
+     * @var FormObjectSteps
+     */
+    protected $stepService;
+
+    /**
      * @var PersistenceManager
      */
     protected $persistenceManager;
@@ -66,6 +72,7 @@ class FormObject
         $this->static = $static;
 
         $this->persistenceManager = Core::instantiate(PersistenceManager::class, $this);
+        $this->stepService = FormObjectFactory::get()->getStepService($this);
     }
 
     /**
@@ -224,7 +231,7 @@ class FormObject
      */
     public function getCurrentStep()
     {
-        return $this->getProxy()->getCurrentStep();
+        return $this->stepService->getCurrentStep();
     }
 
     /**
@@ -233,18 +240,17 @@ class FormObject
      */
     public function fetchCurrentStep(Request $request)
     {
-        $this->getProxy()->fetchCurrentStep($request);
+        $this->stepService->fetchCurrentStep($request);
 
         return $this;
     }
 
     /**
-     * @return SubstepDefinition
+     * @return SubstepDefinition|null
      */
     public function getCurrentSubstepDefinition()
     {
-        return $this->getProxy()->getCurrentSubstepDefinition();
-
+        return $this->stepService->getCurrentSubstepDefinition();
     }
 
     /**
