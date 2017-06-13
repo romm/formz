@@ -33,7 +33,7 @@ class FieldViewHelperService implements SingletonInterface
      *
      * @var FieldContextEntry[]
      */
-    protected $contextEntries;
+    protected $contextEntries = [];
 
     /**
      * @var StandaloneView[]

@@ -50,7 +50,8 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->method('formContextExists')
             ->willReturn(true);
 
-        $viewHelper->injectFieldService(new FieldViewHelperService);
+        $fieldServiceMock = $this->getMockedFieldService();
+        $viewHelper->injectFieldService($fieldServiceMock);
 
         $viewHelper->injectSlotService(new SlotViewHelperService);
         $viewHelper->setRenderingContext($this->getMockedRenderingContext());
@@ -404,7 +405,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
     protected function getMockedFieldService()
     {
         $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
-            ->setMethods(['setCurrentField', 'getView'])
+            ->setMethods(['getView'])
             ->getMock();
 
         $view = $this->getMockBuilder(StandaloneView::class)

@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Service\ViewHelper\Field;
 
-
 use Romm\Formz\Form\Definition\Field\Field;
 
 class FieldContextEntry

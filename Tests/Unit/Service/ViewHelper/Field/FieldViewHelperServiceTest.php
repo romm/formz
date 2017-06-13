@@ -45,8 +45,8 @@ class FieldViewHelperServiceTest extends AbstractUnitTest
     public function nestingFieldsWorks()
     {
         $fieldService = new FieldViewHelperService;
-        $field1 = new Field;
-        $field2 = new Field;
+        $field1 = new Field('foo');
+        $field2 = new Field('foo');
 
         $fieldService->setCurrentField($field1);
         $this->assertSame($field1, $fieldService->getCurrentField());

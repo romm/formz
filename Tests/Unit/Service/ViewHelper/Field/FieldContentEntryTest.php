@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Service\ViewHelper\Field;
 
-use Romm\Formz\Configuration\Form\Field\Field;
+use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\ViewHelper\Field\FieldContextEntry;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
@@ -12,7 +12,7 @@ class FieldContentEntryTest extends AbstractUnitTest
      */
     public function initializationDoneProperly()
     {
-        $field = new Field;
+        $field = new Field('foo');
 
         $fieldContextEntry = new FieldContextEntry($field);
         $this->assertSame($field, $fieldContextEntry->getField());
@@ -23,7 +23,7 @@ class FieldContentEntryTest extends AbstractUnitTest
      */
     public function setFieldOptionSetsFieldOption()
     {
-        $fieldContextEntry = new FieldContextEntry(new Field);
+        $fieldContextEntry = new FieldContextEntry(new Field('foo'));
 
         $fieldContextEntry->setOption('foo', 'bar');
         $this->assertEquals(
