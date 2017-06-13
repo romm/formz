@@ -139,14 +139,13 @@ class FormValidatorExecutor
 
         $this->markFieldActivationCheckBegin($field);
 
-        if (true === $field->hasActivation()
+        $this->checkFieldStepSupport($field);
+
+        if (false === $this->result->fieldIsOutOfScope($field)
+            && true === $field->hasActivation()
             && false === $this->getFieldActivationProcessResult($field)
         ) {
             $this->result->deactivateField($field);
-        }
-
-        if (false === $this->result->fieldIsDeactivated($field)) {
-            $this->checkFieldStepSupport($field);
         }
 
         if (false === $this->result->fieldIsDeactivated($field)) {
@@ -169,7 +168,7 @@ class FormValidatorExecutor
         if ($validatedStep
             && false === $validatedStep->supportsField($field)
         ) {
-            $this->result->deactivateField($field);
+            $this->result->markFieldOutOfScope($field);
         }
     }
 
@@ -218,7 +217,7 @@ class FormValidatorExecutor
         $currentSubstepDefinition = null;
         
         $stepService = FormObjectFactory::get()->getStepService($this->formObject);
-        $substepsPath = $stepService->getSubstepsPath();
+        $substepsPath = $stepService->getSubstepsPath($this->dataObject->getValidatedStep());
 
         while ($substepDefinition) {
             /** @var Substep $currentSubstepFromPath */
@@ -322,7 +321,9 @@ class FormValidatorExecutor
         if (false === $this->fieldWasValidated($field)) {
             $this->checkFieldActivation($field);
 
-            if (false === $this->result->fieldIsDeactivated($field)) {
+            if (false === $this->result->fieldIsOutOfScope($field)
+                && false === $this->result->fieldIsDeactivated($field)
+            ) {
                 $this->markFieldAsValidated($field);
 
                 // Looping on the field's validators settings...

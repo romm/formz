@@ -297,7 +297,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                         function (Substep $substep) {
                             return $substep->getIdentifier();
                         },
-                        $stepService->getSubstepsPath()
+                        $stepService->getSubstepsPath($currentStep)
                     );
                     
                     $substepsPath = [

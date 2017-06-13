@@ -75,6 +75,7 @@ class FieldIsValidCondition extends AbstractConditionItem
         $result = $formValidator->getResult();
 
         return false === $result->forProperty($this->fieldName)->hasErrors()
+            && false === $result->fieldIsOutOfScope($field)
             && false === $result->fieldIsDeactivated($field);
     }
 

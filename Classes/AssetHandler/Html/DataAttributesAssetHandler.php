@@ -93,7 +93,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         foreach ($formConfiguration->getFields() as $field) {
             $fieldName = $field->getName();
 
-            if (false === $formResult->fieldIsDeactivated($field)
+            if (false === $formResult->fieldIsOutOfScope($field)
+                && false === $formResult->fieldIsDeactivated($field)
                 && false === $formResult->forProperty($fieldName)->hasErrors()
             ) {
                 $result[self::getFieldDataValidKey($fieldName)] = '1';
@@ -120,8 +121,11 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         $formResult = $this->getFormObject()->getFormResult();
 
         foreach ($formResult->getSubResults() as $fieldName => $fieldResult) {
+            $field = $formConfiguration->getField($fieldName);
+
             if (true === $formConfiguration->hasField($fieldName)
-                && false === $formResult->fieldIsDeactivated($formConfiguration->getField($fieldName))
+                && false === $formResult->fieldIsOutOfScope($field)
+                && false === $formResult->fieldIsDeactivated($field)
             ) {
                 $result += $this->getFieldErrorMessages($fieldName, $fieldResult);
                 $result += $this->getFieldWarningMessages($fieldName, $fieldResult);

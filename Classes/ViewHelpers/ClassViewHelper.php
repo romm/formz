@@ -237,11 +237,13 @@ class ClassViewHelper extends AbstractViewHelper
     {
         $result = '';
         $formObject = $this->formService->getFormObject();
+        $formResult = $formObject->getFormResult();
         $field = $formObject->getDefinition()->getField($this->fieldName);
 
         if ($formObject->hasForm()
             && false === $propertyResult->hasErrors()
-            && false === $formObject->getFormResult()->fieldIsDeactivated($field)
+            && false === $formResult->fieldIsOutOfScope($field)
+            && false === $formResult->fieldIsDeactivated($field)
         ) {
             $fieldValue = ObjectAccess::getProperty($formObject->getForm(), $this->fieldName);
 

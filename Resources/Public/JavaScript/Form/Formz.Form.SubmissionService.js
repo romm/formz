@@ -89,7 +89,8 @@ Fz.Form.SubmissionService = (function () {
                         checkAllFieldsAreValid();
                     }
                 } catch (e) {
-                    Fz.debug('Error during submission: "' + e + '".', Fz.TYPE_ERROR);
+                    var error = e.stack ? e.stack : e;
+                    Fz.debug('Error during submission: "' + error + '".', Fz.TYPE_ERROR);
 
                     form.getElement().submit();
                 }

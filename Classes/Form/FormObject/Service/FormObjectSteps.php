@@ -95,7 +95,7 @@ class FormObjectSteps
                 $data = [
                     // @todo: no page uid to fetch?
 //                $step->getPageUid()    => Core::get()->getPageController()->id,
-                    $step->getExtension()  => $request->getControllerExtensionName(),
+                    $step->getExtension() => $request->getControllerExtensionName(),
                     $step->getController() => $request->getControllerName()
                 ];
 
@@ -198,27 +198,36 @@ class FormObjectSteps
     }
 
     /**
+     * @param Step $step
      * @return Substep[]
      */
-    public function getSubstepsPath()
+    public function getSubstepsPath(Step $step = null)
     {
-        return $this->substepsPath ?: [$this->getCurrentStep()->getSubsteps()->getFirstSubstepDefinition()->getSubstep()];
+        $step = $step ?: $this->getCurrentStep();
+
+        return $this->substepsPath[$step->getIdentifier()] ?: [$step->getSubsteps()->getFirstSubstepDefinition()->getSubstep()];
     }
 
     /**
      * @param Substep[] $substepsPath
+     * @param Step      $step
      */
-    public function setSubstepsPath(array $substepsPath)
+    public function setSubstepsPath(array $substepsPath, Step $step = null)
     {
-        $this->substepsPath = $substepsPath;
+        $step = $step ?: $this->getCurrentStep();
+
+        $this->substepsPath[$step->getIdentifier()] = $substepsPath;
     }
 
     /**
      * @param Substep $substep
+     * @param Step    $step
      */
-    public function addSubstepToPath(Substep $substep)
+    public function addSubstepToPath(Substep $substep, Step $step = null)
     {
-        $this->substepsPath[] = $substep;
+        $step = $step ?: $this->getCurrentStep();
+
+        $this->substepsPath[$step->getIdentifier()][] = $substep;
     }
 
     /**

@@ -32,6 +32,14 @@ class FormResult extends Result
     protected $deactivatedFields = [];
 
     /**
+     * Contains fields that are not currently shown, they can be in a different
+     * step or substep.
+     *
+     * @var Field[]
+     */
+    protected $fieldsOutOfScope = [];
+
+    /**
      * @var Validator[]
      */
     protected $deactivatedFieldsValidators = [];
@@ -42,7 +50,8 @@ class FormResult extends Result
     protected $validatedFields = [];
 
     /**
-     * Flags the given field as deactivated.
+     * Flags the given field as deactivated: its activation conditions did not
+     * match.
      *
      * @param Field $field
      */
@@ -52,7 +61,7 @@ class FormResult extends Result
     }
 
     /**
-     * Returns true if the given field is flagged as deactivated.
+     * Returns true if the given field is deactivated.
      *
      * @param Field $field
      * @return bool
@@ -60,6 +69,23 @@ class FormResult extends Result
     public function fieldIsDeactivated(Field $field)
     {
         return array_key_exists($field->getName(), $this->deactivatedFields);
+    }
+
+    /**
+     * @param Field $field
+     */
+    public function markFieldOutOfScope(Field $field)
+    {
+        $this->fieldsOutOfScope[$field->getName()] = $field;
+    }
+
+    /**
+     * @param Field $field
+     * @return bool
+     */
+    public function fieldIsOutOfScope(Field $field)
+    {
+        return array_key_exists($field->getName(), $this->fieldsOutOfScope);
     }
 
     /**
