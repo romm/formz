@@ -51,6 +51,11 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
     protected $action;
 
     /**
+     * @var string[]
+     */
+    protected $authorizedActions = [];
+
+    /**
      * @var \Romm\Formz\Form\Definition\Step\Step\SupportedField[]
      * @validate NotEmpty
      */
@@ -99,6 +104,14 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
     public function getAction()
     {
         return $this->action;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAuthorizedActions()
+    {
+        return array_merge([$this->action], $this->authorizedActions);
     }
 
     /**

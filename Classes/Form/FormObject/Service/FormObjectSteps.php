@@ -107,7 +107,7 @@ class FormObjectSteps
                     }
                 }
 
-                $actionList = GeneralUtility::trimExplode(',', $step->getAction());
+                $actionList = $step->getAuthorizedActions();
 
                 if (false === in_array($request->getControllerActionName(), $actionList)) {
                     continue;
