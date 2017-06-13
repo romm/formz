@@ -9,7 +9,7 @@ use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ControllerService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use Romm\Formz\Service\ViewHelper\Legacy\FormViewHelper;
 use Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;

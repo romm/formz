@@ -11,12 +11,13 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Service\ViewHelper;
+namespace Romm\Formz\Service\ViewHelper\Field;
 
 use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Field\Field;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -26,14 +27,13 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class FieldViewHelperService implements SingletonInterface
 {
     /**
-     * @var Field
+     * Contains all current fields being rendered by FormZ: if a field is
+     * rendered beneath another field, several entries will be added to this
+     * property.
+     *
+     * @var FieldContextEntry[]
      */
-    protected $currentField;
-
-    /**
-     * @var array
-     */
-    protected $fieldOptions = [];
+    protected $contextEntries = [];
 
     /**
      * @var StandaloneView[]
@@ -41,43 +41,41 @@ class FieldViewHelperService implements SingletonInterface
     protected $view;
 
     /**
-     * Reset every state that can be used by this service.
+     * Adds a new context entry to the entries array. The other field-related
+     * methods will be processed on this entry until the field rendering has
+     * ended.
+     *
+     * @param Field $field
      */
-    public function resetState()
+    public function setCurrentField(Field $field)
     {
-        $this->currentField = null;
-        $this->fieldOptions = [];
+        $this->contextEntries[] = GeneralUtility::makeInstance(FieldContextEntry::class, $field);
     }
 
     /**
-     * Checks that the `FieldViewHelper` has been called. If not, an exception
-     * is thrown.
+     * Removes the current field context entry.
+     */
+    public function removeCurrentField()
+    {
+        array_pop($this->contextEntries);
+    }
+
+    /**
+     * Checks that a field context is found.
      *
      * @return bool
      */
     public function fieldContextExists()
     {
-        return $this->currentField instanceof Field;
+        return false === empty($this->contextEntries);
     }
 
     /**
-     * Returns the current field which was defined by the `FieldViewHelper`.
-     *
-     * Returns null if no current field was found.
-     *
-     * @return Field|null
+     * @return Field
      */
     public function getCurrentField()
     {
-        return $this->currentField;
-    }
-
-    /**
-     * @param Field $field
-     */
-    public function setCurrentField(Field $field)
-    {
-        $this->currentField = $field;
+        return $this->getCurrentContext()->getField();
     }
 
     /**
@@ -86,7 +84,7 @@ class FieldViewHelperService implements SingletonInterface
      */
     public function setFieldOption($name, $value)
     {
-        $this->fieldOptions[$name] = $value;
+        $this->getCurrentContext()->setOption($name, $value);
     }
 
     /**
@@ -94,7 +92,7 @@ class FieldViewHelperService implements SingletonInterface
      */
     public function getFieldOptions()
     {
-        return $this->fieldOptions;
+        return $this->getCurrentContext()->getOptions();
     }
 
     /**
@@ -118,5 +116,13 @@ class FieldViewHelperService implements SingletonInterface
         }
 
         return $this->view[$identifier];
+    }
+
+    /**
+     * @return FieldContextEntry
+     */
+    protected function getCurrentContext()
+    {
+        return end($this->contextEntries);
     }
 }

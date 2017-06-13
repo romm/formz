@@ -7,8 +7,8 @@ use Romm\Formz\Error\Warning;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Service\ViewHelper\FieldViewHelperService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
 use TYPO3\CMS\Extbase\Error\Message;
 

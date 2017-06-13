@@ -28,7 +28,7 @@ use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\FormService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
-use Romm\Formz\Service\ViewHelper\FormViewHelperService;
+use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
