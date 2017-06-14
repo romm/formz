@@ -20,7 +20,6 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
 use Romm\Formz\Form\Definition\Step\Step\Step;
-use Romm\Formz\Form\Definition\Step\Step\Substep\Substep;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
@@ -290,29 +289,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             $currentStep = $this->getCurrentStep();
 
             if ($currentStep->hasSubsteps()) {
-                if ($this->formObject->hasForm()) {
-                    $stepService = FormObjectFactory::get()->getStepService($this->formObject);
-                    
-                    $path = array_map(
-                        function (Substep $substep) {
-                            return $substep->getIdentifier();
-                        },
-                        $stepService->getSubstepsPath($currentStep)
-                    );
-                    
-                    $substepsPath = [
-                        'current' => $this->formObject->getCurrentSubstepDefinition()->getSubstep()->getIdentifier(),
-                        'path'    => $path
-                    ];
-                } else {
-                    $identifier = $currentStep->getSubsteps()->getFirstSubstepDefinition()->getSubstep()->getIdentifier();
-                    $substepsPath = [
-                        'current' => $identifier,
-                        'path'    => [$identifier]
-                    ];
-                }
+                $substepsLevel = FormObjectFactory::get()
+                    ->getStepService($this->formObject)
+                    ->getSubstepsLevel();
 
-                $result .= '<input type="hidden" fz-substep-path="1" name="' . $this->prefixFieldName('substepsPath') . '" value="' . htmlspecialchars(json_encode($substepsPath)) . '" />' . LF;
+                $result .= '<input type="hidden" fz-substeps-level="1" name="' . $this->prefixFieldName('substepsLevel') . '" value="' . $substepsLevel . '" />' . LF;
             }
         }
 
@@ -362,8 +343,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         if ($currentStep
             && $currentStep->hasSubsteps()
         ) {
-            $substepDefinition = $this->formObject->getCurrentSubstepDefinition();
-            $this->tag->addAttribute('fz-substep', $substepDefinition->getSubstep()->getIdentifier());
+            $identifier = FormObjectFactory::get()
+                ->getStepService($this->formObject)
+                ->getCurrentSubstepDefinition()
+                ->getSubstep()
+                ->getIdentifier();
+
+            $this->tag->addAttribute('fz-substep', $identifier);
         }
     }
 

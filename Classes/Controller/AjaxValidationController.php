@@ -257,6 +257,17 @@ class AjaxValidationController extends ActionController
     protected function invokeMiddlewares()
     {
         try {
+            $definition = $this->formObject->getDefinition();
+
+            if ($definition->hasSteps()) {
+                $stepIdentifier = $this->formObject->getRequestData()->getCurrentStepIdentifier();
+
+                if ($definition->getSteps()->hasEntry($stepIdentifier)) {
+                    $stepService = FormObjectFactory::get()->getStepService($this->formObject);
+                    $stepService->setCurrentStep($definition->getSteps()->getEntry($stepIdentifier));
+                }
+            }
+
             $controllerProcessor = ControllerProcessor::prepare($this->request, $this->arguments, $this->getContentObjectSettings());
 
             /** @var MiddlewareProcessor $middlewareProcessor */

@@ -20,7 +20,6 @@ use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\Definition\Step\Step\Step;
-use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
 use Romm\Formz\Form\FormObject\Service\FormObjectSteps;
@@ -243,14 +242,6 @@ class FormObject
         $this->stepService->fetchCurrentStep($request);
 
         return $this;
-    }
-
-    /**
-     * @return SubstepDefinition|null
-     */
-    public function getCurrentSubstepDefinition()
-    {
-        return $this->stepService->getCurrentSubstepDefinition();
     }
 
     /**

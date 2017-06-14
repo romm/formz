@@ -36,6 +36,11 @@ class FormObjectRequestData
     /**
      * @var string
      */
+    protected $currentStepIdentifier;
+
+    /**
+     * @var string
+     */
     protected $contentObjectTable;
 
     /**
@@ -115,6 +120,22 @@ class FormObjectRequestData
     public function setFormHash($formHash)
     {
         $this->formHash = $formHash;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentStepIdentifier()
+    {
+        return $this->currentStepIdentifier;
+    }
+
+    /**
+     * @param string $currentStepIdentifier
+     */
+    public function setCurrentStepIdentifier($currentStepIdentifier)
+    {
+        $this->currentStepIdentifier = $currentStepIdentifier;
     }
 
     /**

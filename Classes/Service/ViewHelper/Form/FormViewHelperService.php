@@ -142,14 +142,19 @@ class FormViewHelperService implements SingletonInterface
             return;
         }
 
+        $requestData = $this->formObject->getRequestData();
+
+        $currentStepIdentifier = $this->getCurrentStep()
+            ? $this->getCurrentStep()->getIdentifier()
+            : null;
+        $requestData->setCurrentStepIdentifier($currentStepIdentifier);
+
         /** @var ConfigurationManager $configurationManager */
         $configurationManager = Core::instantiate(ConfigurationManagerInterface::class);
 
         $contentObject = $configurationManager->getContentObject();
 
         if (null !== $contentObject) {
-            $requestData = $this->formObject->getRequestData();
-
             $requestData->setContentObjectTable($contentObject->getCurrentTable());
             $requestData->setContentObjectUid($contentObject->data['uid']);
         }

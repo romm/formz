@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Middleware\Item\Step;
 
-use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Middleware\Item\AbstractMiddleware;

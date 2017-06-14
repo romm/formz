@@ -14,7 +14,6 @@
 namespace Romm\Formz\Form\FormObject\Service;
 
 use Romm\Formz\Form\Definition\Step\Step\Step;
-use Romm\Formz\Form\Definition\Step\Step\Substep\Substep;
 use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
@@ -52,9 +51,9 @@ class FormObjectSteps
     protected $currentSubstepDefinition;
 
     /**
-     * @var Substep[]
+     * @var int
      */
-    protected $substepsPath;
+    protected $substepsLevel = 1;
 
     /**
      * @var bool
@@ -123,6 +122,14 @@ class FormObjectSteps
     }
 
     /**
+     * @param Step $step
+     */
+    public function setCurrentStep(Step $step)
+    {
+        $this->currentStep = $step;
+    }
+
+    /**
      * @return Step|null
      */
     public function getCurrentStep()
@@ -171,21 +178,11 @@ class FormObjectSteps
     }
 
     /**
-     * @return SubstepDefinition|null
+     * @return SubstepDefinition
      */
     public function getCurrentSubstepDefinition()
     {
-        // @todo check current step has been set?
-
-        if (null === $this->currentSubstepDefinition) {
-            $currentStep = $this->getCurrentStep();
-
-            $this->currentSubstepDefinition = ($currentStep && $currentStep->hasSubsteps())
-                ? $currentStep->getSubsteps()->getFirstSubstepDefinition()
-                : false;
-        }
-
-        return $this->currentSubstepDefinition ?: null;
+        return $this->currentSubstepDefinition ?: $this->getCurrentStep()->getSubsteps()->getFirstSubstepDefinition();
     }
 
     /**
@@ -193,41 +190,23 @@ class FormObjectSteps
      */
     public function setCurrentSubstepDefinition(SubstepDefinition $currentSubstepDefinition)
     {
-        // @todo check current step has been set?
         $this->currentSubstepDefinition = $currentSubstepDefinition;
     }
 
     /**
-     * @param Step $step
-     * @return Substep[]
+     * @param int $level
      */
-    public function getSubstepsPath(Step $step = null)
+    public function setSubstepsLevel($level)
     {
-        $step = $step ?: $this->getCurrentStep();
-
-        return $this->substepsPath[$step->getIdentifier()] ?: [$step->getSubsteps()->getFirstSubstepDefinition()->getSubstep()];
+        $this->substepsLevel = max(1, (int)$level);
     }
 
     /**
-     * @param Substep[] $substepsPath
-     * @param Step      $step
+     * @return int
      */
-    public function setSubstepsPath(array $substepsPath, Step $step = null)
+    public function getSubstepsLevel()
     {
-        $step = $step ?: $this->getCurrentStep();
-
-        $this->substepsPath[$step->getIdentifier()] = $substepsPath;
-    }
-
-    /**
-     * @param Substep $substep
-     * @param Step    $step
-     */
-    public function addSubstepToPath(Substep $substep, Step $step = null)
-    {
-        $step = $step ?: $this->getCurrentStep();
-
-        $this->substepsPath[$step->getIdentifier()][] = $substep;
+        return $this->substepsLevel;
     }
 
     /**

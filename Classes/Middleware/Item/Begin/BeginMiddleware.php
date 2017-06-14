@@ -16,7 +16,6 @@ namespace Romm\Formz\Middleware\Item\Begin;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\BasicMiddlewareInterface;
-use Romm\Formz\Middleware\Item\Step\Service\SubstepMiddlewareService;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
@@ -35,7 +34,7 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     {
         $this->checkFormSubmission();
         $this->fetchCurrentStep();
-        $this->manageSubstepsPathData();
+        $this->fetchSubstepsLevel();
     }
 
     /**
@@ -46,19 +45,6 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     {
         $signalObject = new SignalObject($this->processor, BeginSignal::class, After::class);
         $signalObject->dispatch();
-    }
-
-    /**
-     * @todo
-     */
-    protected function fetchCurrentStep()
-    {
-        $formObject = $this->processor->getFormObject();
-        $request = ($formObject->formWasSubmitted())
-            ? $this->processor->getRequest()->getReferringRequest()
-            : $this->processor->getRequest();
-
-        $formObject->fetchCurrentStep($request);
     }
 
     /**
@@ -79,7 +65,7 @@ final class BeginMiddleware implements BasicMiddlewareInterface
         $formObject = $this->processor->getFormObject();
         $formName = $formObject->getName();
 
-        if ($request->getMethod() === 'POST'
+        if ($this->requestWasSubmitted()
             && $this->processor->getRequestArguments()->hasArgument($formName)
         ) {
             if (false === $request->hasArgument('formzData')) {
@@ -103,11 +89,31 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     /**
      * @todo
      */
-    protected function manageSubstepsPathData()
+    protected function fetchCurrentStep()
     {
-        SubstepMiddlewareService::get()
-            ->reset($this->processor->getFormObject(), $this->processor->getRequest())
-            ->manageSubstepPathData();
+        $formObject = $this->processor->getFormObject();
+        $request = ($formObject->formWasSubmitted())
+            ? $this->processor->getRequest()->getReferringRequest()
+            : $this->processor->getRequest();
+
+        $formObject->fetchCurrentStep($request);
+    }
+
+    /**
+     * @todo
+     */
+    protected function fetchSubstepsLevel()
+    {
+        $request = $this->processor->getRequest();
+
+        if ($this->requestWasSubmitted()
+            && $request->hasArgument('substepsLevel')
+        ) {
+            $substepLevel = $request->getArgument('substepsLevel');
+            FormObjectFactory::get()
+                ->getStepService($this->processor->getFormObject())
+                ->setSubstepsLevel($substepLevel);
+        }
     }
 
     /**
@@ -141,5 +147,13 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     final public function bindMiddlewareProcessor(MiddlewareProcessor $middlewareProcessor)
     {
         $this->processor = $middlewareProcessor;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function requestWasSubmitted()
+    {
+        return $this->processor->getRequest()->getMethod() === 'POST';
     }
 }

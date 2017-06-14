@@ -20,7 +20,7 @@ use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
-use Romm\Formz\Form\Definition\Step\Step\Substep\Substep;
+use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\MessageService;
@@ -211,32 +211,20 @@ class FormValidatorExecutor
      */
     protected function handleSubsteps()
     {
-        $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->formObject);
+        $stepService = FormObjectFactory::get()->getStepService($this->formObject);
+
         $firstSubstepDefinition = $this->dataObject->getValidatedStep()->getSubsteps()->getFirstSubstepDefinition();
         $substepDefinition = $firstSubstepDefinition;
         $currentSubstepDefinition = null;
-        
-        $stepService = FormObjectFactory::get()->getStepService($this->formObject);
-        $substepsPath = $stepService->getSubstepsPath($this->dataObject->getValidatedStep());
 
-        while ($substepDefinition) {
-            /** @var Substep $currentSubstepFromPath */
-            $currentSubstepFromPath = current($substepsPath);
+        $substepsLevel = $stepService->getSubstepsLevel();
 
-            if ($currentSubstepFromPath
-                && $currentSubstepFromPath->getIdentifier() !== $substepDefinition->getSubstep()->getIdentifier()
-            ) {
-                break;
-            }
-
-            next($substepsPath);
-
+        while ($substepDefinition && $substepsLevel > 0) {
+            $substepsLevel--;
             $phpResult = true;
 
             if ($substepDefinition->hasActivation()) {
-                $tree = $conditionProcessor->getActivationConditionTreeForSubstep($substepDefinition);
-                $dataObject = new PhpConditionDataObject($this->formObject->getForm(), $this);
-                $phpResult = $tree->getPhpResult($dataObject);
+                $phpResult = $this->getSubstepDefinitionActivationResult($substepDefinition);
             }
 
             if (true === $phpResult) {
@@ -245,11 +233,13 @@ class FormValidatorExecutor
                 foreach ($supportedFields as $supportedField) {
                     $this->launchFieldValidation($supportedField->getField());
                 }
+            }
 
-                if ($substepDefinition === $this->formObject->getCurrentSubstepDefinition()) {
-                    $currentSubstepDefinition = $substepDefinition;
-                    break;
-                }
+            if ($substepsLevel === 0
+                || $this->result->hasErrors()
+            ) {
+                $currentSubstepDefinition = $substepDefinition;
+                break;
             }
 
             $substepDefinition = $substepDefinition->hasNextSubstep()
@@ -258,40 +248,69 @@ class FormValidatorExecutor
         }
 
         if (null !== $currentSubstepDefinition
-            && false === $this->result->hasErrors()
+            && $this->dataObject->getValidatedStep() === $stepService->getCurrentStep()
         ) {
-            $substepDefinition = $currentSubstepDefinition;
+            if ($this->result->hasErrors()) {
+                $stepService->setCurrentSubstepDefinition($currentSubstepDefinition);
+            } else {
+                list($nextSubstep, $substepsLevelIncrease) = $this->getNextSubstep($currentSubstepDefinition);
 
-            while ($substepDefinition) {
-                if (false === $substepDefinition->hasNextSubstep()) {
+                if ($nextSubstep) {
+                    $stepService->setCurrentSubstepDefinition($nextSubstep);
+                    $stepService->setSubstepsLevel($stepService->getSubstepsLevel() + $substepsLevelIncrease);
+
+                    list($nextSubstep) = $this->getNextSubstep($nextSubstep);
+
+                    if (null === $nextSubstep) {
+                        $stepService->markLastSubstepAsValidated();
+                    }
+                } else {
                     $stepService->markLastSubstepAsValidated();
+                }
+            }
+        }
+    }
+
+    protected function getNextSubstep(SubstepDefinition $substepDefinition)
+    {
+        $substepsLevelIncrease = 0;
+        $nextSubstep = null;
+
+        while ($substepDefinition) {
+            if (false === $substepDefinition->hasNextSubstep()) {
+                break;
+            } else {
+                $substepDefinition = $substepDefinition->getNextSubstep();
+                $substepsLevelIncrease++;
+
+                if (false === $substepDefinition->hasActivation()) {
+                    $nextSubstep = $substepDefinition;
                     break;
                 } else {
-                    $substepDefinition = $substepDefinition->getNextSubstep();
-                    $nextSubstep = null;
+                    $phpResult = $this->getSubstepDefinitionActivationResult($substepDefinition);
 
-                    if (false === $substepDefinition->hasActivation()) {
+                    if (true === $phpResult) {
                         $nextSubstep = $substepDefinition;
-                    } else {
-                        $tree = $conditionProcessor->getActivationConditionTreeForSubstep($substepDefinition);
-                        $dataObject = new PhpConditionDataObject($this->formObject->getForm(), $this);
-                        $phpResult = $tree->getPhpResult($dataObject);
-
-                        if (true === $phpResult) {
-                            $nextSubstep = $substepDefinition;
-                        }
-                    }
-
-                    $stepService->addSubstepToPath($substepDefinition->getSubstep());
-
-                    if ($nextSubstep) {
-                        $stepService->setCurrentSubstepDefinition($nextSubstep);
-
                         break;
                     }
                 }
             }
         }
+
+        return [$nextSubstep, $substepsLevelIncrease];
+    }
+
+    /**
+     * @param SubstepDefinition $substepDefinition
+     * @return bool
+     */
+    protected function getSubstepDefinitionActivationResult(SubstepDefinition $substepDefinition)
+    {
+        $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->formObject);
+        $tree = $conditionProcessor->getActivationConditionTreeForSubstep($substepDefinition);
+        $dataObject = new PhpConditionDataObject($this->formObject->getForm(), $this);
+
+        return $tree->getPhpResult($dataObject);
     }
 
     /**
