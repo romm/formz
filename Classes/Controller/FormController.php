@@ -17,6 +17,7 @@ use Exception;
 use Romm\Formz\Controller\Processor\ControllerProcessor;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Exception\ForwardException;
 use Romm\Formz\Middleware\Request\Exception\RedirectException;
@@ -77,6 +78,7 @@ class FormController extends ActionController
                 if ($exception instanceof RedirectException) {
                     $this->redirectFromException($exception);
                 } elseif (false === $exception instanceof ForwardException) {
+                    $this->resetSubstepsLevel();
                     $this->forwardToReferrer();
                 }
             } else {
@@ -106,6 +108,17 @@ class FormController extends ActionController
             $middlewareProcessor = Core::instantiate(MiddlewareProcessor::class, $formObject, $this->processor);
 
             $middlewareProcessor->run();
+        }
+    }
+
+    /**
+     * @todo
+     */
+    protected function resetSubstepsLevel()
+    {
+        foreach ($this->processor->getRequestForms() as $formObject) {
+            $stepService = FormObjectFactory::get()->getStepService($formObject);
+            $stepService->setSubstepsLevel(1);
         }
     }
 
