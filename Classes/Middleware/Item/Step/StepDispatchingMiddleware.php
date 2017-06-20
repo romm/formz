@@ -53,7 +53,7 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
         if (false === $formObject->getDefinition()->hasSteps()) {
             return;
         }
-        
+
         $formResult = $formObject->getFormResult();
 
         if ($formObject->formWasSubmitted()
@@ -65,49 +65,7 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
                 return;
             }
 
-            /*
-             * The form was submitted, and no error was found, we can safely
-             * dispatch the request to the next step.
-             */
-            $currentStep = $this->getCurrentStep();
-            $currentStepDefinition = $this->service->getStepDefinition($currentStep);
-
-            // Saving submitted form data for further usage.
-            $this->service->markStepAsValidated($currentStepDefinition, $this->getFormRawValues());
-            $this->service->addValidatedFields($formResult->getValidatedFields());
-
-            $nextStep = null;
-
-            if ($currentStepDefinition->hasNextStep()) {
-                $nextStep = $this->service->getNextStepDefinition($currentStepDefinition, true);
-            }
-
-            if ($nextStep) {
-                $this->service->moveForwardToStep($nextStep, $this->redirect());
-            }
+            $this->service->redirectToNextStep($this->getCurrentStep(), $this->redirect());
         }
-    }
-
-    /**
-     * Fetches the raw values sent in the request.
-     *
-     * @return array
-     * @throws InvalidArgumentTypeException
-     */
-    protected function getFormRawValues()
-    {
-        $formName = $this->getFormObject()->getName();
-        $formArray = null;
-
-        if ($this->getRequest()->hasArgument($formName)) {
-            /** @var array $formArray */
-            $formArray = $this->getRequest()->getArgument($formName);
-        }
-
-        if (false === is_array($formArray)) {
-            throw InvalidArgumentTypeException::formArgumentNotArray($this->getFormObject(), $formArray);
-        }
-
-        return $formArray;
     }
 }

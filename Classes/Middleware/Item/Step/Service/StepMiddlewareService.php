@@ -15,6 +15,7 @@ namespace Romm\Formz\Middleware\Item\Step\Service;
 
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
@@ -26,6 +27,7 @@ use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
 use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 /**
  * This service allows extended form steps manipulation.
@@ -40,6 +42,11 @@ class StepMiddlewareService implements SingletonInterface
     protected $formObject;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * @var StepMiddlewareValidationService
      */
     protected $validationService;
@@ -51,14 +58,64 @@ class StepMiddlewareService implements SingletonInterface
 
     /**
      * @param FormObject $formObject
+     * @param Request $request
      */
-    public function reset(FormObject $formObject)
+    public function reset(FormObject $formObject, Request $request)
     {
         $this->formObject = $formObject;
+        $this->request = $request;
 
         $this->persistence = FormObjectFactory::get()->getStepService($formObject)->getStepPersistence();
 
         $this->validationService = GeneralUtility::makeInstance(StepMiddlewareValidationService::class, $this);
+    }
+
+    public function redirectToNextStep(Step $currentStep, Redirect $redirect)
+    {
+        /*
+         * The form was submitted, and no error was found, we can safely
+         * dispatch the request to the next step.
+         */
+        $currentStepDefinition = $this->getStepDefinition($currentStep);
+
+        // Saving submitted form data for further usage.
+        $this->markStepAsValidated($currentStepDefinition, $this->getFormRawValues());
+        $this->addValidatedFields($this->formObject->getFormResult()->getValidatedFields());
+
+        $nextStep = null;
+
+        if ($currentStepDefinition->hasNextStep()) {
+            $nextStep = $this->getNextStepDefinition($currentStepDefinition, true);
+        }
+
+        if ($nextStep) {
+            $this->moveForwardToStep($nextStep, $redirect);
+        }
+    }
+
+    /**
+     * Fetches the raw values sent in the request.
+     *
+     * @return array
+     * @throws InvalidArgumentTypeException
+     */
+    protected function getFormRawValues()
+    {
+        $formName = $this->getFormObject()->getName();
+        $formArray = null;
+
+        if ($this->request->hasArgument($formName)) {
+            /** @var array $formArray */
+            $formArray = $this->request->getArgument($formName);
+
+            if (false === is_array($formArray)) {
+                throw InvalidArgumentTypeException::formArgumentNotArray($this->getFormObject(), $formArray);
+            }
+        } else {
+            $formArray = [];
+        }
+
+        return $formArray;
     }
 
     /**

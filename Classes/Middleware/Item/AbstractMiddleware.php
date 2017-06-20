@@ -20,7 +20,9 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Exceptions\SignalNotFoundException;
 use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
@@ -121,6 +123,24 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * @todo
+     */
+    protected function redirectToNextStep()
+    {
+        $formObject = $this->getFormObject();
+
+        $formObject->getPersistenceManager()->save();
+
+        if ($formObject->hasForm()
+            && $formObject->isPersistent()
+        ) {
+            $formObject->getFormMetadata()->persist();
+        }
+
+        StepMiddlewareService::get()->redirectToNextStep($this->getCurrentStep(), $this->redirect());
     }
 
     /**

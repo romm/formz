@@ -56,7 +56,7 @@ class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormV
     public function before(Arguments $arguments)
     {
         $formObject = $this->getFormObject();
-        $this->service->reset($formObject);
+        $this->service->reset($formObject, $this->getRequest());
 
         if (false === $formObject->getDefinition()->hasSteps()) {
             return;
