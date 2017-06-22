@@ -63,19 +63,20 @@ class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormV
         }
 
         $currentStep = $this->getCurrentStep();
-        $stepDefinition = $this->service->getStepDefinition($currentStep);
 
-        if ($currentStep
-            && false === $this->service->stepIsValid($stepDefinition)
-        ) {
-            /*
-             * The user has no right to stand on the current step, a previous
-             * valid step is determined, and the user is redirected to it.
-             */
-            $stepToRedirect = $this->service->getFirstInvalidStep($currentStep);
+        if ($currentStep) {
+            $stepDefinition = $this->service->getStepDefinition($currentStep);
 
-            if ($stepToRedirect instanceof StepDefinition) {
-                $this->service->redirectToStep($stepToRedirect->getStep(), $this->redirect());
+            if (false === $this->service->stepIsValid($stepDefinition)) {
+                /*
+                 * The user has no right to stand on the current step, a previous
+                 * valid step is determined, and the user is redirected to it.
+                 */
+                $stepToRedirect = $this->service->getFirstInvalidStep($currentStep);
+
+                if ($stepToRedirect instanceof StepDefinition) {
+                    $this->service->redirectToStep($stepToRedirect->getStep(), $this->redirect());
+                }
             }
         }
     }

@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Middleware\Item\Step;
 
-use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\DefaultMiddleware;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
@@ -59,13 +58,16 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
         if ($formObject->formWasSubmitted()
             && false === $formResult->hasErrors()
         ) {
+            $currentStep = $this->getCurrentStep();
             $stepService = FormObjectFactory::get()->getStepService($formObject);
 
-            if (false === $stepService->lastSubstepWasValidated()) {
+            if ($currentStep->hasSubsteps()
+                && false === $stepService->lastSubstepWasValidated()
+            ) {
                 return;
             }
 
-            $this->service->redirectToNextStep($this->getCurrentStep(), $this->redirect());
+            $this->service->redirectToNextStep($currentStep, $this->redirect());
         }
     }
 }
