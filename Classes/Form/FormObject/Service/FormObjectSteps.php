@@ -46,6 +46,13 @@ class FormObjectSteps
     protected $currentStep;
 
     /**
+     * @todo ADD REQUEST CONTEXT INSIDE THE FORM OBJECT ?!
+     *
+     * @var string
+     */
+    protected $currentHash;
+
+    /**
      * @var SubstepDefinition
      */
     protected $currentSubstepDefinition;
@@ -81,11 +88,13 @@ class FormObjectSteps
      */
     public function fetchCurrentStep(Request $request)
     {
-        if (null !== $this->currentStep) {
+        $this->currentHash = spl_object_hash($request);
+
+        if (null !== $this->currentStep[$this->currentHash]) {
             return;
         }
 
-        $this->currentStep = false;
+        $this->currentStep[$this->currentHash] = false;
 
         $configuration = $this->formObject->getDefinition();
 
@@ -112,11 +121,11 @@ class FormObjectSteps
                     continue;
                 }
 
-                if ($this->currentStep instanceof Step) {
+                if ($this->currentStep[$this->currentHash] instanceof Step) {
                     throw new \Exception('todo'); // @todo
                 }
 
-                $this->currentStep = $step;
+                $this->currentStep[$this->currentHash] = $step;
             }
         }
     }
@@ -126,7 +135,7 @@ class FormObjectSteps
      */
     public function setCurrentStep(Step $step)
     {
-        $this->currentStep = $step;
+        $this->currentStep[$this->currentHash] = $step;
     }
 
     /**
@@ -134,11 +143,11 @@ class FormObjectSteps
      */
     public function getCurrentStep()
     {
-        if (null === $this->currentStep) {
+        if (null === $this->currentStep[$this->currentHash]) {
             throw new \Exception('todo'); // @todo
         }
 
-        return $this->currentStep ?: null;
+        return $this->currentStep[$this->currentHash] ?: null;
     }
 
     /**
