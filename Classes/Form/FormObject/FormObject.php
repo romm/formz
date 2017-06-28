@@ -239,7 +239,7 @@ class FormObject
      */
     public function fetchCurrentStep(Request $request)
     {
-        $this->stepService->fetchCurrentStep($request);
+        $this->stepService->fetchCurrentStep($request->getControllerExtensionName(), $request->getControllerName(), $request->getControllerActionName());
 
         return $this;
     }

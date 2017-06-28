@@ -18,7 +18,6 @@ use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 class FormObjectSteps
 {
@@ -84,11 +83,13 @@ class FormObjectSteps
      *
      * @todo: memoization with request spl object storage
      *
-     * @param Request $request
+     * @param string $extensionName
+     * @param string $controllerName
+     * @param string $actionName
      */
-    public function fetchCurrentStep(Request $request)
+    public function fetchCurrentStep($extensionName, $controllerName, $actionName)
     {
-        $this->currentHash = spl_object_hash($request);
+        $this->currentHash = "$extensionName:$controllerName->$actionName";
 
         if (null !== $this->currentStep[$this->currentHash]) {
             return;
@@ -96,15 +97,15 @@ class FormObjectSteps
 
         $this->currentStep[$this->currentHash] = false;
 
-        $configuration = $this->formObject->getDefinition();
+        $definition = $this->formObject->getDefinition();
 
-        if ($configuration->hasSteps()) {
-            foreach ($configuration->getSteps()->getEntries() as $step) {
+        if ($definition->hasSteps()) {
+            foreach ($definition->getSteps()->getEntries() as $step) {
                 $data = [
                     // @todo: no page uid to fetch?
 //                $step->getPageUid()    => Core::get()->getPageController()->id,
-                    $step->getExtension() => $request->getControllerExtensionName(),
-                    $step->getController() => $request->getControllerName()
+                    $step->getExtension() => $extensionName,
+                    $step->getController() => $controllerName
                 ];
 
                 foreach ($data as $stepData => $requestData) {
@@ -117,7 +118,7 @@ class FormObjectSteps
 
                 $actionList = $step->getAuthorizedActions();
 
-                if (false === in_array($request->getControllerActionName(), $actionList)) {
+                if (false === in_array($actionName, $actionList)) {
                     continue;
                 }
 

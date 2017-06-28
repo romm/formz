@@ -263,11 +263,14 @@ class AjaxValidationController extends ActionController
                 $stepIdentifier = $this->formObject->getRequestData()->getCurrentStepIdentifier();
 
                 if ($definition->getSteps()->hasEntry($stepIdentifier)) {
+                    $step = $definition->getSteps()->getEntry($stepIdentifier);
+
                     $stepService = FormObjectFactory::get()->getStepService($this->formObject);
-                    $stepService->setCurrentStep($definition->getSteps()->getEntry($stepIdentifier));
+                    // @todo : dégueulasse
+                    $stepService->fetchCurrentStep('Formz', 'AjaxValidation', 'run');
+                    $stepService->setCurrentStep($step);
                 }
             }
-
             $controllerProcessor = ControllerProcessor::prepare($this->request, $this->arguments, $this->getContentObjectSettings());
 
             /** @var MiddlewareProcessor $middlewareProcessor */

@@ -16,7 +16,6 @@ namespace Romm\Formz\Middleware\Item\FormInjection;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Middleware\Item\OnBeginMiddleware;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
-use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 
 /**
@@ -30,7 +29,7 @@ use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
  * The goal is to provide a form instance to the controller in every case, so
  * the developer can manipulate it easily, for instance by pre-setting values.
  */
-class FormInjectionMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
+class FormInjectionMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal
 {
     /**
      * @var int
