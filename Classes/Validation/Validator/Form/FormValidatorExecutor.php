@@ -261,12 +261,6 @@ class FormValidatorExecutor
                 if ($nextSubstep) {
                     $stepService->setCurrentSubstepDefinition($nextSubstep);
                     $stepService->setSubstepsLevel($stepService->getSubstepsLevel() + $substepsLevelIncrease);
-
-                    list($nextSubstep) = $this->getNextSubstep($nextSubstep);
-
-                    if (null === $nextSubstep) {
-                        $stepService->markLastSubstepAsValidated();
-                    }
                 } else {
                     $stepService->markLastSubstepAsValidated();
                 }
