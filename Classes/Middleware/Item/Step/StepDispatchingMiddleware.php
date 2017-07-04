@@ -59,15 +59,18 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
             && false === $formResult->hasErrors()
         ) {
             $currentStep = $this->getCurrentStep();
-            $stepService = FormObjectFactory::get()->getStepService($formObject);
 
-            if ($currentStep->hasSubsteps()
-                && false === $stepService->lastSubstepWasValidated()
-            ) {
-                return;
+            if ($currentStep) {
+                $stepService = FormObjectFactory::get()->getStepService($formObject);
+
+                if ($currentStep->hasSubsteps()
+                    && false === $stepService->lastSubstepWasValidated()
+                ) {
+                    return;
+                }
+
+                $this->service->redirectToNextStep($currentStep, $this->redirect());
             }
-
-            $this->service->redirectToNextStep($currentStep, $this->redirect());
         }
     }
 }
