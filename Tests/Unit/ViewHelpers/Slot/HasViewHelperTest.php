@@ -47,10 +47,10 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
             ->with($slotArgument)
             ->willReturn(true);
 
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService($fieldService);
         $viewHelper->setArguments(['slot' => $slotArgument]);
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
@@ -94,10 +94,10 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
             ->with($slotArgument)
             ->willReturn(false);
 
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper->setRenderingContext($this->renderingContext);
-        $viewHelper->injectFieldService($fieldService);
         $viewHelper->setArguments(['slot' => $slotArgument]);
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
@@ -120,7 +120,6 @@ class HasViewHelperTest extends AbstractViewHelperUnitTest
         /** @var HasViewHelper $viewHelper */
         $viewHelper = new $className;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService(new FieldViewHelperService);
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $viewHelper->injectReflectionService(new ReflectionService);
