@@ -55,6 +55,7 @@ class UnitTestContainer extends Container
      */
     public function resetInstances()
     {
+        $this->mockedInstances = [];
         $blankInstance = new static;
         $reflectionClass = new \ReflectionClass(get_parent_class());
 
