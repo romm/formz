@@ -16,6 +16,7 @@ namespace Romm\Formz\Form;
 use Romm\Formz\Domain\Model\DataObject\FormMetadataObject;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -66,6 +67,15 @@ trait FormTrait
     public function getPersistent()
     {
         return $this->getFormObject()->isPersistent();
+    }
+
+    /**
+     * @return SubstepDefinition
+     */
+    public function getCurrentSubstep()
+    {
+        return FormObjectFactory::get()->getStepService($this->getFormObject())->getCurrentSubstepDefinition();
+
     }
 
     /**
