@@ -17,12 +17,14 @@ use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\DefaultMiddleware;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
+use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
+use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 
 /**
  * This middleware should be the last one called, as it is used to dispatch the
  * request to the next step, if there is one.
  */
-class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddlewareInterface
+class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
 {
     /**
      * @var int
@@ -69,8 +71,22 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
                     return;
                 }
 
-                $this->service->redirectToNextStep($currentStep, $this->redirect());
+                $nextStep = $this->service->getNextStep($currentStep);
+
+                if ($nextStep) {
+                    $this->beforeSignal()->dispatch();
+
+                    $this->service->moveForwardToStep($nextStep, $this->redirect());
+                }
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedSignals()
+    {
+        return [StepDispatchingSignal::class];
     }
 }

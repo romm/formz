@@ -70,7 +70,11 @@ class StepMiddlewareService implements SingletonInterface
         $this->validationService = GeneralUtility::makeInstance(StepMiddlewareValidationService::class, $this);
     }
 
-    public function redirectToNextStep(Step $currentStep, Redirect $redirect)
+    /**
+     * @param Step $currentStep
+     * @return StepDefinition|null
+     */
+    public function getNextStep(Step $currentStep)
     {
         /*
          * The form was submitted, and no error was found, we can safely
@@ -88,9 +92,7 @@ class StepMiddlewareService implements SingletonInterface
             $nextStep = $this->getNextStepDefinition($currentStepDefinition, true);
         }
 
-        if ($nextStep) {
-            $this->moveForwardToStep($nextStep, $redirect);
-        }
+        return $nextStep;
     }
 
     /**
