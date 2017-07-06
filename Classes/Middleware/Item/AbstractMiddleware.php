@@ -25,7 +25,6 @@ use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
-use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
 use Romm\Formz\Middleware\Request\Forward;
 use Romm\Formz\Middleware\Request\Redirect;
 use Romm\Formz\Middleware\Signal\After;
@@ -175,17 +174,6 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     final protected function redirect()
     {
         return new Redirect($this->getRequest());
-    }
-
-    /**
-     * Will stop the propagation of middlewares: the next middlewares wont be
-     * processed.
-     *
-     * Use with caution!
-     */
-    final protected function stopPropagation()
-    {
-        throw new StopPropagationException;
     }
 
     /**
