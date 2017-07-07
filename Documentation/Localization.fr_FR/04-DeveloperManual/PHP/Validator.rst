@@ -22,8 +22,6 @@ Les validateurs de FormZ vous donnent accès aux variables/fonctions suivantes :
 - :ref:`$supportsAllMessages <validator-supportsAllMessages>`
 - :ref:`$javaScriptValidationFiles <validator-javaScriptValidationFiles>`
 - :ref:`addError($key, $code, array $arguments) <validator-addError>`
-- :ref:`setValidationData($validationData) <validator-setValidationData>`
-- :ref:`setValidationDataValue($key, $value) <validator-setValidationDataValue>`
 
 -----
 
@@ -138,43 +136,6 @@ Ajouter un erreur
         - ``$arguments`` : les éventuels arguments qui seront remplacés dans le texte du message.
     Description
         Vous devrez utiliser cette fonction pour rajouter une erreur si la valeur ne passe pas la validation.
-
-.. _validator-setValidationData:
-
-Enregistrer un tableau d'information
-------------------------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->setValidationData(array $validationData);
-    Retour
-        /
-    Paramètres
-        - ``$validationData`` : tableau de données arbitraires à enregistrer.
-    Description
-        Lorsqu'un validateur est utilisé sur un champ de formulaire, vous pouvez vouloir mettre de côté quelques informations arbitraires pour une utilisation future. Il s'agit d'un simple tableau pouvant contenir n'importe quelle information. Ce tableau sera injecté dans l'instance du formulaire (``$this->form``) à la fin du processus du validateur.
-
-.. _validator-setValidationDataValue:
-
-Enregistrer une valeur dans le tableau d'information
-----------------------------------------------------
-
-.. container:: table-row
-
-    Fonction
-        .. code-block:: php
-
-            $this->setValidationDataValue($key, $value);
-    Retour
-        /
-    Paramètres
-        - ``$key`` : clé de la valeur arbitraire à enregistrer.
-        - ``$value`` : valeur arbitraire à enregistrer.
-    Description
-        Pareil qu'au dessus, mais pour une simple entrée dans le tableau.
 
 .. _validator-javaScriptValidationFiles:
 

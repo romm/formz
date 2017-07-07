@@ -73,14 +73,6 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     protected $messages = [];
 
     /**
-     * Array of arbitral data which can be added by child classes, and will
-     * then be added to the `$validationData` property of the form instance.
-     *
-     * @var array
-     */
-    protected $validationData = [];
-
-    /**
      * @var ValidatorDataObject
      */
     protected $dataObject;
@@ -144,38 +136,6 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     {
         $message = $this->addMessage(Notice::class, $key, $code, $arguments, $title);
         $this->result->addNotice($message);
-    }
-
-    /**
-     * Get the full validation data.
-     *
-     * @return array
-     */
-    public function getValidationData()
-    {
-        return $this->validationData;
-    }
-
-    /**
-     * Refreshes entirely the validation data (see `setValidationDataValue()`).
-     *
-     * @param array $validationData
-     */
-    protected function setValidationData(array $validationData)
-    {
-        $this->validationData = array_merge($this->validationData, $validationData);
-    }
-
-    /**
-     * Adds an arbitral value to the validator, which will be added to the
-     * `$validationData` property of the form.
-     *
-     * @param string $key   Key of the data.
-     * @param mixed  $value Value bound to the key.
-     */
-    protected function setValidationDataValue($key, $value)
-    {
-        $this->validationData[$key] = $value;
     }
 
     /**

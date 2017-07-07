@@ -24,7 +24,6 @@ use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
-use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -58,13 +57,6 @@ class FormValidatorExecutor
      * @var array
      */
     protected $fieldsValidated = [];
-
-    /**
-     * Array of arbitral data which are handled by validators.
-     *
-     * @var array
-     */
-    protected $validationData = [];
 
     /**
      * @var PhpConditionDataObject
@@ -221,18 +213,6 @@ class FormValidatorExecutor
 
         $validatorResult = $validatorInstance->validate($fieldValue);
         $validatorResult = MessageService::get()->sanitizeValidatorResult($validatorResult, $validator->getName());
-
-        if ($validatorInstance instanceof AbstractValidator
-            && false === empty($validationData = $validatorInstance->getValidationData())
-        ) {
-            $this->validationData[$fieldName] = ($this->validationData[$fieldName]) ?: [];
-            $this->validationData[$fieldName] = array_merge(
-                $this->validationData[$fieldName],
-                $validationData
-            );
-
-            $form->setValidationData($this->validationData);
-        }
 
         $this->getResult()->forProperty($fieldName)->merge($validatorResult);
         unset($validatorDataObject);

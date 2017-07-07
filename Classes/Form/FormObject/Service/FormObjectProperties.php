@@ -26,7 +26,7 @@ class FormObjectProperties
     /**
      * @var array
      */
-    private static $ignoredProperties = ['validationData', 'uid', 'pid', '_localizedUid', '_languageUid', '_versionedUid'];
+    private static $ignoredProperties = ['uid', 'pid', '_localizedUid', '_languageUid', '_versionedUid'];
 
     /**
      * @var FormObjectStatic

@@ -22,8 +22,6 @@ The validators of FormZ give you access to the following variables/functions:
 - :ref:`$supportsAllMessages <validator-supportsAllMessages>`
 - :ref:`$javaScriptValidationFiles <validator-javaScriptValidationFiles>`
 - :ref:`addError($key, $code, array $arguments) <validator-addError>`
-- :ref:`setValidationData($validationData) <validator-setValidationData>`
-- :ref:`setValidationDataValue($key, $value) <validator-setValidationDataValue>`
 
 -----
 
@@ -138,43 +136,6 @@ Add an error
         - ``$arguments``: eventual arguments which will be replaced in the text of the message.
     Description
         You must use this function in order to add an error if the value does not pass the validation.
-
-.. _validator-setValidationData:
-
-Save information in an array
-----------------------------
-
-.. container:: table-row
-
-    Function
-        .. code-block:: php
-
-            $this->setValidationData(array $validationData);
-    Return
-        /
-    Parameters
-        - ``$validationData``: arbitrary data array to be saved.
-    Description
-        When a validator is used on a form field, you may want to put some arbitrary information aside for a future usage. It is a plain array which can contain any information. This array will then be injected inside the form instance (``$this->form``) at the end of the validation process.
-
-.. _validator-setValidationDataValue:
-
-Save information value in an array
-----------------------------------
-
-.. container:: table-row
-
-    Function
-        .. code-block:: php
-
-            $this->setValidationDataValue($key, $value);
-    Return
-        /
-    Parameters
-        - ``$key``: key of the arbitrary data to be saved.
-        - ``$value``: arbitrary data to be saved.
-    Description
-        Same as above, but for a simple entry in the array.
 
 .. _validator-javaScriptValidationFiles:
 
