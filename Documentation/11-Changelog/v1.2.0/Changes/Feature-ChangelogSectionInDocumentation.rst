@@ -1,5 +1,7 @@
 .. include:: ../../../Includes.txt
 
+.. _1-2-0-feature-changelogSectionDocumentation:
+
 ===========================================
 Feature: Changelog section in documentation
 ===========================================
