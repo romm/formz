@@ -60,3 +60,4 @@ FormZ • Modern form handler
     08-Example/Index
     09-Contact/Index
     10-Credits/Index
+    11-Changelog/Index
