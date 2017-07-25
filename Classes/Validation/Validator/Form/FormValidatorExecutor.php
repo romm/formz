@@ -231,7 +231,7 @@ class FormValidatorExecutor
         $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validation);
 
         /** @var ValidatorInterface $validator */
-        $validator = GeneralUtility::makeInstance(
+        $validator = Core::instantiate(
             $validation->getClassName(),
             $validation->getOptions(),
             $validatorDataObject

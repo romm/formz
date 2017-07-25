@@ -1,0 +1,4 @@
+.. |release-version| replace:: x.y.z
+.. |release-date|    replace:: YYYY/MM/DD
+
+.. |release-title|   replace:: |release-version| — |release-date|
