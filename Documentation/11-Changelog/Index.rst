@@ -16,9 +16,7 @@ Changelog
     Select the version you want to know more about in the list below:
 
     .. toctree::
-        :maxdepth: 5
-        :titlesonly:
-        :includehidden:
+        :maxdepth: 1
         :glob:
 
         v*/Index

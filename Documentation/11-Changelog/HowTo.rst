@@ -21,11 +21,15 @@ Some rules differ though:
 New release
 -----------
 
-Before a release, every changelog file must be moved into a new folder corresponding to the new version number, in a sub-folder named ``Changes``.
+For a new release, the steps below must be followed:
 
-The new folder and its files should be copied from the folder ``Release``.
+1. The folder ``Release`` should be duplicated to a new folder named after the new version number (prefixed by a ``v``);
 
-The file ``Notes.rst`` should contain general information about the new release.
+2. Every changelog file in ``Development/Changes`` must be moved into the ``Changes`` sub-folder of the newly created folder;
+
+3. The files ``Release.txt`` must be updated with correct information about the new release;
+
+4. The file ``Notes.rst`` should contain general information about the new release.
 
 .. note::
 
@@ -49,6 +53,7 @@ For the release of the version ``1.42.0``:
     |── Release
     |   |── Index.rst
     |   |── Notes.rst
+    |   |── Release.txt
 
 **After:**
 
@@ -59,6 +64,7 @@ For the release of the version ``1.42.0``:
     |── v1.42.0
     |   |── Index.rst
     |   |── Notes.rst
+    |   |── Release.txt
     |   |── Changes
     |       |── Feature-SomeFeature.rst
     |       |── Deprecation-SomeDeprecationChange.rst
