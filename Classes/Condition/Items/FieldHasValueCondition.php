@@ -61,9 +61,9 @@ class FieldHasValueCondition extends AbstractConditionItem
     public function getCssResult()
     {
         if ($this->fieldValue == '') {
-            return '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '="' . $this->fieldValue . '"]';
+            return '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '="' . addslashes($this->fieldValue) . '"]';
         } else {
-            return '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '~="' . $this->fieldValue . '"]';
+            return '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '~="' . addslashes($this->fieldValue) . '"]';
         }
     }
 
