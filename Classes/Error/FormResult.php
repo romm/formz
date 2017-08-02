@@ -32,7 +32,7 @@ class FormResult extends Result
     protected $deactivatedFields = [];
 
     /**
-     * @var Validator[]
+     * @var Validator[][]
      */
     protected $deactivatedFieldsValidators = [];
 
@@ -92,7 +92,7 @@ class FormResult extends Result
     }
 
     /**
-     * @return Validator[]
+     * @return Validator[][]
      */
     public function getDeactivatedValidators()
     {
