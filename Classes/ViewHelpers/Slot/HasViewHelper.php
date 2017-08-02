@@ -28,11 +28,6 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 class HasViewHelper extends AbstractConditionViewHelper implements CompilableInterface
 {
     /**
-     * @var FieldViewHelperService
-     */
-    protected $fieldService;
-
-    /**
      * @inheritdoc
      */
     public function initializeArguments()
@@ -41,37 +36,23 @@ class HasViewHelper extends AbstractConditionViewHelper implements CompilableInt
     }
 
     /**
-     * @inheritdoc
-     *
-     * @throws ContextNotFoundException
-     */
-    protected function callRenderMethod()
-    {
-        if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::slotHasViewHelperFieldContextNotFound();
-        }
-
-        return parent::callRenderMethod();
-    }
-
-    /**
      * @param array $arguments
      * @return bool
+     * @throws ContextNotFoundException
      */
     protected static function evaluateCondition($arguments = null)
     {
+        /** @var FieldViewHelperService $fieldService */
+        $fieldService = Core::instantiate(FieldViewHelperService::class);
+
+        if (false === $fieldService->fieldContextExists()) {
+            throw ContextNotFoundException::slotHasViewHelperFieldContextNotFound();
+        }
+
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
         $slotName = $arguments['slot'];
 
         return $slotService->hasSlot($slotName);
-    }
-
-    /**
-     * @param FieldViewHelperService $service
-     */
-    public function injectFieldService(FieldViewHelperService $service)
-    {
-        $this->fieldService = $service;
     }
 }

@@ -17,6 +17,7 @@ use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
@@ -212,7 +213,7 @@ class FormValidatorExecutor
         $validatorDataObject = new ValidatorDataObject($this->formObject, $validator);
 
         /** @var ValidatorInterface $validatorInstance */
-        $validatorInstance = GeneralUtility::makeInstance(
+        $validatorInstance = Core::instantiate(
             $validator->getClassName(),
             $validator->getOptions(),
             $validatorDataObject

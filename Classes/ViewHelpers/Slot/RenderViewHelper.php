@@ -35,11 +35,6 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
     protected $escapeOutput = false;
 
     /**
-     * @var FieldViewHelperService
-     */
-    protected $fieldService;
-
-    /**
      * @inheritdoc
      */
     public function initializeArguments()
@@ -53,10 +48,6 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::slotRenderViewHelperFieldContextNotFound();
-        }
-
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -67,6 +58,13 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
+        /** @var FieldViewHelperService $fieldService */
+        $fieldService = Core::instantiate(FieldViewHelperService::class);
+
+        if (false === $fieldService->fieldContextExists()) {
+            throw ContextNotFoundException::slotRenderViewHelperFieldContextNotFound();
+        }
+
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
         $slotName = $arguments['slot'];
@@ -82,13 +80,5 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param FieldViewHelperService $service
-     */
-    public function injectFieldService(FieldViewHelperService $service)
-    {
-        $this->fieldService = $service;
     }
 }

@@ -125,7 +125,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
 
         $field->addValidator('foo', RequiredValidator::class);
 
-        $formzValidatorExecutor = new FormValidatorExecutor($formObject, 'foo');
+        $formzValidatorExecutor = new FormValidatorExecutor($formObject);
 
         $this->assertFalse($result->forProperty('foo')->hasErrors());
         $formzValidatorExecutor->validateFields();

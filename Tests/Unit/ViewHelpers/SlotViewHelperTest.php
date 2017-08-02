@@ -29,11 +29,11 @@ class SlotViewHelperTest extends AbstractViewHelperUnitTest
         $slotService->expects($this->once())
             ->method('addSlot');
 
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new SlotViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService($fieldService);
         $viewHelper->initializeArguments();
         $viewHelper->setArguments(['arguments' => []]);
 
@@ -49,7 +49,6 @@ class SlotViewHelperTest extends AbstractViewHelperUnitTest
     {
         $viewHelper = new SlotViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();
 
         $this->setExpectedException(ContextNotFoundException::class);

@@ -60,6 +60,7 @@ class UnitTestContainer extends Container
     {
         InstanceService::get()->reset();
 
+        $this->mockedInstances = [];
         $blankInstance = new static;
         $reflectionClass = new \ReflectionClass(get_parent_class());
 
