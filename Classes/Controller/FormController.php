@@ -71,7 +71,7 @@ class FormController extends ActionController
         } catch (Exception $exception) {
         }
 
-        $this->commitMetadata();
+        $this->persistForms();
 
         if ($exception instanceof Exception) {
             if ($exception instanceof StopPropagationException) {
@@ -138,16 +138,21 @@ class FormController extends ActionController
     }
 
     /**
-     * Loops on every form of this request, and commits the metadata in database
-     * for each one.
+     * Loops on every form of this request, and persists each one.
      */
-    protected function commitMetadata()
+    protected function persistForms()
     {
         foreach ($this->processor->getRequestForms() as $formObject) {
             if ($formObject->hasForm()
-                && $formObject->isPersistent()
+                && ($formObject->isPersistent()
+                    || $formObject->formWasSubmitted()
+                )
             ) {
-                $formObject->getFormMetadata()->persist();
+                $formObject->getPersistenceManager()->save();
+
+                if ($formObject->isPersistent()) {
+                    $formObject->getFormMetadata()->persist();
+                }
             }
         }
     }

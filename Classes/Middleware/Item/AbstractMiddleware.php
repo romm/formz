@@ -130,8 +130,6 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     {
         $formObject = $this->getFormObject();
 
-        $formObject->getPersistenceManager()->save();
-
         if ($formObject->hasForm()
             && $formObject->isPersistent()
         ) {

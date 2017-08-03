@@ -19,7 +19,6 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware;
 use Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware;
-use Romm\Formz\Middleware\Item\Persistence\PersistenceInjectionMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepFetchingMiddleware;
 use Romm\Formz\Middleware\MiddlewareInterface;
@@ -37,11 +36,6 @@ class PresetMiddlewares implements DataPreProcessorInterface
      * @var \Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware
      */
     protected $formValidationMiddleware;
-
-    /**
-     * @var \Romm\Formz\Middleware\Item\Persistence\PersistenceInjectionMiddleware
-     */
-    protected $persistenceInjectionMiddleware;
 
     /**
      * @var \Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware
@@ -100,14 +94,6 @@ class PresetMiddlewares implements DataPreProcessorInterface
     public function getFormValidationMiddleware()
     {
         return $this->formValidationMiddleware;
-    }
-
-    /**
-     * @return PersistenceInjectionMiddleware
-     */
-    public function getPersistenceInjectionMiddleware()
-    {
-        return $this->persistenceInjectionMiddleware;
     }
 
     /**

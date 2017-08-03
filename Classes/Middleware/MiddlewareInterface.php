@@ -19,7 +19,6 @@ interface MiddlewareInterface extends BasicMiddlewareInterface
 {
     const PRIORITY_INJECT_FORM = 1000;
     const PRIORITY_BEHAVIOURS = 100;
-    const PRIORITY_PERSISTENCE_INJECTION = -1000000;
     const PRIORITY_STEP = -1000000;
 
     /**
