@@ -91,7 +91,7 @@ class FormValidatorExecutor
     {
         $this->dataObject = $dataObject;
         $this->formObject = $formObject;
-        $this->result = $this->formObject->getFormResult();
+        $this->result = $this->dataObject->getFormResult();
         $this->conditionProcessor = $this->getConditionProcessor();
         $this->phpConditionDataObject = $this->getPhpConditionDataObject();
     }

@@ -13,10 +13,16 @@
 
 namespace Romm\Formz\Validation\Validator\Form\DataObject;
 
+use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 
 class FormValidatorDataObject
 {
+    /**
+     * @var FormResult
+     */
+    protected $formResult;
+
     /**
      * @var callable[]
      */
@@ -26,6 +32,22 @@ class FormValidatorDataObject
      * @var Step
      */
     protected $validatedStep;
+
+    /**
+     * @param FormResult $formResult
+     */
+    public function __construct(FormResult $formResult)
+    {
+        $this->formResult = $formResult;
+    }
+
+    /**
+     * @return FormResult
+     */
+    public function getFormResult()
+    {
+        return $this->formResult;
+    }
 
     /**
      * @return callable[]

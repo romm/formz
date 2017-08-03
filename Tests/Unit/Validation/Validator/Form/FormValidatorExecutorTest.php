@@ -2,6 +2,7 @@
 
 namespace Romm\Formz\Tests\Unit\Validation\Validator\Form;
 
+use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -21,30 +22,30 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     {
         $formObject = $this->getExtendedFormObject();
         $formObject->setForm(new DefaultForm);
-        $result = $formObject->getFormResult();
+        $formValidatorDataObject = $this->getFormValidatorDataObjectDummy();
 
         $fieldFoo = $formObject->getDefinition()->getField('foo');
         $fieldBar = $formObject->getDefinition()->getField('bar');
 
-        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formzValidatorExecutor */
-        $formzValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
+        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
+        $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['checkFieldActivation'])
-            ->setConstructorArgs([$formObject, new FormValidatorDataObject])
+            ->setConstructorArgs([$formObject, $formValidatorDataObject])
             ->getMock();
 
-        $formzValidatorExecutor->expects($this->exactly(2))
+        $formValidatorExecutor->expects($this->exactly(2))
             ->method('checkFieldActivation')
             ->withConsecutive(
                 [$fieldFoo],
                 [$fieldBar]
             )
-            ->willReturnCallback(function (Field $field) use ($result) {
-                $result->deactivateField($field);
+            ->willReturnCallback(function (Field $field) use ($formValidatorExecutor) {
+                $formValidatorExecutor->getResult()->deactivateField($field);
             });
 
-        $formzValidatorExecutor->checkFieldsActivation();
-        $formzValidatorExecutor->checkFieldsActivation();
-        $formzValidatorExecutor->checkFieldsActivation();
+        $formValidatorExecutor->checkFieldsActivation();
+        $formValidatorExecutor->checkFieldsActivation();
+        $formValidatorExecutor->checkFieldsActivation();
     }
 
     /**
@@ -56,24 +57,25 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     {
         $formObject = $this->getDefaultFormObject();
         $formObject->setForm(new DefaultForm);
-        $result = $formObject->getFormResult();
 
         $field = $formObject->getDefinition()->getField('foo');
         $field->addActivation();
 
-        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formzValidatorExecutor */
-        $formzValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
+        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
+        $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['getFieldActivationProcessResult'])
-            ->setConstructorArgs([$formObject, new FormValidatorDataObject])
+            ->setConstructorArgs([$formObject, $this->getFormValidatorDataObjectDummy()])
             ->getMock();
 
-        $formzValidatorExecutor->expects($this->once())
+        $formValidatorExecutor->expects($this->once())
             ->method('getFieldActivationProcessResult')
             ->with($field)
             ->willReturn(false);
 
+        $result = $formValidatorExecutor->getResult();
+
         $this->assertFalse($result->fieldIsDeactivated($field));
-        $formzValidatorExecutor->checkFieldsActivation();
+        $formValidatorExecutor->checkFieldsActivation();
         $this->assertTrue($result->fieldIsDeactivated($field));
     }
 
@@ -86,25 +88,26 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     {
         $formObject = $this->getDefaultFormObject();
         $formObject->setForm(new DefaultForm);
-        $result = $formObject->getFormResult();
 
         $field = $formObject->getDefinition()->getField('foo');
         $validator = $field->addValidator('foo', RequiredValidator::class);
         $validator->addActivation();
 
-        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formzValidatorExecutor */
-        $formzValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
+        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
+        $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['getValidatorActivationProcessResult'])
-            ->setConstructorArgs([$formObject, new FormValidatorDataObject])
+            ->setConstructorArgs([$formObject, $this->getFormValidatorDataObjectDummy()])
             ->getMock();
 
-        $formzValidatorExecutor->expects($this->once())
+        $formValidatorExecutor->expects($this->once())
             ->method('getValidatorActivationProcessResult')
             ->with($validator)
             ->willReturn(false);
 
+        $result = $formValidatorExecutor->getResult();
+
         $this->assertFalse($result->validatorIsDeactivated($validator));
-        $formzValidatorExecutor->checkFieldsActivation();
+        $formValidatorExecutor->checkFieldsActivation();
         $this->assertTrue($result->validatorIsDeactivated($validator));
     }
 
@@ -124,16 +127,16 @@ class FormValidatorExecutorTest extends AbstractUnitTest
         $form->setFoo('');
         $formObject->setForm($form);
 
-        $result = $formObject->getFormResult();
-
         $field = $formObject->getDefinition()->getField('foo');
 
         $field->addValidator('foo', RequiredValidator::class);
 
-        $formzValidatorExecutor = new FormValidatorExecutor($formObject, new FormValidatorDataObject);
+        $formValidatorExecutor = new FormValidatorExecutor($formObject, $this->getFormValidatorDataObjectDummy());
+
+        $result = $formValidatorExecutor->getResult();
 
         $this->assertFalse($result->forProperty('foo')->hasErrors());
-        $formzValidatorExecutor->validateFields();
+        $formValidatorExecutor->validateFields();
         $this->assertTrue($result->forProperty('foo')->hasErrors());
     }
 
@@ -151,19 +154,27 @@ class FormValidatorExecutorTest extends AbstractUnitTest
         $validator = $field->addValidator('foo', RequiredValidator::class);
         $validator->addActivation();
 
-        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formzValidatorExecutor */
-        $formzValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
+        /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
+        $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['getValidatorActivationProcessResult'])
-            ->setConstructorArgs([$formObject, new FormValidatorDataObject])
+            ->setConstructorArgs([$formObject, $this->getFormValidatorDataObjectDummy()])
             ->getMock();
 
-        $formzValidatorExecutor->expects($this->once())
+        $formValidatorExecutor->expects($this->once())
             ->method('getValidatorActivationProcessResult')
             ->with($validator)
             ->willReturn(false);
 
         $this->assertFalse($result->forProperty('foo')->hasErrors());
-        $formzValidatorExecutor->validateFields();
+        $formValidatorExecutor->validateFields();
         $this->assertFalse($result->forProperty('foo')->hasErrors());
+    }
+
+    /**
+     * @return FormValidatorDataObject
+     */
+    protected function getFormValidatorDataObjectDummy()
+    {
+        return new FormValidatorDataObject(new FormResult);
     }
 }

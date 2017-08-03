@@ -23,6 +23,7 @@ use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Service\FormService;
 use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 
 /**
@@ -121,7 +122,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         $this->form = $form;
         $this->formObject = $this->getFormObject();
         $this->formValidatorExecutor = $this->getFormValidatorExecutor();
-        $this->result = $this->formObject->getFormResult();
+        $this->result = $this->getFormResult();
 
         $this->getDataObject()->addFieldValidationCallback(function (Field $field) {
             $this->afterFieldValidation($field);
@@ -139,7 +140,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     {
         $this->initializeValidator($form);
 
-        if (true !== $this->options['dummy']) {
+        if (false === $this->isDummy()) {
             $proxy = $this->getProxy($form);
             $proxy->markFormAsValidated();
             $proxy->markFormAsSubmitted();
@@ -205,6 +206,30 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         if (method_exists($this, $functionName)) {
             call_user_func([$this, $functionName]);
         }
+    }
+
+    /**
+     * If the form validator is a dummy, a new instance of `FormResult` is
+     * created and returned, preventing
+     *
+     * @return FormResult
+     */
+    protected function getFormResult()
+    {
+        /** @var FormResult $formResult */
+        $formResult = $this->isDummy()
+            ? GeneralUtility::makeInstance(FormResult::class)
+            : $this->formObject->getFormResult();
+
+        return $formResult;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDummy()
+    {
+        return true === $this->options['dummy'];
     }
 
     /**
