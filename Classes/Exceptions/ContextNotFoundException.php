@@ -14,6 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\ViewHelpers\FieldViewHelper;
+use Romm\Formz\ViewHelpers\FormIdentifierHashViewHelper;
 use Romm\Formz\ViewHelpers\FormViewHelper;
 use Romm\Formz\ViewHelpers\OptionViewHelper;
 use Romm\Formz\ViewHelpers\Slot\HasViewHelper;
@@ -25,6 +26,8 @@ class ContextNotFoundException extends FormzException
     const FORM_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "%s".';
 
     const FIELD_CONTEXT_NOT_FOUND = 'The view helper "%s" must be used inside the view helper "%s".';
+
+    const FORM_IDENTIFIER_FORM_CONTEXT_NOT_FOUND = 'The form context was not found for the view helper "%". You must either fill the arguments `form` and `name`, or use this view helper inside "%s"';
 
     /**
      * @code 1465243085
@@ -101,6 +104,22 @@ class ContextNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FIELD_CONTEXT_NOT_FOUND,
             [HasViewHelper::class, FieldViewHelper::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490960228
+     *
+     * @return self
+     */
+    final public static function formIdentifierViewHelperFormContextNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_IDENTIFIER_FORM_CONTEXT_NOT_FOUND,
+            [FormIdentifierHashViewHelper::class, FormViewHelper::class]
         );
 
         return $exception;

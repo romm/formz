@@ -49,6 +49,16 @@ abstract class AbstractFormObjectBuilder implements FormObjectBuilderInterface
 
         $this->process();
 
+//        $middleware = $this->static->getDefinition()->addMiddleware(
+//            'test',
+//            \Romm\FormzExample\Middlewares\TestMiddleware::class,
+//            function (\Romm\FormzExample\Middlewares\Options\TestOptions $options) {
+//                $options->setFoo('pouet');
+//            }
+//        );
+//        debug($middleware);
+//        die('!!');
+
         $formDefinitionObject->refreshValidationResult();
 
         return $this->static;

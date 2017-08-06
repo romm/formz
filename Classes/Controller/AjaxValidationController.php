@@ -14,6 +14,7 @@
 namespace Romm\Formz\Controller;
 
 use Exception;
+use Romm\Formz\Controller\Processor\ControllerProcessor;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Error\AjaxResult;
 use Romm\Formz\Error\FormzMessageInterface;
@@ -26,6 +27,8 @@ use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
+use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
+use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\MessageService;
@@ -156,6 +159,10 @@ class AjaxValidationController extends ActionController
 
         $request = $this->getRequest();
 
+        if (false === $request->hasArgument('formzData')) {
+            throw new \Exception('todo'); // @todo
+        }
+
         if (false === $request->hasArgument('name')) {
             throw MissingArgumentException::ajaxControllerNameArgumentNotSet();
         }
@@ -184,8 +191,9 @@ class AjaxValidationController extends ActionController
      * @param string $className
      * @param string $fieldName
      * @param string $validatorName
+     * @param string $formzData
      */
-    public function runAction($name, $className, $fieldName, $validatorName)
+    public function runAction($name, $className, $fieldName, $validatorName, $formzData)
     {
         $this->formName = $name;
         $this->formClassName = $className;
@@ -194,6 +202,12 @@ class AjaxValidationController extends ActionController
         $this->form = $this->getForm();
 
         $this->formObject = $this->getFormObject();
+
+        if ($formzData) {
+            $this->formObject->getRequestData()->fillFromHash($formzData);
+        }
+
+        $this->invokeMiddlewares();
 
         $this->validation = $this->getFieldValidation();
 
@@ -210,6 +224,29 @@ class AjaxValidationController extends ActionController
         $result = $validator->validate($fieldValue);
 
         $this->result->merge($result);
+    }
+
+    /**
+     * Will call all middlewares of the form.
+     *
+     * Note that the "single field validation context" is activated, meaning
+     * some middlewares wont be called.
+     *
+     * @see \Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext
+     */
+    protected function invokeMiddlewares()
+    {
+        try {
+            $controllerProcessor = ControllerProcessor::prepare($this->request, $this->arguments);
+
+            /** @var MiddlewareProcessor $middlewareProcessor */
+            $middlewareProcessor = Core::instantiate(MiddlewareProcessor::class, $this->formObject, $controllerProcessor);
+
+            $middlewareProcessor->activateSingleFieldValidationContext();
+            $middlewareProcessor->run();
+        } catch (StopPropagationException $exception) {
+            // @todo exception if forward/redirect?
+        }
     }
 
     /**

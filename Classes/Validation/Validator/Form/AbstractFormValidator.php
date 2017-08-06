@@ -22,6 +22,8 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Service\FormService;
+use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 
 /**
@@ -70,7 +72,7 @@ use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractV
  *   are still able to add an error to `$this->result` (in a controller you do
  *   not have access to it anymore).
  */
-abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements FormValidatorInterface
+abstract class AbstractFormValidator extends ExtbaseAbstractValidator
 {
     /**
      * @inheritdoc
@@ -101,6 +103,11 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     private $formValidatorExecutor;
 
     /**
+     * @var FormValidatorDataObject
+     */
+    protected $dataObject;
+
+    /**
      * Initializes all class variables.
      *
      * @param FormInterface $form
@@ -115,7 +122,11 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
         $this->form = $form;
         $this->formObject = $this->getFormObject();
         $this->formValidatorExecutor = $this->getFormValidatorExecutor();
-        $this->result = $this->formObject->getFormResult();
+        $this->result = $this->getFormResult();
+
+        $this->getDataObject()->addFieldValidationCallback(function (Field $field) {
+            $this->afterFieldValidation($field);
+        });
     }
 
     /**
@@ -129,7 +140,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     {
         $this->initializeValidator($form);
 
-        if (true !== $this->options['dummy']) {
+        if (false === $this->isDummy()) {
             $proxy = $this->getProxy($form);
             $proxy->markFormAsValidated();
             $proxy->markFormAsSubmitted();
@@ -152,9 +163,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
 
         $this->beforeValidationProcess();
 
-        $this->formValidatorExecutor->validateFields(function (Field $field) {
-            $this->callAfterFieldValidationMethod($field);
-        });
+        $this->formValidatorExecutor->validateFields();
 
         $this->afterValidationProcess();
 
@@ -190,7 +199,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      *
      * @param Field $field
      */
-    private function callAfterFieldValidationMethod(Field $field)
+    protected function afterFieldValidation(Field $field)
     {
         $functionName = lcfirst($field->getName() . 'Validated');
 
@@ -200,12 +209,36 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     }
 
     /**
+     * If the form validator is a dummy, a new instance of `FormResult` is
+     * created and returned, preventing
+     *
+     * @return FormResult
+     */
+    protected function getFormResult()
+    {
+        /** @var FormResult $formResult */
+        $formResult = $this->isDummy()
+            ? GeneralUtility::makeInstance(FormResult::class)
+            : $this->formObject->getFormResult();
+
+        return $formResult;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDummy()
+    {
+        return true === $this->options['dummy'];
+    }
+
+    /**
      * @return FormValidatorExecutor
      */
     protected function getFormValidatorExecutor()
     {
         /** @var FormValidatorExecutor $formValidatorExecutor */
-        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $this->formObject);
+        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $this->formObject, $this->getDataObject());
 
         return $formValidatorExecutor;
     }
@@ -225,5 +258,17 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected function getProxy(FormInterface $form)
     {
         return FormObjectFactory::get()->getProxy($form);
+    }
+
+    /**
+     * @return FormValidatorDataObject
+     */
+    public function getDataObject()
+    {
+        if (null === $this->dataObject) {
+            $this->dataObject = Core::instantiate(FormValidatorDataObject::class);
+        }
+
+        return $this->dataObject;
     }
 }

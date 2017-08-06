@@ -23,6 +23,7 @@ use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
+use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
@@ -70,11 +71,17 @@ class EntryNotFoundException extends FormzException
 
     const SLOT_NOT_FOUND = 'No slot "%s" was found.';
 
+    const ARGUMENT_NOT_FOUND = 'Trying to get an argument that does not exist: "%s". Please use function `has()`.';
+
+    const FORM_REQUEST_DATA_NOT_FOUND = 'The data "%s" was not found. Please use the function `%s::hasData()` before.';
+
     const FORM_CONFIGURATION_NOT_FOUND = 'The configuration for form of class "%s" was not found. Please use the function `%s::hasForm()` before.';
 
     const CONDITION_NOT_FOUND_IN_DEFINITION = 'The condition "%s" was not found in the form definition. Please use the function `%s::hasCondition()` before.';
 
     const CONDITION_DOES_NOT_EXIST = 'The condition "%s" does not exist';
+
+    const MIDDLEWARE_NOT_FOUND = 'The middleware "%s" was not found. Please use the function `%s::hasMiddleware()` before.';
 
     const FORM_OBJECT_INSTANCE_NOT_FOUND = 'The form instance for the object of type "%s" was not found. Please take care of registering it before with "%s::registerFormInstance()".';
 
@@ -510,6 +517,40 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
+     * @code 1490792697
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function argumentNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::ARGUMENT_NOT_FOUND,
+            [$name]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490799273
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function formRequestDataNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_REQUEST_DATA_NOT_FOUND,
+            [$name, FormObjectRequestData::class]
+        );
+
+        return $exception;
+    }
+
+    /**
      * @code 1491997168
      *
      * @return self
@@ -537,6 +578,23 @@ class EntryNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::CONDITION_NOT_FOUND_IN_DEFINITION,
             [$name, Configuration::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1491997309
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function middlewareNotFound($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_NOT_FOUND,
+            [$name, FormDefinition::class]
         );
 
         return $exception;

@@ -12,7 +12,10 @@
 				<source>FormZ TypoScript configuration seems not to be included. Please include the "formz" static TypoScript on this page.</source>
 			</trans-unit>
 			<trans-unit id="form.wrong_configuration.error_message">
-				<source>The configuration for this form contains at least one error:</source>
+				<source>The configuration for the form "%s" (class "%") contains at least one error:</source>
+			</trans-unit>
+			<trans-unit id="form.rendering_error.error_message">
+				<source>The form "%s" (class "%s") couldn't be rendered for the following reasons:</source>
 			</trans-unit>
 
 			<trans-unit id="default_error_message">

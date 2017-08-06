@@ -11,8 +11,10 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Validation\Validator\Form;
+namespace Romm\Formz\Middleware\Item\FieldValidation;
 
-interface FormValidatorInterface
+use Romm\Formz\Middleware\Signal\MiddlewareSignal;
+
+interface FieldValidationSignal extends MiddlewareSignal
 {
 }

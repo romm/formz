@@ -73,7 +73,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     protected $messages = [];
 
     /**
-     * Array of arbitral data which can be added by child classes, and will
+     * Array of arbitrary data which can be added by child classes, and will
      * then be added to the `$validationData` property of the form instance.
      *
      * @var array
@@ -167,7 +167,7 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
     }
 
     /**
-     * Adds an arbitral value to the validator, which will be added to the
+     * Adds an arbitrary value to the validator, which will be added to the
      * `$validationData` property of the form.
      *
      * @param string $key   Key of the data.

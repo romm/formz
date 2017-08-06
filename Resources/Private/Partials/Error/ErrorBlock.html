@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xsd.helmut-hummel.de/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:fz="http://typo3.org/ns/Romm/Formz/ViewHelpers">
+
+<f:section name="ErrorBlock">
+    <fz:asset.errorBlockAsset />
+
+    <f:if condition="{formObject.definitionValidationResult.flattenedErrors}">
+        <p><f:translate key="form.wrong_configuration.error_message" extensionName="formz" arguments="{0: formObject.name, 1: formObject.className}" /></p>
+
+        <ul>
+            <f:for each="{formObject.definitionValidationResult.flattenedErrors}" key="property" as="errors">
+                <li>
+                    {property}
+                    <ul>
+                        <f:for each="{errors}" as="error">
+                            <li>{error}</li>
+                        </f:for>
+                    </ul>
+                </li>
+            </f:for>
+        </ul>
+    </f:if>
+
+    <f:if condition="{renderingResult.errors}">
+        <p><f:translate key="form.rendering_error.error_message" extensionName="formz" arguments="{0: formObject.name, 1: formObject.className}" /></p>
+
+        <ul>
+            <f:for each="{renderingResult.errors}" as="error">
+                <li>{error}</li>
+            </f:for>
+        </ul>
+    </f:if>
+
+</f:section>
+
+</html>

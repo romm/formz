@@ -24,7 +24,7 @@ use Romm\Formz\Service\InstanceService;
 trait SelfInstantiateTrait
 {
     /**
-     * @return self
+     * @return self|object
      */
     public static function get()
     {

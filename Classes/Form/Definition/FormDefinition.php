@@ -26,7 +26,10 @@ use Romm\Formz\Configuration\ConfigurationState;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\Definition\Middleware\PresetMiddlewares;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
+use Romm\Formz\Middleware\MiddlewareFactory;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormDefinition extends AbstractFormDefinitionComponent implements ConfigurationObjectInterface, DataPreProcessorInterface
@@ -50,6 +53,17 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
      * @var \Romm\Formz\Form\Definition\Settings\FormSettings
      */
     protected $settings;
+
+    /**
+     * @var \Romm\Formz\Form\Definition\Middleware\PresetMiddlewares
+     */
+    protected $presetMiddlewares;
+
+    /**
+     * @var \Romm\Formz\Middleware\MiddlewareInterface[]
+     * @mixedTypesResolver \Romm\Formz\Form\Definition\Middleware\MiddlewareResolver
+     */
+    protected $middlewares = [];
 
     /**
      * @var ConfigurationState
@@ -221,6 +235,82 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
     }
 
     /**
+     * @return PresetMiddlewares
+     */
+    public function getPresetMiddlewares()
+    {
+        return $this->presetMiddlewares;
+    }
+
+    /**
+     * @return MiddlewareInterface[]
+     */
+    public function getMiddlewares()
+    {
+        return $this->middlewares;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasMiddleware($name)
+    {
+        return isset($this->middlewares[$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return MiddlewareInterface
+     * @throws EntryNotFoundException
+     */
+    public function getMiddleware($name)
+    {
+        if (false === $this->hasMiddleware($name)) {
+            throw EntryNotFoundException::middlewareNotFound($name);
+        }
+
+        return $this->middlewares[$name];
+    }
+
+    /**
+     * @param string $name
+     * @param string $className
+     * @param callable $optionsCallback
+     * @return MiddlewareInterface
+     * @throws DuplicateEntryException
+     */
+    public function addMiddleware($name, $className, callable $optionsCallback = null)
+    {
+        $this->checkDefinitionFreezeState();
+
+        if ($this->hasMiddleware($name)) {
+            throw new DuplicateEntryException('@todo');  // @todo
+        }
+
+        $this->middlewares[$name] = MiddlewareFactory::get()->create($className, $optionsCallback);
+
+        return $this->middlewares[$name];
+    }
+
+    /**
+     * Returns the merged list of preset middlewares and custom registered
+     * middlewares.
+     *
+     * @return MiddlewareInterface[]
+     */
+    public function getAllMiddlewares()
+    {
+        $middlewaresList = $this->middlewares;
+
+        foreach ($this->presetMiddlewares->getList() as $name => $middleware) {
+            $middlewaresList['__preset-' . $name] = $middleware;
+        }
+
+        return $middlewaresList;
+    }
+
+    /**
      * @return ConfigurationState
      */
     public function getState()
@@ -234,6 +324,10 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
     public static function dataPreProcessor(DataPreProcessor $processor)
     {
         $data = $processor->getData();
+
+        if (false === isset($data['presetMiddlewares'])) {
+            $data['presetMiddlewares'] = [];
+        }
 
         /*
          * Forcing the names of the fields: they are the keys of the array

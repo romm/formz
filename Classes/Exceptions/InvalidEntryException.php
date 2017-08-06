@@ -13,9 +13,14 @@
 
 namespace Romm\Formz\Exceptions;
 
+use Romm\Formz\Middleware\Item\AbstractMiddleware;
+use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+
 class InvalidEntryException extends FormzException
 {
     const INVALID_CSS_CLASS_NAMESPACE = 'The class "%s" is not valid: the namespace of the error must be one of the following: %s.';
+
+    const MIDDLEWARE_NOT_SENDING_SIGNALS = 'The middleware "%s" does not implement interface "%s", therefore it can not dispatch signals.';
 
     /**
      * @code 1467623504
@@ -30,6 +35,23 @@ class InvalidEntryException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::INVALID_CSS_CLASS_NAMESPACE,
             [$className, implode(', ', $acceptedClassesNameSpace)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490798324
+     *
+     * @param AbstractMiddleware $middleware
+     * @return InvalidEntryException
+     */
+    final public static function middlewareNotSendingSignals(AbstractMiddleware $middleware)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_NOT_SENDING_SIGNALS,
+            [get_class($middleware), SendsMiddlewareSignal::class]
         );
 
         return $exception;

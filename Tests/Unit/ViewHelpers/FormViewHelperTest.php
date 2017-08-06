@@ -215,6 +215,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
     {
         $defaultClass = 'default-class';
         $formObject = $this->getDefaultFormObject();
+        $formObject->setForm(new DefaultForm);
 
         $viewHelper = $this->getFormViewHelperMock(
             [

@@ -14,7 +14,9 @@
 namespace Romm\Formz\Form\FormObject\Service;
 
 use Romm\Formz\Configuration\ConfigurationFactory;
+use Romm\Formz\Core\Container;
 use Romm\Formz\Core\Core;
+use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Form\FormObject\FormObjectStatic;
 use Romm\Formz\Validation\Validator\Internal\FormDefinitionValidator;
@@ -95,10 +97,32 @@ class FormObjectConfiguration
     }
 
     /**
+     * Middlewares of the form are stored in cache, so their dependencies must
+     * be injected again when they are fetched from cache.
+     */
+    protected function injectDependenciesInConfiguration()
+    {
+        /** @var FormDefinition $formDefinition */
+        $formDefinition = $this->definition->getObject(true);
+
+        foreach ($formDefinition->getAllMiddlewares() as $middleware) {
+            Container::get()->injectDependenciesInInstance($middleware);
+        }
+    }
+
+    /**
      * @return Result
      */
     protected function getGlobalConfigurationValidationResult()
     {
         return ConfigurationFactory::get()->getRootConfiguration()->getValidationResult();
+    }
+
+    /**
+     * Some operations must be done when this object is unserialized.
+     */
+    public function __wakeup()
+    {
+        $this->injectDependenciesInConfiguration();
     }
 }

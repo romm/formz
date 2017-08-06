@@ -54,7 +54,7 @@ class MessageService implements SingletonInterface
     /**
      * This function will go through all errors, warnings and notices and check
      * if they are instances of `FormzMessageInterface`. If not, they are
-     * converted in order to have more informations that are needed later.
+     * converted in order to have more information that are needed later.
      *
      * @param Result $result
      * @param string $validationName

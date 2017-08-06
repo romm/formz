@@ -32,6 +32,7 @@ use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -128,12 +129,16 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
             $this->formObjectClassName = $this->getFormClassName();
             $this->formObject = $this->getFormObject($this->getFormInstance());
-
             $this->timeTracker->logTime('post-config');
 
             $this->assetHandlerFactory = AssetHandlerFactory::get($this->formObject, $this->controllerContext);
 
+            /** @var Request $request */
+            $request = $this->controllerContext->getRequest();
+
             $this->formService->setFormObject($this->formObject);
+            $this->formService->setRequest($request);
+            $this->formService->injectFormRequestData();
         }
 
         /*
@@ -173,11 +178,9 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 : '';
         }
 
-        $formzValidationResult = $this->formObject->getDefinitionValidationResult();
-
-        $result = ($formzValidationResult->hasErrors())
+        $result = ($this->formObject->getDefinitionValidationResult()->hasErrors())
             // If the form configuration is not valid, we display the errors list.
-            ? $this->getErrorText($formzValidationResult)
+            ? $this->getErrorText()
             // Everything is ok, we render the form.
             : $this->renderForm(func_get_args());
 
@@ -213,7 +216,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         /*
          * If the form was submitted, applying custom behaviours on its fields.
          */
-        $this->formService->applyBehavioursOnSubmittedForm($this->controllerContext);
+        $this->formService->applyBehavioursOnSubmittedForm();
 
         /*
          * Adding the default class configured in TypoScript configuration to
@@ -238,6 +241,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
          * Getting the result of the original Fluid `FormViewHelper` rendering.
          */
         $result = $this->getParentRenderResult($arguments);
+        $renderingResult = $this->formService->getResult();
+
+        if ($renderingResult->hasErrors()) {
+            $result = $this->getErrorText($renderingResult);
+        }
 
         /*
          * Language files need to be included at the end, because they depend on
@@ -246,6 +254,25 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->getAssetHandlerConnectorManager()
             ->getJavaScriptAssetHandlerConnector()
             ->includeLanguageJavaScriptFiles();
+
+        return $result;
+    }
+
+    /**
+     * Adds a hidden field to the form rendering, containing the form request
+     * data as a hashed string (which can be retrieved and used later).
+     *
+     * @return string
+     */
+    protected function renderHiddenReferrerFields()
+    {
+        $result = parent::renderHiddenReferrerFields();
+
+        $requestData = $this->formObject->getRequestData();
+        $requestData->setFormHash($this->formObject->getFormHash());
+        $value = htmlspecialchars($this->hashService->appendHmac(base64_encode(serialize($requestData->toArray()))));
+
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('formzData') . '" value="' . $value . '" />' . LF;
 
         return $result;
     }
@@ -308,20 +335,20 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     /**
      * Will return an error text from a Fluid view.
      *
-     * @param Result $result
+     * @param Result $renderingResult
      * @return string
      */
-    protected function getErrorText(Result $result)
+    protected function getErrorText(Result $renderingResult = null)
     {
         /** @var $view StandaloneView */
         $view = Core::instantiate(StandaloneView::class);
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Private/Templates/Error/ConfigurationErrorBlock.html'));
         $layoutRootPath = StringService::get()->getExtensionRelativePath('Resources/Private/Layouts');
+        $partialRootPath = StringService::get()->getExtensionRelativePath('Resources/Private/Partials');
         $view->setLayoutRootPaths([$layoutRootPath]);
-        $view->assign('result', $result);
-
-        $templatePath = GeneralUtility::getFileAbsFileName('EXT:' . ExtensionService::get()->getExtensionKey() . '/Resources/Public/StyleSheets/Form.ErrorBlock.css');
-        $this->pageRenderer->addCssFile(StringService::get()->getResourceRelativePath($templatePath));
+        $view->setPartialRootPaths([$partialRootPath]);
+        $view->assign('formObject', $this->formObject);
+        $view->assign('renderingResult', $renderingResult);
 
         return $view->render();
     }

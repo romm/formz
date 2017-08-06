@@ -25,6 +25,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -33,9 +34,19 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 class FormValidatorExecutor
 {
     /**
+     * @var FormValidatorDataObject
+     */
+    protected $dataObject;
+
+    /**
      * @var FormObject
      */
     protected $formObject;
+
+    /**
+     * @var FormResult
+     */
+    protected $result;
 
     /**
      * @var ConditionProcessor
@@ -60,7 +71,7 @@ class FormValidatorExecutor
     protected $fieldsValidated = [];
 
     /**
-     * Array of arbitral data which are handled by validators.
+     * Array of arbitrary data which are handled by validators.
      *
      * @var array
      */
@@ -72,11 +83,14 @@ class FormValidatorExecutor
     protected $phpConditionDataObject;
 
     /**
-     * @param FormObject $formObject
+     * @param FormObject              $formObject
+     * @param FormValidatorDataObject $dataObject
      */
-    public function __construct(FormObject $formObject)
+    public function __construct(FormObject $formObject, FormValidatorDataObject $dataObject)
     {
+        $this->dataObject = $dataObject;
         $this->formObject = $formObject;
+        $this->result = $this->dataObject->getFormResult();
         $this->conditionProcessor = $this->getConditionProcessor();
         $this->phpConditionDataObject = $this->getPhpConditionDataObject();
     }
@@ -102,7 +116,7 @@ class FormValidatorExecutor
     public function checkFieldsActivation()
     {
         foreach ($this->formObject->getDefinition()->getFields() as $field) {
-            if (false === $this->getResult()->fieldIsDeactivated($field)) {
+            if (false === $this->result->fieldIsDeactivated($field)) {
                 $this->checkFieldActivation($field);
             }
         }
@@ -127,10 +141,12 @@ class FormValidatorExecutor
         if (true === $field->hasActivation()
             && false === $this->getFieldActivationProcessResult($field)
         ) {
-            $this->getResult()->deactivateField($field);
+            $this->result->deactivateField($field);
         }
 
-        $this->checkFieldValidatorActivation($field);
+        if (false === $this->result->fieldIsDeactivated($field)) {
+            $this->checkFieldValidatorActivation($field);
+        }
 
         $this->markFieldActivationAsChecked($field);
         $this->markFieldActivationCheckEnd($field);
@@ -145,28 +161,35 @@ class FormValidatorExecutor
             if (true === $validator->hasActivation()
                 && false === $this->getValidatorActivationProcessResult($validator)
             ) {
-                $this->getResult()->deactivateValidator($validator);
+                $this->result->deactivateValidator($validator);
             }
         }
     }
 
     /**
-     * @param callable $callback
      * @return FormValidatorExecutor
      */
-    public function validateFields(callable $callback = null)
+    public function validateFields()
     {
         foreach ($this->formObject->getDefinition()->getFields() as $field) {
-            $this->validateField($field);
-
-            if ($callback
-                && $this->fieldWasValidated($field)
-            ) {
-                call_user_func($callback, $field);
-            }
+            $this->launchFieldValidation($field);
         }
 
         return $this;
+    }
+
+    /**
+     * @param Field $field
+     */
+    protected function launchFieldValidation(Field $field)
+    {
+        if (false === $this->fieldWasValidated($field)) {
+            $this->validateField($field);
+
+            if ($this->fieldWasValidated($field)) {
+                $this->callFieldValidationCallback($field);
+            }
+        }
     }
 
     /**
@@ -180,12 +203,12 @@ class FormValidatorExecutor
         if (false === $this->fieldWasValidated($field)) {
             $this->checkFieldActivation($field);
 
-            if (false === $this->getResult()->fieldIsDeactivated($field)) {
+            if (false === $this->result->fieldIsDeactivated($field)) {
                 $this->markFieldAsValidated($field);
 
                 // Looping on the field's validators settings...
                 foreach ($field->getValidators() as $validator) {
-                    if ($this->getResult()->validatorIsDeactivated($validator)) {
+                    if ($this->result->validatorIsDeactivated($validator)) {
                         continue;
                     }
 
@@ -234,10 +257,27 @@ class FormValidatorExecutor
             $form->setValidationData($this->validationData);
         }
 
-        $this->getResult()->forProperty($fieldName)->merge($validatorResult);
+        $this->result->forProperty($fieldName)->merge($validatorResult);
         unset($validatorDataObject);
 
         return $validatorResult;
+    }
+
+    /**
+     * Loops on registered callbacks that should be called after the given field
+     * validation.
+     *
+     * @param Field $field
+     */
+    protected function callFieldValidationCallback(Field $field)
+    {
+        $fieldValidationCallbacks = $this->dataObject->getFieldValidationCallbacks();
+
+        foreach ($fieldValidationCallbacks as $callback) {
+            if (is_callable($callback)) {
+                call_user_func($callback, $field);
+            }
+        }
     }
 
     /**
@@ -245,7 +285,7 @@ class FormValidatorExecutor
      */
     public function getResult()
     {
-        return $this->formObject->getFormResult();
+        return $this->result;
     }
 
     /**

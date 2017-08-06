@@ -18,6 +18,7 @@ use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
 use TYPO3\CMS\Extbase\Error\Result;
 
 /**
@@ -147,6 +148,14 @@ class FormObject
     public function getFormResult()
     {
         return $this->getProxy()->getFormResult();
+    }
+
+    /**
+     * @return FormObjectRequestData
+     */
+    public function getRequestData()
+    {
+        return $this->getProxy()->getRequestData();
     }
 
     /**

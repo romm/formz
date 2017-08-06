@@ -16,8 +16,11 @@ namespace Romm\Formz\Exceptions;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
+use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
 use TYPO3\CMS\Extbase\Error\Message;
 
 class InvalidArgumentTypeException extends FormzException
@@ -37,6 +40,8 @@ class InvalidArgumentTypeException extends FormzException
     const CONDITION_NAME_NOT_STRING = 'The name of the condition must be a correct string (given type: "%s").';
 
     const CONDITION_CLASS_NAME_NOT_VALID = 'The condition class must implement "%s" (given class is "%s").';
+
+    const MIDDLEWARE_WRONG_CLASS_NAME = 'The middleware class must be an instance of "%s", given class is of type "%s".';
 
     /**
      * @code 1477468571
@@ -188,6 +193,23 @@ class InvalidArgumentTypeException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
             [FormInterface::class, $className]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1492613743
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function middlewareWrongClassName($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_WRONG_CLASS_NAME,
+            [MiddlewareInterface::class, $className]
         );
 
         return $exception;

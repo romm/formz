@@ -21,9 +21,9 @@ class PropertyNotAccessibleException extends FormzException
 
     const FORM_INSTANCE_NOT_SET = 'The form instance is not accessible yet. You must use proxy methods after the form instance has been injected in the form object.';
 
-    const ROOT_CONFIGURATION_FROZEN_METHOD = 'Trying to call the method "%s::%s()" when the root configuration has been frozen. If you need to modify the root configuration, you can use the post configuration process signal.';
-
     const FORM_DEFINITION_FROZEN_METHOD = 'Trying to call the method "%s::%s()" when the form definition has been frozen. If you need to modify the form definition, you must do it in the form object builder only.';
+
+    const ROOT_CONFIGURATION_FROZEN_METHOD = 'Trying to call the method "%s::%s()" when the root configuration has been frozen. If you need to modify the root configuration, you can use the post configuration process signal.';
 
     const CONFIGURATION_OBJECT_FROZEN_PROPERTY = 'The property "%s::$%s" cannot be modified this way.';
 

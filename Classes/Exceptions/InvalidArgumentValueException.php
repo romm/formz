@@ -14,12 +14,17 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 
 class InvalidArgumentValueException extends FormzException
 {
     const FIELD_VIEW_HELPER_EMPTY_LAYOUT = 'The layout name cannot be empty, please fill with a value.';
 
+    const SIGNAL_NOT_ALLOWED = 'Trying to dispatch a signal that was not allowed by the middleware "%s". Authorized signals for this middleware are: "%s".';
+
     const FORM_NAME_EMPTY = 'The name of the form (type: "%s") can not be empty.';
+
+    const FORMZ_DATA_FETCHING_ERROR = 'There was an error during the fetching of the form data.';
 
     /**
      * @code 1485786285
@@ -30,6 +35,26 @@ class InvalidArgumentValueException extends FormzException
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_EMPTY_LAYOUT);
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490798201
+     *
+     * @param SendsMiddlewareSignal $middleware
+     * @return InvalidArgumentValueException
+     */
+    final public static function signalNotAllowed(SendsMiddlewareSignal $middleware)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::SIGNAL_NOT_ALLOWED,
+            [
+                get_class($middleware),
+                implode('", "', $middleware->getAllowedSignals())
+            ]
+        );
 
         return $exception;
     }
@@ -47,6 +72,19 @@ class InvalidArgumentValueException extends FormzException
             self::FORM_NAME_EMPTY,
             [get_class($form)]
         );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1502036543
+     *
+     * @return self
+     */
+    final public static function formzDataFetchingError()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(self::FORMZ_DATA_FETCHING_ERROR);
 
         return $exception;
     }

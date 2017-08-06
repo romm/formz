@@ -14,6 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\ViewHelpers\FormIdentifierHashViewHelper;
 use Romm\Formz\ViewHelpers\FormViewHelper;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 
@@ -125,6 +126,50 @@ class InvalidOptionValueException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::WRONG_BACKEND_CACHE_TYPE,
             [AbstractBackend::class, $className]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490959351
+     *
+     * @param mixed $value
+     * @return self
+     */
+    final public static function formIdentifierViewHelperWrongFormValueType($value)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_VALUE_TYPE,
+            [
+                'form',
+                FormIdentifierHashViewHelper::class,
+                FormInterface::class,
+                gettype($value)
+            ]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490959375
+     *
+     * @param object $value
+     * @return self
+     */
+    final public static function formIdentifierViewHelperWrongFormValueObjectType($value)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::WRONG_FORM_VALUE_OBJECT_TYPE,
+            [
+                'form',
+                FormIdentifierHashViewHelper::class,
+                FormInterface::class,
+                get_class($value)
+            ]
         );
 
         return $exception;

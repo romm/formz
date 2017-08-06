@@ -15,6 +15,7 @@ namespace Romm\Formz\Form\FormObject;
 
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
 use Romm\Formz\Service\HashService;
 
 class FormObjectProxy
@@ -48,6 +49,11 @@ class FormObjectProxy
      * @var FormResult
      */
     protected $formResult;
+
+    /**
+     * @var FormObjectRequestData
+     */
+    protected $requestData;
 
     /**
      * @param FormObject    $formObject
@@ -115,6 +121,14 @@ class FormObjectProxy
     }
 
     /**
+     * @return FormObjectRequestData
+     */
+    public function getRequestData()
+    {
+        return $this->requestData;
+    }
+
+    /**
      * @return string
      */
     public function getFormHash()
@@ -132,5 +146,13 @@ class FormObjectProxy
     public function setFormHash($hash)
     {
         $this->formHash = $hash;
+    }
+
+    /**
+     * @param FormObjectRequestData $requestData
+     */
+    public function injectRequestData(FormObjectRequestData $requestData)
+    {
+        $this->requestData = $requestData;
     }
 }

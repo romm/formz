@@ -374,7 +374,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     {
         /** @var AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject $ajaxValidationController */
         $ajaxValidationController = $this->getMockBuilder(AjaxValidationController::class)
-            ->setMethods(['processRequestParent', 'setUpResponseResult', 'getForm', 'getFormObject', 'throwStatus', 'getDebugMessageForException'])
+            ->setMethods(['processRequestParent', 'setUpResponseResult', 'getForm', 'getFormObject', 'throwStatus', 'getDebugMessageForException', 'invokeMiddlewares'])
             ->getMock();
 
         $ajaxValidationController->method('processRequestParent')

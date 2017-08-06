@@ -77,15 +77,13 @@ class CssAssetHandlerConnector
         $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
             $filePath,
             function () {
+                $assetHandlerFactory = $this->assetHandlerConnectorManager->getAssetHandlerFactory();
+
                 /** @var MessageContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
-                $errorContainerDisplayCssAssetHandler = $this->assetHandlerConnectorManager
-                    ->getAssetHandlerFactory()
-                    ->getAssetHandler(MessageContainerDisplayCssAssetHandler::class);
+                $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(MessageContainerDisplayCssAssetHandler::class);
 
                 /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
-                $fieldsActivationCssAssetHandler = $this->assetHandlerConnectorManager
-                    ->getAssetHandlerFactory()
-                    ->getAssetHandler(FieldsActivationCssAssetHandler::class);
+                $fieldsActivationCssAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsActivationCssAssetHandler::class);
 
                 $css = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss() . LF;
                 $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss();

@@ -25,6 +25,8 @@ class ClassNotFoundException extends FormzException
 
     const CONDITION_CLASS_NAME_NOT_FOUND = 'The class name for the condition "%s" was not found (given value: "%s").';
 
+    const MIDDLEWARE_CLASS_NAME_NOT_FOUND = 'The class name "%s" was not found.';
+
     /**
      * @code 1489602455
      *
@@ -125,6 +127,23 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_CLASS_NAME,
+            [$className]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1490180343
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function middlewareClassNameNotFound($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_CLASS_NAME_NOT_FOUND,
             [$className]
         );
 
