@@ -24,10 +24,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * - Access to the last submitted form which validation failed:
  *   `$myFailedForm = FormUtility::getFormWithErrors(MyForm::class);`
- *
- * - Automatic redirect if required argument is missing:
- *
- * @see `onRequiredArgumentIsMissing()`
  */
 class FormService implements SingletonInterface
 {
