@@ -285,7 +285,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
         $this->checkDefinitionFreezeState();
 
         if ($this->hasMiddleware($name)) {
-            throw new DuplicateEntryException('@todo');  // @todo
+            throw DuplicateEntryException::middlewareAlreadyAdded($name);
         }
 
         $this->middlewares[$name] = MiddlewareFactory::get()->create($className, $optionsCallback);
@@ -303,7 +303,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
     {
         $middlewaresList = $this->middlewares;
 
-        foreach ($this->presetMiddlewares->getList() as $name => $middleware) {
+        foreach ($this->getPresetMiddlewares()->getList() as $name => $middleware) {
             $middlewaresList['__preset-' . $name] = $middleware;
         }
 

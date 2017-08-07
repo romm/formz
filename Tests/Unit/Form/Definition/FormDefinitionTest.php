@@ -1,6 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Form\Definition;
 
+use ReflectionClass;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Configuration\Configuration;
@@ -8,7 +9,11 @@ use Romm\Formz\Configuration\ConfigurationState;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\FormDefinition;
+use Romm\Formz\Form\Definition\Middleware\PresetMiddlewares;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
+use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
+use Romm\Formz\Middleware\MiddlewareFactory;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 
@@ -176,6 +181,97 @@ class FormDefinitionTest extends AbstractUnitTest
     }
 
     /**
+     * @test
+     */
+    public function addMiddlewareAddsMiddleware()
+    {
+        $formDefinition = new FormDefinition;
+
+        $this->getMiddlewareFactoryMock()
+            ->expects($this->once())
+            ->method('create')
+            ->willReturn($this->prophesize(MiddlewareInterface::class)->reveal());
+
+        $this->assertFalse($formDefinition->hasMiddleware('foo'));
+        $middleware = $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
+        $this->assertTrue($formDefinition->hasMiddleware('foo'));
+        $this->assertSame($middleware, $formDefinition->getMiddleware('foo'));
+        $this->assertSame(['foo' => $middleware], $formDefinition->getMiddlewares());
+    }
+
+    /**
+     * @test
+     */
+    public function addMiddlewareOnFrozenDefinitionIsChecked()
+    {
+        $this->getMiddlewareFactoryMock();
+
+        $formDefinition = $this->getFormDefinitionWithDefinitionFreezeStateCheck();
+
+        $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
+    }
+
+    /**
+     * @test
+     */
+    public function addExistingMiddlewareThrowsException()
+    {
+        $this->setExpectedException(DuplicateEntryException::class);
+
+        $this->getMiddlewareFactoryMock()
+            ->expects($this->once())
+            ->method('create')
+            ->willReturn($this->prophesize(MiddlewareInterface::class)->reveal());
+
+        $formDefinition = new FormDefinition;
+
+        $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
+        $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
+    }
+
+    /**
+     * @test
+     */
+    public function getUnknownMiddlewareThrowsException()
+    {
+        $this->setExpectedException(EntryNotFoundException::class);
+
+        $formDefinition = new FormDefinition;
+
+        $formDefinition->getMiddleware('nope');
+    }
+
+    /**
+     * Checks that both the preset middlewares and the manually added
+     * middlewares are fetched.
+     *
+     * @test
+     */
+    public function allMiddlewaresAreMerged()
+    {
+        $presetMiddlewareMock = $this->getMockBuilder(FormInjectionMiddleware::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $presetMiddlewaresMock = new PresetMiddlewares;
+        $this->inject($presetMiddlewaresMock, 'formInjectionMiddleware', $presetMiddlewareMock);
+
+        $formDefinition = new FormDefinition;
+        $this->inject($formDefinition, 'presetMiddlewares', $presetMiddlewaresMock);
+
+        $this->getMiddlewareFactoryMock()
+            ->expects($this->once())
+            ->method('create')
+            ->willReturn($this->prophesize(MiddlewareInterface::class)->reveal());
+        $middlewareMock = $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
+
+        $allMiddlewares = $formDefinition->getAllMiddlewares();
+
+        $this->assertContains($presetMiddlewareMock, $allMiddlewares);
+        $this->assertContains($middlewareMock, $allMiddlewares);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function getConditionFactoryMock()
@@ -211,5 +307,20 @@ class FormDefinitionTest extends AbstractUnitTest
             ->method('checkDefinitionFreezeState');
 
         return $formDefinition;
+    }
+
+    /**
+     * @return MiddlewareFactory|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getMiddlewareFactoryMock()
+    {
+        $middlewareFactoryMock = $this->getMockBuilder(MiddlewareFactory::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['create'])
+            ->getMock();
+
+        UnitTestContainer::get()->registerMockedInstance(MiddlewareFactory::class, $middlewareFactoryMock);
+
+        return $middlewareFactoryMock;
     }
 }

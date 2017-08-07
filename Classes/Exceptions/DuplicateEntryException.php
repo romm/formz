@@ -50,6 +50,8 @@ class DuplicateEntryException extends FormzException
 
     const LAYOUT_ITEM_ALREADY_ADDED = 'The item "%s" already exists for the layout "%s". Please use the function `%s::hasItem()` before.';
 
+    const MIDDLEWARE_ALREADY_ADDED = 'The middleware "%s" was already added to the form. Please use the function `%s::hasMiddleware()` before.';
+
     /**
      * @code 1465242575
      *
@@ -250,6 +252,23 @@ class DuplicateEntryException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::LAYOUT_ITEM_ALREADY_ADDED,
             [$name, $layoutGroup->getName(), LayoutGroup::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1502104500
+     *
+     * @param string $name
+     * @return self
+     */
+    final public static function middlewareAlreadyAdded($name)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_ALREADY_ADDED,
+            [$name, FormDefinition::class]
         );
 
         return $exception;
