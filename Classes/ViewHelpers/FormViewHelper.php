@@ -272,7 +272,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $requestData->setFormHash($this->formObject->getFormHash());
         $value = htmlspecialchars($this->hashService->appendHmac(base64_encode(serialize($requestData->toArray()))));
 
-        $result .= '<input type="hidden" name="' . $this->prefixFieldName('formzData') . '" value="' . $value . '" />' . LF;
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('formData') . '" value="' . $value . '" />' . LF;
 
         return $result;
     }

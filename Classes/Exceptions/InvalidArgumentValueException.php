@@ -24,7 +24,7 @@ class InvalidArgumentValueException extends FormzException
 
     const FORM_NAME_EMPTY = 'The name of the form (type: "%s") can not be empty.';
 
-    const FORMZ_DATA_FETCHING_ERROR = 'There was an error during the fetching of the form data.';
+    const FORM_DATA_FETCHING_ERROR = 'There was an error during the fetching of the form data.';
 
     /**
      * @code 1485786285
@@ -81,10 +81,10 @@ class InvalidArgumentValueException extends FormzException
      *
      * @return self
      */
-    final public static function formzDataFetchingError()
+    final public static function formDataFetchingError()
     {
         /** @var self $exception */
-        $exception = self::getNewExceptionInstance(self::FORMZ_DATA_FETCHING_ERROR);
+        $exception = self::getNewExceptionInstance(self::FORM_DATA_FETCHING_ERROR);
 
         return $exception;
     }

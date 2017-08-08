@@ -66,7 +66,7 @@ final class BeginMiddleware implements BasicMiddlewareInterface
         if ($request->getMethod() === 'POST'
             && $this->processor->getRequestArguments()->hasArgument($formName)
         ) {
-            if (false === $request->hasArgument('formzData')) {
+            if (false === $request->hasArgument('formData')) {
                 throw new \Exception('todo'); // @todo
             }
 
@@ -74,8 +74,8 @@ final class BeginMiddleware implements BasicMiddlewareInterface
 
             $formObject->setForm($form);
 
-            $formzData = $request->getArgument('formzData');
-            $formObject->getRequestData()->fillFromHash($formzData);
+            $formData = $request->getArgument('formData');
+            $formObject->getRequestData()->fillFromHash($formData);
 
             $proxy = FormObjectFactory::get()->getProxy($form);
             $proxy->markFormAsSubmitted();

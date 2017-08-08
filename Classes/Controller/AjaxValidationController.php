@@ -159,10 +159,6 @@ class AjaxValidationController extends ActionController
 
         $request = $this->getRequest();
 
-        if (false === $request->hasArgument('formzData')) {
-            throw new \Exception('todo'); // @todo
-        }
-
         if (false === $request->hasArgument('name')) {
             throw MissingArgumentException::ajaxControllerNameArgumentNotSet();
         }
@@ -182,6 +178,10 @@ class AjaxValidationController extends ActionController
         }
 
         $this->arguments->addNewArgument($request->getArgument('name'), $className, true);
+
+        if (false === $request->hasArgument('formData')) {
+            throw MissingArgumentException::ajaxControllerFormDataArgumentNotSet();
+        }
     }
 
     /**
@@ -191,9 +191,9 @@ class AjaxValidationController extends ActionController
      * @param string $className
      * @param string $fieldName
      * @param string $validatorName
-     * @param string $formzData
+     * @param string $formData
      */
-    public function runAction($name, $className, $fieldName, $validatorName, $formzData)
+    public function runAction($name, $className, $fieldName, $validatorName, $formData)
     {
         $this->formName = $name;
         $this->formClassName = $className;
@@ -203,8 +203,8 @@ class AjaxValidationController extends ActionController
 
         $this->formObject = $this->getFormObject();
 
-        if ($formzData) {
-            $this->formObject->getRequestData()->fillFromHash($formzData);
+        if ($formData) {
+            $this->formObject->getRequestData()->fillFromHash($formData);
         }
 
         $this->invokeMiddlewares();

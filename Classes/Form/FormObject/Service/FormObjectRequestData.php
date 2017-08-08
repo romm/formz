@@ -58,19 +58,19 @@ class FormObjectRequestData
             /** @var FormObjectRequestData $requestData */
             $requestData = $this->hashService->validateAndStripHmac($hash);
         } catch (Exception $exception) {
-            $this->throwFormzDataException();
+            $this->throwFormDataException();
         }
 
         $requestData = base64_decode($requestData);
 
         if (false === $requestData) {
-            $this->throwFormzDataException();
+            $this->throwFormDataException();
         }
 
         $requestData = unserialize($requestData);
 
         if (false === $requestData) {
-            $this->throwFormzDataException();
+            $this->throwFormDataException();
         }
 
         foreach ($requestData as $key => $value) {
@@ -194,8 +194,8 @@ class FormObjectRequestData
     /**
      * @throws InvalidArgumentValueException
      */
-    protected function throwFormzDataException()
+    protected function throwFormDataException()
     {
-        throw InvalidArgumentValueException::formzDataFetchingError();
+        throw InvalidArgumentValueException::formDataFetchingError();
     }
 }

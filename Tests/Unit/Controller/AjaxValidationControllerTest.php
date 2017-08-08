@@ -174,7 +174,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
             ->shouldBeCalled()
             ->willReturn(false);
 
-        /** @var Request|ObjectProphecy $request1 */
+        /** @var Request|ObjectProphecy $request2 */
         $request2 = $this->prophesize(Request::class);
         $request2->hasArgument('name')
             ->shouldBeCalled()
@@ -183,7 +183,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
             ->shouldBeCalled()
             ->willReturn(false);
 
-        /** @var Request|ObjectProphecy $request1 */
+        /** @var Request|ObjectProphecy $request3 */
         $request3 = $this->prophesize(Request::class);
         $request3->hasArgument('name')
             ->shouldBeCalled()
@@ -195,7 +195,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
             ->shouldBeCalled()
             ->willReturn('undefined class');
 
-        /** @var Request|ObjectProphecy $request1 */
+        /** @var Request|ObjectProphecy $request4 */
         $request4 = $this->prophesize(Request::class);
         $request4->hasArgument('name')
             ->shouldBeCalled()
@@ -206,6 +206,24 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $request4->getArgument('className')
             ->shouldBeCalled()
             ->willReturn(\stdClass::class);
+
+        /** @var Request|ObjectProphecy $request1 */
+        $request5 = $this->prophesize(Request::class);
+        $request5->hasArgument('name')
+            ->shouldBeCalled()
+            ->willReturn(true);
+        $request5->hasArgument('className')
+            ->shouldBeCalled()
+            ->willReturn(true);
+        $request5->getArgument('className')
+            ->shouldBeCalled()
+            ->willReturn(DefaultForm::class);
+        $request5->getArgument('name')
+            ->shouldBeCalled()
+            ->willReturn('foo');
+        $request5->hasArgument('formData')
+            ->shouldBeCalled()
+            ->willReturn(false);
 
         return [
             [
@@ -227,6 +245,11 @@ class AjaxValidationControllerTest extends AbstractUnitTest
                 'request'       => $request4->reveal(),
                 'exceptionType' => InvalidArgumentTypeException::class,
                 'exceptionCode' => 1490179427
+            ],
+            [
+                'request'       => $request5->reveal(),
+                'exceptionType' => MissingArgumentException::class,
+                'exceptionCode' => 1502192265
             ]
         ];
     }
@@ -246,7 +269,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar', '');
     }
 
     /**
@@ -262,7 +285,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $ajaxValidationController = $this->getAjaxValidationControllerMock();
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction('foo', DefaultForm::class, 'unknown', 'bar');
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'unknown', 'bar', '');
     }
 
     /**
@@ -277,7 +300,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $ajaxValidationController = $this->getAjaxValidationControllerMock();
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar', '');
     }
 
     /**
@@ -296,7 +319,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
 
         $ajaxValidationController->setProtectedRequestMode(false);
-        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
+        $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar', '');
     }
 
     /**
@@ -379,7 +402,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
 
         $ajaxValidationController->method('processRequestParent')
             ->willReturnCallback(function () use ($ajaxValidationController) {
-                $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar');
+                $ajaxValidationController->runAction('foo', DefaultForm::class, 'foo', 'bar', '');
             });
 
         $form = new DefaultForm;

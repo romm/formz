@@ -56,6 +56,22 @@ class MissingArgumentException extends FormzException
     }
 
     /**
+     * @code 1502192265
+     *
+     * @return self
+     */
+    final public static function ajaxControllerFormDataArgumentNotSet()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::ARGUMENT_MISSING,
+            ['formData']
+        );
+
+        return $exception;
+    }
+
+    /**
      * @code 1494850270
      *
      * @param string $conditionName
