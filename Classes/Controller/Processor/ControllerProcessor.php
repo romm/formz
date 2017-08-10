@@ -46,17 +46,12 @@ class ControllerProcessor implements SingletonInterface
     /**
      * @var Request
      */
-    protected $request;
-
-    /**
-     * @var Request
-     */
-    protected $realRequest;
-
-    /**
-     * @var Request
-     */
     protected $originalRequest;
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * @var Arguments
@@ -103,9 +98,8 @@ class ControllerProcessor implements SingletonInterface
         if ($dispatchedRequest !== $this->lastDispatchedRequest) {
             $this->lastDispatchedRequest = $dispatchedRequest;
 
-            $this->realRequest = $request;
+            $this->originalRequest = $request;
             $this->request = clone $request;
-            $this->originalRequest = clone $request;
             $this->requestArguments = $requestArguments;
             $this->settings = $settings;
             $this->formArguments = null;
@@ -129,20 +123,25 @@ class ControllerProcessor implements SingletonInterface
         if (false === $this->dispatched) {
             $this->dispatched = true;
 
-            if (false === empty($this->getRequestForms())) {
-                $this->realRequest->setDispatched(false);
-                $this->realRequest->setControllerVendorName('Romm');
-                $this->realRequest->setControllerName('Form');
-                $this->realRequest->setControllerExtensionName('Formz');
-                $this->realRequest->setControllerActionName('processForm');
-                $this->realRequest->setArguments([
-                    'originalRequest' => $this->originalRequest
-                ]);
+            $this->doDispatch();
+        }
+    }
 
-                $this->checkFormObjectsErrors();
+    /**
+     * Wrapper for unit testing.
+     */
+    protected function doDispatch()
+    {
+        if (false === empty($this->getRequestForms())) {
+            $this->originalRequest->setDispatched(false);
+            $this->originalRequest->setControllerVendorName('Romm');
+            $this->originalRequest->setControllerExtensionName('Formz');
+            $this->originalRequest->setControllerName('Form');
+            $this->originalRequest->setControllerActionName('processForm');
 
-                throw new StopActionException;
-            }
+            $this->checkFormObjectsErrors();
+
+            throw new StopActionException;
         }
     }
 
@@ -155,8 +154,8 @@ class ControllerProcessor implements SingletonInterface
     {
         foreach ($this->getRequestForms() as $formObject) {
             if ($formObject->getDefinitionValidationResult()->hasErrors()) {
-                $this->realRequest->setControllerActionName('formObjectError');
-                $this->realRequest->setArguments(['formObject' => $formObject]);
+                $this->originalRequest->setControllerActionName('formObjectError');
+                $this->originalRequest->setArguments(['formObject' => $formObject]);
 
                 break;
             }
@@ -164,7 +163,7 @@ class ControllerProcessor implements SingletonInterface
     }
 
     /**
-     * Loops on the request arguments, and pick up each one that is a form
+     * Loops on the request arguments, and picks up each one that is a form
      * instance (it implements `FormInterface`).
      *
      * @return FormObject[]
@@ -183,8 +182,8 @@ class ControllerProcessor implements SingletonInterface
                 ) {
                     $formClassName = $argument->getDataType();
                     $formName = $argument->getName();
-
                     $formObject = $this->formObjectFactory->getInstanceWithClassName($formClassName, $formName);
+
                     $this->formArguments[$formName] = $formObject;
                 }
             }
