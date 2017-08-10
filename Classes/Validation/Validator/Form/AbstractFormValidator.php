@@ -249,7 +249,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     protected function getFormObject()
     {
         if (null === $this->formObject) {
-            $form = $this->options['form'];
+            $form = $this->form ?: $this->options['form'];
 
             if (null === $form) {
                 // @todo
