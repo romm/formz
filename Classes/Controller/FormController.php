@@ -24,7 +24,6 @@ use Romm\Formz\Middleware\Request\Exception\RedirectException;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
-use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 /**
  * This is the main form controller, which is called before a controller action
@@ -42,11 +41,6 @@ class FormController extends ActionController
     protected $processor;
 
     /**
-     * @var Request
-     */
-    protected $originalRequest;
-
-    /**
      * Main action used to dispatch the request properly, depending on FormZ
      * configuration.
      *
@@ -57,13 +51,11 @@ class FormController extends ActionController
      * Middlewares will be called for each form argument, and may modify the
      * request, which is then dispatched again with modified data.
      *
-     * @param Request $originalRequest
      * @throws Exception
      */
-    public function processFormAction(Request $originalRequest)
+    public function processFormAction()
     {
         $exception = null;
-        $this->originalRequest = $originalRequest;
 
         try {
             $this->invokeMiddlewares();
@@ -185,11 +177,12 @@ class FormController extends ActionController
      */
     protected function forwardToReferrer()
     {
-        $referringRequest = $this->originalRequest->getReferringRequest();
+        $originalRequest = $this->processor->getRequest();
+        $referringRequest = $originalRequest->getReferringRequest();
 
         if ($referringRequest) {
             $this->request->setDispatched(false);
-            $this->request->setOriginalRequest($this->originalRequest);
+            $this->request->setOriginalRequest($originalRequest);
 
             $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerExtensionName($referringRequest->getControllerExtensionName());
