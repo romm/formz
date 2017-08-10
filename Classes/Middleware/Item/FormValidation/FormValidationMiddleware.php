@@ -59,7 +59,10 @@ class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddle
         if ($formObject->hasForm()
             && $formObject->formWasSubmitted()
         ) {
-            $this->validator = Core::instantiate($this->options->getFormValidatorClassName());
+            $this->validator = Core::instantiate(
+                $this->options->getFormValidatorClassName(),
+                ['form' => $formObject->getForm()]
+            );
 
             $this->injectFieldValidationCallback();
             $this->injectCurrentStep();

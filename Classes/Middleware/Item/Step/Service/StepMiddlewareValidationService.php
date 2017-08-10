@@ -233,7 +233,7 @@ class StepMiddlewareValidationService
         $validator = Core::instantiate(
             $formValidationMiddlewareOptions->getFormValidatorClassName(),
             [
-                'name'  => $this->formObject->getName(),
+                'form'  => $form,
                 'dummy' => true
             ]
         );
