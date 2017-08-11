@@ -219,6 +219,7 @@ class FormValidatorExecutor
         $currentSubstepDefinition = null;
 
         $substepsLevel = $stepService->getSubstepsLevel();
+        $stepService->setSubstepsLevel(1);
         $substepsLevelCounter = 0;
 
         while ($substepDefinition && $substepsLevel > 0) {
