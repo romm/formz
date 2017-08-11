@@ -182,18 +182,20 @@ class FormController extends ActionController
 
         if ($referringRequest) {
             $this->request->setDispatched(false);
-            $this->request->setOriginalRequest($originalRequest);
 
             $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerExtensionName($referringRequest->getControllerExtensionName());
             $this->request->setControllerName($referringRequest->getControllerName());
             $this->request->setControllerActionName($referringRequest->getControllerActionName());
             $this->request->setArguments($this->processor->getRequest()->getArguments());
+            throw new StopActionException;
         } else {
-            // @todo ?
+            /**
+             * @todo ?
+             * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::forwardToReferringRequest()
+             */
         }
 
-        throw new StopActionException;
     }
 
     /**
