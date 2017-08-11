@@ -22,6 +22,7 @@ use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Exception\ForwardException;
 use Romm\Formz\Middleware\Request\Exception\RedirectException;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
+use Throwable;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 
@@ -61,11 +62,12 @@ class FormController extends ActionController
             $this->invokeMiddlewares();
             $this->manageRequestResult();
         } catch (Exception $exception) {
+        } catch (Throwable $exception) {
         }
 
         $this->persistForms();
 
-        if ($exception instanceof Exception) {
+        if ($exception) {
             if ($exception instanceof StopPropagationException) {
                 if ($exception instanceof RedirectException) {
                     $this->redirectFromException($exception);
@@ -73,6 +75,8 @@ class FormController extends ActionController
                     $this->resetSubstepsLevel();
                     $this->forwardToReferrer();
                 }
+            } elseif ($this->processor->hasExceptionCallback()) {
+                call_user_func($this->processor->getExceptionCallback(), $exception);
             } else {
                 throw $exception;
             }

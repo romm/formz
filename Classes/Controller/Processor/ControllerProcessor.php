@@ -71,6 +71,11 @@ class ControllerProcessor implements SingletonInterface
     protected $lastDispatchedRequest;
 
     /**
+     * @var callable
+     */
+    protected $exceptionCallback;
+
+    /**
      * @param MvcRequest $request
      * @param Arguments  $requestArguments
      * @param array      $settings
@@ -214,6 +219,33 @@ class ControllerProcessor implements SingletonInterface
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function setExceptionCallback(callable $callback)
+    {
+        $this->exceptionCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @return callable
+     */
+    public function getExceptionCallback()
+    {
+        return $this->exceptionCallback;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasExceptionCallback()
+    {
+        return null !== $this->exceptionCallback;
     }
 
     /**

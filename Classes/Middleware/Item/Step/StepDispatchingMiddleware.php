@@ -19,6 +19,7 @@ use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This middleware should be the last one called, as it is used to dispatch the
@@ -74,9 +75,16 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
                 $nextStep = $this->service->getNextStep($currentStep);
 
                 if ($nextStep) {
-                    $this->beforeSignal()->dispatch();
+                    /** @var StepDispatchingArguments $arguments */
+                    $arguments = GeneralUtility::makeInstance(StepDispatchingArguments::class);
 
-                    $this->service->moveForwardToStep($nextStep, $this->redirect());
+                    $this->beforeSignal()
+                        ->withArguments($arguments)
+                        ->dispatch();
+
+                    if (false === $arguments->getCancelStepDispatching()) {
+                        $this->service->moveForwardToStep($nextStep, $this->redirect());
+                    }
                 }
             }
         }
