@@ -6,6 +6,7 @@ use Romm\Formz\Validation\Validator\AbstractValidator;
 class DummyValidator extends AbstractValidator
 {
     const MESSAGE_1 = 'message1';
+    const DYNAMIC_MESSAGE = 'dynamic_message';
 
     /**
      * @var array
@@ -25,6 +26,16 @@ class DummyValidator extends AbstractValidator
      * @var callable
      */
     protected $callback;
+
+    /**
+     * Dynamically assigns a message to the list of supported messages.
+     *
+     * @see \Romm\Formz\Tests\Unit\Validation\Validator\AbstractValidatorTest::runValidatorDataProvider #9
+     */
+    public function initializeObject()
+    {
+        $this->supportedMessages[self::DYNAMIC_MESSAGE]['value'] = 'dynamic message';
+    }
 
     /**
      * @param mixed $value

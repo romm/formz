@@ -32,6 +32,8 @@ class AbstractValidatorTest extends AbstractUnitTest
         $validatorDataObject = new ValidatorDataObject($this->getDefaultFormObject(), $validation);
 
         $validator = new DummyValidator([], $validatorDataObject);
+        $validator->initializeObject();
+
         if (is_callable($callback)) {
             $validator->setCallBack($callback);
         }
@@ -204,6 +206,27 @@ class AbstractValidatorTest extends AbstractUnitTest
                     $this->assertEquals('hello world!', $message->getMessage());
                     $this->assertEquals(42, $message->getCode());
                     $this->assertEquals('baz', $message->getTitle());
+                }
+            ],
+            /*
+             * #9
+             *
+             * Messages can be assigned dynamically (outside of the variable
+             * declaration scope). The code below will test that a dynamic
+             * message can be retrieved after the validation process.
+             */
+            [
+                'value'    => 'foo',
+                'messages' => [],
+                'callback' => function (DummyValidator $validator) {
+                    $validator->addNewError(DummyValidator::DYNAMIC_MESSAGE, 42, [], 'foo');
+                },
+                'final'    => function (Result $result) {
+                    $this->assertTrue($result->hasErrors());
+                    $message = $result->getFirstError();
+                    $this->assertEquals('dynamic message', $message->getMessage());
+                    $this->assertEquals(42, $message->getCode());
+                    $this->assertEquals('foo', $message->getTitle());
                 }
             ]
         ];

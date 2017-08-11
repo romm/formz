@@ -20,6 +20,7 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use TYPO3\CMS\Extbase\Error\Result;
 
 abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
 {
@@ -96,11 +97,31 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
 
         $this->dataObject = $dataObject;
         $this->form = $dataObject->getFormObject()->getForm();
+    }
+
+    /**
+     * @param mixed $value
+     * @return Result
+     */
+    public function validate($value)
+    {
+        /*
+         * Messages are initialized just before the validation actually runs,
+         * and not in the constructor.
+         *
+         * This allows more flexibility for the messages initialization; for
+         * instance you can dynamically build the messages list in the method
+         * `initializeObject()` of your validator (and not only in the class
+         * variable declaration), then the messages will be processed just
+         * below.
+         */
         $this->messages = MessageService::get()->filterMessages(
             $this->dataObject->getValidation()->getMessages(),
             $this->supportedMessages,
             (bool)$this->supportsAllMessages
         );
+
+        return parent::validate($value);
     }
 
     /**
