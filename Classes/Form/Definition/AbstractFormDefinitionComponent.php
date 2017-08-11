@@ -20,7 +20,7 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\ConfigurationState;
 use Romm\Formz\Exceptions\PropertyNotAccessibleException;
 
-class AbstractFormDefinitionComponent
+abstract class AbstractFormDefinitionComponent
 {
     use MagicMethodsTrait {
         handlePropertyMagicMethod as handlePropertyMagicMethodInternal;

@@ -51,11 +51,6 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
 {
     /**
-     * @var FieldViewHelperService
-     */
-    protected $fieldService;
-
-    /**
      * @var array
      */
     protected static $options = [];
@@ -74,10 +69,6 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::optionViewHelperFieldContextNotFound();
-        }
-
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -89,14 +80,10 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
         /** @var FieldViewHelperService $service */
         $service = Core::instantiate(FieldViewHelperService::class);
 
-        $service->setFieldOption($arguments['name'], $arguments['value']);
-    }
+        if (false === $service->fieldContextExists()) {
+            throw ContextNotFoundException::optionViewHelperFieldContextNotFound();
+        }
 
-    /**
-     * @param FieldViewHelperService $service
-     */
-    public function injectFieldService(FieldViewHelperService $service)
-    {
-        $this->fieldService = $service;
+        $service->setFieldOption($arguments['name'], $arguments['value']);
     }
 }

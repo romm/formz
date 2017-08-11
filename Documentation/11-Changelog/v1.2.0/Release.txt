@@ -1,0 +1,4 @@
+.. |release-version| replace:: 1.2.0
+.. |release-date|    replace:: 2017/07/25
+
+.. |release-title|   replace:: |release-version| — |release-date|

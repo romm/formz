@@ -50,11 +50,11 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
             ->with($slotName)
             ->willReturn([]);
 
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService($fieldService);
         $viewHelper->setArguments([
             'slot'      => $slotName,
             'arguments' => []
@@ -72,6 +72,9 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function argumentsAreAddedThenRemoved()
     {
+        $fieldService = new FieldViewHelperService;
+        $fieldService->setCurrentField(new Field('foo'));
+
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
             ->setMethods(['addTemplateVariables', 'restoreTemplateVariables'])
@@ -86,6 +89,7 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $slotService->expects($this->once())
             ->method('restoreTemplateVariables');
 
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new RenderViewHelper;
@@ -95,10 +99,6 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
             'arguments' => []
         ]);
         $viewHelper->initializeArguments();
-
-        $fieldService = new FieldViewHelperService;
-        $fieldService->setCurrentField(new Field('foo'));
-        $viewHelper->injectFieldService($fieldService);
 
         $viewHelper->render();
     }
@@ -114,7 +114,6 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
 
         $viewHelper = new RenderViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();
 
         $viewHelper->render();

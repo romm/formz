@@ -1,8 +1,3 @@
-.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
 .. include:: ../Includes.txt
 
 .. _credits:
@@ -21,8 +16,8 @@ I want to thank the whole team which provided a lot of support during the develo
 
 http://www.direct-energie.com/
 
-Logo
-----
+FormZ logo
+----------
 
 A big thanks to `pierre.tl <http://www.pierre.tl/>`_ for the beautiful logo!
 
