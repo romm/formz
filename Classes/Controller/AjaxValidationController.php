@@ -30,7 +30,6 @@ use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\RequestInterface;
@@ -201,7 +200,7 @@ class AjaxValidationController extends ActionController
         $validatorDataObject = new ValidatorDataObject($this->formObject, $this->validation);
 
         /** @var ValidatorInterface $validator */
-        $validator = GeneralUtility::makeInstance(
+        $validator = Core::instantiate(
             $this->validation->getClassName(),
             $this->validation->getOptions(),
             $validatorDataObject
