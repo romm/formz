@@ -20,7 +20,7 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Exceptions\SignalNotFoundException;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Middleware\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareComponentInterface;
 use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Forward;
@@ -39,7 +39,7 @@ use TYPO3\CMS\Extbase\Mvc\Web\Request;
  *
  * Child middleware must implement their own signals.
  */
-abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcessorInterface
+abstract class AbstractMiddleware implements MiddlewareComponentInterface, DataPreProcessorInterface
 {
     /**
      * @var MiddlewareProcessor

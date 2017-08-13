@@ -13,12 +13,12 @@
 
 namespace Romm\Formz\Middleware\Item\End;
 
-use Romm\Formz\Middleware\BasicMiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\Before;
 use Romm\Formz\Middleware\Signal\SignalObject;
 
-final class EndMiddleware implements BasicMiddlewareInterface
+final class EndMiddleware implements MiddlewareInterface
 {
     /**
      * @var MiddlewareProcessor

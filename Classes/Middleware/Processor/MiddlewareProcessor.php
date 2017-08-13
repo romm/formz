@@ -17,7 +17,7 @@ use Romm\Formz\Controller\Processor\ControllerProcessor;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Middleware\Item\Begin\BeginMiddleware;
 use Romm\Formz\Middleware\Item\End\EndMiddleware;
-use Romm\Formz\Middleware\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareComponentInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
@@ -95,7 +95,7 @@ class MiddlewareProcessor
      * Returns the sorted list of middlewares bound to the given signal name.
      *
      * @param string $signalName
-     * @return MiddlewareInterface[]
+     * @return MiddlewareComponentInterface[]
      */
     public function getMiddlewaresBoundToSignal($signalName)
     {
@@ -142,7 +142,7 @@ class MiddlewareProcessor
      * that implement the interface `RemoveFromSingleFieldValidationContext` are
      * removed from the list.
      *
-     * @return MiddlewareInterface[]
+     * @return MiddlewareComponentInterface[]
      */
     protected function getFilteredMiddlewares()
     {
@@ -164,12 +164,12 @@ class MiddlewareProcessor
      * middleware. The middlewares with the highest priority will be placed at
      * the top of the list.
      *
-     * @param MiddlewareInterface[] $list
-     * @return MiddlewareInterface[]
+     * @param MiddlewareComponentInterface[] $list
+     * @return MiddlewareComponentInterface[]
      */
     private function sortMiddlewaresListByPriority(array $list)
     {
-        usort($list, function (MiddlewareInterface $a, MiddlewareInterface $b) {
+        usort($list, function (MiddlewareComponentInterface $a, MiddlewareComponentInterface $b) {
             $priorityA = (int)$a->getPriority();
             $priorityB = (int)$b->getPriority();
 

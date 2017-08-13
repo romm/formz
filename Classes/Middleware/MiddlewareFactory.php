@@ -41,7 +41,7 @@ class MiddlewareFactory implements SingletonInterface
     /**
      * @param string   $className
      * @param callable $optionsCallback
-     * @return MiddlewareInterface
+     * @return MiddlewareComponentInterface
      * @throws ClassNotFoundException
      * @throws InvalidArgumentTypeException
      */
@@ -51,7 +51,7 @@ class MiddlewareFactory implements SingletonInterface
             throw ClassNotFoundException::middlewareClassNameNotFound($className);
         }
 
-        if (false === in_array(MiddlewareInterface::class, class_implements($className))) {
+        if (false === in_array(MiddlewareComponentInterface::class, class_implements($className))) {
             throw InvalidArgumentTypeException::middlewareWrongClassName($className);
         }
 
@@ -62,7 +62,7 @@ class MiddlewareFactory implements SingletonInterface
             call_user_func($optionsCallback, $options);
         }
 
-        /** @var MiddlewareInterface $middleware */
+        /** @var MiddlewareComponentInterface $middleware */
         $middleware = Core::instantiate($className, $options);
 
         return $middleware;

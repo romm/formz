@@ -15,12 +15,12 @@ namespace Romm\Formz\Middleware\Item\Begin;
 
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
-use Romm\Formz\Middleware\BasicMiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
 
-final class BeginMiddleware implements BasicMiddlewareInterface
+final class BeginMiddleware implements MiddlewareInterface
 {
     /**
      * @var MiddlewareProcessor

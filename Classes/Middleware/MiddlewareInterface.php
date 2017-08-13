@@ -13,39 +13,13 @@
 
 namespace Romm\Formz\Middleware;
 
-use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 
-interface MiddlewareInterface extends BasicMiddlewareInterface
+interface MiddlewareInterface
 {
-    const PRIORITY_INJECT_FORM = 1000;
-
     /**
-     * @param AbstractOptionDefinition $options
-     */
-    public function __construct(AbstractOptionDefinition $options);
-
-    /**
+     * @param MiddlewareProcessor $middlewareProcessor
      * @return void
      */
-    public function initialize();
-
-    /**
-     * @return AbstractOptionDefinition
-     */
-    public function getOptions();
-
-    /**
-     * Must return a positive/negative integer priority. Considering two
-     * middlewares, the one with the higher priority will be executed first.
-     *
-     * @return int
-     */
-    public function getPriority();
-
-    /**
-     * Returns the name of the signal on which this middleware is bound.
-     *
-     * @return string
-     */
-    public function getBoundSignalName();
+    public function bindMiddlewareProcessor(MiddlewareProcessor $middlewareProcessor);
 }

@@ -14,6 +14,8 @@
 namespace Romm\Formz\Middleware\Processor;
 
 /**
+ * This interface is implemented by all middlewares in FormZ core.
+ *
  * @internal
  */
 interface PresetMiddlewareInterface

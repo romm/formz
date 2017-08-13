@@ -29,7 +29,7 @@ use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Middleware\PresetMiddlewares;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
 use Romm\Formz\Middleware\MiddlewareFactory;
-use Romm\Formz\Middleware\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareComponentInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormDefinition extends AbstractFormDefinitionComponent implements ConfigurationObjectInterface, DataPreProcessorInterface
@@ -60,7 +60,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
     protected $presetMiddlewares;
 
     /**
-     * @var \Romm\Formz\Middleware\MiddlewareInterface[]
+     * @var \Romm\Formz\Middleware\MiddlewareComponentInterface[]
      * @mixedTypesResolver \Romm\Formz\Form\Definition\Middleware\MiddlewareResolver
      */
     protected $middlewares = [];
@@ -243,7 +243,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
     }
 
     /**
-     * @return MiddlewareInterface[]
+     * @return MiddlewareComponentInterface[]
      */
     public function getMiddlewares()
     {
@@ -261,7 +261,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
 
     /**
      * @param string $name
-     * @return MiddlewareInterface
+     * @return MiddlewareComponentInterface
      * @throws EntryNotFoundException
      */
     public function getMiddleware($name)
@@ -277,7 +277,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
      * @param string $name
      * @param string $className
      * @param callable $optionsCallback
-     * @return MiddlewareInterface
+     * @return MiddlewareComponentInterface
      * @throws DuplicateEntryException
      */
     public function addMiddleware($name, $className, callable $optionsCallback = null)
@@ -297,7 +297,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
      * Returns the merged list of preset middlewares and custom registered
      * middlewares.
      *
-     * @return MiddlewareInterface[]
+     * @return MiddlewareComponentInterface[]
      */
     public function getAllMiddlewares()
     {
