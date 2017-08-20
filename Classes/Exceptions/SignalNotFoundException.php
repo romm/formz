@@ -14,7 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Middleware\Item\AbstractMiddleware;
-use Romm\Formz\Middleware\Signal\MiddlewareSignal;
+use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
 class SignalNotFoundException extends FormzException
 {
@@ -31,7 +31,7 @@ class SignalNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::SIGNAL_NOT_FOUND,
-            [get_class($middleware), MiddlewareSignal::class]
+            [get_class($middleware), MiddlewareSignalInterface::class]
         );
 
         return $exception;

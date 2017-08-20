@@ -16,6 +16,6 @@ namespace Romm\Formz\Middleware\Signal;
 /**
  * Interface that must be extended by signal interfaces.
  */
-interface MiddlewareSignal
+interface MiddlewareSignalInterface
 {
 }

@@ -28,7 +28,7 @@ use Romm\Formz\Middleware\Request\Forward;
 use Romm\Formz\Middleware\Request\Redirect;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\Before;
-use Romm\Formz\Middleware\Signal\MiddlewareSignal;
+use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 use Romm\Formz\Middleware\Signal\SignalObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -216,7 +216,7 @@ abstract class AbstractMiddleware implements MiddlewareComponentInterface, DataP
         $interfaces = class_implements($this);
 
         foreach ($interfaces as $interface) {
-            if (in_array(MiddlewareSignal::class, class_implements($interface))) {
+            if (in_array(MiddlewareSignalInterface::class, class_implements($interface))) {
                 return $interface;
             }
         }

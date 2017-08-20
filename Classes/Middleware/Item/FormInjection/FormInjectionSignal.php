@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Middleware\Item\FormInjection;
 
-use Romm\Formz\Middleware\Signal\MiddlewareSignal;
+use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
-interface FormInjectionSignal extends MiddlewareSignal
+interface FormInjectionSignal extends MiddlewareSignalInterface
 {
 }

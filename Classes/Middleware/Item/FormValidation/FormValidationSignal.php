@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Middleware\Item\FormValidation;
 
-use Romm\Formz\Middleware\Signal\MiddlewareSignal;
+use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
-interface FormValidationSignal extends MiddlewareSignal
+interface FormValidationSignal extends MiddlewareSignalInterface
 {
 }

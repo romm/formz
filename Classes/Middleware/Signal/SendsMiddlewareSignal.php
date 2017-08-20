@@ -14,7 +14,7 @@
 namespace Romm\Formz\Middleware\Signal;
 
 /**
- * This interface should be implemented by middlewares that will send signals,
+ * This interface must be implemented by middlewares that will send signals,
  * on which other middlewares can bind themselves.
  */
 interface SendsMiddlewareSignal

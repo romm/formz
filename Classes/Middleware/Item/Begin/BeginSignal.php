@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Middleware\Item\Begin;
 
-use Romm\Formz\Middleware\Signal\MiddlewareSignal;
+use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
-interface BeginSignal extends MiddlewareSignal
+interface BeginSignal extends MiddlewareSignalInterface
 {
 }

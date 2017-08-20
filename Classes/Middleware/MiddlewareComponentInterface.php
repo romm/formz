@@ -43,17 +43,17 @@ interface MiddlewareComponentInterface extends MiddlewareInterface
     public static function getOptionsClassName();
 
     /**
+     * Returns the name of the signal on which this middleware is bound.
+     *
+     * @return string
+     */
+    public function getBoundSignalName();
+
+    /**
      * Must return a positive/negative integer priority. Considering two
      * middlewares, the one with the higher priority will be executed first.
      *
      * @return int
      */
     public function getPriority();
-
-    /**
-     * Returns the name of the signal on which this middleware is bound.
-     *
-     * @return string
-     */
-    public function getBoundSignalName();
 }

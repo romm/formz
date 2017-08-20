@@ -19,7 +19,7 @@ use Romm\Formz\Middleware\MiddlewareComponentInterface;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\Before;
-use Romm\Formz\Middleware\Signal\MiddlewareSignal;
+use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class MiddlewareIsValidValidator extends AbstractValidator
@@ -64,7 +64,7 @@ class MiddlewareIsValidValidator extends AbstractValidator
 
             $signalsFound = [];
             foreach ($interfaces as $interface) {
-                if (in_array(MiddlewareSignal::class, class_implements($interface))) {
+                if (in_array(MiddlewareSignalInterface::class, class_implements($interface))) {
                     $signalsFound[] = $interface;
                 }
             }
@@ -73,7 +73,7 @@ class MiddlewareIsValidValidator extends AbstractValidator
                 $this->addError(
                     'Class "%s" must implement one interface that extends "%s".',
                     1489074248,
-                    [$middleware, MiddlewareSignal::class]
+                    [$middleware, MiddlewareSignalInterface::class]
                 );
             } elseif (count($signalsFound) > 1) {
                 $this->addError(
@@ -81,7 +81,7 @@ class MiddlewareIsValidValidator extends AbstractValidator
                     1489074852,
                     [
                         $middleware,
-                        MiddlewareSignal::class,
+                        MiddlewareSignalInterface::class,
                         count($signalsFound),
                         implode('", "', $signalsFound)
                     ]
