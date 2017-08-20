@@ -13,16 +13,16 @@
 
 namespace Romm\Formz\Middleware;
 
-use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 
 interface MiddlewareComponentInterface extends MiddlewareInterface
 {
     const PRIORITY_INJECT_FORM = 1000;
 
     /**
-     * @param AbstractOptionDefinition $options
+     * @param OptionDefinitionInterface $options
      */
-    public function __construct(AbstractOptionDefinition $options);
+    public function __construct(OptionDefinitionInterface $options);
 
     /**
      * @return void
@@ -30,9 +30,17 @@ interface MiddlewareComponentInterface extends MiddlewareInterface
     public function initialize();
 
     /**
-     * @return AbstractOptionDefinition
+     * @return OptionDefinitionInterface
      */
     public function getOptions();
+
+    /**
+     * Returns the class name of the options that will be passed to the
+     * middleware constructor.
+     *
+     * @return string
+     */
+    public static function getOptionsClassName();
 
     /**
      * Must return a positive/negative integer priority. Considering two

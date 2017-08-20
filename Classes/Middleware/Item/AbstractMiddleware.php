@@ -21,7 +21,8 @@ use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Exceptions\SignalNotFoundException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Middleware\MiddlewareComponentInterface;
-use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\MiddlewareFactory;
+use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Forward;
 use Romm\Formz\Middleware\Request\Redirect;
@@ -33,6 +34,7 @@ use Romm\Formz\Middleware\Signal\SignalObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
+use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
  * Abstract class that must be extended by middlewares.
@@ -67,9 +69,14 @@ abstract class AbstractMiddleware implements MiddlewareComponentInterface, DataP
     protected $priority = 0;
 
     /**
-     * @param AbstractOptionDefinition $options
+     * @var ReflectionService
      */
-    final public function __construct(AbstractOptionDefinition $options)
+    protected $reflectionService;
+
+    /**
+     * @param OptionDefinitionInterface $options
+     */
+    final public function __construct(OptionDefinitionInterface $options)
     {
         $this->options = $options;
     }
@@ -115,11 +122,19 @@ abstract class AbstractMiddleware implements MiddlewareComponentInterface, DataP
     }
 
     /**
-     * @return AbstractOptionDefinition
+     * @return OptionDefinitionInterface
      */
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getOptionsClassName()
+    {
+        return MiddlewareFactory::get()->getOptionsClassNameFromProperty(self::class);
     }
 
     /**
@@ -226,6 +241,9 @@ abstract class AbstractMiddleware implements MiddlewareComponentInterface, DataP
     }
 
     /**
+     * Returns a signal object, that will be used to dispatch a signal coming
+     * from this middleware.
+     *
      * @param string $signal
      * @param string $type
      * @return SignalObject
@@ -264,5 +282,13 @@ abstract class AbstractMiddleware implements MiddlewareComponentInterface, DataP
     public function __sleep()
     {
         return ['options'];
+    }
+
+    /**
+     * @param ReflectionService $reflectionService
+     */
+    public function injectReflectionService(ReflectionService $reflectionService)
+    {
+        $this->reflectionService = $reflectionService;
     }
 }

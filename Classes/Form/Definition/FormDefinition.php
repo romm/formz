@@ -274,6 +274,10 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
     }
 
     /**
+     * Adds a middleware. The `$optionCallback` parameter may contain a callable
+     * that can be used to customize the options that are sent to the middleware
+     * instance.
+     *
      * @param string $name
      * @param string $className
      * @param callable $optionsCallback

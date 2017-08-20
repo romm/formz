@@ -13,12 +13,6 @@
 
 namespace Romm\Formz\Middleware\Option;
 
-use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
-
-/**
- * Abstract class that must be extended by classes used for middlewares options.
- */
-abstract class AbstractOptionDefinition implements OptionDefinitionInterface
+interface OptionDefinitionInterface
 {
-    use MagicMethodsTrait;
 }

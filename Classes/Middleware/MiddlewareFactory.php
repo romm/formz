@@ -16,7 +16,7 @@ namespace Romm\Formz\Middleware;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -55,7 +55,8 @@ class MiddlewareFactory implements SingletonInterface
             throw InvalidArgumentTypeException::middlewareWrongClassName($className);
         }
 
-        $optionsType = $this->getOptionsType($className);
+        /** @var MiddlewareComponentInterface $className */
+        $optionsType = $className::getOptionsClassName();
         $options = Core::instantiate($optionsType);
 
         if (is_callable($optionsCallback)) {
@@ -69,20 +70,25 @@ class MiddlewareFactory implements SingletonInterface
     }
 
     /**
-     * @param string $className
+     * Returns the option class name for the given middleware, depending on the
+     * `@var` annotation of the `$options` property.
+     *
+     * @param string $middlewareClassName
      * @return string
+     * @throws ClassNotFoundException
+     * @throws InvalidArgumentTypeException
      */
-    protected function getOptionsType($className)
+    public function getOptionsClassNameFromProperty($middlewareClassName)
     {
-        $property = $this->reflectionService->getClassSchema($className)->getProperty('options');
+        $property = $this->reflectionService->getClassSchema($middlewareClassName)->getProperty('options');
         $optionsType = $property['type'];
 
         if (false === class_exists($optionsType)) {
-            throw new \Exception('todo'); // todo exception
+            throw ClassNotFoundException::middlewareOptionsPropertyClassNameNotFound($middlewareClassName, $optionsType);
         }
 
-        if (false === in_array(AbstractOptionDefinition::class, class_parents($optionsType))) {
-            throw new \Exception('todo'); // todo exception
+        if (false === in_array(OptionDefinitionInterface::class, class_implements($optionsType))) {
+            throw InvalidArgumentTypeException::middlewareOptionPropertyWrongClassName($optionsType);
         }
 
         return $optionsType;

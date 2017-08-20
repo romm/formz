@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\Exceptions;
 
+use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
+
 class ClassNotFoundException extends FormzException
 {
     const WRONG_ASSET_HANDLER_CLASS_NAME = 'Trying to get an asset handler with a wrong class name: "%s".';
@@ -26,6 +28,8 @@ class ClassNotFoundException extends FormzException
     const CONDITION_CLASS_NAME_NOT_FOUND = 'The class name for the condition "%s" was not found (given value: "%s").';
 
     const MIDDLEWARE_CLASS_NAME_NOT_FOUND = 'The class name "%s" was not found.';
+
+    const MIDDLEWARE_OPTIONS_PROPERTY_CLASS_NAME_NOT_FOUND = 'The `@var` annotation of the property `%s::$%s` is not correct: it must be filled the name of a class that implements `%s`. Current value of the annotation is `%s`.';
 
     /**
      * @code 1489602455
@@ -145,6 +149,24 @@ class ClassNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_CLASS_NAME_NOT_FOUND,
             [$className]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1502658604
+     *
+     * @param string $middlewareClassName
+     * @param string $propertyType
+     * @return ClassNotFoundException
+     */
+    final public static function middlewareOptionsPropertyClassNameNotFound($middlewareClassName, $propertyType)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_OPTIONS_PROPERTY_CLASS_NAME_NOT_FOUND,
+            [$middlewareClassName, 'options', OptionDefinitionInterface::class, (string)$propertyType]
         );
 
         return $exception;

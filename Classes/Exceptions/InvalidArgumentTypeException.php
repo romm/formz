@@ -17,6 +17,7 @@ use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Middleware\MiddlewareComponentInterface;
+use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
 use TYPO3\CMS\Extbase\Error\Message;
@@ -40,6 +41,8 @@ class InvalidArgumentTypeException extends FormzException
     const CONDITION_CLASS_NAME_NOT_VALID = 'The condition class must implement "%s" (given class is "%s").';
 
     const MIDDLEWARE_WRONG_CLASS_NAME = 'The middleware class must be an instance of "%s", given class is of type "%s".';
+
+    const MIDDLEWARE_OPTION_PROPERTY_WRONG_CLASS_NAME = 'The middleware option class must be an instance of "%s", given class is of type "%s".';
 
     /**
      * @code 1477468571
@@ -208,6 +211,23 @@ class InvalidArgumentTypeException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_WRONG_CLASS_NAME,
             [MiddlewareComponentInterface::class, $className]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1503255611
+     *
+     * @param string $className
+     * @return self
+     */
+    final public static function middlewareOptionPropertyWrongClassName($className)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::MIDDLEWARE_OPTION_PROPERTY_WRONG_CLASS_NAME,
+            [OptionDefinitionInterface::class, $className]
         );
 
         return $exception;
