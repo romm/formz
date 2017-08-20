@@ -17,6 +17,7 @@ use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\Before;
 use Romm\Formz\Middleware\Signal\SignalObject;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class EndMiddleware implements MiddlewareInterface
 {
@@ -31,7 +32,8 @@ final class EndMiddleware implements MiddlewareInterface
      */
     public function execute()
     {
-        $signalObject = new SignalObject($this->processor, EndSignal::class, Before::class);
+        /** @var SignalObject $signalObject */
+        $signalObject = GeneralUtility::makeInstance(SignalObject::class,$this->processor, EndSignal::class, Before::class);
         $signalObject->dispatch();
 
         $this->injectFormInRequest();

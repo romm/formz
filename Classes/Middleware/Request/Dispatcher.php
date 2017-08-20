@@ -16,6 +16,10 @@ namespace Romm\Formz\Middleware\Request;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
 use TYPO3\CMS\Extbase\Mvc\Request;
 
+/**
+ * A dispatcher used to forward or redirect the current request to another
+ * controller.
+ */
 abstract class Dispatcher
 {
     /**
