@@ -48,7 +48,6 @@ abstract class FormActionController extends ActionController
             $extensionName = $this->request->getControllerExtensionName();
             $controllerName = $this->request->getControllerName();
 
-
             $processor->setExceptionCallback(function ($exception) use ($vendorName, $controllerName, $extensionName) {
                 $this->request->setControllerVendorName($vendorName);
                 $this->forward($this->actionForException, $controllerName, $extensionName, ['exception' => $exception]);
