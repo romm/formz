@@ -11,10 +11,10 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\Begin;
+namespace Romm\Formz\Domain\Middleware\FormValidation;
 
 use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
-interface BeginSignal extends MiddlewareSignalInterface
+interface FormValidationSignal extends MiddlewareSignalInterface
 {
 }

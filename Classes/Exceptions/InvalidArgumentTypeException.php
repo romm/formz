@@ -16,7 +16,7 @@ namespace Romm\Formz\Exceptions;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Middleware\MiddlewareComponentInterface;
+use Romm\Formz\Middleware\Element\MiddlewareInterface;
 use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
@@ -210,7 +210,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_WRONG_CLASS_NAME,
-            [MiddlewareComponentInterface::class, $className]
+            [MiddlewareInterface::class, $className]
         );
 
         return $exception;

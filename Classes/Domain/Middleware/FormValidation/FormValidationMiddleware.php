@@ -11,13 +11,13 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\FormValidation;
+namespace Romm\Formz\Domain\Middleware\FormValidation;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Middleware\Item\FieldValidation\FieldValidationArguments;
-use Romm\Formz\Middleware\Item\FieldValidation\FieldValidationSignal;
-use Romm\Formz\Middleware\Item\OnBeginMiddleware;
+use Romm\Formz\Domain\Middleware\FieldValidation\FieldValidationArguments;
+use Romm\Formz\Domain\Middleware\FieldValidation\FieldValidationSignal;
+use Romm\Formz\Middleware\Element\OnBeginMiddleware;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
@@ -38,7 +38,7 @@ use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
 {
     /**
-     * @var \Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddlewareOption
+     * @var \Romm\Formz\Domain\Middleware\FormValidation\FormValidationMiddlewareOption
      */
     protected $options;
 

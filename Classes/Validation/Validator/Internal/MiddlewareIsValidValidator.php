@@ -13,9 +13,9 @@
 
 namespace Romm\Formz\Validation\Validator\Internal;
 
-use Romm\Formz\Middleware\Item\Begin\BeginSignal;
-use Romm\Formz\Middleware\Item\End\EndSignal;
-use Romm\Formz\Middleware\MiddlewareComponentInterface;
+use Romm\Formz\Domain\Middleware\Begin\BeginSignal;
+use Romm\Formz\Domain\Middleware\End\EndSignal;
+use Romm\Formz\Middleware\Element\MiddlewareInterface;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\Before;
@@ -46,11 +46,11 @@ class MiddlewareIsValidValidator extends AbstractValidator
         } else {
             $interfaces = class_implements($middleware);
 
-            if (false === in_array(MiddlewareComponentInterface::class, $interfaces)) {
+            if (false === in_array(MiddlewareInterface::class, $interfaces)) {
                 $this->addError(
                     'Class "%s" must implement "%s".',
                     1489070282,
-                    [$middleware, MiddlewareComponentInterface::class]
+                    [$middleware, MiddlewareInterface::class]
                 );
             }
 

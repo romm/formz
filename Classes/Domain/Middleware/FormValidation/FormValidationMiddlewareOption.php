@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\FormValidation;
+namespace Romm\Formz\Domain\Middleware\FormValidation;
 
 use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;

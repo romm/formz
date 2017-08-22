@@ -11,17 +11,16 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\Begin;
+namespace Romm\Formz\Domain\Middleware\Begin;
 
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
-use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-final class BeginMiddleware implements MiddlewareInterface
+final class BeginMiddleware
 {
     /**
      * @var MiddlewareProcessor

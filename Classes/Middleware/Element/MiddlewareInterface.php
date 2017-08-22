@@ -11,11 +11,12 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware;
+namespace Romm\Formz\Middleware\Element;
 
 use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
+use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 
-interface MiddlewareComponentInterface extends MiddlewareInterface
+interface MiddlewareInterface
 {
     const PRIORITY_INJECT_FORM = 1000;
 
@@ -28,6 +29,12 @@ interface MiddlewareComponentInterface extends MiddlewareInterface
      * @return void
      */
     public function initialize();
+
+    /**
+     * @param MiddlewareProcessor $middlewareProcessor
+     * @return void
+     */
+    public function bindMiddlewareProcessor(MiddlewareProcessor $middlewareProcessor);
 
     /**
      * @return OptionDefinitionInterface

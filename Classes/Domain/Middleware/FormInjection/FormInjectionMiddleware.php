@@ -11,10 +11,10 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\FormInjection;
+namespace Romm\Formz\Domain\Middleware\FormInjection;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\Middleware\Item\OnBeginMiddleware;
+use Romm\Formz\Middleware\Element\OnBeginMiddleware;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;

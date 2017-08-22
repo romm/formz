@@ -16,28 +16,28 @@ namespace Romm\Formz\Form\Definition\Middleware;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
-use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
-use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware;
-use Romm\Formz\Middleware\MiddlewareComponentInterface;
+use Romm\Formz\Domain\Middleware\FormInjection\FormInjectionMiddleware;
+use Romm\Formz\Domain\Middleware\FormValidation\FormValidationMiddleware;
+use Romm\Formz\Middleware\Element\MiddlewareInterface;
 
 class PresetMiddlewares implements DataPreProcessorInterface
 {
     use MagicMethodsTrait;
 
     /**
-     * @var \Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware
+     * @var \Romm\Formz\Domain\Middleware\FormInjection\FormInjectionMiddleware
      */
     protected $formInjectionMiddleware;
 
     /**
-     * @var \Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware
+     * @var \Romm\Formz\Domain\Middleware\FormValidation\FormValidationMiddleware
      */
     protected $formValidationMiddleware;
 
     /**
      * Returns the full list of preset middlewares.
      *
-     * @return MiddlewareComponentInterface[]
+     * @return MiddlewareInterface[]
      */
     public function getList()
     {

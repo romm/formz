@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item;
+namespace Romm\Formz\Middleware\Element;
 
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
@@ -20,7 +20,7 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Exceptions\SignalNotFoundException;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Middleware\MiddlewareComponentInterface;
+use Romm\Formz\Middleware\Element\MiddlewareInterface;
 use Romm\Formz\Middleware\MiddlewareFactory;
 use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
@@ -41,7 +41,7 @@ use TYPO3\CMS\Extbase\Reflection\ReflectionService;
  *
  * Child middleware must implement their own signals.
  */
-abstract class AbstractMiddleware implements MiddlewareComponentInterface, DataPreProcessorInterface
+abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcessorInterface
 {
     /**
      * @var MiddlewareProcessor

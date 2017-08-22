@@ -1,7 +1,6 @@
 <?php
 namespace Romm\Formz\Tests\Unit\Form\Definition;
 
-use ReflectionClass;
 use Romm\Formz\Condition\ConditionFactory;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Configuration\Configuration;
@@ -11,9 +10,9 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\Definition\Middleware\PresetMiddlewares;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
-use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
+use Romm\Formz\Domain\Middleware\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Middleware\MiddlewareFactory;
-use Romm\Formz\Middleware\MiddlewareComponentInterface;
+use Romm\Formz\Middleware\Element\MiddlewareInterface;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 
@@ -190,10 +189,10 @@ class FormDefinitionTest extends AbstractUnitTest
         $this->getMiddlewareFactoryMock()
             ->expects($this->once())
             ->method('create')
-            ->willReturn($this->prophesize(MiddlewareComponentInterface::class)->reveal());
+            ->willReturn($this->prophesize(MiddlewareInterface::class)->reveal());
 
         $this->assertFalse($formDefinition->hasMiddleware('foo'));
-        $middleware = $formDefinition->addMiddleware('foo', MiddlewareComponentInterface::class);
+        $middleware = $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
         $this->assertTrue($formDefinition->hasMiddleware('foo'));
         $this->assertSame($middleware, $formDefinition->getMiddleware('foo'));
         $this->assertSame(['foo' => $middleware], $formDefinition->getMiddlewares());
@@ -208,7 +207,7 @@ class FormDefinitionTest extends AbstractUnitTest
 
         $formDefinition = $this->getFormDefinitionWithDefinitionFreezeStateCheck();
 
-        $formDefinition->addMiddleware('foo', MiddlewareComponentInterface::class);
+        $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
     }
 
     /**
@@ -221,12 +220,12 @@ class FormDefinitionTest extends AbstractUnitTest
         $this->getMiddlewareFactoryMock()
             ->expects($this->once())
             ->method('create')
-            ->willReturn($this->prophesize(MiddlewareComponentInterface::class)->reveal());
+            ->willReturn($this->prophesize(MiddlewareInterface::class)->reveal());
 
         $formDefinition = new FormDefinition;
 
-        $formDefinition->addMiddleware('foo', MiddlewareComponentInterface::class);
-        $formDefinition->addMiddleware('foo', MiddlewareComponentInterface::class);
+        $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
+        $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
     }
 
     /**
@@ -262,8 +261,8 @@ class FormDefinitionTest extends AbstractUnitTest
         $this->getMiddlewareFactoryMock()
             ->expects($this->once())
             ->method('create')
-            ->willReturn($this->prophesize(MiddlewareComponentInterface::class)->reveal());
-        $middlewareMock = $formDefinition->addMiddleware('foo', MiddlewareComponentInterface::class);
+            ->willReturn($this->prophesize(MiddlewareInterface::class)->reveal());
+        $middlewareMock = $formDefinition->addMiddleware('foo', MiddlewareInterface::class);
 
         $allMiddlewares = $formDefinition->getAllMiddlewares();
 

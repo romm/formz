@@ -11,15 +11,14 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\End;
+namespace Romm\Formz\Domain\Middleware\End;
 
-use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\Before;
 use Romm\Formz\Middleware\Signal\SignalObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-final class EndMiddleware implements MiddlewareInterface
+final class EndMiddleware
 {
     /**
      * @var MiddlewareProcessor

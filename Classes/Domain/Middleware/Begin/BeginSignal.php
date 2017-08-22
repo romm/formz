@@ -11,10 +11,10 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\End;
+namespace Romm\Formz\Domain\Middleware\Begin;
 
 use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
-interface EndSignal extends MiddlewareSignalInterface
+interface BeginSignal extends MiddlewareSignalInterface
 {
 }

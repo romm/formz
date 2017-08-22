@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Middleware\Item\AbstractMiddleware;
+use Romm\Formz\Middleware\Element\AbstractMiddleware;
 use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
 class SignalNotFoundException extends FormzException

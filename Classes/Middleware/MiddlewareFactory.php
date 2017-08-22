@@ -16,6 +16,7 @@ namespace Romm\Formz\Middleware;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Middleware\Element\MiddlewareInterface;
 use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
@@ -41,7 +42,7 @@ class MiddlewareFactory implements SingletonInterface
     /**
      * @param string   $className
      * @param callable $optionsCallback
-     * @return MiddlewareComponentInterface
+     * @return MiddlewareInterface
      * @throws ClassNotFoundException
      * @throws InvalidArgumentTypeException
      */
@@ -51,11 +52,11 @@ class MiddlewareFactory implements SingletonInterface
             throw ClassNotFoundException::middlewareClassNameNotFound($className);
         }
 
-        if (false === in_array(MiddlewareComponentInterface::class, class_implements($className))) {
+        if (false === in_array(MiddlewareInterface::class, class_implements($className))) {
             throw InvalidArgumentTypeException::middlewareWrongClassName($className);
         }
 
-        /** @var MiddlewareComponentInterface $className */
+        /** @var MiddlewareInterface $className */
         $optionsType = $className::getOptionsClassName();
         $options = Core::instantiate($optionsType);
 
@@ -63,7 +64,7 @@ class MiddlewareFactory implements SingletonInterface
             call_user_func($optionsCallback, $options);
         }
 
-        /** @var MiddlewareComponentInterface $middleware */
+        /** @var MiddlewareInterface $middleware */
         $middleware = Core::instantiate($className, $options);
 
         return $middleware;

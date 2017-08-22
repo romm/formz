@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Middleware\MiddlewareComponentInterface;
+use Romm\Formz\Middleware\Element\MiddlewareInterface;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 
 class InvalidEntryException extends FormzException
@@ -43,10 +43,10 @@ class InvalidEntryException extends FormzException
     /**
      * @code 1490798324
      *
-     * @param MiddlewareComponentInterface $middleware
+     * @param MiddlewareInterface $middleware
      * @return InvalidEntryException
      */
-    final public static function middlewareNotSendingSignals(MiddlewareComponentInterface $middleware)
+    final public static function middlewareNotSendingSignals(MiddlewareInterface $middleware)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(

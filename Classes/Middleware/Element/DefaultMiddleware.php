@@ -11,23 +11,23 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item;
+namespace Romm\Formz\Middleware\Element;
 
 use Romm\Formz\Middleware\Argument\Arguments;
-use Romm\Formz\Middleware\Item\Begin\BeginSignal;
-use Romm\Formz\Middleware\Signal\After;
+use Romm\Formz\Domain\Middleware\End\EndSignal;
+use Romm\Formz\Middleware\Signal\Before;
 
 /**
- * Middleware abstraction that can be extended by custom middleware.
+ * Default middleware abstraction that can be extended by custom middleware.
  *
- * Note that a middleware extending this class will be called at the beginning
- * of the middleware processing.
+ * Note that a middleware extending this class will be called before the end of
+ * the middleware processing.
  *
- * If you need the middleware to be called later, you can:
- * - @see \Romm\Formz\Middleware\Item\DefaultMiddleware (called at the end)
- * - @see \Romm\Formz\Middleware\Item\AbstractMiddleware
+ * If you need the middleware to be called earlier, you can:
+ * - @see \Romm\Formz\Middleware\Element\OnBeginMiddleware
+ * - @see \Romm\Formz\Middleware\Element\AbstractMiddleware
  */
-abstract class OnBeginMiddleware extends AbstractMiddleware implements After, BeginSignal
+abstract class DefaultMiddleware extends AbstractMiddleware implements Before, EndSignal
 {
     /**
      * @var Arguments
@@ -44,7 +44,7 @@ abstract class OnBeginMiddleware extends AbstractMiddleware implements After, Be
      *
      * @param Arguments $arguments
      */
-    final public function after(Arguments $arguments)
+    final public function before(Arguments $arguments)
     {
         $this->arguments = $arguments;
 

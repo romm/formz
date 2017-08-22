@@ -11,15 +11,10 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware;
+namespace Romm\Formz\Domain\Middleware\FieldValidation;
 
-use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
+use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
 
-interface MiddlewareInterface
+interface FieldValidationSignal extends MiddlewareSignalInterface
 {
-    /**
-     * @param MiddlewareProcessor $middlewareProcessor
-     * @return void
-     */
-    public function bindMiddlewareProcessor(MiddlewareProcessor $middlewareProcessor);
 }
