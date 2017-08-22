@@ -15,7 +15,7 @@ namespace Romm\Formz\Domain\Middleware\End;
 
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\Before;
-use Romm\Formz\Middleware\Signal\SignalObject;
+use Romm\Formz\Middleware\Signal\Element\SignalObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class EndMiddleware

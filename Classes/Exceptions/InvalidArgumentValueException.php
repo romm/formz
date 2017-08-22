@@ -14,7 +14,7 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use Romm\Formz\Middleware\Signal\SendsSignal;
 
 class InvalidArgumentValueException extends FormzException
 {
@@ -42,10 +42,10 @@ class InvalidArgumentValueException extends FormzException
     /**
      * @code 1490798201
      *
-     * @param SendsMiddlewareSignal $middleware
+     * @param SendsSignal $middleware
      * @return InvalidArgumentValueException
      */
-    final public static function signalNotAllowed(SendsMiddlewareSignal $middleware)
+    final public static function signalNotAllowed(SendsSignal $middleware)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(

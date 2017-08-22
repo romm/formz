@@ -12,7 +12,7 @@ use Romm\Formz\Form\Definition\Middleware\PresetMiddlewares;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
 use Romm\Formz\Domain\Middleware\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Middleware\MiddlewareFactory;
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 

@@ -13,8 +13,8 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
-use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use Romm\Formz\Middleware\MiddlewareInterface;
+use Romm\Formz\Middleware\Signal\SendsSignal;
 
 class InvalidEntryException extends FormzException
 {
@@ -51,7 +51,7 @@ class InvalidEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_NOT_SENDING_SIGNALS,
-            [get_class($middleware), SendsMiddlewareSignal::class]
+            [get_class($middleware), SendsSignal::class]
         );
 
         return $exception;

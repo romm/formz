@@ -17,7 +17,7 @@ use Romm\Formz\Controller\Processor\ControllerProcessor;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Domain\Middleware\Begin\BeginMiddleware;
 use Romm\Formz\Domain\Middleware\End\EndMiddleware;
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;

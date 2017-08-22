@@ -15,11 +15,11 @@ namespace Romm\Formz\Validation\Validator\Internal;
 
 use Romm\Formz\Domain\Middleware\Begin\BeginSignal;
 use Romm\Formz\Domain\Middleware\End\EndSignal;
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
-use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
+use Romm\Formz\Middleware\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\Before;
-use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
+use Romm\Formz\Middleware\Signal\Element\MiddlewareSignalInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 class MiddlewareIsValidValidator extends AbstractValidator

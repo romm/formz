@@ -13,11 +13,13 @@
 
 namespace Romm\Formz\Middleware\Signal;
 
+use Romm\Formz\Middleware\Signal\Element\SignalObject;
+
 /**
- * This interface must be implemented by middlewares that will send signals,
- * on which other middlewares can bind themselves.
+ * This interface must be implemented by a middleware if it needs to send
+ * signals to other middlewares.
  */
-interface SendsMiddlewareSignal
+interface SendsSignal
 {
     /**
      * This method should be called before the middleware starts processing.

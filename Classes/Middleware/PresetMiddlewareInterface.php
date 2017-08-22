@@ -11,10 +11,11 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Processor;
+namespace Romm\Formz\Middleware;
 
 /**
- * This interface is implemented by all middlewares in FormZ core.
+ * This interface is implemented by middlewares in FormZ core. Do not use in
+ * your own projects!
  *
  * @internal
  */

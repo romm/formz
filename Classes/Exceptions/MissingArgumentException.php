@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use Romm\Formz\Middleware\Signal\SendsSignal;
 
 class MissingArgumentException extends FormzException
 {
@@ -93,10 +93,10 @@ class MissingArgumentException extends FormzException
     /**
      * @code 1490793826
      *
-     * @param SendsMiddlewareSignal $middleware
+     * @param SendsSignal $middleware
      * @return self
      */
-    final public static function signalNameArgumentMissing(SendsMiddlewareSignal $middleware)
+    final public static function signalNameArgumentMissing(SendsSignal $middleware)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(

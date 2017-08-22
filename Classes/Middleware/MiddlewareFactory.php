@@ -16,7 +16,6 @@ namespace Romm\Formz\Middleware;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
 use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;

@@ -11,10 +11,10 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Signal;
+namespace Romm\Formz\Middleware\Signal\Element;
 
 /**
- * Interface that must be extended by signal interfaces.
+ * Interface that must be extended by middleware signals interfaces.
  */
 interface MiddlewareSignalInterface
 {

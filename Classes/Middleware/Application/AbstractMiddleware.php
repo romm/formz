@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Element;
+namespace Romm\Formz\Middleware\Application;
 
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
@@ -20,7 +20,7 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Exceptions\SignalNotFoundException;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\MiddlewareFactory;
 use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
@@ -28,18 +28,19 @@ use Romm\Formz\Middleware\Request\Forward;
 use Romm\Formz\Middleware\Request\Redirect;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\Before;
-use Romm\Formz\Middleware\Signal\MiddlewareSignalInterface;
-use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
-use Romm\Formz\Middleware\Signal\SignalObject;
+use Romm\Formz\Middleware\Signal\Element\MiddlewareSignalInterface;
+use Romm\Formz\Middleware\Signal\SendsSignal;
+use Romm\Formz\Middleware\Signal\Element\SignalObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
 
 /**
- * Abstract class that must be extended by middlewares.
+ * Default abstraction layout that can be extended by middlewares. It contains
+ * basic implementation needed by a middleware to work properly.
  *
- * Child middleware must implement their own signals.
+ * The middleware class must still implement its own signals.
  */
 abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcessorInterface
 {
@@ -51,6 +52,8 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     /**
      * This is the default option class, this property can be overridden in
      * children classes to be mapped to another option definition.
+     *
+     * Please note that the full class name of the option must be written.
      *
      * @var \Romm\Formz\Middleware\Option\DefaultOptionDefinition
      */
@@ -100,7 +103,7 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     }
 
     /**
-     * @see \Romm\Formz\Middleware\Signal\SendsMiddlewareSignal::beforeSignal()
+     * @see \Romm\Formz\Middleware\Signal\SendsSignal::beforeSignal()
      *
      * @param string $signal
      * @return SignalObject
@@ -111,7 +114,7 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     }
 
     /**
-     * @see \Romm\Formz\Middleware\Signal\SendsMiddlewareSignal::afterSignal()
+     * @see \Romm\Formz\Middleware\Signal\SendsSignal::afterSignal()
      *
      * @param string $signal
      * @return SignalObject
@@ -253,11 +256,11 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
      */
     private function getSignalObject($signal, $type)
     {
-        if (false === $this instanceof SendsMiddlewareSignal) {
+        if (false === $this instanceof SendsSignal) {
             throw InvalidEntryException::middlewareNotSendingSignals($this);
         }
 
-        /** @var SendsMiddlewareSignal $this */
+        /** @var SendsSignal $this */
         if (null === $signal) {
             if (count($this->getAllowedSignals()) > 1) {
                 throw MissingArgumentException::signalNameArgumentMissing($this);

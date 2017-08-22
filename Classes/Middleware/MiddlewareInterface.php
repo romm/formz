@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Element;
+namespace Romm\Formz\Middleware;
 
 use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;

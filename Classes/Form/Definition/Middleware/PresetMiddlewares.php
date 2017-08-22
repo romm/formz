@@ -18,7 +18,7 @@ use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInte
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 use Romm\Formz\Domain\Middleware\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Domain\Middleware\FormValidation\FormValidationMiddleware;
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
 
 class PresetMiddlewares implements DataPreProcessorInterface
 {

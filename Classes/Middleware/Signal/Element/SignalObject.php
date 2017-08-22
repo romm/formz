@@ -11,11 +11,12 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Signal;
+namespace Romm\Formz\Middleware\Signal\Element;
 
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Middleware\Argument\EmptyArguments;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
+use Romm\Formz\Middleware\Signal\Before;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SignalObject

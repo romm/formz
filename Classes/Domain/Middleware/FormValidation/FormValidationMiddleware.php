@@ -17,10 +17,10 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Domain\Middleware\FieldValidation\FieldValidationArguments;
 use Romm\Formz\Domain\Middleware\FieldValidation\FieldValidationSignal;
-use Romm\Formz\Middleware\Element\OnBeginMiddleware;
-use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
+use Romm\Formz\Middleware\Application\OnBeginMiddleware;
+use Romm\Formz\Middleware\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
-use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use Romm\Formz\Middleware\Signal\SendsSignal;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 
 /**
@@ -35,7 +35,7 @@ use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
  *
  * @see \Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext
  */
-class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
+class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsSignal, RemoveFromSingleFieldValidationContext
 {
     /**
      * @var \Romm\Formz\Domain\Middleware\FormValidation\FormValidationMiddlewareOption

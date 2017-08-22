@@ -29,7 +29,7 @@ use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Middleware\PresetMiddlewares;
 use Romm\Formz\Form\Definition\Settings\FormSettings;
 use Romm\Formz\Middleware\MiddlewareFactory;
-use Romm\Formz\Middleware\Element\MiddlewareInterface;
+use Romm\Formz\Middleware\MiddlewareInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormDefinition extends AbstractFormDefinitionComponent implements ConfigurationObjectInterface, DataPreProcessorInterface
@@ -60,7 +60,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
     protected $presetMiddlewares;
 
     /**
-     * @var \Romm\Formz\Middleware\Element\MiddlewareInterface[]
+     * @var \Romm\Formz\Middleware\MiddlewareInterface[]
      * @mixedTypesResolver \Romm\Formz\Form\Definition\Middleware\MiddlewareResolver
      */
     protected $middlewares = [];

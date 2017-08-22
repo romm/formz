@@ -14,10 +14,10 @@
 namespace Romm\Formz\Domain\Middleware\FormInjection;
 
 use Romm\Formz\Core\Core;
-use Romm\Formz\Middleware\Element\OnBeginMiddleware;
-use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
+use Romm\Formz\Middleware\Application\OnBeginMiddleware;
+use Romm\Formz\Middleware\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
-use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use Romm\Formz\Middleware\Signal\SendsSignal;
 
 /**
  * This middleware takes care of creating new form instances, based on the
@@ -30,7 +30,7 @@ use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
  * The goal is to provide a form instance to the controller in every case, so
  * the developer can manipulate it easily, for instance by pre-setting values.
  */
-class FormInjectionMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
+class FormInjectionMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsSignal, RemoveFromSingleFieldValidationContext
 {
     /**
      * @var int

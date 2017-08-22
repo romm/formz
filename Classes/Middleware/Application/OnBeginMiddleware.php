@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Element;
+namespace Romm\Formz\Middleware\Application;
 
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Domain\Middleware\Begin\BeginSignal;
@@ -24,8 +24,8 @@ use Romm\Formz\Middleware\Signal\After;
  * of the middleware processing.
  *
  * If you need the middleware to be called later, you can:
- * - @see \Romm\Formz\Middleware\Element\DefaultMiddleware (called at the end)
- * - @see \Romm\Formz\Middleware\Element\AbstractMiddleware
+ * - @see \Romm\Formz\Middleware\Application\DefaultMiddleware (called at the end)
+ * - @see \Romm\Formz\Middleware\Application\AbstractMiddleware
  */
 abstract class OnBeginMiddleware extends AbstractMiddleware implements After, BeginSignal
 {

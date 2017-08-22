@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Element;
+namespace Romm\Formz\Middleware\Application;
 
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Domain\Middleware\End\EndSignal;
@@ -24,8 +24,8 @@ use Romm\Formz\Middleware\Signal\Before;
  * the middleware processing.
  *
  * If you need the middleware to be called earlier, you can:
- * - @see \Romm\Formz\Middleware\Element\OnBeginMiddleware
- * - @see \Romm\Formz\Middleware\Element\AbstractMiddleware
+ * - @see \Romm\Formz\Middleware\Application\OnBeginMiddleware
+ * - @see \Romm\Formz\Middleware\Application\AbstractMiddleware
  */
 abstract class DefaultMiddleware extends AbstractMiddleware implements Before, EndSignal
 {

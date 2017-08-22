@@ -17,7 +17,7 @@ use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
-use Romm\Formz\Middleware\Signal\SignalObject;
+use Romm\Formz\Middleware\Signal\Element\SignalObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class BeginMiddleware

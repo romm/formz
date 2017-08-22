@@ -18,6 +18,12 @@ use Romm\Formz\Middleware\Argument\Arguments;
 interface After
 {
     /**
+     * This method is called after the dispatching of the signal on which the
+     * middleware is bound. The main logic of the middleware will be implemented
+     * here.
+     *
+     * Arguments may be passed to the method, depending on the signal.
+     *
      * @param Arguments $arguments
      * @return void
      */
