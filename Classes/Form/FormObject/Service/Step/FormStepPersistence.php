@@ -133,7 +133,11 @@ class FormStepPersistence
     {
         $identifier = $stepDefinition->getStep()->getIdentifier();
 
-        ArrayUtility::mergeRecursiveWithOverrule($this->stepsFormValues[$identifier], $formValues);
+        if (false === isset($this->stepsFormValues[$identifier])) {
+            $this->stepsFormValues[$identifier] = $formValues;
+        } else {
+            ArrayUtility::mergeRecursiveWithOverrule($this->stepsFormValues[$identifier], $formValues);
+        }
     }
 
     /**
