@@ -23,13 +23,13 @@ abstract class FormActionController extends ActionController
      * middlewares execution, it can be automatically caught by FormZ, and the
      * request will be forwarded to an action of the controller.
      *
-     * Just fill the property below with the name of an existing action of the
-     * controller. The method will have a single parameter which is the
-     * exception.
-     *
      * You can use it for instance to log your exception in some log service; to
      * render a view that contains a message explaining to the user that
      * something went wrong.
+     *
+     * Just fill the property below with the name of an existing action of the
+     * controller. The method will have a single parameter which is the
+     * exception.
      *
      * @var string
      */
