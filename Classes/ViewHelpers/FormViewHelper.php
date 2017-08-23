@@ -283,6 +283,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $requestData->setFormHash($this->formObject->getFormHash());
         $value = htmlspecialchars($this->hashService->appendHmac(base64_encode(serialize($requestData->toArray()))));
 
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('fz-hash') . '" value="' . $this->formObject->getFormHash() . '" />' . LF;
         $result .= '<input type="hidden" name="' . $this->prefixFieldName('formzData') . '" value="' . $value . '" />' . LF;
 
         if ($this->formObject->hasSteps()) {
@@ -480,6 +481,19 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->formService->checkStepFields($this->viewHelperVariableContainer);
 
         parent::removeFormFieldNamesFromViewHelperVariableContainer();
+    }
+
+    /**
+     * The identity of the form will be handled by FormZ, thanks to the form
+     * hash.
+     *
+     * @param object $object
+     * @param string $name
+     * @return string
+     */
+    protected function renderHiddenIdentityField($object, $name)
+    {
+        return '';
     }
 
     /**

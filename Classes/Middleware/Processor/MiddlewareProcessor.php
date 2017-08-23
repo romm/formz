@@ -14,6 +14,7 @@
 namespace Romm\Formz\Middleware\Processor;
 
 use Romm\Formz\Controller\Processor\ControllerProcessor;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Middleware\Item\Begin\BeginMiddleware;
@@ -78,7 +79,8 @@ class MiddlewareProcessor
      */
     public function run()
     {
-        $beginMiddleware = new BeginMiddleware;
+        /** @var BeginMiddleware $beginMiddleware */
+        $beginMiddleware = Core::instantiate(BeginMiddleware::class);
         $beginMiddleware->bindMiddlewareProcessor($this);
         $beginMiddleware->initialize();
 
@@ -89,7 +91,8 @@ class MiddlewareProcessor
 
         $beginMiddleware->execute();
 
-        $endMiddleware = new EndMiddleware;
+        /** @var EndMiddleware $endMiddleware */
+        $endMiddleware = Core::instantiate(EndMiddleware::class);
         $endMiddleware->bindMiddlewareProcessor($this);
         $endMiddleware->execute();
     }

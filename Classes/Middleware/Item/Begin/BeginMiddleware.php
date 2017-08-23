@@ -13,9 +13,10 @@
 
 namespace Romm\Formz\Middleware\Item\Begin;
 
-use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\BasicMiddlewareInterface;
+use Romm\Formz\Middleware\Item\Begin\Service\FormService;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
@@ -28,10 +29,17 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     private $processor;
 
     /**
+     * @var FormService
+     */
+    protected $formService;
+
+    /**
      * Initialization of this middleware.
      */
     public function initialize()
     {
+        $this->formService = Core::instantiate(FormService::class, $this->processor);
+
         $this->checkFormSubmission();
         $this->fetchCurrentStep();
         $this->fetchSubstepsLevel();
@@ -68,11 +76,15 @@ final class BeginMiddleware implements BasicMiddlewareInterface
         if ($this->requestWasSubmitted()
             && $this->processor->getRequestArguments()->hasArgument($formName)
         ) {
-            if (false === $request->hasArgument('formzData')) {
-                throw new \Exception('todo'); // @todo
+            if (false === $request->hasArgument('fz-hash')) {
+                throw new \Exception('todo fz-hash'); // @todo
             }
 
-            $form = $this->getFormInstance();
+            if (false === $request->hasArgument('formzData')) {
+                throw new \Exception('todo formzData'); // @todo
+            }
+
+            $form = $this->formService->getFormInstance();
 
             $formObject->setForm($form);
 
@@ -127,18 +139,6 @@ final class BeginMiddleware implements BasicMiddlewareInterface
 
         $proxy = FormObjectFactory::get()->getProxy($formObject->getForm());
         $proxy->setFormHash($hash);
-    }
-
-    /**
-     * @return FormInterface
-     */
-    protected function getFormInstance()
-    {
-        $formName = $this->processor->getFormObject()->getName();
-        $formArray = $this->processor->getRequest()->getArgument($formName);
-        $argument = $this->processor->getRequestArguments()->getArgument($formName);
-
-        return $argument->setValue($formArray)->getValue();
     }
 
     /**
