@@ -15,6 +15,7 @@ namespace Romm\Formz\Form\FormObject\Service\Step;
 
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
  * This object is stored in a form metadata, and contains important information
@@ -130,7 +131,9 @@ class FormStepPersistence
      */
     public function addStepFormValues(StepDefinition $stepDefinition, array $formValues)
     {
-        $this->stepsFormValues[$stepDefinition->getStep()->getIdentifier()] = $formValues;
+        $identifier = $stepDefinition->getStep()->getIdentifier();
+
+        ArrayUtility::mergeRecursiveWithOverrule($this->stepsFormValues[$identifier], $formValues);
     }
 
     /**

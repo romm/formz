@@ -69,8 +69,6 @@ class StepMiddlewareValidationService
         ) {
             $this->persistence->resetValidationData();
         }
-
-        $this->persistence->addStepFormValues($stepDefinition, $formValues);
     }
 
     /**

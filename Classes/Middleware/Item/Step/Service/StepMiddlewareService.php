@@ -97,6 +97,16 @@ class StepMiddlewareService implements SingletonInterface
     }
 
     /**
+     * Saves the submitted values in the metadata, for the given step.
+     *
+     * @param Step $currentStep
+     */
+    public function saveStepFormValues(Step $currentStep)
+    {
+        $this->persistence->addStepFormValues($this->getStepDefinition($currentStep), $this->getFormRawValues());
+    }
+
+    /**
      * Fetches the raw values sent in the request.
      *
      * @return array
