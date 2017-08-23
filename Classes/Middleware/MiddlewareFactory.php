@@ -16,7 +16,7 @@ namespace Romm\Formz\Middleware;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
-use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
+use Romm\Formz\Middleware\Option\OptionInterface;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Reflection\ReflectionService;
@@ -87,7 +87,7 @@ class MiddlewareFactory implements SingletonInterface
             throw ClassNotFoundException::middlewareOptionsPropertyClassNameNotFound($middlewareClassName, $optionsType);
         }
 
-        if (false === in_array(OptionDefinitionInterface::class, class_implements($optionsType))) {
+        if (false === in_array(OptionInterface::class, class_implements($optionsType))) {
             throw InvalidArgumentTypeException::middlewareOptionPropertyWrongClassName($optionsType);
         }
 

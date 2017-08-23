@@ -14,11 +14,11 @@
 namespace Romm\Formz\Middleware\Processor;
 
 use Romm\Formz\Controller\Processor\ControllerProcessor;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Domain\Middleware\Begin\BeginMiddleware;
 use Romm\Formz\Domain\Middleware\End\EndMiddleware;
 use Romm\Formz\Middleware\MiddlewareInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
@@ -74,7 +74,7 @@ class MiddlewareProcessor
     public function run()
     {
         /** @var BeginMiddleware $beginMiddleware */
-        $beginMiddleware = GeneralUtility::makeInstance(BeginMiddleware::class);
+        $beginMiddleware = Core::instantiate(BeginMiddleware::class);
         $beginMiddleware->bindMiddlewareProcessor($this);
         $beginMiddleware->initialize();
 
@@ -86,7 +86,7 @@ class MiddlewareProcessor
         $beginMiddleware->execute();
 
         /** @var EndMiddleware $endMiddleware */
-        $endMiddleware = GeneralUtility::makeInstance(EndMiddleware::class);
+        $endMiddleware = Core::instantiate(EndMiddleware::class);
         $endMiddleware->bindMiddlewareProcessor($this);
         $endMiddleware->execute();
     }

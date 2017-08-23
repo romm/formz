@@ -13,10 +13,10 @@
 
 namespace Romm\Formz\Domain\Middleware\FormValidation;
 
-use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\Option\AbstractOption;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
 
-class FormValidationMiddlewareOption extends AbstractOptionDefinition
+class FormValidationMiddlewareOption extends AbstractOption
 {
     /**
      * @var string

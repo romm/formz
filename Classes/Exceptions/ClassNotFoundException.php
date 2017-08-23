@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Exceptions;
 
-use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
+use Romm\Formz\Middleware\Option\OptionInterface;
 
 class ClassNotFoundException extends FormzException
 {
@@ -166,7 +166,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_OPTIONS_PROPERTY_CLASS_NAME_NOT_FOUND,
-            [$middlewareClassName, 'options', OptionDefinitionInterface::class, (string)$propertyType]
+            [$middlewareClassName, 'options', OptionInterface::class, (string)$propertyType]
         );
 
         return $exception;

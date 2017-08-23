@@ -13,8 +13,6 @@
 
 namespace Romm\Formz\Middleware\Option;
 
-use TYPO3\CMS\Core\SingletonInterface;
-
-class DefaultOptionDefinition extends AbstractOptionDefinition implements SingletonInterface
+interface OptionInterface
 {
 }

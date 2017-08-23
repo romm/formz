@@ -17,7 +17,7 @@ use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Middleware\MiddlewareInterface;
-use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
+use Romm\Formz\Middleware\Option\OptionInterface;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
 use TYPO3\CMS\Extbase\Error\Message;
@@ -227,7 +227,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_OPTION_PROPERTY_WRONG_CLASS_NAME,
-            [OptionDefinitionInterface::class, $className]
+            [OptionInterface::class, $className]
         );
 
         return $exception;

@@ -22,7 +22,7 @@ use Romm\Formz\Exceptions\SignalNotFoundException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\MiddlewareFactory;
-use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
+use Romm\Formz\Middleware\Option\OptionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Forward;
 use Romm\Formz\Middleware\Request\Redirect;
@@ -55,7 +55,7 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
      *
      * Please note that the full class name of the option must be written.
      *
-     * @var \Romm\Formz\Middleware\Option\DefaultOptionDefinition
+     * @var \Romm\Formz\Middleware\Option\DefaultOption
      */
     protected $options;
 
@@ -77,9 +77,9 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     protected $reflectionService;
 
     /**
-     * @param OptionDefinitionInterface $options
+     * @param OptionInterface $options
      */
-    final public function __construct(OptionDefinitionInterface $options)
+    final public function __construct(OptionInterface $options)
     {
         $this->options = $options;
     }
@@ -125,7 +125,7 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     }
 
     /**
-     * @return OptionDefinitionInterface
+     * @return OptionInterface
      */
     public function getOptions()
     {

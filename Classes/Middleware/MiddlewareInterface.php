@@ -13,7 +13,7 @@
 
 namespace Romm\Formz\Middleware;
 
-use Romm\Formz\Middleware\Option\OptionDefinitionInterface;
+use Romm\Formz\Middleware\Option\OptionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 
 interface MiddlewareInterface
@@ -21,9 +21,9 @@ interface MiddlewareInterface
     const PRIORITY_INJECT_FORM = 1000;
 
     /**
-     * @param OptionDefinitionInterface $options
+     * @param OptionInterface $options
      */
-    public function __construct(OptionDefinitionInterface $options);
+    public function __construct(OptionInterface $options);
 
     /**
      * @return void
@@ -37,7 +37,7 @@ interface MiddlewareInterface
     public function bindMiddlewareProcessor(MiddlewareProcessor $middlewareProcessor);
 
     /**
-     * @return OptionDefinitionInterface
+     * @return OptionInterface
      */
     public function getOptions();
 
