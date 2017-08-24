@@ -151,7 +151,7 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
      */
     final protected function forward()
     {
-        return new Forward($this->getRequest());
+        return new Forward($this->getRequest(), $this->getFormObject());
     }
 
     /**
@@ -165,7 +165,7 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
      */
     final protected function redirect()
     {
-        return new Redirect($this->getRequest());
+        return new Redirect($this->getRequest(), $this->getFormObject());
     }
 
     /**
