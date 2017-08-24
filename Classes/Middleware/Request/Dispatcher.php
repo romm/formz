@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Middleware\Request;
 
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
 use TYPO3\CMS\Extbase\Mvc\Request;
 
@@ -22,6 +23,11 @@ abstract class Dispatcher
      * @var Request
      */
     protected $request;
+
+    /**
+     * @var FormObject
+     */
+    protected $formObject;
 
     /**
      * @var string
@@ -45,10 +51,12 @@ abstract class Dispatcher
 
     /**
      * @param Request $request
+     * @param FormObject $formObject
      */
-    final public function __construct(Request $request)
+    final public function __construct(Request $request, FormObject $formObject)
     {
         $this->request = $request;
+        $this->formObject = $formObject;
     }
 
     /**
