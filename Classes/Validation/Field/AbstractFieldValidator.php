@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Validation\Validator;
+namespace Romm\Formz\Validation\Field;
 
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\Notice;
@@ -20,9 +20,10 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\ValidatorService;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
+use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
-abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
+abstract class AbstractFieldValidator extends AbstractValidator
 {
 
     /**

@@ -13,7 +13,9 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-class StringLengthValidator extends AbstractValidator
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
+
+class StringLengthValidator extends AbstractFieldValidator
 {
     const OPTION_MINIMUM = 'minimum';
     const OPTION_MAXIMUM = 'maximum';

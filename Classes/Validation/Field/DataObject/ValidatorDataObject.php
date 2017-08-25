@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Validation\DataObject;
+namespace Romm\Formz\Validation\Field\DataObject;
 
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;

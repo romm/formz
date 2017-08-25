@@ -193,7 +193,7 @@ Validateur de formulaire
 Validateurs
 -----------
 
-* Il est conseillé d'utiliser des validateurs qui héritent de :php:`Romm\Formz\Validation\Validator\AbstractValidator` ; la principale raison est l'utilisation de la propriété :php:`$javaScriptValidationFiles` (cf. ligne 4). Sinon les validateurs « classiques » d'Extbase fonctionnent ;
+* Il est conseillé d'utiliser des validateurs qui héritent de :php:`Romm\Formz\Validation\Field\AbstractFieldValidator` ; la principale raison est l'utilisation de la propriété :php:`$javaScriptValidationFiles` (cf. ligne 4). Sinon les validateurs « classiques » d'Extbase fonctionnent ;
 * Peut associer des fichiers JavaScript avec la propriété :php:`$javaScriptValidationFiles` : ces fichiers contiendront une adaptation du code de validation en JavaScript (cf. ligne 10) ;
 * Peut définir des messages qui pourront être surchargés en TypoScript grâce à la propriété :php:`$supportedMessages` (cf. ligne 25) ;
 * Contient également toutes les fonctionnalités des validateurs « classiques » d'Extbase, comme la propriété :php:`$supportedOptions` (cf. ligne 17).

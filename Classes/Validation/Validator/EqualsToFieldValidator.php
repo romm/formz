@@ -14,9 +14,10 @@
 namespace Romm\Formz\Validation\Validator;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
-class EqualsToFieldValidator extends AbstractValidator
+class EqualsToFieldValidator extends AbstractFieldValidator
 {
     const OPTION_FIELD = 'field';
 

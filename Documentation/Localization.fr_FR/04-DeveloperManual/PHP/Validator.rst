@@ -9,7 +9,7 @@ Les validateurs sont utilisés pour vérifier la valeur des champs envoyés à l
 
 Pour configurer les validateurs utilisables dans la configuration des formulaires, consultez le chapitre « :ref:`usersManual-typoScript-configurationValidators` ».
 
-Vous avez la possibilité de créer vos propres validateurs selon vos besoins ; veillez à ce qu'ils aient comme parent ``Romm\Formz\Validation\Validator\AbstractValidator``, et à utiliser correctement les fonctions de l'API.
+Vous avez la possibilité de créer vos propres validateurs selon vos besoins ; veillez à ce qu'ils aient comme parent ``Romm\Formz\Validation\Field\AbstractFieldValidator``, et à utiliser correctement les fonctions de l'API.
 
 API
 ^^^
@@ -214,7 +214,7 @@ Vous retrouverez ci-dessous un exemple de validateur.
     <?php
     namespace Romm\Formz\Validation\Validator;
 
-    use Romm\Formz\Validation\Validator\AbstractValidator;
+    use Romm\Formz\Validation\Field\AbstractFieldValidator;
 
     class ContainsValuesValidator extends AbstractValidator {
         /**

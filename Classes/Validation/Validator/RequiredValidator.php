@@ -13,7 +13,9 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-class RequiredValidator extends AbstractValidator
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
+
+class RequiredValidator extends AbstractFieldValidator
 {
     const MESSAGE_DEFAULT = 'default';
 

@@ -1,9 +1,9 @@
 <?php
 namespace Romm\Formz\Tests\Fixture\Validation\Validator;
 
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 
-class ExceptionDummyValidator extends AbstractValidator
+class ExceptionDummyValidator extends AbstractFieldValidator
 {
     /**
      * @param mixed $value

@@ -13,9 +13,10 @@
 
 namespace Romm\Formz\Validation\Validator;
 
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 use TYPO3\CMS\Core\Utility\MathUtility;
 
-class IsIntegerValidator extends AbstractValidator
+class IsIntegerValidator extends AbstractFieldValidator
 {
     const MESSAGE_DEFAULT = 'default';
 

@@ -18,7 +18,7 @@ use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Service\ArrayService;
 use Romm\Formz\Service\ValidatorService;
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -81,7 +81,7 @@ JS;
         foreach ($field->getValidators() as $validator) {
             $validatorClassName = $validator->getClassName();
 
-            if (in_array(AbstractValidator::class, class_parents($validatorClassName))) {
+            if (in_array(AbstractFieldValidator::class, class_parents($validatorClassName))) {
                 $javaScriptCode[] = (string)$this->getInlineJavaScriptValidatorCode($field, $validator);
             }
         }
@@ -175,8 +175,8 @@ JS;
                 foreach ($field->getValidators() as $validator) {
                     $validatorClassName = $validator->getClassName();
 
-                    if (in_array(AbstractValidator::class, class_parents($validatorClassName))) {
-                        /** @var AbstractValidator $validatorClassName */
+                    if (in_array(AbstractFieldValidator::class, class_parents($validatorClassName))) {
+                        /** @var AbstractFieldValidator $validatorClassName */
                         $this->javaScriptValidationFiles = array_merge($this->javaScriptValidationFiles, $validatorClassName::getJavaScriptValidationFiles());
                     }
                 }
