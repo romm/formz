@@ -133,7 +133,7 @@ Vous retrouverez ci-dessous un exemple de validateur de formulaire.
     <?php
     namespace MyVendor\MyExtension\Validation\Validator\Form;
 
-    use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+    use Romm\Formz\Validation\Form\AbstractFormValidator;
     use MyVendor\MyExtension\Utility\SimulationUtility;
     use MyVendor\MyExtension\Form\SimulationForm
 

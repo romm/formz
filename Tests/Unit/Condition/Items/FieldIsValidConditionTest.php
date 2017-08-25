@@ -6,7 +6,7 @@ use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\Error;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 
 class FieldIsValidConditionTest extends AbstractConditionItemUnitTest
 {

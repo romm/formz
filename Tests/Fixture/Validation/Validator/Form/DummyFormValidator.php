@@ -1,7 +1,7 @@
 <?php
 namespace Romm\Formz\Tests\Fixture\Validation\Validator\Form;
 
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use Romm\Formz\Validation\Form\AbstractFormValidator;
 
 class DummyFormValidator extends AbstractFormValidator
 {

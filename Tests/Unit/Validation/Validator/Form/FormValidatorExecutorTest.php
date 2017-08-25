@@ -5,7 +5,7 @@ namespace Romm\Formz\Tests\Unit\Validation\Validator\Form;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 use Romm\Formz\Validation\Validator\RequiredValidator;
 
 class FormValidatorExecutorTest extends AbstractUnitTest

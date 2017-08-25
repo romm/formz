@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\Validation\Validator\Form;
 
+use Romm\Formz\Validation\Form\AbstractFormValidator;
+
 /**
  * This is a default form validator, with no particular functionality.
  *

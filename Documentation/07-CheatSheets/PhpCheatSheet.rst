@@ -104,7 +104,7 @@ Controller
 Form validator
 --------------
 
-* Must inherit  :php:`Romm\Formz\Validation\Validator\Form\AbstractFormValidator` (see line 10);
+* Must inherit  :php:`Romm\Formz\Validation\Form\AbstractFormValidator` (see line 10);
 * Can manipulate :php:`$this->result`, for instance to add errors (see line 65).
 * Can override the methods :php:`beforeValidationProcess()` and :php:`afterValidationProcess()`, which are called before and after the validation process (see lines 24 & 58);
 * Can call dynamic methods at the end of a field validation: :php:`*Validated` where ``*`` is the field name in lowerCamelCase (see line 43);
@@ -119,7 +119,7 @@ Form validator
     <?php
     namespace MyVendor\MyExtension\Validation\Validator\Form;
 
-    use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+    use Romm\Formz\Validation\Form\AbstractFormValidator;
     use MyVendor\MyExtension\Utility\SimulationUtility;
     use MyVendor\MyExtension\Utility\SessionUtility;
     use MyVendor\MyExtension\Utility\GeographyUtility;
