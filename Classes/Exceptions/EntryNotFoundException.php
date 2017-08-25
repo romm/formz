@@ -24,7 +24,7 @@ use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 use Romm\Formz\ViewHelpers\ClassViewHelper;
 use Romm\Formz\ViewHelpers\FieldViewHelper;
 use Romm\Formz\ViewHelpers\FormatMessageViewHelper;
@@ -344,11 +344,11 @@ class EntryNotFoundException extends FormzException
     /**
      * @code 1455272659
      *
-     * @param string            $key
-     * @param AbstractValidator $validator
+     * @param string                 $key
+     * @param AbstractFieldValidator $validator
      * @return self
      */
-    final public static function errorKeyNotFoundForValidator($key, AbstractValidator $validator)
+    final public static function errorKeyNotFoundForValidator($key, AbstractFieldValidator $validator)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(

@@ -15,7 +15,7 @@ namespace Romm\Formz\Service;
 
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
-use Romm\Formz\Validation\Validator\AbstractValidator as FormzAbstractValidator;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
@@ -87,7 +87,7 @@ class ValidatorService implements SingletonInterface
                     'acceptsEmptyValues' => $validatorProperties['acceptsEmptyValues']
                 ];
 
-                if (in_array(FormzAbstractValidator::class, class_parents($validatorClassName))) {
+                if (in_array(AbstractFieldValidator::class, class_parents($validatorClassName))) {
                     $validatorData['formzValidator'] = true;
                     $validatorData['supportedMessages'] = $validatorProperties['supportedMessages'];
                     $validatorData['supportsAllMessages'] = $validatorProperties['supportsAllMessages'];

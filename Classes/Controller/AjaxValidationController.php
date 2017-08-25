@@ -32,7 +32,7 @@ use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\MessageService;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;

@@ -7,8 +7,8 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Extbase\Error\Result;
 
 abstract class AbstractValidatorUnitTest extends AbstractUnitTest
@@ -64,7 +64,7 @@ abstract class AbstractValidatorUnitTest extends AbstractUnitTest
      * @param string $className
      * @param array  $options
      * @param array  $methods
-     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractValidator
+     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractFieldValidator
      */
     protected function getValidatorInstance($className, array $options = [], array $methods = [])
     {

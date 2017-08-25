@@ -1,9 +1,9 @@
 <?php
 namespace Romm\Formz\Tests\Fixture\Validation\Validator;
 
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 
-class MessagesValidator extends AbstractValidator
+class MessagesValidator extends AbstractFieldValidator
 {
     const MESSAGE_1 = 'message1';
     const MESSAGE_2 = 'message2';

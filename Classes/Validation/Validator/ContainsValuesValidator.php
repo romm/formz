@@ -13,9 +13,10 @@
 
 namespace Romm\Formz\Validation\Validator;
 
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ContainsValuesValidator extends AbstractValidator
+class ContainsValuesValidator extends AbstractFieldValidator
 {
     const OPTION_VALUES = 'values';
 
