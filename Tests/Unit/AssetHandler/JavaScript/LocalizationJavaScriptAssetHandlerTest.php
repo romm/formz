@@ -26,7 +26,7 @@ TXT;
         $field = $assetHandlerFactory->getFormObject()->getDefinition()->getField('foo');
         $validator = $field->addValidator('validation-name', RequiredValidator::class);
 
-            /** @var LocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        /** @var LocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
         $assetHandler = $this->getMockBuilder(LocalizationJavaScriptAssetHandler::class)
             ->setMethods(['handleRealTranslations', 'handleTranslationsBinding'])
             ->setConstructorArgs([$assetHandlerFactory])

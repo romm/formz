@@ -21,7 +21,7 @@ Pour installer un formulaire, vous serez amené à utiliser les classes suivante
 
 - :ref:`developerManual-php-validator`
 
-  :php:`Romm\Formz\Validation\Validator\AbstractValidator` — devra être héritée par vos validateurs.
+  :php:`Romm\Formz\Validation\Field\AbstractFieldValidator` — devra être héritée par vos validateurs.
 
 - :ref:`developerManual-php-behaviour`
 

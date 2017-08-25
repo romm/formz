@@ -193,7 +193,7 @@ Form validator
 Validators
 ----------
 
-* It is advised to use validators which inherit :php:`Romm\Formz\Validation\Validator\AbstractValidator`; the main reason for that is to be able to use the property :php:`$javaScriptValidationFiles` (see line 4). Otherwise, basic Extbase validators work;
+* It is advised to use validators which inherit :php:`Romm\Formz\Validation\Field\AbstractFieldValidator`; the main reason for that is to be able to use the property :php:`$javaScriptValidationFiles` (see line 4). Otherwise, basic Extbase validators work;
 * Can associate JavaScript files with the property :php:`$javaScriptValidationFiles`: these files contain a code adaptation of the validator in JavaScript (see line 10);
 * Can define messages which may be overridden in TypoScript with the property :php:`$supportedMessages` (see line 25);
 * Also contains all basic Extbase validators features, like the property :php:`$supportedOptions` (see line 17).

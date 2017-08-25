@@ -23,8 +23,8 @@ use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\MessageService;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
-use Romm\Formz\Validation\Validator\AbstractValidator;
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -222,7 +222,7 @@ class FormValidatorExecutor
         $validatorResult = $validatorInstance->validate($fieldValue);
         $validatorResult = MessageService::get()->sanitizeValidatorResult($validatorResult, $validator->getName());
 
-        if ($validatorInstance instanceof AbstractValidator
+        if ($validatorInstance instanceof AbstractFieldValidator
             && false === empty($validationData = $validatorInstance->getValidationData())
         ) {
             $this->validationData[$fieldName] = ($this->validationData[$fieldName]) ?: [];

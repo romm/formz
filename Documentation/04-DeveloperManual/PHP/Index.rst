@@ -21,7 +21,7 @@ To create a form, you will have to use the following classes:
 
 - :ref:`developerManual-php-validator`
 
-  :php:`Romm\Formz\Validation\Validator\AbstractValidator` — must be inherited by your validators.
+  :php:`Romm\Formz\Validation\Field\AbstractFieldValidator` — must be inherited by your validators.
 
 - :ref:`developerManual-php-behaviour`
 

@@ -13,7 +13,9 @@
 
 namespace Romm\Formz\Validation\Validator;
 
-class RegexValidator extends AbstractValidator
+use Romm\Formz\Validation\Field\AbstractFieldValidator;
+
+class RegexValidator extends AbstractFieldValidator
 {
     const MESSAGE_DEFAULT = 'default';
 
