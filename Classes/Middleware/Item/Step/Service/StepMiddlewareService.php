@@ -24,8 +24,8 @@ use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
 use Romm\Formz\Middleware\Request\Redirect;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
-use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
@@ -253,7 +253,7 @@ class StepMiddlewareService implements SingletonInterface
     {
         $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
         $tree = $conditionProcessor->getActivationConditionTreeForStep($stepDefinition);
-        $todo = new FormValidatorExecutor($this->getFormObject(), new FormValidatorDataObject(new FormResult())); // @todo
+        $todo = new FormValidatorExecutor(new FormValidatorDataObject($this->getFormObject(), new FormResult())); // @todo
         $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
 
         return $tree->getPhpResult($dataObject);

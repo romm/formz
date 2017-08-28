@@ -5,7 +5,7 @@ use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
-use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
+use Romm\Formz\Tests\Fixture\Validation\Validator\DummyFieldValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
@@ -68,7 +68,7 @@ abstract class AbstractValidatorUnitTest extends AbstractUnitTest
      */
     protected function getValidatorInstance($className, array $options = [], array $methods = [])
     {
-        $validation = new Validator('foo', DummyValidator::class);
+        $validation = new Validator('foo', DummyFieldValidator::class);
 
         $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validation);
 

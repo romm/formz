@@ -1,15 +1,15 @@
 <?php
-namespace Romm\Formz\Tests\Unit\Validation\Validator;
+namespace Romm\Formz\Tests\Unit\Validation\Field;
 
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
-use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
+use Romm\Formz\Tests\Fixture\Validation\Validator\DummyFieldValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Extbase\Error\Result;
 
-class AbstractValidatorTest extends AbstractUnitTest
+class AbstractFieldValidatorTest extends AbstractUnitTest
 {
     /**
      * @test
@@ -26,7 +26,7 @@ class AbstractValidatorTest extends AbstractUnitTest
             $this->setExpectedException($expectedException);
         }
 
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
 
         foreach ($messages as $message) {
             $validator->addMessage($message[0])->setValue($message[1]);
@@ -37,7 +37,7 @@ class AbstractValidatorTest extends AbstractUnitTest
 
         $validatorDataObject = new ValidatorDataObject($formObject, $validator);
 
-        $validator = new DummyValidator([], $validatorDataObject);
+        $validator = new DummyFieldValidator([], $validatorDataObject);
         if (is_callable($callback)) {
             $validator->setCallBack($callback);
         }
@@ -78,7 +78,7 @@ class AbstractValidatorTest extends AbstractUnitTest
             [
                 'value'     => 'foo',
                 'messages'  => [],
-                'callback'  => function (DummyValidator $validator) {
+                'callback'  => function (DummyFieldValidator $validator) {
                     $validator->addNewError('unknownMessage', 42, [], '');
                 },
                 'final'     => null,
@@ -93,8 +93,8 @@ class AbstractValidatorTest extends AbstractUnitTest
             [
                 'value'    => 'foo',
                 'messages' => [],
-                'callback' => function (DummyValidator $validator) {
-                    $validator->addNewError(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
+                'callback' => function (DummyFieldValidator $validator) {
+                    $validator->addNewError(DummyFieldValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
                 'final'    => function (Result $result) {
                     $this->assertTrue($result->hasErrors());
@@ -112,9 +112,9 @@ class AbstractValidatorTest extends AbstractUnitTest
              */
             [
                 'value'    => 'foo',
-                'messages' => [[DummyValidator::MESSAGE_1, 'hello world!']],
-                'callback' => function (DummyValidator $validator) {
-                    $validator->addNewError(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
+                'messages' => [[DummyFieldValidator::MESSAGE_1, 'hello world!']],
+                'callback' => function (DummyFieldValidator $validator) {
+                    $validator->addNewError(DummyFieldValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
                 'final'    => function (Result $result) {
                     $this->assertTrue($result->hasErrors());
@@ -132,8 +132,8 @@ class AbstractValidatorTest extends AbstractUnitTest
             [
                 'value'    => 'foo',
                 'messages' => [],
-                'callback' => function (DummyValidator $validator) {
-                    $validator->addNewWarning(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
+                'callback' => function (DummyFieldValidator $validator) {
+                    $validator->addNewWarning(DummyFieldValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
                 'final'    => function (Result $result) {
                     $this->assertTrue($result->hasWarnings());
@@ -150,9 +150,9 @@ class AbstractValidatorTest extends AbstractUnitTest
              */
             [
                 'value'    => 'foo',
-                'messages' => [[DummyValidator::MESSAGE_1, 'hello world!']],
-                'callback' => function (DummyValidator $validator) {
-                    $validator->addNewWarning(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
+                'messages' => [[DummyFieldValidator::MESSAGE_1, 'hello world!']],
+                'callback' => function (DummyFieldValidator $validator) {
+                    $validator->addNewWarning(DummyFieldValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
                 'final'    => function (Result $result) {
                     $this->assertTrue($result->hasWarnings());
@@ -170,8 +170,8 @@ class AbstractValidatorTest extends AbstractUnitTest
             [
                 'value'    => 'foo',
                 'messages' => [],
-                'callback' => function (DummyValidator $validator) {
-                    $validator->addNewNotice(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
+                'callback' => function (DummyFieldValidator $validator) {
+                    $validator->addNewNotice(DummyFieldValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
                 'final'    => function (Result $result) {
                     $this->assertTrue($result->hasNotices());
@@ -188,9 +188,9 @@ class AbstractValidatorTest extends AbstractUnitTest
              */
             [
                 'value'    => 'foo',
-                'messages' => [[DummyValidator::MESSAGE_1, 'hello world!']],
-                'callback' => function (DummyValidator $validator) {
-                    $validator->addNewNotice(DummyValidator::MESSAGE_1, 42, ['bar'], 'baz');
+                'messages' => [[DummyFieldValidator::MESSAGE_1, 'hello world!']],
+                'callback' => function (DummyFieldValidator $validator) {
+                    $validator->addNewNotice(DummyFieldValidator::MESSAGE_1, 42, ['bar'], 'baz');
                 },
                 'final'    => function (Result $result) {
                     $this->assertTrue($result->hasNotices());
@@ -208,6 +208,6 @@ class AbstractValidatorTest extends AbstractUnitTest
      */
     public function javaScriptValidationFilesCanBeAccessed()
     {
-        $this->assertSame(DummyValidator::$javaScriptValidationFiles, DummyValidator::getJavaScriptValidationFiles());
+        $this->assertSame(DummyFieldValidator::$javaScriptValidationFiles, DummyFieldValidator::getJavaScriptValidationFiles());
     }
 }

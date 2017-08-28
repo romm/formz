@@ -7,7 +7,7 @@ use Romm\Formz\Exceptions\SilentException;
 use Romm\Formz\Form\Definition\Condition\Activation;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
-use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
+use Romm\Formz\Tests\Fixture\Validation\Validator\DummyFieldValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class ValidatorTest extends AbstractUnitTest
@@ -18,7 +18,7 @@ class ValidatorTest extends AbstractUnitTest
     public function initializationDoneProperly()
     {
         $name = 'foo';
-        $className = DummyValidator::class;
+        $className = DummyFieldValidator::class;
 
         $validator = new Validator($name, $className);
 
@@ -31,7 +31,7 @@ class ValidatorTest extends AbstractUnitTest
      */
     public function setPrioritySetsPriority()
     {
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
 
         $validator->setPriority(404);
         $this->assertEquals(404, $validator->getPriority());
@@ -52,7 +52,7 @@ class ValidatorTest extends AbstractUnitTest
      */
     public function setOptionsSetsOptions()
     {
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
         $options = ['foo' => 'bar'];
 
         $validator->setOptions($options);
@@ -75,7 +75,7 @@ class ValidatorTest extends AbstractUnitTest
     public function addMessageAddsMessage()
     {
         $messageIdentifier = 'my-message';
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
 
         $this->assertFalse($validator->hasMessage($messageIdentifier));
         $message = $validator->addMessage($messageIdentifier);
@@ -101,7 +101,7 @@ class ValidatorTest extends AbstractUnitTest
     {
         $this->setExpectedException(DuplicateEntryException::class);
 
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
         $validator->addMessage('foo');
         $validator->addMessage('foo');
     }
@@ -113,7 +113,7 @@ class ValidatorTest extends AbstractUnitTest
     {
         $this->setExpectedException(EntryNotFoundException::class);
 
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
         $validator->getMessage('foo');
     }
 
@@ -122,7 +122,7 @@ class ValidatorTest extends AbstractUnitTest
      */
     public function addActivationAddsActivation()
     {
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
 
         $this->assertFalse($validator->hasActivation());
         $validator->addActivation();
@@ -147,7 +147,7 @@ class ValidatorTest extends AbstractUnitTest
     {
         $this->setExpectedException(SilentException::class);
 
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
         $validator->getActivation();
     }
 
@@ -156,7 +156,7 @@ class ValidatorTest extends AbstractUnitTest
      */
     public function activateAjaxUsageActivatesAjaxUsage()
     {
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
 
         $this->assertFalse($validator->doesUseAjax());
         $validator->activateAjaxUsage();
@@ -190,7 +190,7 @@ class ValidatorTest extends AbstractUnitTest
      */
     public function parentFieldCanBeFetched()
     {
-        $validator = new Validator('foo', DummyValidator::class);
+        $validator = new Validator('foo', DummyFieldValidator::class);
         $field = new Field('foo');
 
         $validator->attachParent($field);
@@ -204,7 +204,7 @@ class ValidatorTest extends AbstractUnitTest
     {
         /** @var Validator|\PHPUnit_Framework_MockObject_MockObject $validator */
         $validator = $this->getMockBuilder(Validator::class)
-            ->setConstructorArgs(['foo', DummyValidator::class])
+            ->setConstructorArgs(['foo', DummyFieldValidator::class])
             ->setMethods(['checkDefinitionFreezeState'])
             ->getMock();
 

@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Validation\Validator\Form;
+namespace Romm\Formz\Validation\Form;
 
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Condition\Processor\ConditionProcessor;
@@ -21,13 +21,12 @@ use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
-use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
+use Romm\Formz\Validation\Form\Service\SubstepService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
-use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -41,19 +40,19 @@ class FormValidatorExecutor
     protected $dataObject;
 
     /**
-     * @var FormObject
-     */
-    protected $formObject;
-
-    /**
-     * @var FormResult
-     */
-    protected $result;
-
-    /**
      * @var ConditionProcessor
      */
     private $conditionProcessor;
+
+    /**
+     * @var PhpConditionDataObject
+     */
+    protected $phpConditionDataObject;
+
+    /**
+     * @var SubstepService
+     */
+    protected $substepService;
 
     /**
      * @var array
@@ -80,21 +79,16 @@ class FormValidatorExecutor
     protected $validationData = [];
 
     /**
-     * @var PhpConditionDataObject
-     */
-    protected $phpConditionDataObject;
-
-    /**
-     * @param FormObject              $formObject
      * @param FormValidatorDataObject $dataObject
      */
-    public function __construct(FormObject $formObject, FormValidatorDataObject $dataObject)
+    public function __construct(FormValidatorDataObject $dataObject)
     {
         $this->dataObject = $dataObject;
-        $this->formObject = $formObject;
-        $this->result = $this->dataObject->getFormResult();
+
         $this->conditionProcessor = $this->getConditionProcessor();
         $this->phpConditionDataObject = $this->getPhpConditionDataObject();
+
+        $this->substepService = Core::instantiate(SubstepService::class, $this, $dataObject);
     }
 
     /**
@@ -104,7 +98,7 @@ class FormValidatorExecutor
     {
         /** @var BehavioursManager $behavioursManager */
         $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
-        $behavioursManager->applyBehaviourOnFormInstance($this->formObject);
+        $behavioursManager->applyBehaviourOnFormInstance($this->getFormObject());
 
         return $this;
     }
@@ -117,8 +111,8 @@ class FormValidatorExecutor
      */
     public function checkFieldsActivation()
     {
-        foreach ($this->formObject->getDefinition()->getFields() as $field) {
-            if (false === $this->result->fieldIsDeactivated($field)) {
+        foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
+            if (false === $this->getResult()->fieldIsDeactivated($field)) {
                 $this->checkFieldActivation($field);
             }
         }
@@ -142,14 +136,14 @@ class FormValidatorExecutor
 
         $this->checkFieldStepSupport($field);
 
-        if (false === $this->result->fieldIsOutOfScope($field)
+        if (false === $this->getResult()->fieldIsOutOfScope($field)
             && true === $field->hasActivation()
             && false === $this->getFieldActivationProcessResult($field)
         ) {
-            $this->result->deactivateField($field);
+            $this->getResult()->deactivateField($field);
         }
 
-        if (false === $this->result->fieldIsDeactivated($field)) {
+        if (false === $this->getResult()->fieldIsDeactivated($field)) {
             $this->checkFieldValidatorActivation($field);
         }
 
@@ -169,7 +163,7 @@ class FormValidatorExecutor
         if ($validatedStep
             && false === $validatedStep->supportsField($field)
         ) {
-            $this->result->markFieldOutOfScope($field);
+            $this->getResult()->markFieldOutOfScope($field);
         }
     }
 
@@ -182,7 +176,7 @@ class FormValidatorExecutor
             if (true === $validator->hasActivation()
                 && false === $this->getValidatorActivationProcessResult($validator)
             ) {
-                $this->result->deactivateValidator($validator);
+                $this->getResult()->deactivateValidator($validator);
             }
         }
     }
@@ -194,138 +188,15 @@ class FormValidatorExecutor
     {
         $validatedStep = $this->dataObject->getValidatedStep();
 
-        if ($validatedStep
-            && $validatedStep->hasSubsteps()
-        ) {
-            $this->handleSubsteps();
+        if ($validatedStep && $validatedStep->hasSubsteps()) {
+            $this->substepService->handleSubsteps();
         } else {
-            foreach ($this->formObject->getDefinition()->getFields() as $field) {
-                $this->launchFieldValidation($field);
+            foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
+                $this->validateField($field);
             }
         }
 
         return $this;
-    }
-
-    /**
-     * @todo
-     */
-    protected function handleSubsteps()
-    {
-        $stepService = FormObjectFactory::get()->getStepService($this->formObject);
-
-        $firstSubstepDefinition = $this->dataObject->getValidatedStep()->getSubsteps()->getFirstSubstepDefinition();
-        $substepDefinition = $firstSubstepDefinition;
-        $currentSubstepDefinition = null;
-
-        $substepsLevel = $stepService->getSubstepsLevel();
-        $stepService->setSubstepsLevel(1);
-        $substepsLevelCounter = 0;
-
-        while ($substepDefinition && $substepsLevel > 0) {
-            $substepsLevel--;
-            $substepsLevelCounter++;
-            $phpResult = true;
-
-            if ($substepDefinition->hasActivation()) {
-                $phpResult = $this->getSubstepDefinitionActivationResult($substepDefinition);
-            }
-
-            if (true === $phpResult) {
-                $supportedFields = $substepDefinition->getSubstep()->getSupportedFields();
-
-                foreach ($supportedFields as $supportedField) {
-                    $this->launchFieldValidation($supportedField->getField());
-                }
-            }
-
-            if ($substepsLevel === 0
-                || $this->result->hasErrors()
-            ) {
-                $currentSubstepDefinition = $substepDefinition;
-                $stepService->setSubstepsLevel($substepsLevelCounter);
-                break;
-            }
-
-            $substepDefinition = $substepDefinition->hasNextSubstep()
-                ? $substepDefinition->getNextSubstep()
-                : null;
-        }
-
-        if (null !== $currentSubstepDefinition
-            && $this->dataObject->getValidatedStep() === $stepService->getCurrentStep()
-        ) {
-            if ($this->result->hasErrors()) {
-                $stepService->setCurrentSubstepDefinition($currentSubstepDefinition);
-            } else {
-                list($nextSubstep, $substepsLevelIncrease) = $this->getNextSubstep($currentSubstepDefinition);
-
-                if ($nextSubstep) {
-                    $stepService->setCurrentSubstepDefinition($nextSubstep);
-                    $stepService->setSubstepsLevel($stepService->getSubstepsLevel() + $substepsLevelIncrease);
-                } else {
-                    $stepService->markLastSubstepAsValidated();
-                }
-            }
-        }
-    }
-
-    protected function getNextSubstep(SubstepDefinition $substepDefinition)
-    {
-        $substepsLevelIncrease = 0;
-        $nextSubstep = null;
-
-        while ($substepDefinition) {
-            if (false === $substepDefinition->hasNextSubstep()) {
-                break;
-            } else {
-                $substepDefinition = $substepDefinition->getNextSubstep();
-                $substepsLevelIncrease++;
-
-                if (false === $substepDefinition->hasActivation()) {
-                    $nextSubstep = $substepDefinition;
-                    break;
-                } else {
-                    $phpResult = $this->getSubstepDefinitionActivationResult($substepDefinition);
-
-                    if (true === $phpResult) {
-                        $nextSubstep = $substepDefinition;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return [$nextSubstep, $substepsLevelIncrease];
-    }
-
-    /**
-     * @param SubstepDefinition $substepDefinition
-     * @return bool
-     */
-    protected function getSubstepDefinitionActivationResult(SubstepDefinition $substepDefinition)
-    {
-        $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->formObject);
-        $tree = $conditionProcessor->getActivationConditionTreeForSubstep($substepDefinition);
-        $dataObject = new PhpConditionDataObject($this->formObject->getForm(), $this);
-
-        return $tree->getPhpResult($dataObject);
-    }
-
-    /**
-     * @todo
-     *
-     * @param Field $field
-     */
-    protected function launchFieldValidation(Field $field)
-    {
-        if (false === $this->fieldWasValidated($field)) {
-            $this->validateField($field);
-
-            if ($this->fieldWasValidated($field)) {
-                $this->callFieldValidationCallback($field);
-            }
-        }
     }
 
     /**
@@ -339,25 +210,27 @@ class FormValidatorExecutor
         if (false === $this->fieldWasValidated($field)) {
             $this->checkFieldActivation($field);
 
-            if (false === $this->result->fieldIsOutOfScope($field)
-                && false === $this->result->fieldIsDeactivated($field)
+            if (false === $this->getResult()->fieldIsOutOfScope($field)
+                && false === $this->getResult()->fieldIsDeactivated($field)
             ) {
                 $this->markFieldAsValidated($field);
 
                 // Looping on the field's validators settings...
                 foreach ($field->getValidators() as $validator) {
-                    if ($this->result->validatorIsDeactivated($validator)) {
+                    if ($this->getResult()->validatorIsDeactivated($validator)) {
                         continue;
                     }
 
                     $validatorResult = $this->processFieldValidator($field, $validator);
-                    $this->result->markFieldAsValidated($field);
+                    $this->getResult()->markFieldAsValidated($field);
 
                     // Breaking the loop if an error occurred: we stop the validation process for the current field.
                     if ($validatorResult->hasErrors()) {
                         break;
                     }
                 }
+
+                $this->callFieldValidationCallback($field);
             }
         }
     }
@@ -369,10 +242,10 @@ class FormValidatorExecutor
      */
     protected function processFieldValidator(Field $field, Validator $validator)
     {
-        $form = $this->formObject->getForm();
+        $form = $this->getFormObject()->getForm();
         $fieldName = $field->getName();
         $fieldValue = ObjectAccess::getProperty($form, $fieldName);
-        $validatorDataObject = new ValidatorDataObject($this->formObject, $validator);
+        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validator);
 
         /** @var ValidatorInterface $validatorInstance */
         $validatorInstance = Core::instantiate(
@@ -396,7 +269,7 @@ class FormValidatorExecutor
             $form->setValidationData($this->validationData);
         }
 
-        $this->result->forProperty($fieldName)->merge($validatorResult);
+        $this->getResult()->forProperty($fieldName)->merge($validatorResult);
         unset($validatorDataObject);
 
         return $validatorResult;
@@ -420,11 +293,19 @@ class FormValidatorExecutor
     }
 
     /**
+     * @return FormObject
+     */
+    public function getFormObject()
+    {
+        return $this->dataObject->getFormObject();
+    }
+
+    /**
      * @return FormResult
      */
     public function getResult()
     {
-        return $this->result;
+        return $this->dataObject->getFormResult();
     }
 
     /**
@@ -509,7 +390,7 @@ class FormValidatorExecutor
      */
     protected function getConditionProcessor()
     {
-        return ConditionProcessorFactory::getInstance()->get($this->formObject);
+        return ConditionProcessorFactory::getInstance()->get($this->getFormObject());
     }
 
     /**
@@ -517,6 +398,6 @@ class FormValidatorExecutor
      */
     protected function getPhpConditionDataObject()
     {
-        return new PhpConditionDataObject($this->formObject->getForm(), $this);
+        return new PhpConditionDataObject($this->getFormObject()->getForm(), $this);
     }
 }

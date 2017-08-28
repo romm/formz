@@ -13,7 +13,7 @@ use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
-use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
+use Romm\Formz\Tests\Fixture\Validation\Validator\DummyFieldValidator;
 use Romm\Formz\Tests\Fixture\Validation\Validator\ExceptionDummyValidator;
 use Romm\Formz\Tests\Fixture\Validation\Validator\MessagesValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
@@ -315,7 +315,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
         ];
 
         $formObject = $this->getDefaultFormObject();
-        $validator = $formObject->getDefinition()->getField('foo')->addValidator('bar', DummyValidator::class);
+        $validator = $formObject->getDefinition()->getField('foo')->addValidator('bar', DummyFieldValidator::class);
         $validator->activateAjaxUsage();
 
         $ajaxValidationController = $this->getAjaxValidationControllerMock($formObject);
