@@ -20,7 +20,7 @@ class FormValidationMiddlewareOption extends AbstractOption
 {
     /**
      * @var string
-     * @validate Romm.ConfigurationObject:ClassExtends(class=Romm\Formz\Validation\Validator\Form\AbstractFormValidator)
+     * @validate Romm.ConfigurationObject:ClassExtends(class=Romm\Formz\Validation\Form\AbstractFormValidator)
      * @validate NotEmpty
      */
     protected $formValidatorClassName = DefaultFormValidator::class;

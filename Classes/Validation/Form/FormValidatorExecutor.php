@@ -25,7 +25,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\Field\AbstractFieldValidator;
 use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
-use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
+use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -83,14 +83,12 @@ class FormValidatorExecutor
     protected $phpConditionDataObject;
 
     /**
-     * @param FormObject              $formObject
      * @param FormValidatorDataObject $dataObject
      */
-    public function __construct(FormObject $formObject, FormValidatorDataObject $dataObject)
+    public function __construct(FormValidatorDataObject $dataObject)
     {
         $this->dataObject = $dataObject;
-        $this->formObject = $formObject;
-        $this->result = $this->dataObject->getFormResult();
+        
         $this->conditionProcessor = $this->getConditionProcessor();
         $this->phpConditionDataObject = $this->getPhpConditionDataObject();
     }
@@ -102,7 +100,7 @@ class FormValidatorExecutor
     {
         /** @var BehavioursManager $behavioursManager */
         $behavioursManager = GeneralUtility::makeInstance(BehavioursManager::class);
-        $behavioursManager->applyBehaviourOnFormInstance($this->formObject);
+        $behavioursManager->applyBehaviourOnFormInstance($this->getFormObject());
 
         return $this;
     }
@@ -115,8 +113,8 @@ class FormValidatorExecutor
      */
     public function checkFieldsActivation()
     {
-        foreach ($this->formObject->getDefinition()->getFields() as $field) {
-            if (false === $this->result->fieldIsDeactivated($field)) {
+        foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
+            if (false === $this->getResult()->fieldIsDeactivated($field)) {
                 $this->checkFieldActivation($field);
             }
         }
@@ -141,10 +139,10 @@ class FormValidatorExecutor
         if (true === $field->hasActivation()
             && false === $this->getFieldActivationProcessResult($field)
         ) {
-            $this->result->deactivateField($field);
+            $this->getResult()->deactivateField($field);
         }
 
-        if (false === $this->result->fieldIsDeactivated($field)) {
+        if (false === $this->getResult()->fieldIsDeactivated($field)) {
             $this->checkFieldValidatorActivation($field);
         }
 
@@ -161,7 +159,7 @@ class FormValidatorExecutor
             if (true === $validator->hasActivation()
                 && false === $this->getValidatorActivationProcessResult($validator)
             ) {
-                $this->result->deactivateValidator($validator);
+                $this->getResult()->deactivateValidator($validator);
             }
         }
     }
@@ -171,7 +169,7 @@ class FormValidatorExecutor
      */
     public function validateFields()
     {
-        foreach ($this->formObject->getDefinition()->getFields() as $field) {
+        foreach ($this->getFormObject()->getDefinition()->getFields() as $field) {
             $this->launchFieldValidation($field);
         }
 
@@ -203,12 +201,12 @@ class FormValidatorExecutor
         if (false === $this->fieldWasValidated($field)) {
             $this->checkFieldActivation($field);
 
-            if (false === $this->result->fieldIsDeactivated($field)) {
+            if (false === $this->getResult()->fieldIsDeactivated($field)) {
                 $this->markFieldAsValidated($field);
 
                 // Looping on the field's validators settings...
                 foreach ($field->getValidators() as $validator) {
-                    if ($this->result->validatorIsDeactivated($validator)) {
+                    if ($this->getResult()->validatorIsDeactivated($validator)) {
                         continue;
                     }
 
@@ -230,10 +228,10 @@ class FormValidatorExecutor
      */
     protected function processFieldValidator(Field $field, Validator $validator)
     {
-        $form = $this->formObject->getForm();
+        $form = $this->getFormObject()->getForm();
         $fieldName = $field->getName();
         $fieldValue = ObjectAccess::getProperty($form, $fieldName);
-        $validatorDataObject = new ValidatorDataObject($this->formObject, $validator);
+        $validatorDataObject = new ValidatorDataObject($this->getFormObject(), $validator);
 
         /** @var ValidatorInterface $validatorInstance */
         $validatorInstance = Core::instantiate(
@@ -257,7 +255,7 @@ class FormValidatorExecutor
             $form->setValidationData($this->validationData);
         }
 
-        $this->result->forProperty($fieldName)->merge($validatorResult);
+        $this->getResult()->forProperty($fieldName)->merge($validatorResult);
         unset($validatorDataObject);
 
         return $validatorResult;
@@ -281,11 +279,19 @@ class FormValidatorExecutor
     }
 
     /**
+     * @return FormObject
+     */
+    public function getFormObject()
+    {
+        return $this->dataObject->getFormObject();
+    }
+
+    /**
      * @return FormResult
      */
     public function getResult()
     {
-        return $this->result;
+        return $this->dataObject->getFormResult();
     }
 
     /**
@@ -370,7 +376,7 @@ class FormValidatorExecutor
      */
     protected function getConditionProcessor()
     {
-        return ConditionProcessorFactory::getInstance()->get($this->formObject);
+        return ConditionProcessorFactory::getInstance()->get($this->getFormObject());
     }
 
     /**
@@ -378,6 +384,6 @@ class FormValidatorExecutor
      */
     protected function getPhpConditionDataObject()
     {
-        return new PhpConditionDataObject($this->formObject->getForm(), $this);
+        return new PhpConditionDataObject($this->getFormObject()->getForm(), $this);
     }
 }

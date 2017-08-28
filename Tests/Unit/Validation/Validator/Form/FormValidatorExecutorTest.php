@@ -4,9 +4,10 @@ namespace Romm\Formz\Tests\Unit\Validation\Validator\Form;
 
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Field\Field;
+use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
-use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
+use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
 use Romm\Formz\Validation\Form\FormValidatorExecutor;
 use Romm\Formz\Validation\Validator\RequiredValidator;
 
@@ -22,7 +23,6 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     {
         $formObject = $this->getExtendedFormObject();
         $formObject->setForm(new DefaultForm);
-        $formValidatorDataObject = $this->getFormValidatorDataObjectDummy();
 
         $fieldFoo = $formObject->getDefinition()->getField('foo');
         $fieldBar = $formObject->getDefinition()->getField('bar');
@@ -30,7 +30,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
         $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['checkFieldActivation'])
-            ->setConstructorArgs([$formObject, $formValidatorDataObject])
+            ->setConstructorArgs([$this->getFormValidatorDataObjectDummy($formObject)])
             ->getMock();
 
         $formValidatorExecutor->expects($this->exactly(2))
@@ -64,7 +64,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
         $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['getFieldActivationProcessResult'])
-            ->setConstructorArgs([$formObject, $this->getFormValidatorDataObjectDummy()])
+            ->setConstructorArgs([$this->getFormValidatorDataObjectDummy($formObject)])
             ->getMock();
 
         $formValidatorExecutor->expects($this->once())
@@ -96,7 +96,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
         $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['getValidatorActivationProcessResult'])
-            ->setConstructorArgs([$formObject, $this->getFormValidatorDataObjectDummy()])
+            ->setConstructorArgs([$this->getFormValidatorDataObjectDummy($formObject)])
             ->getMock();
 
         $formValidatorExecutor->expects($this->once())
@@ -131,7 +131,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
 
         $field->addValidator('foo', RequiredValidator::class);
 
-        $formValidatorExecutor = new FormValidatorExecutor($formObject, $this->getFormValidatorDataObjectDummy());
+        $formValidatorExecutor = new FormValidatorExecutor($this->getFormValidatorDataObjectDummy($formObject));
 
         $result = $formValidatorExecutor->getResult();
 
@@ -157,7 +157,7 @@ class FormValidatorExecutorTest extends AbstractUnitTest
         /** @var FormValidatorExecutor|\PHPUnit_Framework_MockObject_MockObject $formValidatorExecutor */
         $formValidatorExecutor = $this->getMockBuilder(FormValidatorExecutor::class)
             ->setMethods(['getValidatorActivationProcessResult'])
-            ->setConstructorArgs([$formObject, $this->getFormValidatorDataObjectDummy()])
+            ->setConstructorArgs([$this->getFormValidatorDataObjectDummy($formObject)])
             ->getMock();
 
         $formValidatorExecutor->expects($this->once())
@@ -171,10 +171,11 @@ class FormValidatorExecutorTest extends AbstractUnitTest
     }
 
     /**
+     * @param FormObject $formObject
      * @return FormValidatorDataObject
      */
-    protected function getFormValidatorDataObjectDummy()
+    protected function getFormValidatorDataObjectDummy(FormObject $formObject)
     {
-        return new FormValidatorDataObject(new FormResult);
+        return new FormValidatorDataObject($formObject, new FormResult);
     }
 }

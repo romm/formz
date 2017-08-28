@@ -22,7 +22,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Service\FormService;
-use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
+use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator as ExtbaseAbstractValidator;
 
@@ -240,7 +240,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator
     protected function getFormValidatorExecutor()
     {
         /** @var FormValidatorExecutor $formValidatorExecutor */
-        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $this->getFormObject(), $this->getDataObject());
+        $formValidatorExecutor = Core::instantiate(FormValidatorExecutor::class, $this->getDataObject());
 
         return $formValidatorExecutor;
     }
@@ -278,7 +278,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator
     public function getDataObject()
     {
         if (null === $this->dataObject) {
-            $this->dataObject = Core::instantiate(FormValidatorDataObject::class, $this->getFormResult());
+            $this->dataObject = Core::instantiate(FormValidatorDataObject::class, $this->getFormObject(), $this->getFormResult());
         }
 
         return $this->dataObject;

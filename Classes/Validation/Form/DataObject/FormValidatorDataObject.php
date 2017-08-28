@@ -11,12 +11,18 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Validation\Validator\Form\DataObject;
+namespace Romm\Formz\Validation\Form\DataObject;
 
 use Romm\Formz\Error\FormResult;
+use Romm\Formz\Form\FormObject\FormObject;
 
 class FormValidatorDataObject
 {
+    /**
+     * @var FormObject
+     */
+    protected $formObject;
+
     /**
      * @var FormResult
      */
@@ -28,11 +34,21 @@ class FormValidatorDataObject
     protected $fieldValidationCallback = [];
 
     /**
+     * @param FormObject $formObject
      * @param FormResult $formResult
      */
-    public function __construct(FormResult $formResult)
+    public function __construct(FormObject $formObject, FormResult $formResult)
     {
+        $this->formObject = $formObject;
         $this->formResult = $formResult;
+    }
+
+    /**
+     * @return FormObject
+     */
+    public function getFormObject()
+    {
+        return $this->formObject;
     }
 
     /**
