@@ -64,11 +64,12 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
             $currentStep = $this->getCurrentStep();
 
             if ($currentStep) {
-                /*
-                 * No error during the validation : the submitted form values
-                 * are saved in the step metadata.
-                 */
-                $this->service->saveStepFormValues($currentStep);
+                // @todo tmp-delete?
+//                /*
+//                 * No error during the validation : the submitted form values
+//                 * are saved in the step metadata.
+//                 */
+//                $this->service->saveStepFormValues($currentStep);
 
                 $stepService = FormObjectFactory::get()->getStepService($formObject);
 

@@ -25,7 +25,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Validation\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
-use Romm\Formz\Validation\Form\Service\SubstepService;
+use Romm\Formz\Validation\Form\Service\SubstepValidationService;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -50,7 +50,7 @@ class FormValidatorExecutor
     protected $phpConditionDataObject;
 
     /**
-     * @var SubstepService
+     * @var SubstepValidationService
      */
     protected $substepService;
 
@@ -88,7 +88,7 @@ class FormValidatorExecutor
         $this->conditionProcessor = $this->getConditionProcessor();
         $this->phpConditionDataObject = $this->getPhpConditionDataObject();
 
-        $this->substepService = Core::instantiate(SubstepService::class, $this, $dataObject);
+        $this->substepService = Core::instantiate(SubstepValidationService::class, $this, $dataObject);
     }
 
     /**

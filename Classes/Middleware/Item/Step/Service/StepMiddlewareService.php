@@ -83,8 +83,10 @@ class StepMiddlewareService implements SingletonInterface
          */
         $currentStepDefinition = $this->getStepDefinition($currentStep);
 
-        // Saving submitted form data for further usage.
-        $this->markStepAsValidated($currentStepDefinition, $this->getFormRawValues());
+        $this->validationService->markStepAsValidated($currentStepDefinition);
+        // @todo tmp-delete?
+//        // Saving submitted form data for further usage.
+//        $this->markStepAsValidated($currentStepDefinition, $this->getFormRawValues());
         $this->addValidatedFields($this->formObject->getFormResult()->getValidatedFields());
 
         $nextStep = null;
@@ -96,51 +98,52 @@ class StepMiddlewareService implements SingletonInterface
         return $nextStep;
     }
 
-    /**
-     * Saves the submitted values in the metadata, for the given step.
-     *
-     * @param Step $currentStep
-     */
-    public function saveStepFormValues(Step $currentStep)
-    {
-        $this->persistence->addStepFormValues($this->getStepDefinition($currentStep), $this->getFormRawValues());
-    }
-
-    /**
-     * Fetches the raw values sent in the request.
-     *
-     * @return array
-     * @throws InvalidArgumentTypeException
-     */
-    protected function getFormRawValues()
-    {
-        $formName = $this->getFormObject()->getName();
-        $formArray = null;
-
-        if ($this->request->hasArgument($formName)) {
-            /** @var array $formArray */
-            $formArray = $this->request->getArgument($formName);
-
-            if (false === is_array($formArray)) {
-                throw InvalidArgumentTypeException::formArgumentNotArray($this->getFormObject(), $formArray);
-            }
-        } else {
-            $formArray = [];
-        }
-
-        return $formArray;
-    }
-
-    /**
-     * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::markStepAsValidated
-     *
-     * @param StepDefinition $stepDefinition
-     * @param array          $formValues
-     */
-    public function markStepAsValidated(StepDefinition $stepDefinition, array $formValues)
-    {
-        $this->validationService->markStepAsValidated($stepDefinition, $formValues);
-    }
+    // @todo tmp-delete?
+//    /**
+//     * Saves the submitted values in the metadata, for the given step.
+//     *
+//     * @param Step $currentStep
+//     */
+//    public function saveStepFormValues(Step $currentStep)
+//    {
+//        $this->persistence->addStepFormValues($this->getStepDefinition($currentStep), $this->getFormRawValues());
+//    }
+//
+//    /**
+//     * Fetches the raw values sent in the request.
+//     *
+//     * @return array
+//     * @throws InvalidArgumentTypeException
+//     */
+//    protected function getFormRawValues()
+//    {
+//        $formName = $this->getFormObject()->getName();
+//        $formArray = null;
+//
+//        if ($this->request->hasArgument($formName)) {
+//            /** @var array $formArray */
+//            $formArray = $this->request->getArgument($formName);
+//
+//            if (false === is_array($formArray)) {
+//                throw InvalidArgumentTypeException::formArgumentNotArray($this->getFormObject(), $formArray);
+//            }
+//        } else {
+//            $formArray = [];
+//        }
+//
+//        return $formArray;
+//    }
+//
+//    /**
+//     * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::markStepAsValidated()
+//     *
+//     * @param StepDefinition $stepDefinition
+//     * @param array          $formValues
+//     */
+//    public function markStepAsValidated(StepDefinition $stepDefinition, array $formValues)
+//    {
+//        $this->validationService->markStepAsValidated($stepDefinition, $formValues);
+//    }
 
     /**
      * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::addValidatedFields

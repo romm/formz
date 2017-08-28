@@ -22,7 +22,7 @@ use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
 use Romm\Formz\Validation\Form\FormValidatorExecutor;
 
-class SubstepService
+class SubstepValidationService
 {
     /**
      * @var FormValidatorExecutor

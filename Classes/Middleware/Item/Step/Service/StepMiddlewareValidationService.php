@@ -60,15 +60,16 @@ class StepMiddlewareValidationService
      * @param StepDefinition $stepDefinition
      * @param array          $formValues
      */
-    public function markStepAsValidated(StepDefinition $stepDefinition, array $formValues)
+    public function markStepAsValidated(StepDefinition $stepDefinition/*, array $formValues*/) // @todo tmp-delete?
     {
         $this->persistence->markStepAsValidated($stepDefinition);
 
-        if ($this->persistence->hasStepFormValues($stepDefinition)
-            && serialize($formValues) !== serialize($this->persistence->getStepFormValues($stepDefinition))
-        ) {
-            $this->persistence->resetValidationData();
-        }
+        // @todo tmp-delete?
+//        if ($this->persistence->hasStepFormValues($stepDefinition)
+//            && serialize($formValues) !== serialize($this->persistence->getStepFormValues($stepDefinition))
+//        ) {
+//            $this->persistence->resetValidationData();
+//        }
     }
 
     /**
@@ -137,7 +138,8 @@ class StepMiddlewareValidationService
         /** @var StepDefinition[] $stepDefinitionsToTest */
         $stepDefinitionsToTest = [];
         $invalidStepDefinition = null;
-        $currentStepDefinition = $stepDefinition = $this->service->getStepDefinition($step);
+        // @todo tmp-delete?
+        /*$currentStepDefinition = */$stepDefinition = $this->service->getStepDefinition($step);
 
         while ($stepDefinition->hasPreviousDefinition()) {
             $stepDefinition = $stepDefinition->getPreviousDefinition();
@@ -158,87 +160,92 @@ class StepMiddlewareValidationService
              * If the already submitted form values are not found, the step is
              * considered as invalid.
              */
-            if (false === $this->persistence->hasStepFormValues($stepDefinition)) {
+            if (false === $this->persistence->stepWasValidated($step)) {
                 $invalidStepDefinition = $stepDefinition;
                 break;
             }
 
-            $result = $this->validateStep($step);
-
-            if ($result->hasErrors()) {
-                $invalidStepDefinition = $stepDefinition;
-                break;
-            } else {
-                $this->persistence->markStepAsValidated($stepDefinition);
-                $this->persistence->addValidatedFields($result->getValidatedFields());
-            }
+            // @todo tmp-delete?
+//            $result = $this->validateStep($step);
+//
+//            if ($result->hasErrors()) {
+//                \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($result->getFlattenedErrors(), __METHOD__  . ':' . __LINE__ . ' $result->getFlattenedErrors() ');
+//                $invalidStepDefinition = $stepDefinition;
+//                break;
+//            } else {
+//                $this->persistence->markStepAsValidated($stepDefinition);
+//                $this->persistence->addValidatedFields($result->getValidatedFields());
+//            }
         }
 
-        $nextStepDefinition = $this->service->getNextStepDefinition($stepDefinition);
-
-        if ($nextStepDefinition !== $currentStepDefinition) {
-            $invalidStepDefinition = $stepDefinition;
-        }
+//        $nextStepDefinition = $this->service->getNextStepDefinition($stepDefinition);
+//
+//        if ($nextStepDefinition !== $currentStepDefinition) {
+//            $invalidStepDefinition = $stepDefinition;
+//        }
 
         return $invalidStepDefinition;
     }
 
-    /**
-     * @param array $stepFormValues
-     * @return PropertyMappingConfiguration
-     */
-    protected function getPropertyMappingConfiguration(array $stepFormValues)
-    {
-        /** @var PropertyMappingConfiguration $propertyMappingConfiguration */
-        $propertyMappingConfiguration = GeneralUtility::makeInstance(PropertyMappingConfiguration::class);
-        $propertyMappingConfiguration->allowAllProperties();
-        $propertyMappingConfiguration->setTypeConverterOption(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED, true);
+    // @todo tmp-delete?
 
-        foreach ($stepFormValues as $key => $value) {
-            if (is_array($value)) {
-                $propertyMappingConfiguration->forProperty($key)->allowAllProperties();
-            }
-        }
-
-        return $propertyMappingConfiguration;
-    }
-
-    /**
-     * Validates (again) the given step with the form data that were previously
-     * submitted and fetched from the step persistence.
-     *
-     * @param Step $step
-     * @return FormResult
-     */
-    protected function validateStep(Step $step)
-    {
-        /** @var PropertyMapper $propertyMapper */
-        $propertyMapper = Core::instantiate(PropertyMapper::class);
-
-        $stepFormValues = $this->persistence->getMergedFormValues();
-        $propertyMappingConfiguration = $this->getPropertyMappingConfiguration($stepFormValues);
-
-        $form = $propertyMapper->convert($stepFormValues, $this->formObject->getClassName(), $propertyMappingConfiguration);
-
-        /** @var FormValidationMiddlewareOption $formValidationMiddlewareOptions */
-        $formValidationMiddlewareOptions = $this->formObject
-            ->getDefinition()
-            ->getPresetMiddlewares()
-            ->getFormValidationMiddleware()
-            ->getOptions();
-
-        /** @var AbstractFormValidator $validator */
-        $validator = Core::instantiate(
-            $formValidationMiddlewareOptions->getFormValidatorClassName(),
-            [
-                'name'  => $this->formObject->getName(),
-                'form'  => $form,
-                'dummy' => true
-            ]
-        );
-
-        $validator->getDataObject()->setValidatedStep($step);
-
-        return $validator->validate($form);
-    }
+//    /**
+//     * @param array $stepFormValues
+//     * @return PropertyMappingConfiguration
+//     */
+//    protected function getPropertyMappingConfiguration(array $stepFormValues)
+//    {
+//        /** @var PropertyMappingConfiguration $propertyMappingConfiguration */
+//        $propertyMappingConfiguration = GeneralUtility::makeInstance(PropertyMappingConfiguration::class);
+//        $propertyMappingConfiguration->allowAllProperties();
+//        $propertyMappingConfiguration->setTypeConverterOption(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED, true);
+//
+//        foreach ($stepFormValues as $key => $value) {
+//            if (is_array($value)) {
+//                $propertyMappingConfiguration->forProperty($key)->allowAllProperties();
+//            }
+//        }
+//
+//        return $propertyMappingConfiguration;
+//    }
+//
+//    /**
+//     * Validates (again) the given step with the form data that were previously
+//     * submitted and fetched from the step persistence.
+//     *
+//     * @param Step $step
+//     * @return FormResult
+//     */
+//    protected function validateStep(Step $step)
+//    {
+//        /** @var PropertyMapper $propertyMapper */
+//        $propertyMapper = Core::instantiate(PropertyMapper::class);
+//
+//        $stepFormValues = $this->persistence->getMergedFormValues();
+//        $propertyMappingConfiguration = $this->getPropertyMappingConfiguration($stepFormValues);
+//
+//        $form = $this->formObject->getForm();
+////        $form = $propertyMapper->convert($stepFormValues, $this->formObject->getClassName(), $propertyMappingConfiguration);
+//
+//        /** @var FormValidationMiddlewareOption $formValidationMiddlewareOptions */
+//        $formValidationMiddlewareOptions = $this->formObject
+//            ->getDefinition()
+//            ->getPresetMiddlewares()
+//            ->getFormValidationMiddleware()
+//            ->getOptions();
+//
+//        /** @var AbstractFormValidator $validator */
+//        $validator = Core::instantiate(
+//            $formValidationMiddlewareOptions->getFormValidatorClassName(),
+//            [
+//                'name'  => $this->formObject->getName(),
+//                'form'  => $form,
+//                'dummy' => true
+//            ]
+//        );
+//
+//        $validator->getDataObject()->setValidatedStep($step);
+//
+//        return $validator->validate($form);
+//    }
 }
