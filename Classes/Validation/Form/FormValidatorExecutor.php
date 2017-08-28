@@ -23,7 +23,7 @@ use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Service\MessageService;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
 use Romm\Formz\Validation\Form\Service\SubstepValidationService;
 use Romm\Formz\Validation\Validator\AbstractValidator;

@@ -20,7 +20,7 @@ use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\ValidatorService;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
 
 abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator
 {

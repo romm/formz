@@ -7,7 +7,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyFieldValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
 use Romm\Formz\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Extbase\Error\Result;
 

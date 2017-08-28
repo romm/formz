@@ -51,7 +51,7 @@ class SubstepValidationService
     {
         $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
 
-        $currentSubstepDefinition = $this->aze();
+        $currentSubstepDefinition = $this->getCurrentSubstepDefinition();
 
         if (null !== $currentSubstepDefinition
             && $this->dataObject->getValidatedStep() === $stepService->getCurrentStep()
@@ -71,7 +71,7 @@ class SubstepValidationService
         }
     }
 
-    protected function aze()
+    protected function getCurrentSubstepDefinition()
     {
         $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
 

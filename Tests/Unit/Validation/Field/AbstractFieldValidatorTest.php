@@ -6,7 +6,7 @@ use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\DummyFieldValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
-use Romm\Formz\Validation\DataObject\ValidatorDataObject;
+use Romm\Formz\Validation\Field\DataObject\ValidatorDataObject;
 use TYPO3\CMS\Extbase\Error\Result;
 
 class AbstractFieldValidatorTest extends AbstractUnitTest
