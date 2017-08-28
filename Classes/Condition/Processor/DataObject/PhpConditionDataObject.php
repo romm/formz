@@ -14,7 +14,7 @@
 namespace Romm\Formz\Condition\Processor\DataObject;
 
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 
 class PhpConditionDataObject
 {

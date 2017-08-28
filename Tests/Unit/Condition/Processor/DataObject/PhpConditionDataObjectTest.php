@@ -4,7 +4,7 @@ namespace Romm\Formz\Tests\Unit\Condition\Processor\DataObject;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 
 class PhpConditionDataObjectTest extends AbstractUnitTest
 {

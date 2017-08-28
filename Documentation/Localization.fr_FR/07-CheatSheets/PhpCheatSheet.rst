@@ -104,7 +104,7 @@ Contrôleur
 Validateur de formulaire
 ------------------------
 
-* Doit hériter de :php:`Romm\Formz\Validation\Validator\Form\AbstractFormValidator` (cf. ligne 10) ;
+* Doit hériter de :php:`Romm\Formz\Validation\Form\AbstractFormValidator` (cf. ligne 10) ;
 * Peut manipuler :php:`$this->result` à la volée, par exemple pour rajouter des erreurs (cf. ligne 65) ;
 * Peut surcharger les méthodes :php:`beforeValidationProcess()` et :php:`afterValidationProcess()`, appelées respectivement avant et après le processus de validation (cf. lignes 24 & 58) ;
 * Peut appeler des méthodes dynamiques à chaque fin de validation d'un champ : :php:`*Validated` où ``*`` représente le nom du champ en lowerCamelCase (cf. ligne 43) ;
@@ -119,7 +119,7 @@ Validateur de formulaire
     <?php
     namespace MyVendor\MyExtension\Validation\Validator\Form;
 
-    use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+    use Romm\Formz\Validation\Form\AbstractFormValidator;
     use MyVendor\MyExtension\Utility\SimulationUtility;
     use MyVendor\MyExtension\Utility\SessionUtility;
     use MyVendor\MyExtension\Utility\GeographyUtility;

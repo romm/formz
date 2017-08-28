@@ -17,6 +17,7 @@ use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\Service\FormObjectRequestData;
 use Romm\Formz\Service\HashService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormObjectProxy
 {
@@ -114,7 +115,7 @@ class FormObjectProxy
     public function getFormResult()
     {
         if (null === $this->formResult) {
-            $this->formResult = new FormResult;
+            $this->formResult = GeneralUtility::makeInstance(FormResult::class);
         }
 
         return $this->formResult;
