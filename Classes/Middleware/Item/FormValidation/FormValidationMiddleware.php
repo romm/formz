@@ -15,8 +15,8 @@ namespace Romm\Formz\Middleware\Item\FormValidation;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Middleware\Item\FieldValidation\FieldValidationArguments;
-use Romm\Formz\Middleware\Item\FieldValidation\FieldValidationSignal;
+use Romm\Formz\Middleware\Item\Field\Validation\FieldValidationArguments;
+use Romm\Formz\Middleware\Item\Field\Validation\FieldValidationSignal;
 use Romm\Formz\Middleware\Item\OnBeginMiddleware;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;

@@ -53,17 +53,14 @@ class SubstepValidationService
 
         $currentSubstepDefinition = $this->getCurrentSubstepDefinition();
 
-        if (null !== $currentSubstepDefinition
-            && $this->dataObject->getValidatedStep() === $stepService->getCurrentStep()
-        ) {
+        if ($this->dataObject->getValidatedStep() === $stepService->getCurrentStep()) {
             if ($this->getResult()->hasErrors()) {
                 $stepService->setCurrentSubstepDefinition($currentSubstepDefinition);
             } else {
-                list($nextSubstep, $substepsLevelIncrease) = $this->getNextSubstep($currentSubstepDefinition);
+                $nextSubstep = $this->getNextSubstep($currentSubstepDefinition);
 
                 if ($nextSubstep) {
                     $stepService->setCurrentSubstepDefinition($nextSubstep);
-                    $stepService->setSubstepsLevel($stepService->getSubstepsLevel() + $substepsLevelIncrease);
                 } else {
                     $stepService->markLastSubstepAsValidated();
                 }
@@ -71,45 +68,49 @@ class SubstepValidationService
         }
     }
 
+    /**
+     * @return SubstepDefinition
+     */
     protected function getCurrentSubstepDefinition()
     {
         $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
 
-        $currentSubstepDefinition = null;
         $firstSubstepDefinition = $this->dataObject->getValidatedStep()->getSubsteps()->getFirstSubstepDefinition();
+        $currentSubstepDefinition = $firstSubstepDefinition;
         $substepDefinition = $firstSubstepDefinition;
         $substepsLevel = $stepService->getSubstepsLevel();
-        $stepService->setSubstepsLevel(1);
-        $substepsLevelCounter = 0;
 
-        while ($substepDefinition && $substepsLevel > 0) {
+        while ($substepsLevel > 0) {
             $substepsLevel--;
-            $substepsLevelCounter++;
-            $phpResult = true;
+            $substepIsActivated = true;
 
             if ($substepDefinition->hasActivation()) {
-                $phpResult = $this->getSubstepDefinitionActivationResult($substepDefinition);
+                $substepIsActivated = $this->getSubstepDefinitionActivationResult($substepDefinition);
             }
 
-            if (true === $phpResult) {
+            if (true === $substepIsActivated) {
                 $supportedFields = $substepDefinition->getSubstep()->getSupportedFields();
 
                 foreach ($supportedFields as $supportedField) {
                     $this->formValidatorExecutor->validateField($supportedField->getField());
                 }
+
+                if ($this->getResult()->hasErrors()) {
+                    $currentSubstepDefinition = $substepDefinition;
+                    break;
+                }
             }
 
-            if ($substepsLevel === 0
-                || $this->getResult()->hasErrors()
-            ) {
+            if ($substepsLevel === 0) {
                 $currentSubstepDefinition = $substepDefinition;
-                $stepService->setSubstepsLevel($substepsLevelCounter);
                 break;
             }
 
-            $substepDefinition = $substepDefinition->hasNextSubstep()
-                ? $substepDefinition->getNextSubstep()
-                : null;
+            if (false === $substepDefinition->hasNextSubstep()) {
+                break;
+            }
+
+            $substepDefinition = $substepDefinition->getNextSubstep();
         }
 
         return $currentSubstepDefinition;
@@ -117,7 +118,6 @@ class SubstepValidationService
 
     protected function getNextSubstep(SubstepDefinition $substepDefinition)
     {
-        $substepsLevelIncrease = 0;
         $nextSubstep = null;
 
         while ($substepDefinition) {
@@ -125,7 +125,6 @@ class SubstepValidationService
                 break;
             } else {
                 $substepDefinition = $substepDefinition->getNextSubstep();
-                $substepsLevelIncrease++;
 
                 if (false === $substepDefinition->hasActivation()) {
                     $nextSubstep = $substepDefinition;
@@ -141,7 +140,7 @@ class SubstepValidationService
             }
         }
 
-        return [$nextSubstep, $substepsLevelIncrease];
+        return $nextSubstep;
     }
 
     /**

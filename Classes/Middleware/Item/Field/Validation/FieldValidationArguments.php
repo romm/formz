@@ -11,7 +11,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Romm\Formz\Middleware\Item\FieldValidation;
+namespace Romm\Formz\Middleware\Item\Field\Validation;
 
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Middleware\Argument\Arguments;

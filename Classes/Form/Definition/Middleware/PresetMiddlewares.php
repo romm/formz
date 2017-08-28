@@ -16,6 +16,7 @@ namespace Romm\Formz\Form\Definition\Middleware;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
+use Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware;
 use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware;
 use Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware;
@@ -51,6 +52,11 @@ class PresetMiddlewares implements DataPreProcessorInterface
      * @var \Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware
      */
     protected $stepDispatchingMiddleware;
+
+    /**
+     * @var \Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware
+     */
+    protected $fieldFocusMiddleware;
 
     /**
      * Returns the full list of preset middlewares.
@@ -118,5 +124,13 @@ class PresetMiddlewares implements DataPreProcessorInterface
     public function getStepDispatchingMiddleware()
     {
         return $this->stepDispatchingMiddleware;
+    }
+
+    /**
+     * @return FieldFocusMiddleware
+     */
+    public function getFieldFocusMiddleware()
+    {
+        return $this->fieldFocusMiddleware;
     }
 }

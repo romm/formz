@@ -292,7 +292,8 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             if ($currentStep->hasSubsteps()) {
                 $substepsLevel = FormObjectFactory::get()
                     ->getStepService($this->formObject)
-                    ->getSubstepsLevel();
+                    ->getCurrentSubstepDefinition()
+                    ->getLevel();
 
                 $result .= '<input type="hidden" fz-substeps-level="1" name="' . $this->prefixFieldName('substepsLevel') . '" value="' . $substepsLevel . '" />' . LF;
             }
