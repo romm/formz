@@ -1,6 +1,6 @@
 <?php
 
-namespace Romm\Formz\Tests\Unit\Validation\Validator\Form;
+namespace Romm\Formz\Tests\Unit\Validation\Form;
 
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;

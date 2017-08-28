@@ -3,7 +3,7 @@ namespace Romm\Formz\Tests\Fixture\Validation\Validator;
 
 use Romm\Formz\Validation\Field\AbstractFieldValidator;
 
-class DummyValidator extends AbstractFieldValidator
+class DummyFieldValidator extends AbstractFieldValidator
 {
     const MESSAGE_1 = 'message1';
 
