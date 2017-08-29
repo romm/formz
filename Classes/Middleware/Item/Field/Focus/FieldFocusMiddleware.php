@@ -15,7 +15,6 @@ namespace Romm\Formz\Middleware\Item\Field\Focus;
 
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Step\Step\Step;
-use Romm\Formz\Form\Definition\Step\Step\Substep\Substep;
 use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\OnBeginMiddleware;
@@ -26,6 +25,8 @@ use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
  */
 class FieldFocusMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface
 {
+    const FIELD_FOCUS_ARGUMENT = 'fieldFocus';
+
     /**
      * @var Step
      */
@@ -41,8 +42,6 @@ class FieldFocusMiddleware extends OnBeginMiddleware implements PresetMiddleware
      */
     protected function process()
     {
-        return;
-
         if ($this->getFormObject()->formWasSubmitted()) {
             return;
         }
@@ -66,8 +65,10 @@ class FieldFocusMiddleware extends OnBeginMiddleware implements PresetMiddleware
         $firstSubstepDefinition = $this->step->getSubsteps()->getFirstSubstepDefinition();
         $substepDefinition = $this->fetchFieldSubstep($firstSubstepDefinition);
 
-        $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
-        $stepService->setCurrentSubstepDefinition($substepDefinition);
+        if ($substepDefinition) {
+            $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
+            $stepService->setCurrentSubstepDefinition($substepDefinition);
+        }
     }
 
     /**
@@ -89,14 +90,18 @@ class FieldFocusMiddleware extends OnBeginMiddleware implements PresetMiddleware
 
     protected function fetchField()
     {
-        $fieldName = 'nom';
-        $formDefinition = $this->getFormObject()->getDefinition();
+        $request = $this->getRequest();
 
-        if ($formDefinition->hasField($fieldName)) {
-            $field = $formDefinition->getField($fieldName);
+        if ($request->hasArgument(self::FIELD_FOCUS_ARGUMENT)) {
+            $fieldName = $request->getArgument(self::FIELD_FOCUS_ARGUMENT);
+            $formDefinition = $this->getFormObject()->getDefinition();
 
-            if ($this->step->supportsField($field)) {
-                $this->field = $field;
+            if ($formDefinition->hasField($fieldName)) {
+                $field = $formDefinition->getField($fieldName);
+
+                if ($this->step->supportsField($field)) {
+                    $this->field = $field;
+                }
             }
         }
     }

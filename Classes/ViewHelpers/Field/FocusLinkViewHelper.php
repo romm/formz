@@ -13,9 +13,14 @@
 
 namespace Romm\Formz\ViewHelpers\Field;
 
+use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Form\FormObject\FormObject;
+use Romm\Formz\Form\FormObject\FormObjectFactory;
+use Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware;
 use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
 
@@ -42,6 +47,7 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
         $this->registerUniversalTagAttributes();
 
         $this->registerArgument('field', 'string', 'Name of the field.', true);
+        $this->registerArgument('form', FormInterface::class, '@todo.'); // @todo
         $this->registerArgument('step', 'string', 'Identifier of the step, if the field is present of several steps.');
         $this->registerArgument('additionalParams', 'array', 'Additional parameters passed to the URI.', false, []);
     }
@@ -74,25 +80,43 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
         $controller = null;
         $extensionName = null;
 
-        $arguments = $this->arguments['additionalParams'];
-
         $step = $this->getStep();
 
         if ($step) {
-            $pageUid = $step->getPageUid();
-            $action = $step->getAction();
-            $controller = $step->getController();
-            $extensionName = $step->getExtension();
+            $request = $this->renderingContext->getControllerContext()->getRequest();
+
+            if (Core::get()->getPageController()->id !== $step->getPageUid()) {
+                // @todo handle backend context
+                $pageUid = $step->getPageUid();
+            }
+
+            if ($request->getControllerActionName() !== $step->getAction()) {
+                $action = $step->getAction();
+            }
+
+            if ($request->getControllerName() !== $step->getController()) {
+                $controller = $step->getController();
+            }
+
+            if ($request->getControllerExtensionName() !== $step->getExtension()) {
+                $extensionName = $step->getExtension();
+            }
         }
 
         $uriBuilder = $this->controllerContext->getUriBuilder();
         $uri = $uriBuilder->reset();
+        $uri->setArguments($this->arguments['additionalParams']);
 
         if ($pageUid) {
             $uri->setTargetPageUid($pageUid);
         }
 
-        return $uri->uriFor($action, $arguments, $controller, $extensionName);
+        return $uri->uriFor(
+            $action,
+            [FieldFocusMiddleware::FIELD_FOCUS_ARGUMENT => $this->getField()->getName()],
+            $controller,
+            $extensionName
+        );
 
     }
 
@@ -107,7 +131,7 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
      */
     protected function getStep()
     {
-        $formDefinition = $this->formService->getFormObject()->getDefinition();
+        $formDefinition = $this->getFormObject()->getDefinition();
         $stepIdentifier = $this->arguments['step'];
         $step = null;
 
@@ -122,6 +146,13 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
             if (false === $step->supportsField($field)) {
                 throw new \Exception('@todo : the step "' . $step->getIdentifier() . '" does not support the field "' . $field->getName() . '".'); // @todo
             }
+        } else {
+            foreach ($formDefinition->getSteps()->getEntries() as $stepEntry) {
+                if ($stepEntry->supportsField($this->getField())) {
+                    $step = $stepEntry;
+                    break;
+                }
+            }
         }
 
         return $step;
@@ -132,7 +163,9 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
      */
     protected function checkFormContext()
     {
-        if (false === $this->formService->formContextExists()) {
+        if (null === $this->getForm()
+            && false === $this->formService->formContextExists()
+        ) {
             throw new ContextNotFoundException('form context not found'); // @todo
         }
     }
@@ -142,7 +175,7 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
      */
     protected function checkFieldExists()
     {
-        $formDefinition = $this->formService->getFormObject()->getDefinition();
+        $formDefinition = $this->getFormObject()->getDefinition();
         $fieldName = $this->arguments['field'];
 
         if (false === $formDefinition->hasField($fieldName)) {
@@ -157,10 +190,29 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
      */
     protected function getField()
     {
-        return $this->formService
-            ->getFormObject()
+        return $this->getFormObject()
             ->getDefinition()
             ->getField($this->arguments['field']);
+    }
+
+    /**
+     * @return FormObject
+     */
+    protected function getFormObject()
+    {
+        return $this->formService->formContextExists()
+            ? $this->formService->getFormObject()
+            : FormObjectFactory::get()->getInstanceWithFormInstance($this->getForm());
+    }
+
+    /**
+     * @return FormInterface|null
+     */
+    protected function getForm()
+    {
+        return $this->formService->formContextExists()
+            ? $this->formService->getFormObject()->getForm()
+            : $this->arguments['form'];
     }
 
     /**
