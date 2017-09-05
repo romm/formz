@@ -338,13 +338,15 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
             ->will(function ($arguments) use ($templateVariableContainerProphecy, &$templateVariables) {
                 $templateVariables[$arguments[0]] = $arguments[1];
 
-                if (in_array($arguments[0], FieldViewHelper::$reservedVariablesNames)) {
-                    $templateVariableContainerProphecy
-                        ->remove($arguments[0])
-                        ->shouldBeCalled()
-                        ->will(function () use ($arguments, &$templateVariables) {
-                            unset($templateVariables[$arguments[0]]);
-                        });
+                if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+                    if (in_array($arguments[0], FieldViewHelper::$reservedVariablesNames)) {
+                        $templateVariableContainerProphecy
+                            ->remove($arguments[0])
+                            ->shouldBeCalled()
+                            ->will(function () use ($arguments, &$templateVariables) {
+                                unset($templateVariables[$arguments[0]]);
+                            });
+                    }
                 }
 
                 $templateVariableContainerProphecy

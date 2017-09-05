@@ -30,7 +30,7 @@ TXT;
         $validation->setClassName(RequiredValidator::class);
         $field->addValidation($validation);
 
-            /** @var FormzLocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
+        /** @var FormzLocalizationJavaScriptAssetHandler|\PHPUnit_Framework_MockObject_MockObject $assetHandler */
         $assetHandler = $this->getMockBuilder(FormzLocalizationJavaScriptAssetHandler::class)
             ->setMethods(['handleRealTranslations', 'handleTranslationsBinding'])
             ->setConstructorArgs([$assetHandlerFactory])
