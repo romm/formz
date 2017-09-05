@@ -69,11 +69,6 @@ class FieldViewHelper extends AbstractViewHelper
     protected $slotService;
 
     /**
-     * @var array
-     */
-    protected $originalArguments = [];
-
-    /**
      * @inheritdoc
      */
     public function initializeArguments()
@@ -114,22 +109,11 @@ class FieldViewHelper extends AbstractViewHelper
          */
         $this->renderChildren();
 
-        /*
-         * We need to store original arguments declared for the current view
-         * context, because we may override them during the rendering of this
-         * view helper.
-         */
-        $this->storeOriginalArguments();
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $restoreCallback = $this->storeViewDataLegacy();
+        }
 
-        /*
-         * We merge the arguments with the ones registered with the
-         * `OptionViewHelper`.
-         */
-        $templateArguments = $this->arguments['arguments'] ?: [];
-        ArrayUtility::mergeRecursiveWithOverrule($templateArguments, $this->fieldService->getFieldOptions());
-
-        $viewHelperVariableContainer = $this->renderingContext->getViewHelperVariableContainer();
-        $currentView = $viewHelperVariableContainer->getView();
+        $templateArguments = $this->getTemplateArguments();
 
         $result = $this->renderLayoutView($templateArguments);
 
@@ -139,14 +123,16 @@ class FieldViewHelper extends AbstractViewHelper
         $this->fieldService->removeCurrentField();
         $this->slotService->resetState();
 
-        $viewHelperVariableContainer->setView($currentView);
-        $this->restoreOriginalArguments($templateArguments);
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            /** @noinspection PhpUndefinedVariableInspection */
+            $restoreCallback($templateArguments);
+        }
 
         return $result;
     }
 
     /**
-     * Will render the associated Fluid view for this field (configured with the
+     * Will return the associated Fluid view for this field (configured with the
      * `layout` argument).
      *
      * @param array $templateArguments
@@ -167,30 +153,84 @@ class FieldViewHelper extends AbstractViewHelper
 
         $view = $this->fieldService->getView($layout);
 
-        $layoutPaths = $this->getPaths('layout');
-        $partialPaths = $this->getPaths('partial');
-
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
         } else {
+            $renderingContext = $view->getRenderingContext();
+
+            // Removing all variables previously added to the provider.
+            $provider = $renderingContext->getVariableProvider();
+
+            foreach ($provider->getAllIdentifiers() as $key) {
+                $provider->remove($key);
+            }
+
+            /*
+             * Updating the view dependencies: the variable container as well as
+             * the controller context must be injected in the view.
+             */
+            $renderingContext->setViewHelperVariableContainer($this->viewHelperVariableContainer);
+
             $view->setControllerContext($this->controllerContext);
 
-            $variableProvider = $this->getVariableProvider();
+            $this->viewHelperVariableContainer->setView($view);
+        }
 
-            foreach ($templateArguments as $key => $value) {
+        $view->setLayoutRootPaths($this->getPaths('layout'));
+        $view->setPartialRootPaths($this->getPaths('partial'));
+        $view->assignMultiple($templateArguments);
+
+        return $view->render();
+    }
+
+    /**
+     * Temporary solution for TYPO3 6.2 to 7.6 that will store the current view
+     * variables in a variable, to be able to restore them later.
+     *
+     * A callback function is returned; it will be called once the field layout
+     * view was processed, and will restore all the view data.
+     *
+     * @return \Closure
+     *
+     * @deprecated Will be deleted when TYPO3 7.6 is not supported anymore.
+     */
+    protected function storeViewDataLegacy()
+    {
+        $originalArguments = [];
+
+        $variableProvider = $this->getVariableProvider();
+
+        foreach (self::$reservedVariablesNames as $key) {
+            if ($variableProvider->exists($key)) {
+                $originalArguments[$key] = $variableProvider->get($key);
+            }
+        }
+
+        $viewHelperVariableContainer = $this->renderingContext->getViewHelperVariableContainer();
+        $currentView = $viewHelperVariableContainer->getView();
+
+        return function (array $templateArguments) use ($originalArguments, $variableProvider, $viewHelperVariableContainer, $currentView) {
+            $viewHelperVariableContainer->setView($currentView);
+
+            /*
+             * Cleaning up the variables in the provider: the original
+             * values are restored to make the provider like it was before
+             * the field rendering started.
+             */
+            foreach ($variableProvider->getAllIdentifiers() as $identifier) {
+                if (array_key_exists($identifier, $templateArguments)) {
+                    $variableProvider->remove($identifier);
+                }
+            }
+
+            foreach ($originalArguments as $key => $value) {
                 if ($variableProvider->exists($key)) {
                     $variableProvider->remove($key);
                 }
 
                 $variableProvider->add($key, $value);
             }
-        }
-
-        $view->setLayoutRootPaths($layoutPaths);
-        $view->setPartialRootPaths($partialPaths);
-        $view->assignMultiple($templateArguments);
-
-        return $view->render();
+        };
     }
 
     /**
@@ -256,43 +296,17 @@ class FieldViewHelper extends AbstractViewHelper
     }
 
     /**
-     * Stores some arguments which may already have been initialized, and could
-     * be overridden in the local scope.
-     */
-    protected function storeOriginalArguments()
-    {
-        $this->originalArguments = [];
-        $variableProvider = $this->getVariableProvider();
-
-        foreach (self::$reservedVariablesNames as $key) {
-            if ($variableProvider->exists($key)) {
-                $this->originalArguments[$key] = $variableProvider->get($key);
-            }
-        }
-    }
-
-    /**
-     * Will restore original arguments in the template variable container.
+     * Merging the arguments with the ones registered with the
+     * `OptionViewHelper`.
      *
-     * @param array $templateArguments
+     * @return array
      */
-    protected function restoreOriginalArguments(array $templateArguments)
+    protected function getTemplateArguments()
     {
-        $variableProvider = $this->getVariableProvider();
+        $templateArguments = $this->arguments['arguments'] ?: [];
+        ArrayUtility::mergeRecursiveWithOverrule($templateArguments, $this->fieldService->getFieldOptions());
 
-        foreach ($variableProvider->getAllIdentifiers() as $identifier) {
-            if (array_key_exists($identifier, $templateArguments)) {
-                $variableProvider->remove($identifier);
-            }
-        }
-
-        foreach ($this->originalArguments as $key => $value) {
-            if ($variableProvider->exists($key)) {
-                $variableProvider->remove($key);
-            }
-
-            $variableProvider->add($key, $value);
-        }
+        return $templateArguments;
     }
 
     /**
