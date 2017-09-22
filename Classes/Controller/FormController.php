@@ -22,7 +22,6 @@ use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Exception\ForwardException;
 use Romm\Formz\Middleware\Request\Exception\RedirectException;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
-use Throwable;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 
@@ -56,18 +55,10 @@ class FormController extends ActionController
      */
     public function processFormAction()
     {
-        $exception = null;
-
         try {
             $this->invokeMiddlewares();
             $this->manageRequestResult();
         } catch (Exception $exception) {
-        } catch (Throwable $exception) {
-        }
-
-        $this->persistForms();
-
-        if ($exception) {
             if ($exception instanceof StopPropagationException) {
                 if ($exception instanceof RedirectException) {
                     $this->redirectFromException($exception);
@@ -82,6 +73,8 @@ class FormController extends ActionController
             } else {
                 throw $exception;
             }
+        } finally {
+            $this->persistForms();
         }
 
         $this->continueRequest();
@@ -183,17 +176,26 @@ class FormController extends ActionController
      */
     protected function forwardToReferrer()
     {
-        $originalRequest = $this->processor->getRequest();
-        $referringRequest = $originalRequest->getReferringRequest();
+        /*
+         * If the original request is filled, a forward to referrer has already
+         * been done.
+         */
+        if ($this->request->getOriginalRequest()) {
+            return;
+        }
+
+        $referringRequest = $this->processor->getRequest()->getReferringRequest();
 
         if ($referringRequest) {
+            $originalRequest = clone $this->request;
             $this->request->setDispatched(false);
 
+            $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerExtensionName($referringRequest->getControllerExtensionName());
             $this->request->setControllerName($referringRequest->getControllerName());
             $this->request->setControllerActionName($referringRequest->getControllerActionName());
-            $this->request->setArguments($this->processor->getRequest()->getArguments());
+            $this->request->setOriginalRequest($originalRequest);
             throw new StopActionException;
         } else {
             /**

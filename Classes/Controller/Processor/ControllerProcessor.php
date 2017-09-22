@@ -16,6 +16,7 @@ namespace Romm\Formz\Controller\Processor;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
+use Romm\Formz\Middleware\Scope\ScopeInterface;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
@@ -59,6 +60,17 @@ class ControllerProcessor implements SingletonInterface
     protected $requestArguments;
 
     /**
+     * An interface name that does implement:
+     *
+     * @see \Romm\Formz\Middleware\Scope\ScopeInterface
+     *
+     * It will be used to filter the middlewares that will be called.
+     *
+     * @var string
+     */
+    protected $scope;
+
+    /**
      * @var array
      */
     protected $settings = [];
@@ -79,11 +91,12 @@ class ControllerProcessor implements SingletonInterface
      * @param MvcRequest $request
      * @param Arguments  $requestArguments
      * @param array      $settings
+     * @param string     $scope
      * @return $this
      */
-    public static function prepare(MvcRequest $request, Arguments $requestArguments, array $settings)
+    public static function prepare(MvcRequest $request, Arguments $requestArguments, array $settings, $scope)
     {
-        return self::get()->setData($request, $requestArguments, $settings);
+        return self::get()->setData($request, $requestArguments, $settings, $scope);
     }
 
     /**
@@ -92,13 +105,18 @@ class ControllerProcessor implements SingletonInterface
      *
      * @param MvcRequest $request
      * @param Arguments  $requestArguments
+     * @param string     $scope
      * @param array      $settings
      * @return $this
      */
-    public function setData(MvcRequest $request, Arguments $requestArguments, array $settings)
+    public function setData(MvcRequest $request, Arguments $requestArguments, $scope, array $settings)
     {
+        if (false === in_array(ScopeInterface::class, class_implements($scope))) {
+            throw new \Exception('todo scope : ' . $scope); // @todo
+        }
+
         /** @var Request $request */
-        $dispatchedRequest = $request->getControllerObjectName() . '::' . $request->getControllerActionName();
+        $dispatchedRequest = $request->getControllerObjectName() . '::' . $request->getControllerActionName() . '::' . $scope;
 
         if ($dispatchedRequest !== $this->lastDispatchedRequest) {
             $this->lastDispatchedRequest = $dispatchedRequest;
@@ -106,6 +124,7 @@ class ControllerProcessor implements SingletonInterface
             $this->originalRequest = $request;
             $this->request = clone $request;
             $this->requestArguments = $requestArguments;
+            $this->scope = $scope;
             $this->settings = $settings;
             $this->formArguments = null;
             $this->dispatched = false;
@@ -219,6 +238,14 @@ class ControllerProcessor implements SingletonInterface
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScope()
+    {
+        return $this->scope;
     }
 
     /**

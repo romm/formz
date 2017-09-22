@@ -14,6 +14,7 @@
 namespace Romm\Formz\Controller;
 
 use Romm\Formz\Controller\Processor\ControllerProcessor;
+use Romm\Formz\Middleware\Scope\MainScope;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 abstract class FormActionController extends ActionController
@@ -36,12 +37,19 @@ abstract class FormActionController extends ActionController
     protected $actionForException;
 
     /**
+     * @todo
+     *
+     * @var string
+     */
+    protected $formScope = MainScope::class;
+
+    /**
      * IMPORTANT: if you need to override this method in your own controller, do
      * not forget to call `parent::initializeAction()`!
      */
     public function initializeAction()
     {
-        $processor = ControllerProcessor::prepare($this->request, $this->arguments, $this->settings);
+        $processor = ControllerProcessor::prepare($this->request, $this->arguments, $this->settings, $this->formScope);
 
         if (null !== $this->actionForException) {
             $vendorName = $this->request->getControllerVendorName();

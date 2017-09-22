@@ -29,6 +29,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
+use Romm\Formz\Middleware\Scope\FieldValidationScope;
 use Romm\Formz\Service\ContentObjectService;
 use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
@@ -249,10 +250,10 @@ class AjaxValidationController extends ActionController
     /**
      * Will call all middlewares of the form.
      *
-     * Note that the "single field validation context" is activated, meaning
-     * some middlewares wont be called.
+     * Note that the field validation scope is used, meaning some middlewares
+     * wont be called.
      *
-     * @see \Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext
+     * @see \Romm\Formz\Middleware\Scope\FieldValidationScope
      */
     protected function invokeMiddlewares()
     {
@@ -271,12 +272,11 @@ class AjaxValidationController extends ActionController
                     $stepService->setCurrentStep($step);
                 }
             }
-            $controllerProcessor = ControllerProcessor::prepare($this->request, $this->arguments, $this->getContentObjectSettings());
+            $controllerProcessor = ControllerProcessor::prepare($this->request, $this->arguments, $this->getContentObjectSettings(), FieldValidationScope::class);
 
             /** @var MiddlewareProcessor $middlewareProcessor */
             $middlewareProcessor = Core::instantiate(MiddlewareProcessor::class, $this->formObject, $controllerProcessor);
 
-            $middlewareProcessor->activateSingleFieldValidationContext();
             $middlewareProcessor->run();
         } catch (StopPropagationException $exception) {
             // @todo exception if forward/redirect?

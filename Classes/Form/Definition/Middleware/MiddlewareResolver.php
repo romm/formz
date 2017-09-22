@@ -16,6 +16,7 @@ namespace Romm\Formz\Form\Definition\Middleware;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesInterface;
 use Romm\ConfigurationObject\Service\Items\MixedTypes\MixedTypesResolver;
 use Romm\Formz\Validation\Validator\Internal\MiddlewareIsValidValidator;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 
 class MiddlewareResolver implements MixedTypesInterface
@@ -33,7 +34,10 @@ class MiddlewareResolver implements MixedTypesInterface
 
         if (isset($data['className'])) {
             $middlewareClassName = $data['className'];
-            $validator = new MiddlewareIsValidValidator;
+
+            /** @var MiddlewareIsValidValidator $validator */
+            $validator = GeneralUtility::makeInstance(MiddlewareIsValidValidator::class);
+
             $result = $validator->validate($middlewareClassName);
 
             if ($result->hasErrors()) {
