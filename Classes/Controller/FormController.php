@@ -55,15 +55,10 @@ class FormController extends ActionController
      */
     public function processFormAction()
     {
-        $exception = null;
-
         try {
             $this->invokeMiddlewares();
             $this->manageRequestResult();
         } catch (Exception $exception) {
-        }
-
-        if ($exception instanceof Exception) {
             if ($exception instanceof StopPropagationException) {
                 if ($exception instanceof RedirectException) {
                     $this->redirectFromException($exception);
@@ -143,17 +138,26 @@ class FormController extends ActionController
      */
     protected function forwardToReferrer()
     {
-        $originalRequest = $this->processor->getRequest();
-        $referringRequest = $originalRequest->getReferringRequest();
+        /*
+         * If the original request is filled, a forward to referrer has already
+         * been done.
+         */
+        if ($this->request->getOriginalRequest()) {
+            return;
+        }
+
+        $referringRequest = $this->processor->getRequest()->getReferringRequest();
 
         if ($referringRequest) {
+            $originalRequest = clone $this->request;
             $this->request->setDispatched(false);
 
+            $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerExtensionName($referringRequest->getControllerExtensionName());
             $this->request->setControllerName($referringRequest->getControllerName());
             $this->request->setControllerActionName($referringRequest->getControllerActionName());
-            $this->request->setArguments($this->processor->getRequest()->getArguments());
+            $this->request->setOriginalRequest($originalRequest);
 
             throw new StopActionException;
         } else {

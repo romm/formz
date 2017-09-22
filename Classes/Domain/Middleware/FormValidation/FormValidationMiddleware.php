@@ -19,9 +19,8 @@ use Romm\Formz\Domain\Middleware\FieldValidation\FieldValidationArguments;
 use Romm\Formz\Domain\Middleware\FieldValidation\FieldValidationSignal;
 use Romm\Formz\Middleware\Application\OnBeginMiddleware;
 use Romm\Formz\Middleware\PresetMiddlewareInterface;
-use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
 use Romm\Formz\Middleware\Signal\SendsSignal;
-use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use Romm\Formz\Validation\Form\AbstractFormValidator;
 
 /**
  * This middleware takes care of validating the form instance, with a proper
@@ -29,13 +28,8 @@ use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
  *
  * You can bind middlewares to the signal `FormValidationSignal`, which will be
  * dispatched if and only if the form was submitted by the user.
- *
- * Please note that this middleware will not be called when being in a "single
- * field validation context".
- *
- * @see \Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext
  */
-class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsSignal, RemoveFromSingleFieldValidationContext
+class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsSignal
 {
     /**
      * @var \Romm\Formz\Domain\Middleware\FormValidation\FormValidationMiddlewareOption

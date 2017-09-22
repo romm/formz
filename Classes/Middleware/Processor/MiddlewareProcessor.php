@@ -19,6 +19,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Domain\Middleware\Begin\BeginMiddleware;
 use Romm\Formz\Domain\Middleware\End\EndMiddleware;
 use Romm\Formz\Middleware\MiddlewareInterface;
+use Romm\Formz\Middleware\Scope\MainScope;
 use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
@@ -45,17 +46,6 @@ class MiddlewareProcessor
      * @var array
      */
     protected $signalSortedMiddlewares = [];
-
-    /**
-     * This context is activated when the request is validating a single field
-     * and not the whole form. In this case, special behaviours may occur, and
-     * the processor instance should be aware of it.
-     *
-     * @see \Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext
-     *
-     * @var bool
-     */
-    protected $singleFieldValidationContext = false;
 
     /**
      * @param FormObject          $formObject
@@ -119,7 +109,7 @@ class MiddlewareProcessor
             $this->signalSortedMiddlewares = [];
             $middlewareList = [];
 
-            foreach ($this->getFilteredMiddlewares() as $middleware) {
+            foreach ($this->getScopeFilteredMiddlewares() as $middleware) {
                 $signal = $middleware->getBoundSignalName();
 
                 if (false === isset($middlewareList[$signal])) {
@@ -144,15 +134,19 @@ class MiddlewareProcessor
      *
      * @return MiddlewareInterface[]
      */
-    protected function getFilteredMiddlewares()
+    protected function getScopeFilteredMiddlewares()
     {
         $middlewares = $this->formObject->getDefinition()->getAllMiddlewares();
+        $scope = $this->controllerProcessor->getScope();
 
-        if ($this->inSingleFieldValidationContext()) {
-            foreach ($middlewares as $key => $middleware) {
-                if ($middleware instanceof RemoveFromSingleFieldValidationContext) {
-                    unset($middlewares[$key]);
-                }
+        foreach ($middlewares as $key => $middleware) {
+            $scopes = $middleware->getScopes();
+            if ($scopes->isBlackListed($scope)
+                || (false === $scopes->isWhiteListed($scope)
+                    && false === $scopes->isWhiteListed(MainScope::class)
+                )
+            ) {
+                unset($middlewares[$key]);
             }
         }
 
@@ -205,23 +199,5 @@ class MiddlewareProcessor
     public function getRequestArguments()
     {
         return $this->controllerProcessor->getRequestArguments();
-    }
-
-    /**
-     * @see $singleFieldValidationContext
-     *
-     * @return bool
-     */
-    public function inSingleFieldValidationContext()
-    {
-        return $this->singleFieldValidationContext;
-    }
-
-    /**
-     * @see $singleFieldValidationContext
-     */
-    public function activateSingleFieldValidationContext()
-    {
-        $this->singleFieldValidationContext = true;
     }
 }

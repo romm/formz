@@ -42,7 +42,7 @@ final class BeginMiddleware
     public function execute()
     {
         /** @var SignalObject $signalObject */
-        $signalObject = GeneralUtility::makeInstance(SignalObject::class,$this->processor, BeginSignal::class, After::class);
+        $signalObject = GeneralUtility::makeInstance(SignalObject::class, $this->processor, BeginSignal::class, After::class);
         $signalObject->dispatch();
     }
 
@@ -52,19 +52,17 @@ final class BeginMiddleware
      */
     protected function checkFormSubmission()
     {
-        if ($this->processor->inSingleFieldValidationContext()) {
-            /*
-             * In "single field validation context", there is no need to check
-             * for the form submission.
-             */
+        $formObject = $this->processor->getFormObject();
+
+        if ($formObject->hasForm()) {
             return;
         }
 
         $request = $this->processor->getRequest();
-        $formObject = $this->processor->getFormObject();
         $formName = $formObject->getName();
 
         if ($request->getMethod() === 'POST'
+            && null === $request->getOriginalRequest()
             && $this->processor->getRequestArguments()->hasArgument($formName)
         ) {
             if (false === $request->hasArgument('formData')) {

@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Middleware;
 
+use Romm\Formz\Form\Definition\Middleware\MiddlewareScopes;
 use Romm\Formz\Middleware\Option\OptionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 
@@ -21,9 +22,10 @@ interface MiddlewareInterface
     const PRIORITY_INJECT_FORM = 1000;
 
     /**
-     * @param OptionInterface $options
+     * @param OptionInterface  $options
+     * @param MiddlewareScopes $scopes
      */
-    public function __construct(OptionInterface $options);
+    public function __construct(OptionInterface $options, MiddlewareScopes $scopes);
 
     /**
      * @return void
@@ -48,6 +50,11 @@ interface MiddlewareInterface
      * @return string
      */
     public static function getOptionsClassName();
+
+    /**
+     * @return MiddlewareScopes
+     */
+    public function getScopes();
 
     /**
      * Returns the name of the signal on which this middleware is bound.
