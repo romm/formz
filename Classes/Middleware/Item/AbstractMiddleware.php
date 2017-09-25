@@ -20,10 +20,12 @@ use Romm\Formz\Exceptions\InvalidEntryException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Exceptions\SignalNotFoundException;
 use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\Definition\Middleware\MiddlewareScopes;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\MiddlewareInterface;
 use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\Option\OptionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Forward;
 use Romm\Formz\Middleware\Request\Redirect;
@@ -56,6 +58,11 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     protected $options;
 
     /**
+     * @var \Romm\Formz\Form\Definition\Middleware\MiddlewareScopes
+     */
+    protected $scopes = [];
+
+    /**
      * Can be overridden in child class with custom priority value.
      *
      * The higher the priority is, the earlier the middleware is called.
@@ -68,11 +75,13 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
     protected $priority = 0;
 
     /**
-     * @param AbstractOptionDefinition $options
+     * @param OptionInterface  $options
+     * @param MiddlewareScopes $scopes
      */
-    final public function __construct(AbstractOptionDefinition $options)
+    final public function __construct(OptionInterface $options, MiddlewareScopes $scopes)
     {
         $this->options = $options;
+        $this->scopes = $scopes;
     }
 
     /**
@@ -144,6 +153,14 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
 
             $service->moveForwardToStep($nextStep, $this->redirect());
         }
+    }
+
+    /**
+     * @return MiddlewareScopes
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
     }
 
     /**
@@ -262,6 +279,10 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
             $data['options'] = [];
         }
 
+        if (false === isset($data['scopes'])) {
+            $data['scopes'] = [];
+        }
+
         $processor->setData($data);
     }
 
@@ -300,6 +321,6 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
      */
     public function __sleep()
     {
-        return ['options'];
+        return ['options', 'scopes'];
     }
 }

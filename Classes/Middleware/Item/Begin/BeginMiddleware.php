@@ -61,19 +61,17 @@ final class BeginMiddleware implements BasicMiddlewareInterface
      */
     protected function checkFormSubmission()
     {
-        if ($this->processor->inSingleFieldValidationContext()) {
-            /*
-             * In "single field validation context", there is no need to check
-             * for the form submission.
-             */
+        $formObject = $this->processor->getFormObject();
+
+        if ($formObject->hasForm()) {
             return;
         }
 
         $request = $this->processor->getRequest();
-        $formObject = $this->processor->getFormObject();
         $formName = $formObject->getName();
 
         if ($this->requestWasSubmitted()
+            && null === $request->getOriginalRequest()
             && $this->processor->getRequestArguments()->hasArgument($formName)
         ) {
             if (false === $request->hasArgument('fz-hash')) {

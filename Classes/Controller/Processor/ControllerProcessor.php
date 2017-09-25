@@ -96,7 +96,7 @@ class ControllerProcessor implements SingletonInterface
      */
     public static function prepare(MvcRequest $request, Arguments $requestArguments, array $settings, $scope)
     {
-        return self::get()->setData($request, $requestArguments, $settings, $scope);
+        return self::get()->setData($request, $requestArguments, $scope, $settings);
     }
 
     /**

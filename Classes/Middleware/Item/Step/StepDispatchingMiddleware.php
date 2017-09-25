@@ -17,7 +17,6 @@ use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\DefaultMiddleware;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
-use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -25,7 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * This middleware should be the last one called, as it is used to dispatch the
  * request to the next step, if there is one.
  */
-class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
+class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal
 {
     /**
      * @var int

@@ -15,6 +15,7 @@ namespace Romm\Formz\Middleware;
 
 use Romm\Formz\Form\Definition\Middleware\MiddlewareScopes;
 use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\Option\OptionInterface;
 
 interface MiddlewareInterface extends BasicMiddlewareInterface
 {
@@ -23,9 +24,10 @@ interface MiddlewareInterface extends BasicMiddlewareInterface
     const PRIORITY_STEP = -1000000;
 
     /**
-     * @param AbstractOptionDefinition $options* @param MiddlewareScopes $scopes
+     * @param OptionInterface  $options
+     * @param MiddlewareScopes $scopes
      */
-    public function __construct(AbstractOptionDefinition $options, MiddlewareScopes $scopes);
+    public function __construct(OptionInterface $options, MiddlewareScopes $scopes);
 
     /**
      * @return void
@@ -36,14 +38,6 @@ interface MiddlewareInterface extends BasicMiddlewareInterface
      * @return AbstractOptionDefinition
      */
     public function getOptions();
-
-    /**
-     * Returns the class name of the options that will be passed to the
-     * middleware constructor.
-     *
-     * @return string
-     */
-    public static function getOptionsClassName();
 
     /**
      * @return MiddlewareScopes
