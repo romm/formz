@@ -61,7 +61,7 @@ final class BeginMiddleware
         $request = $this->processor->getRequest();
         $formName = $formObject->getName();
 
-        if ($request->getMethod() === 'POST'
+        if ($this->requestWasSubmitted()
             && null === $request->getOriginalRequest()
             && $this->processor->getRequestArguments()->hasArgument($formName)
         ) {
@@ -115,4 +115,13 @@ final class BeginMiddleware
     {
         $this->processor = $middlewareProcessor;
     }
+
+    /**
+     * @return bool
+     */
+    protected function requestWasSubmitted()
+    {
+        return $this->processor->getRequest()->getMethod() === 'POST';
+    }
+
 }
