@@ -157,6 +157,7 @@ class FormController extends ActionController
             $this->request->setControllerExtensionName($referringRequest->getControllerExtensionName());
             $this->request->setControllerName($referringRequest->getControllerName());
             $this->request->setControllerActionName($referringRequest->getControllerActionName());
+            $this->request->setArguments($this->processor->getRequest()->getArguments());
             $this->request->setOriginalRequest($originalRequest);
 
             throw new StopActionException;
