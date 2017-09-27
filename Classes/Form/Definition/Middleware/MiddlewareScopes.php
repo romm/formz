@@ -14,7 +14,6 @@
 namespace Romm\Formz\Form\Definition\Middleware;
 
 use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
-use Romm\Formz\Middleware\Scope\MainScope;
 
 class MiddlewareScopes extends AbstractFormDefinitionComponent
 {
@@ -47,7 +46,7 @@ class MiddlewareScopes extends AbstractFormDefinitionComponent
      * @param array $whiteList
      * @param array $blackList
      */
-    public function __construct(array $whiteList = [MainScope::class], array $blackList = [])
+    public function __construct(array $whiteList = [], array $blackList = [])
     {
         $this->whiteList = $whiteList;
         $this->blackList = $blackList;

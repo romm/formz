@@ -195,7 +195,9 @@ class FormController extends ActionController
             $this->request->setControllerExtensionName($referringRequest->getControllerExtensionName());
             $this->request->setControllerName($referringRequest->getControllerName());
             $this->request->setControllerActionName($referringRequest->getControllerActionName());
+            $this->request->setArguments($this->processor->getRequest()->getArguments());
             $this->request->setOriginalRequest($originalRequest);
+
             throw new StopActionException;
         } else {
             /**
@@ -203,7 +205,6 @@ class FormController extends ActionController
              * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::forwardToReferringRequest()
              */
         }
-
     }
 
     /**

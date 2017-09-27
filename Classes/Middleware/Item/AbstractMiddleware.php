@@ -29,6 +29,7 @@ use Romm\Formz\Middleware\Option\OptionInterface;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Forward;
 use Romm\Formz\Middleware\Request\Redirect;
+use Romm\Formz\Middleware\Scope\MainScope;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\Before;
 use Romm\Formz\Middleware\Signal\MiddlewareSignal;
@@ -61,6 +62,16 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
      * @var \Romm\Formz\Form\Definition\Middleware\MiddlewareScopes
      */
     protected $scopes = [];
+
+    /**
+     * @var array
+     */
+    protected static $defaultScopesWhiteList = [];
+
+    /**
+     * @var array
+     */
+    protected static $defaultScopesBlackList = [];
 
     /**
      * Can be overridden in child class with custom priority value.
@@ -282,6 +293,17 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
         if (false === isset($data['scopes'])) {
             $data['scopes'] = [];
         }
+
+        if (false === isset($data['scopes']['whiteList'])) {
+            $data['scopes']['whiteList'] = [MainScope::class];
+        }
+
+        if (false === isset($data['scopes']['blackList'])) {
+            $data['scopes']['blackList'] = [];
+        }
+
+        $data['scopes']['whiteList'] = array_unique(array_merge(static::$defaultScopesWhiteList, $data['scopes']['whiteList']));
+        $data['scopes']['blackList'] = array_unique(array_merge(static::$defaultScopesBlackList, $data['scopes']['blackList']));
 
         $processor->setData($data);
     }
