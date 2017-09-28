@@ -19,6 +19,7 @@ use Romm\Formz\Middleware\Item\Field\Validation\FieldValidationArguments;
 use Romm\Formz\Middleware\Item\Field\Validation\FieldValidationSignal;
 use Romm\Formz\Middleware\Item\OnBeginMiddleware;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
+use Romm\Formz\Middleware\Scope\FieldValidationScope;
 use Romm\Formz\Middleware\Scope\ReadScope;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
@@ -45,7 +46,7 @@ class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddle
     /**
      * @var array
      */
-    protected static $defaultScopesBlackList = [ReadScope::class];
+    protected static $defaultScopesBlackList = [ReadScope::class, FieldValidationScope::class];
 
     /**
      * @see FormValidationMiddleware

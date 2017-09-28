@@ -18,6 +18,8 @@ use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Middleware\Item\AbstractMiddleware;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationSignal;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
+use Romm\Formz\Middleware\Scope\FieldValidationScope;
+use Romm\Formz\Middleware\Scope\ReadScope;
 use Romm\Formz\Middleware\Signal\Before;
 
 /**
@@ -39,6 +41,11 @@ class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormV
      * @var StepMiddlewareService
      */
     protected $service;
+
+    /**
+     * @var array
+     */
+    protected static $defaultScopesBlackList = [ReadScope::class, FieldValidationScope::class];
 
     /**
      * Inject the step service.

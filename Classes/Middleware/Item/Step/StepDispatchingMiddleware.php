@@ -17,6 +17,8 @@ use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\DefaultMiddleware;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
+use Romm\Formz\Middleware\Scope\FieldValidationScope;
+use Romm\Formz\Middleware\Scope\ReadScope;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,6 +37,11 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
      * @var StepMiddlewareService
      */
     protected $service;
+
+    /**
+     * @var array
+     */
+    protected static $defaultScopesBlackList = [ReadScope::class, FieldValidationScope::class];
 
     /**
      * Inject the step service.
