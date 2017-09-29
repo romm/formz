@@ -153,6 +153,13 @@ class FieldViewHelper extends AbstractViewHelper
 
         $view = $this->fieldService->getView($layout);
 
+        /*
+         * Warning: we need to store the layouts/partials paths before
+         * manipulating the rendering context!
+         */
+        $layoutPaths = $this->getPaths('layout');
+        $partialPaths = $this->getPaths('partial');
+
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
         } else {
@@ -176,8 +183,8 @@ class FieldViewHelper extends AbstractViewHelper
             $this->viewHelperVariableContainer->setView($view);
         }
 
-        $view->setLayoutRootPaths($this->getPaths('layout'));
-        $view->setPartialRootPaths($this->getPaths('partial'));
+        $view->setLayoutRootPaths($layoutPaths);
+        $view->setPartialRootPaths($partialPaths);
         $view->assignMultiple($templateArguments);
 
         return $view->render();
