@@ -160,8 +160,6 @@ abstract class AbstractMiddleware implements MiddlewareInterface, DataPreProcess
         $nextStep = $service->getNextStep($this->getCurrentStep());
 
         if ($nextStep) {
-            $this->beforeSignal()->dispatch();
-
             $service->moveForwardToStep($nextStep, $this->redirect());
         }
     }
