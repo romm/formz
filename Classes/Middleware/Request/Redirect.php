@@ -39,6 +39,11 @@ class Redirect extends Dispatcher
     protected $step;
 
     /**
+     * @var bool
+     */
+    protected $addFormHashToArguments = true;
+
+    /**
      * @throws RedirectException
      */
     public function dispatch()
@@ -48,7 +53,10 @@ class Redirect extends Dispatcher
             $this->controller = $this->step->getController();
             $this->action = $this->step->getAction();
             $this->extension = $this->step->getExtension();
-            $this->arguments['fz-hash'] = [$this->formObject->getName() => $this->formObject->getFormHash()];
+
+            if ($this->addFormHashToArguments) {
+                $this->arguments['fz-hash'] = [$this->formObject->getName() => $this->formObject->getFormHash()];
+            }
         }
 
         throw new RedirectException(
@@ -102,6 +110,17 @@ class Redirect extends Dispatcher
     public function withStatus($status)
     {
         $this->status = (int)$status;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $addFormHashToArguments
+     * @return $this
+     */
+    public function addFormHashToArguments($addFormHashToArguments)
+    {
+        $this->addFormHashToArguments = (bool)$addFormHashToArguments;
 
         return $this;
     }
