@@ -15,15 +15,25 @@ namespace Romm\Formz\Middleware\Item\Begin\Service;
 
 use Romm\Formz\Domain\Repository\FormMetadataRepository;
 use Romm\Formz\Form\FormInterface;
-use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
+use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
+use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
 
+/**
+ * @todo rename and move service somewhere else, as it is used both in the
+ * Ajax controller and the begin middleware. Maybe move it inside the FormObject?
+ */
 class FormService
 {
     /**
-     * @var MiddlewareProcessor
+     * @var Request
      */
-    private $processor;
+    protected $request;
+
+    /**
+     * @var Arguments
+     */
+    protected $requestArguments;
 
     /**
      * @var FormMetadataRepository
@@ -31,20 +41,22 @@ class FormService
     protected $formMetadataRepository;
 
     /**
-     * @param MiddlewareProcessor $processor
+     * @param Request $request
+     * @param Arguments $requestArguments
      */
-    public function __construct(MiddlewareProcessor $processor)
+    public function __construct(Request $request, Arguments $requestArguments)
     {
-        $this->processor = $processor;
+        $this->request = $request;
+        $this->requestArguments = $requestArguments;
     }
 
     /**
+     * @param string $formName
      * @return FormInterface
      */
-    public function getFormInstance()
+    public function getFormInstance($formName)
     {
-        $formName = $this->processor->getFormObject()->getName();
-        $argument = $this->processor->getRequestArguments()->getArgument($formName);
+        $argument = $this->requestArguments->getArgument($formName);
         $formArray = $this->getFormArray($formName);
 
         return $argument->setValue($formArray)->getValue();
@@ -56,7 +68,7 @@ class FormService
      */
     protected function getFormArray($formName)
     {
-        $formArray = $this->processor->getRequest()->getArgument($formName);
+        $formArray = $this->request->getArgument($formName);
         $formArray = is_array($formArray)
             ? $formArray
             : [];
@@ -69,7 +81,7 @@ class FormService
              * internally by Extbase.
              */
             $formArray['__identity'] = $identifier;
-            $propertyMappingConfiguration = $this->processor->getRequestArguments()->getArgument($formName)->getPropertyMappingConfiguration();
+            $propertyMappingConfiguration = $this->requestArguments->getArgument($formName)->getPropertyMappingConfiguration();
             $propertyMappingConfiguration->setTypeConverterOption(
                 PersistentObjectConverter::class,
                 PersistentObjectConverter::CONFIGURATION_MODIFICATION_ALLOWED,
@@ -91,10 +103,8 @@ class FormService
      */
     protected function getFormIdentifier()
     {
-        $request = $this->processor->getRequest();
-
-        if ($request->hasArgument('fz-hash')) {
-            $hash = $request->getArgument('fz-hash');
+        if ($this->request->hasArgument('fz-hash')) {
+            $hash = $this->request->getArgument('fz-hash');
             $metaData = $this->formMetadataRepository->findOneByHash($hash);
 
             if ($metaData) {

@@ -94,7 +94,7 @@ class ControllerProcessor implements SingletonInterface
      * @param string     $scope
      * @return $this
      */
-    public static function prepare(MvcRequest $request, Arguments $requestArguments, array $settings, $scope)
+    public static function prepare(MvcRequest $request, Arguments $requestArguments, $scope, array $settings = [])
     {
         return self::get()->setData($request, $requestArguments, $scope, $settings);
     }
@@ -109,7 +109,7 @@ class ControllerProcessor implements SingletonInterface
      * @param array      $settings
      * @return $this
      */
-    public function setData(MvcRequest $request, Arguments $requestArguments, $scope, array $settings)
+    public function setData(MvcRequest $request, Arguments $requestArguments, $scope, array $settings = [])
     {
         if (false === in_array(ScopeInterface::class, class_implements($scope))) {
             throw new \Exception('todo scope : ' . $scope); // @todo

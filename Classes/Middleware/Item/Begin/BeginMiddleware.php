@@ -38,7 +38,7 @@ final class BeginMiddleware implements BasicMiddlewareInterface
      */
     public function initialize()
     {
-        $this->formService = Core::instantiate(FormService::class, $this->processor);
+        $this->formService = Core::instantiate(FormService::class, $this->processor->getRequest(), $this->processor->getRequestArguments());
 
         $this->checkFormSubmission();
         $this->fetchCurrentStep();
@@ -82,7 +82,7 @@ final class BeginMiddleware implements BasicMiddlewareInterface
                 throw new \Exception('todo formzData'); // @todo
             }
 
-            $form = $this->formService->getFormInstance();
+            $form = $this->formService->getFormInstance($formName);
 
             $formObject->setForm($form);
 
