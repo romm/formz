@@ -95,7 +95,9 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
                         ->withArguments($arguments)
                         ->dispatch();
 
-                    if (false === $arguments->getCancelStepDispatching()) {
+                    if (false === $arguments->getCancelStepDispatching()
+                        && false === $formResult->hasErrors()
+                    ) {
                         $this->service->moveForwardToStep($nextStep, $this->redirect());
                     }
                 }
