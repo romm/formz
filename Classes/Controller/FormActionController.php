@@ -49,7 +49,11 @@ abstract class FormActionController extends ActionController
      */
     public function initializeAction()
     {
-        $processor = ControllerProcessor::prepare($this->request, $this->arguments, $this->settings, $this->formScope);
+        $settings = is_array($this->settings)
+            ? $this->settings
+            : [];
+
+        $processor = ControllerProcessor::prepare($this->request, $this->arguments, $settings, $this->formScope);
 
         if (null !== $this->actionForException) {
             $vendorName = $this->request->getControllerVendorName();
