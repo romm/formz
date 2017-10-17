@@ -97,12 +97,12 @@ Fz.Field = (function () {
                                 for (var name in messages[validationRuleName]) {
                                     if (messages[validationRuleName].hasOwnProperty(name)) {
                                         messageListContainerElement.innerHTML += messageTemplate
-                                            .replace('#FIELD#', this.getName())
-                                            .replace('#FIELD_ID#', Fz.camelCaseToDashed('fz-' + this.getForm().getName() + '-' + this.getName()))
-                                            .replace('#VALIDATOR#', Fz.camelCaseToDashed(validationRuleName))
-                                            .replace('#TYPE#', type)
-                                            .replace('#KEY#', name)
-                                            .replace('#MESSAGE#', messages[validationRuleName][name]);
+                                            .split('#FIELD#').join(this.getName())
+                                            .split('#FIELD_ID#').join(Fz.camelCaseToDashed('fz-' + this.getForm().getName() + '-' + this.getName()))
+                                            .split('#VALIDATOR#').join(Fz.camelCaseToDashed(validationRuleName))
+                                            .split('#TYPE#').join(type)
+                                            .split('#KEY#').join(name)
+                                            .split('#MESSAGE#').join(messages[validationRuleName][name]);
                                     }
                                 }
                             }
