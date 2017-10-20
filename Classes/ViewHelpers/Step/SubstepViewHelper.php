@@ -23,6 +23,11 @@ use TYPO3\CMS\Extbase\Mvc\Web\Request;
 class SubstepViewHelper extends AbstractViewHelper
 {
     /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
+    /**
      * @var FormViewHelperService
      */
     protected $formService;
