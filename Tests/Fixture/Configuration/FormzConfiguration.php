@@ -20,8 +20,9 @@ class FormzConfiguration
      */
     public static function getDefaultConfiguration()
     {
-        $typoScriptConfiguration = file_get_contents(realpath(dirname(__FILE__)) . '/../../../Configuration/TypoScript/Configuration/Settings.ts');
-
+        $configurationPath = realpath(dirname(__FILE__)) . '/../../../Configuration/';
+        $typoScriptConfiguration = file_get_contents($configurationPath . 'TypoScript/Configuration/Settings.ts');
+        $typoScriptConfiguration .= file_get_contents($configurationPath . 'TypoScript/View/ViewConfiguration.ts');
         $typoScriptParser = new TypoScriptParser;
         $typoScriptParser->parse($typoScriptConfiguration);
 

@@ -145,7 +145,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
     public function requestArgumentMissingThrowsException(RequestInterface $request, $exceptionType = null, $exceptionCode = null)
     {
         if ($exceptionType) {
-            $this->setExpectedException($exceptionType, '', $exceptionCode);
+            $this->setExpectedException($exceptionType, null, $exceptionCode);
         }
 
         /** @var AjaxValidationController|\PHPUnit_Framework_MockObject_MockObject $controller */
@@ -241,7 +241,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
      */
     public function incorrectFormConfigurationThrowsException()
     {
-        $this->setExpectedException(InvalidConfigurationException::class, '', 1487671395);
+        $this->setExpectedException(InvalidConfigurationException::class, null, 1487671395);
 
         $formObject = $this->getDefaultFormObject();
         $formObject->getConfigurationValidationResult()->addError(new Error('foo', 42));
@@ -260,7 +260,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
      */
     public function validatingUnknownFieldThrowsException()
     {
-        $this->setExpectedException(EntryNotFoundException::class, '', 1487671603);
+        $this->setExpectedException(EntryNotFoundException::class, null, 1487671603);
 
         $ajaxValidationController = $this->getAjaxValidationControllerMock();
 
@@ -276,7 +276,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
      */
     public function validatingFieldWithUnknownValidationThrowsException()
     {
-        $this->setExpectedException(EntryNotFoundException::class, '', 1487672956);
+        $this->setExpectedException(EntryNotFoundException::class, null, 1487672956);
         $ajaxValidationController = $this->getAjaxValidationControllerMock();
 
         $ajaxValidationController->setProtectedRequestMode(false);
@@ -291,7 +291,7 @@ class AjaxValidationControllerTest extends AbstractUnitTest
      */
     public function validationFieldValidationWithAjaxDeactivatedThrowsException()
     {
-        $this->setExpectedException(InvalidConfigurationException::class, '', 1487673434);
+        $this->setExpectedException(InvalidConfigurationException::class, null, 1487673434);
 
         $formObject = $this->getDefaultFormObject();
         $validation = new Validation;

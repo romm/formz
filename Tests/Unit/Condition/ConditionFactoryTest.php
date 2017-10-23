@@ -16,7 +16,7 @@ class ConditionFactoryTest extends AbstractUnitTest
      */
     public function registerConditionMustBeAString()
     {
-        $this->setExpectedException(InvalidArgumentTypeException::class, '', 1466588489);
+        $this->setExpectedException(InvalidArgumentTypeException::class, null, 1466588489);
 
         $conditionFactory = new ConditionFactory;
         $conditionFactory->registerCondition(true, 'foo');
@@ -27,7 +27,7 @@ class ConditionFactoryTest extends AbstractUnitTest
      */
     public function registerConditionWithClassNameNotFoundThrowsException()
     {
-        $this->setExpectedException(ClassNotFoundException::class, '', 1489602455);
+        $this->setExpectedException(ClassNotFoundException::class, null, 1489602455);
 
         $conditionFactory = new ConditionFactory;
         $conditionFactory->registerCondition('foo', 'nope!');
@@ -38,7 +38,7 @@ class ConditionFactoryTest extends AbstractUnitTest
      */
     public function registerConditionWithInvalidClassNameThrowsException()
     {
-        $this->setExpectedException(InvalidArgumentTypeException::class, '', 1466588495);
+        $this->setExpectedException(InvalidArgumentTypeException::class, null, 1466588495);
 
         $conditionFactory = new ConditionFactory;
         $conditionFactory->registerCondition('foo', \stdClass::class);

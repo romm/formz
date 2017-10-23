@@ -199,6 +199,8 @@ class FormObjectConfigurationTest extends AbstractUnitTest
     protected function getConfigurationObjectInstance()
     {
         $formzConfiguration = new Configuration;
+        $formzConfiguration->getView()->setPartialRootPath('foo', 'bar');
+        $formzConfiguration->getView()->setLayoutRootPath('foo', 'bar');
         $result = new Result;
 
         return new ConfigurationObjectInstance($formzConfiguration, $result);

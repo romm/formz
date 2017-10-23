@@ -18,7 +18,7 @@ class AbstractConditionItemTest extends AbstractUnitTest
      */
     public function validatingFieldConditionConfigurationThrowsException()
     {
-        $this->setExpectedException(InvalidConditionException::class, '', 1488653398);
+        $this->setExpectedException(InvalidConditionException::class, null, 1488653398);
 
         /** @var AbstractConditionItem|\PHPUnit_Framework_MockObject_MockObject $conditionItem */
         $conditionItem = $this->getMockBuilder(AbstractConditionItem::class)
@@ -53,7 +53,7 @@ class AbstractConditionItemTest extends AbstractUnitTest
      */
     public function validatingValidationConditionConfigurationThrowsException()
     {
-        $this->setExpectedException(InvalidConditionException::class, '', 1488653713);
+        $this->setExpectedException(InvalidConditionException::class, null, 1488653713);
 
         /** @var AbstractConditionItem|\PHPUnit_Framework_MockObject_MockObject $conditionItem */
         $conditionItem = $this->getMockBuilder(AbstractConditionItem::class)

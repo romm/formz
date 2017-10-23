@@ -229,7 +229,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderFieldWithNotExistingLayoutNameThrowsException()
     {
-        $this->setExpectedException(EntryNotFoundException::class, '', 1465243586);
+        $this->setExpectedException(EntryNotFoundException::class, null, 1465243586);
         $this->addFooLayoutToTypoScriptConfiguration();
 
         /** @var FormObjectFactory $formObjectFactory */
@@ -262,7 +262,7 @@ class FieldViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function renderFieldWithNotExistingLayoutItemNameThrowsException()
     {
-        $this->setExpectedException(EntryNotFoundException::class, '', 1485867803);
+        $this->setExpectedException(EntryNotFoundException::class, null, 1485867803);
         $this->addFooLayoutToTypoScriptConfiguration();
 
         /** @var FormObjectFactory $formObjectFactory */

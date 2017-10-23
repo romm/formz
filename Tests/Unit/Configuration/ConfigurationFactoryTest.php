@@ -126,6 +126,8 @@ class ConfigurationFactoryTest extends AbstractUnitTest
 
         $configurationInstance = new Configuration;
         $configurationResult = new Result;
+        $configurationInstance->getView()->setPartialRootPath('foo', 'bar');
+        $configurationInstance->getView()->setLayoutRootPath('foo', 'bar');
         $configurationObjectInstance = new ConfigurationObjectInstance($configurationInstance, $configurationResult);
         $configurationObjectInstance->refreshValidationResult();
 

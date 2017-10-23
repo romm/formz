@@ -75,7 +75,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function formArgumentIsNotAnObjectThrowsException()
     {
-        $this->setExpectedException(InvalidOptionValueException::class, '', 1490713939);
+        $this->setExpectedException(InvalidOptionValueException::class, null, 1490713939);
 
         $viewHelper = $this->getFormViewHelperMock(['getFormClassName']);
 
@@ -92,7 +92,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function formArgumentIsNotFormThrowsException()
     {
-        $this->setExpectedException(InvalidOptionValueException::class, '', 1490714346);
+        $this->setExpectedException(InvalidOptionValueException::class, null, 1490714346);
 
         $viewHelper = $this->getFormViewHelperMock(['getFormClassName']);
 
@@ -110,7 +110,7 @@ class FormViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function formArgumentIsNotExpectedClassThrowsException()
     {
-        $this->setExpectedException(InvalidOptionValueException::class, '', 1490714534);
+        $this->setExpectedException(InvalidOptionValueException::class, null, 1490714534);
 
         $viewHelper = $this->getFormViewHelperMock(['getFormClassName']);
 
