@@ -6,6 +6,8 @@ use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorStates;
 use Romm\Formz\AssetHandler\Connector\CssAssetHandlerConnector;
 use Romm\Formz\AssetHandler\Connector\JavaScriptAssetHandlerConnector;
+use Romm\Formz\Form\FormObject;
+use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -101,7 +103,7 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
      *
      * @test
      */
-    public function GeneratedFilePathDependsOnPrefix()
+    public function generatedFilePathDependsOnPrefix()
     {
         $formObject = $this->getDefaultFormObject();
         $controllerContext = new ControllerContext;
@@ -119,5 +121,34 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
         $path4 = $assetHandlerConnectorManager->getFormzGeneratedFilePath('foo');
         $this->assertEquals($path3, $path4);
         $this->assertNotEquals($path1, $path3);
+    }
+
+    /**
+     * The assets file names must be different for two forms with the same
+     * definition but different names.
+     *
+     * @test
+     */
+    public function sameFormsWithDifferentNamesUseDifferentGeneratedFileNames()
+    {
+        $pageRenderer = new PageRenderer;
+
+        $formObject = new FormObject(DefaultForm::class, 'foo', []);
+        $controllerContext = new ControllerContext;
+
+        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+
+        $assetHandlerConnectorManager1 = new AssetHandlerConnectorManager($pageRenderer, $assetHandlerFactory);
+        $path1 = $assetHandlerConnectorManager1->getFormzGeneratedFilePath('foo');
+
+        $formObject = new FormObject(DefaultForm::class, 'bar', []);
+        $controllerContext = new ControllerContext;
+
+        $assetHandlerFactory = AssetHandlerFactory::get($formObject, $controllerContext);
+
+        $assetHandlerConnectorManager2 = new AssetHandlerConnectorManager($pageRenderer, $assetHandlerFactory);
+        $path2 = $assetHandlerConnectorManager2->getFormzGeneratedFilePath('foo');
+
+        $this->assertNotEquals($path1, $path2);
     }
 }
