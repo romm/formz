@@ -121,7 +121,7 @@
                 && null === key.match(/\[__referrer\]\[arguments\]/)
             ) {
                 var value = getElementValue(form.elements[i]);
-                if (value) {
+                if (value && key.indexOf("[") !== -1) {
                     if ('' !== query) {
                         query += '&';
                     }
