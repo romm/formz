@@ -44,6 +44,8 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerUniversalTagAttributes();
 
         $this->registerArgument('field', 'string', 'Name of the field.', true);

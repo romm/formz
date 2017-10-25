@@ -41,6 +41,8 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('slot', 'string', 'Instance of the slot which will be rendered.', true);
         $this->registerArgument('arguments', 'array', 'Arguments sent to the slot.', false, []);
     }

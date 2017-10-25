@@ -32,6 +32,8 @@ class HasViewHelper extends AbstractConditionViewHelper implements CompilableInt
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('slot', 'string', 'Name of the slot.', true);
     }
 

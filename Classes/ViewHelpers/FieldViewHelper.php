@@ -73,6 +73,8 @@ class FieldViewHelper extends AbstractViewHelper
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('name', 'string', 'Name of the field which should be rendered.', true);
         $this->registerArgument('layout', 'string', 'Path of the TypoScript layout which will be used.', true);
         $this->registerArgument('arguments', 'array', 'Arbitrary arguments which will be sent to the field template.', false, []);

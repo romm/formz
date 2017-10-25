@@ -60,6 +60,8 @@ class OptionViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('name', 'string', 'Name of the option.', true);
         $this->registerArgument('value', 'string', 'Value of the option.', true);
     }

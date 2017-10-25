@@ -35,6 +35,8 @@ class FormIdentifierHashViewHelper extends AbstractViewHelper implements Compila
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('form', 'object', 'Form instance, that must implement `FormInterface`.');
     }
 

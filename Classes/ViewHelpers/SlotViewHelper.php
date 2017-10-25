@@ -35,6 +35,8 @@ class SlotViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('name', 'string', 'Name of the slot.', true);
         $this->registerArgument('arguments', 'array', 'Arguments sent to the slot.', false, []);
     }
