@@ -151,6 +151,9 @@ class FieldViewHelper extends AbstractViewHelper
         $templateArguments['fieldName'] = $fieldName;
         $templateArguments['fieldId'] = ($templateArguments['fieldId']) ?: StringService::get()->sanitizeString('formz-' . $formObject->getName() . '-' . $fieldName);
 
+        $currentView = $this->viewHelperVariableContainer->getView();
+        $currentVariables = [];
+
         $view = $this->fieldService->getView($layout);
 
         /*
@@ -163,24 +166,55 @@ class FieldViewHelper extends AbstractViewHelper
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
             $view->setRenderingContext($this->renderingContext);
         } else {
-            $renderingContext = $view->getRenderingContext();
+            $currentVariables = $this->renderingContext->getVariableProvider()->getAll();
 
             /*
              * Updating the view dependencies: the variable container as well as
              * the controller context must be injected in the view.
              */
-            $renderingContext->setViewHelperVariableContainer($this->viewHelperVariableContainer);
+            $this->viewHelperVariableContainer->setView($view);
+
+            $view->getRenderingContext()->setViewHelperVariableContainer($this->viewHelperVariableContainer);
 
             $view->setControllerContext($this->controllerContext);
 
-            $this->viewHelperVariableContainer->setView($view);
+            /*
+             * Adding current variables to the field view variables.
+             */
+            $tmpVariables = $currentVariables;
+            ArrayUtility::mergeRecursiveWithOverrule($tmpVariables, $templateArguments);
+            $templateArguments = $tmpVariables;
         }
 
         $view->setLayoutRootPaths($layoutPaths);
         $view->setPartialRootPaths($partialPaths);
         $view->assignMultiple($templateArguments);
 
-        return $view->render();
+        $result = $view->render();
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '>=')) {
+            /*
+             * Because the view can be used several times in nested fields, we
+             * need to restore the variables after the view was rendered.
+             */
+            $viewVariableProvider = $view->getRenderingContext()->getVariableProvider();
+
+            foreach ($viewVariableProvider->getAllIdentifiers() as $identifier) {
+                $viewVariableProvider->remove($identifier);
+            }
+
+            foreach ($currentVariables as $key => $value) {
+                $viewVariableProvider->add($key, $value);
+            }
+
+            /*
+             * Resetting the view of the variable container with the original
+             * view.
+             */
+            $this->viewHelperVariableContainer->setView($currentView);
+        }
+
+        return $result;
     }
 
     /**
