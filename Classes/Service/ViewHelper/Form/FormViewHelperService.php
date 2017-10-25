@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Service\ViewHelper\Form;
 
+use DateTime;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
@@ -20,6 +21,7 @@ use Romm\Formz\Error\FormResult;
 use Romm\Formz\Exceptions\DuplicateEntryException;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
+use Traversable;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
@@ -144,6 +146,31 @@ class FormViewHelperService implements SingletonInterface
         if (true === $this->formObject->formWasValidated()) {
             $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes();
             $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
+        }
+
+        $dataAttributes = $this->formatDataAttributes($dataAttributes);
+
+        return $dataAttributes;
+    }
+
+    /**
+     * Checks the type of every data attribute and formats it if needed.
+     * @todo add unit test
+     *
+     * @param array $dataAttributes
+     * @return array
+     */
+    protected function formatDataAttributes(array $dataAttributes)
+    {
+        foreach ($dataAttributes as $key => $value) {
+            if (is_array($value) || $value instanceof Traversable) {
+                $dataAttributes[$key] = implode(',', $value);
+            } elseif ($value instanceof DateTime) {
+                $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'] . ' ' . $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'];
+                $dataAttributes[$key] = $value->format($format);
+            } elseif (false === is_string($value)) {
+                $dataAttributes[$key] = (string)$value;
+            }
         }
 
         return $dataAttributes;
