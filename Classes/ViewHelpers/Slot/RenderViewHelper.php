@@ -50,6 +50,8 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
+        parent::initializeArguments();
+
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 

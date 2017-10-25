@@ -89,6 +89,8 @@ class ClassViewHelper extends AbstractViewHelper
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('name', 'string', 'Name of the class which will be managed.', true);
         $this->registerArgument('field', 'string', 'Name of the field which will be managed. By default, it is the field from the current `FieldViewHelper`.');
     }
