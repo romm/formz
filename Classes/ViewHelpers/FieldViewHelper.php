@@ -165,13 +165,6 @@ class FieldViewHelper extends AbstractViewHelper
         } else {
             $renderingContext = $view->getRenderingContext();
 
-            // Removing all variables previously added to the provider.
-            $provider = $renderingContext->getVariableProvider();
-
-            foreach ($provider->getAllIdentifiers() as $key) {
-                $provider->remove($key);
-            }
-
             /*
              * Updating the view dependencies: the variable container as well as
              * the controller context must be injected in the view.
