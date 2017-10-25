@@ -336,7 +336,11 @@ class FieldViewHelper extends AbstractViewHelper
             : $viewConfiguration->getAbsoluteLayoutRootPaths();
 
         if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '>=')) {
-            return $paths;
+            $templatePaths = $this->renderingContext->getTemplatePaths();
+
+            $currentPaths = $type === 'partial'
+                ? $templatePaths->getPartialRootPaths()
+                : $templatePaths->getLayoutRootPaths();
         } else {
             $currentView = $this->renderingContext->getViewHelperVariableContainer()->getView();
             $propertyName = $type === 'partial'
@@ -347,10 +351,10 @@ class FieldViewHelper extends AbstractViewHelper
             $method = $reflectionClass->getMethod($propertyName);
             $method->setAccessible(true);
 
-            $value = $method->invoke($currentView);
-
-            return array_unique(array_merge($paths, $value));
+            $currentPaths = $method->invoke($currentView);
         }
+
+        return array_unique(array_merge($paths, $currentPaths));
     }
 
     /**
