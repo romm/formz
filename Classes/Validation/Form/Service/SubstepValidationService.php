@@ -54,16 +54,16 @@ class SubstepValidationService
         $currentSubstepDefinition = $this->getCurrentSubstepDefinition();
 
         if ($this->dataObject->getValidatedStep() === $stepService->getCurrentStep()) {
+            $nextSubstep = $this->getNextSubstep($currentSubstepDefinition);
+
+            if (!$nextSubstep) {
+                $stepService->markLastSubstepAsValidated();
+            }
+
             if ($this->getResult()->hasErrors()) {
                 $stepService->setCurrentSubstepDefinition($currentSubstepDefinition);
-            } else {
-                $nextSubstep = $this->getNextSubstep($currentSubstepDefinition);
-
-                if ($nextSubstep) {
-                    $stepService->setCurrentSubstepDefinition($nextSubstep);
-                } else {
-                    $stepService->markLastSubstepAsValidated();
-                }
+            } elseif ($nextSubstep) {
+                $stepService->setCurrentSubstepDefinition($nextSubstep);
             }
         }
     }
