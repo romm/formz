@@ -38,6 +38,8 @@ class InvalidArgumentTypeException extends FormzException
 
     const CONDITION_CLASS_NAME_NOT_VALID = 'The condition class must implement "%s" (given class is "%s").';
 
+    const DATA_ATTRIBUTE_NOT_FORMATTABLE = 'The field "%s" in the form "%s" cannot be formatted. It needs to either implement `__toString()` or you need to use the `@formz-ignore` annotation in the property docblock.';
+
     /**
      * @code 1477468571
      *
@@ -188,6 +190,29 @@ class InvalidArgumentTypeException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
             [FormInterface::class, $className]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1509724328
+     *
+     * @param FormInterface $form
+     * @param $fieldName
+     * @param $value
+     * @return InvalidArgumentTypeException
+     */
+    final public static function dataAttributeValueNotFormattable(FormInterface $form, $fieldName, $value)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::DATA_ATTRIBUTE_NOT_FORMATTABLE,
+            [
+                $fieldName,
+                get_class($form),
+                $value,
+            ]
         );
 
         return $exception;
