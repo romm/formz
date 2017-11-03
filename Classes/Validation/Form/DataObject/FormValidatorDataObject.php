@@ -30,6 +30,11 @@ class FormValidatorDataObject
     protected $formResult;
 
     /**
+     * @var bool
+     */
+    protected $dummyMode;
+
+    /**
      * @var callable[]
      */
     protected $fieldValidationCallback = [];
@@ -42,11 +47,13 @@ class FormValidatorDataObject
     /**
      * @param FormObject $formObject
      * @param FormResult $formResult
+     * @param bool $dummyMode
      */
-    public function __construct(FormObject $formObject, FormResult $formResult)
+    public function __construct(FormObject $formObject, FormResult $formResult, $dummyMode)
     {
         $this->formObject = $formObject;
         $this->formResult = $formResult;
+        $this->dummyMode = $dummyMode;
     }
 
     /**
@@ -63,6 +70,14 @@ class FormValidatorDataObject
     public function getFormResult()
     {
         return $this->formResult;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDummyMode()
+    {
+        return $this->dummyMode;
     }
 
     /**

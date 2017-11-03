@@ -277,7 +277,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     public function getDataObject()
     {
         if (null === $this->dataObject) {
-            $this->dataObject = Core::instantiate(FormValidatorDataObject::class, $this->getFormObject(), $this->getFormResult());
+            $this->dataObject = Core::instantiate(FormValidatorDataObject::class, $this->getFormObject(), $this->getFormResult(), $this->isDummy());
         }
 
         return $this->dataObject;

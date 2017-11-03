@@ -80,7 +80,7 @@ class SubstepValidationService
         $substepDefinition = $firstSubstepDefinition;
         $substepsLevel = $stepService->getSubstepsLevel();
 
-        while ($substepsLevel > 0) {
+        while ($this->dataObject->isDummyMode() || $substepsLevel > 0) {
             $substepsLevel--;
             $substepIsActivated = true;
 
@@ -101,7 +101,7 @@ class SubstepValidationService
                 }
             }
 
-            if ($substepsLevel === 0) {
+            if (!$this->dataObject->isDummyMode() && $substepsLevel === 0) {
                 $currentSubstepDefinition = $substepDefinition;
                 break;
             }

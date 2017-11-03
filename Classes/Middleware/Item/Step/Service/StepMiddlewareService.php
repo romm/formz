@@ -16,7 +16,6 @@ namespace Romm\Formz\Middleware\Item\Step\Service;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\FormResult;
-use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
@@ -256,7 +255,7 @@ class StepMiddlewareService implements SingletonInterface
     {
         $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
         $tree = $conditionProcessor->getActivationConditionTreeForStep($stepDefinition);
-        $todo = new FormValidatorExecutor(new FormValidatorDataObject($this->getFormObject(), new FormResult())); // @todo
+        $todo = new FormValidatorExecutor(new FormValidatorDataObject($this->getFormObject(), new FormResult(), true)); // @todo
         $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
 
         return $tree->getPhpResult($dataObject);
