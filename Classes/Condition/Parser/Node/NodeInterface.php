@@ -27,9 +27,9 @@ interface NodeInterface
     public function getParent();
 
     /**
-     * @param NodeInterface $parent
+     * @param self $parent
      */
-    public function setParent(NodeInterface $parent);
+    public function setParent(self $parent);
 
     /**
      * @return ConditionTree
