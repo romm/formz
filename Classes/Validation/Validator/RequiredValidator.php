@@ -45,7 +45,6 @@ class RequiredValidator extends AbstractValidator
     public function isValid($value)
     {
         if (null === $value
-            || false === $value
             || '' === $value
             || (is_array($value) && empty($value))
             || (is_object($value) && $value instanceof \Countable && $value->count() === 0)
