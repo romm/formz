@@ -64,7 +64,7 @@ class SubstepViewHelper extends AbstractViewHelper
 
         /** @var Request $request */
         $request = $this->controllerContext->getRequest();
-        $currentStep = $this->formService->getFormObject()->fetchCurrentStep($request)->getCurrentStep();
+        $currentStep = $formObject->fetchCurrentStep($request)->getCurrentStep();
 
         if (false === $currentStep->hasSubsteps()) {
             throw new \Exception('todo'); // @todo
