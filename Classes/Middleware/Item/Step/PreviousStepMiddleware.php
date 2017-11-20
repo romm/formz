@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Middleware\Item\Step;
 
-use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Middleware\Item\AbstractMiddleware;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationSignal;
@@ -21,21 +20,17 @@ use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\Scope\FieldValidationScope;
 use Romm\Formz\Middleware\Scope\ReadScope;
 use Romm\Formz\Middleware\Signal\Before;
+use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
 
 /**
- * This middleware will fetch the current step in the form, based on the request
- * context and the steps definition in the form configuration.
- *
- * It will check if the user has the right to stand on this step; if not, a loop
- * on all previous steps is done to determine the first valid step: the request
- * is then redirected to this step.
+ * @todo
  */
-class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormValidationSignal
+class PreviousStepMiddleware extends AbstractMiddleware implements Before, FormValidationSignal
 {
     /**
      * @var int
      */
-    protected $priority = self::PRIORITY_STEP;
+    protected $priority = self::PRIORITY_STEP + 100;
 
     /**
      * @var StepMiddlewareService
@@ -63,8 +58,13 @@ class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormV
     public function before(Arguments $arguments)
     {
         $formObject = $this->getFormObject();
+        $this->service->reset($formObject, $this->getRequest());
 
         if (false === $formObject->getDefinition()->hasSteps()) {
+            return;
+        }
+
+        if (!$this->getRequest()->hasArgument(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER)) {
             return;
         }
 
@@ -73,16 +73,8 @@ class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormV
         if ($currentStep) {
             $stepDefinition = $this->service->getStepDefinition($currentStep);
 
-            if (false === $this->service->stepIsValid($stepDefinition)) {
-                /*
-                 * The user has no right to stand on the current step, a previous
-                 * valid step is determined, and the user is redirected to it.
-                 */
-                $stepToRedirect = $this->service->getFirstInvalidStep($currentStep);
-
-                if ($stepToRedirect instanceof StepDefinition) {
-                    $this->service->redirectToStep($stepToRedirect->getStep(), $this->redirect());
-                }
+            if ($stepDefinition->hasPreviousDefinition()) {
+                $this->service->redirectToStep($stepDefinition->getPreviousDefinition()->getStep(), $this->redirect());
             }
         }
     }

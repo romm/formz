@@ -20,6 +20,7 @@ use Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware;
 use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware;
 use Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware;
+use Romm\Formz\Middleware\Item\Step\PreviousStepMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepFetchingMiddleware;
 use Romm\Formz\Middleware\MiddlewareInterface;
@@ -42,6 +43,11 @@ class PresetMiddlewares implements DataPreProcessorInterface
      * @var \Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware
      */
     protected $persistenceFetchingMiddleware;
+
+    /**
+     * @var \Romm\Formz\Middleware\Item\Step\PreviousStepMiddleware
+     */
+    protected $previousStepMiddleware;
 
     /**
      * @var \Romm\Formz\Middleware\Item\Step\StepFetchingMiddleware
@@ -108,6 +114,14 @@ class PresetMiddlewares implements DataPreProcessorInterface
     public function getPersistenceFetchingMiddleware()
     {
         return $this->persistenceFetchingMiddleware;
+    }
+
+    /**
+     * @return PreviousStepMiddleware
+     */
+    public function getPreviousStepMiddleware()
+    {
+        return $this->previousStepMiddleware;
     }
 
     /**
