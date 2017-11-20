@@ -134,7 +134,7 @@ class StepMiddlewareValidationService
         /** @var StepDefinition[] $stepDefinitionsToTest */
         $stepDefinitionsToTest = [];
         $invalidStepDefinition = null;
-        $stepDefinition = $this->service->getStepDefinition($step);
+        $currentStepDefinition = $stepDefinition = $this->service->getStepDefinition($step);
 
         while ($stepDefinition->hasPreviousDefinition()) {
             $stepDefinition = $stepDefinition->getPreviousDefinition();
@@ -168,6 +168,15 @@ class StepMiddlewareValidationService
                 $this->persistence->addValidatedFields($result->getValidatedFields());
             }
         }
+
+        if (null === $invalidStepDefinition
+            && $currentStepDefinition->hasActivation()
+            && false === $this->service->getStepDefinitionConditionResult($currentStepDefinition)
+        ) {
+
+            $invalidStepDefinition = end($stepDefinitionsToTest);
+        }
+
 
         return $invalidStepDefinition;
     }
