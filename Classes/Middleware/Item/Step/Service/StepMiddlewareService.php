@@ -18,6 +18,7 @@ use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
+use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
@@ -91,7 +92,7 @@ class StepMiddlewareService implements SingletonInterface
         $nextStep = null;
 
         if ($currentStepDefinition->hasNextStep()) {
-            $nextStep = $this->getNextStepDefinition($currentStepDefinition, true);
+            $nextStep = $this->getNextStepDefinition($currentStepDefinition);
         }
 
         return $nextStep;
@@ -178,10 +179,9 @@ class StepMiddlewareService implements SingletonInterface
 
     /**
      * @param StepDefinition $step
-     * @param bool           $removeConditionalSteps
      * @return StepDefinition
      */
-    public function getNextStepDefinition(StepDefinition $step, $removeConditionalSteps = false)
+    public function getNextStepDefinition(StepDefinition $step)
     {
         $nextStep = null;
 
@@ -204,7 +204,7 @@ class StepMiddlewareService implements SingletonInterface
                     if (true === $this->getStepDefinitionConditionResult($step)) {
                         $nextStep = $step;
                         break;
-                    } elseif (true === $removeConditionalSteps) {
+                    } else {
                         $this->persistence->removeStep($step);
                     }
                 } else {
@@ -215,6 +215,60 @@ class StepMiddlewareService implements SingletonInterface
         }
 
         return $nextStep;
+    }
+
+    public function getNextSubstepDefinition(SubstepDefinition $substepDefinition)
+    {
+        $nextSubstep = null;
+
+        if ($substepDefinition->hasDivergence()) {
+            $divergenceSteps = $substepDefinition->getDivergenceSubsteps();
+
+            foreach ($divergenceSteps as $divergenceStep) {
+                if (true === $this->getSubstepDefinitionConditionResult($divergenceStep)) {
+                    $nextSubstep = $divergenceStep;
+                    break;
+                }
+            }
+        }
+
+        if (null === $nextSubstep) {
+            while ($substepDefinition->hasNextSubstep()) {
+                $substepDefinition = $substepDefinition->getNextSubstep();
+
+                if ($substepDefinition->hasActivation()) {
+                    if (true === $this->getSubstepDefinitionConditionResult($substepDefinition)) {
+                        $nextSubstep = $substepDefinition;
+                        break;
+                    }
+                } else {
+                    $nextSubstep = $substepDefinition;
+                    break;
+                }
+            }
+        }
+
+        return $nextSubstep;
+    }
+
+    public function findSubstepDefinition(Step $step, callable $callback)
+    {
+        return $this->findSubstepDefinitionRecursive($step->getSubsteps()->getFirstSubstepDefinition(), $callback);
+    }
+
+    protected function findSubstepDefinitionRecursive(SubstepDefinition $substepDefinition, callable $callback)
+    {
+        $result = $callback($substepDefinition);
+
+        if (true === $result) {
+            return $substepDefinition;
+        }
+
+        $substepDefinition = $this->getNextSubstepDefinition($substepDefinition);
+
+        return $substepDefinition
+            ? $this->findSubstepDefinitionRecursive($substepDefinition, $callback)
+            : null;
     }
 
     /**
@@ -255,6 +309,20 @@ class StepMiddlewareService implements SingletonInterface
     {
         $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
         $tree = $conditionProcessor->getActivationConditionTreeForStep($stepDefinition);
+        $todo = new FormValidatorExecutor(new FormValidatorDataObject($this->getFormObject(), new FormResult(), true)); // @todo
+        $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
+
+        return $tree->getPhpResult($dataObject);
+    }
+
+    /**
+     * @param SubstepDefinition $substepDefinition
+     * @return bool
+     */
+    public function getSubstepDefinitionConditionResult(SubstepDefinition $substepDefinition)
+    {
+        $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
+        $tree = $conditionProcessor->getActivationConditionTreeForSubstep($substepDefinition);
         $todo = new FormValidatorExecutor(new FormValidatorDataObject($this->getFormObject(), new FormResult(), true)); // @todo
         $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
 

@@ -16,11 +16,12 @@ namespace Romm\Formz\Middleware\Item\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Middleware\Item\AbstractMiddleware;
-use Romm\Formz\Middleware\Item\FormValidation\FormValidationSignal;
+use Romm\Formz\Middleware\Item\FormInjection\FormInjectionSignal;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
+use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Scope\FieldValidationScope;
 use Romm\Formz\Middleware\Scope\ReadScope;
-use Romm\Formz\Middleware\Signal\Before;
+use Romm\Formz\Middleware\Signal\After;
 
 /**
  * This middleware will fetch the current step in the form, based on the request
@@ -30,12 +31,12 @@ use Romm\Formz\Middleware\Signal\Before;
  * on all previous steps is done to determine the first valid step: the request
  * is then redirected to this step.
  */
-class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormValidationSignal
+class StepFetchingMiddleware extends AbstractMiddleware implements After, FormInjectionSignal, PresetMiddlewareInterface
 {
     /**
      * @var int
      */
-    protected $priority = self::PRIORITY_STEP;
+    protected $priority = self::PRIORITY_STEP_FETCHING;
 
     /**
      * @var StepMiddlewareService
@@ -60,7 +61,7 @@ class StepFetchingMiddleware extends AbstractMiddleware implements Before, FormV
      *
      * @param Arguments $arguments
      */
-    public function before(Arguments $arguments)
+    public function after(Arguments $arguments)
     {
         $formObject = $this->getFormObject();
 

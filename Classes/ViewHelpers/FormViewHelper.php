@@ -30,6 +30,7 @@ use Romm\Formz\Service\FormService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
+use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -296,6 +297,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                     ->getLevel();
 
                 $result .= '<input type="hidden" fz-substeps-level="1" name="' . $this->prefixFieldName('substepsLevel') . '" value="' . $substepsLevel . '" />' . LF;
+                $result .= '<input type="hidden" fz-substeps-previous="1" name="' . $this->prefixFieldName(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER) . '" disabled="1" value="1" />' . LF;
             }
         }
 

@@ -31,7 +31,7 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
     /**
      * @var int
      */
-    protected $priority = self::PRIORITY_STEP;
+    protected $priority = self::PRIORITY_STEP_DISPATCHING;
 
     /**
      * @var StepMiddlewareService

@@ -20,6 +20,7 @@ use Romm\Formz\Middleware\Item\Begin\Service\FormService;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
+use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
 
 final class BeginMiddleware implements BasicMiddlewareInterface
 {
@@ -89,8 +90,10 @@ final class BeginMiddleware implements BasicMiddlewareInterface
             $formzData = $request->getArgument('formzData');
             $formObject->getRequestData()->fillFromHash($formzData);
 
-            $proxy = FormObjectFactory::get()->getProxy($form);
-            $proxy->markFormAsSubmitted();
+            if (!$request->hasArgument(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER)) {
+                $proxy = FormObjectFactory::get()->getProxy($form);
+                $proxy->markFormAsSubmitted();
+            }
 
             $this->injectFormHashInProxy();
         }

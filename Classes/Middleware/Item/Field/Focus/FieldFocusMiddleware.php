@@ -18,6 +18,7 @@ use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\OnBeginMiddleware;
+use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 
 /**
@@ -36,6 +37,19 @@ class FieldFocusMiddleware extends OnBeginMiddleware implements PresetMiddleware
      * @var Field
      */
     protected $field;
+
+    /**
+     * @var StepMiddlewareService
+     */
+    protected $service;
+
+    /**
+     * Inject the step service.
+     */
+    public function initializeMiddleware()
+    {
+        $this->service = StepMiddlewareService::get();
+    }
 
     /**
      * @todo
@@ -62,8 +76,7 @@ class FieldFocusMiddleware extends OnBeginMiddleware implements PresetMiddleware
             return;
         }
 
-        $firstSubstepDefinition = $this->step->getSubsteps()->getFirstSubstepDefinition();
-        $substepDefinition = $this->fetchFieldSubstep($firstSubstepDefinition);
+        $substepDefinition = $this->fetchFieldSubstep();
 
         if ($substepDefinition) {
             $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
@@ -72,20 +85,16 @@ class FieldFocusMiddleware extends OnBeginMiddleware implements PresetMiddleware
     }
 
     /**
-     * @param SubstepDefinition $substepDefinition
      * @return SubstepDefinition|null
      */
-    protected function fetchFieldSubstep(SubstepDefinition $substepDefinition)
+    protected function fetchFieldSubstep()
     {
-        if ($substepDefinition->getSubstep()->supportsField($this->field)) {
-            return $substepDefinition;
-        }
-
-        if ($substepDefinition->hasNextSubstep()) {
-            return $this->fetchFieldSubstep($substepDefinition->getNextSubstep());
-        }
-
-        return null;
+        return $this->service->findSubstepDefinition(
+            $this->step,
+            function (SubstepDefinition $substepDefinition) {
+                return $substepDefinition->getSubstep()->supportsField($this->field);
+            }
+        );
     }
 
     protected function fetchField()

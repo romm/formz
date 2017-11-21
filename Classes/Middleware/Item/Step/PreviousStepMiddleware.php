@@ -13,24 +13,26 @@
 
 namespace Romm\Formz\Middleware\Item\Step;
 
+use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Middleware\Item\AbstractMiddleware;
-use Romm\Formz\Middleware\Item\FormValidation\FormValidationSignal;
+use Romm\Formz\Middleware\Item\FormInjection\FormInjectionSignal;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
+use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
 use Romm\Formz\Middleware\Scope\FieldValidationScope;
 use Romm\Formz\Middleware\Scope\ReadScope;
-use Romm\Formz\Middleware\Signal\Before;
+use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
 
 /**
  * @todo
  */
-class PreviousStepMiddleware extends AbstractMiddleware implements Before, FormValidationSignal
+class PreviousStepMiddleware extends AbstractMiddleware implements After, FormInjectionSignal, PresetMiddlewareInterface
 {
     /**
      * @var int
      */
-    protected $priority = self::PRIORITY_STEP + 100;
+    protected $priority = self::PRIORITY_STEP_FETCHING + 100;
 
     /**
      * @var StepMiddlewareService
@@ -51,11 +53,11 @@ class PreviousStepMiddleware extends AbstractMiddleware implements Before, FormV
     }
 
     /**
-     * @see StepFetchingMiddleware
+     * @see PreviousStepMiddleware
      *
      * @param Arguments $arguments
      */
-    public function before(Arguments $arguments)
+    public function after(Arguments $arguments)
     {
         $formObject = $this->getFormObject();
         $this->service->reset($formObject, $this->getRequest());
@@ -72,6 +74,39 @@ class PreviousStepMiddleware extends AbstractMiddleware implements Before, FormV
 
         if ($currentStep) {
             $stepDefinition = $this->service->getStepDefinition($currentStep);
+
+            if ($currentStep->hasSubsteps()) {
+                $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
+                $substepsLevel = $stepService->getSubstepsLevel();
+
+                if ($substepsLevel > 1) {
+                    $substepDefinition = $currentStep->getSubsteps()->getFirstSubstepDefinition();
+
+                    while ($substepDefinition) {
+                        $nextSubstepDefinition = $this->service->getNextSubstepDefinition($substepDefinition);
+
+                        if (!$nextSubstepDefinition
+                            || $nextSubstepDefinition->getLevel() >= $substepsLevel - 1
+                        ) {
+                            break;
+                        }
+
+                        $substepDefinition = $nextSubstepDefinition;
+                    }
+
+                    $stepService->setCurrentSubstepDefinition($substepDefinition);
+                    $stepService->setCurrentStep($currentStep);
+                    $stepService->setSubstepsLevel($substepDefinition->getLevel());
+//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($substepDefinition, __CLASS__ . ':' . __LINE__ . ' $substepDefinition');
+//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($substepDefinition->getLevel(), __CLASS__ . ':' . __LINE__ . ' $substepDefinition->getLevel()');
+//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($currentStep, __CLASS__ . ':' . __LINE__ . ' $currentStep');
+//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($stepService, __CLASS__ . ':' . __LINE__ . ' $stepService');
+//                    die();
+
+                    return;
+                }
+            }
+
 
             if ($stepDefinition->hasPreviousDefinition()) {
                 $this->service->redirectToStep($stepDefinition->getPreviousDefinition()->getStep(), $this->redirect());

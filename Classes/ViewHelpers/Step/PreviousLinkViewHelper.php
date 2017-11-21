@@ -13,20 +13,19 @@
 
 namespace Romm\Formz\ViewHelpers\Step;
 
-use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
-use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
+use TYPO3\CMS\Fluid\ViewHelpers\Form\AbstractFormFieldViewHelper;
 
-class PreviousLinkViewHelper extends AbstractTagBasedViewHelper
+class PreviousLinkViewHelper extends AbstractFormFieldViewHelper
 {
-    const PREVIOUS_LINK_PARAMETER = 'fz-previous-step';
+    const PREVIOUS_LINK_PARAMETER = 'substepsPrevious';
 
     /**
      * @var string
      */
-    protected $tagName = 'a';
+    protected $tagName = 'input';
 
     /**
      * @var FormViewHelperService
@@ -69,17 +68,22 @@ class PreviousLinkViewHelper extends AbstractTagBasedViewHelper
             return null;
         }
 
-        $stepService = FormObjectFactory::get()->getStepService($formObject);
-        $level = $stepService->getSubstepsLevel();
+//        $stepService = FormObjectFactory::get()->getStepService($formObject);
+//        $level = $stepService->getSubstepsLevel();
 
-        $uriBuilder = $this->controllerContext->getUriBuilder();
-        $uri = $uriBuilder
-            ->reset()
-            ->uriFor(null, [self::PREVIOUS_LINK_PARAMETER => $level]);
+//        $uriBuilder = $this->controllerContext->getUriBuilder();
+//        $uri = $uriBuilder
+//            ->reset()
+//            ->uriFor(null, [self::PREVIOUS_LINK_PARAMETER => $level]);
 
-        $this->tag->addAttribute('href', $uri);
-        $this->tag->setContent($this->renderChildren());
-        $this->tag->forceClosingTag(true);
+        $this->tag->addAttribute('type', 'submit');
+        $this->tag->addAttribute('value', $this->getValueAttribute());
+        $this->tag->addAttribute('name', $this->prefixFieldName(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER));
+
+//        $this->tag->addAttribute('href', $uri);
+        $this->tag->addAttribute('fz-previous-link', true);
+//        $this->tag->setContent($this->renderChildren());
+//        $this->tag->forceClosingTag(true);
 
         return $this->tag->render();
     }
