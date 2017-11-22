@@ -108,9 +108,7 @@ class RepositoryPersistence extends AbstractPersistence
 
         $this->persistenceManager->persistAll();
 
-        if ($new) {
-            $metadata->setIdentifier($form->getUid());
-        }
+        $metadata->setIdentifier($form->getUid());
     }
 
     /**
