@@ -13,7 +13,9 @@
 
 namespace Romm\Formz\Middleware\Item\Step;
 
+use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
+use Romm\Formz\Form\FormObject\Service\FormObjectSteps;
 use Romm\Formz\Middleware\Argument\Arguments;
 use Romm\Formz\Middleware\Item\AbstractMiddleware;
 use Romm\Formz\Middleware\Item\FormInjection\FormInjectionSignal;
@@ -33,6 +35,16 @@ class PreviousStepMiddleware extends AbstractMiddleware implements After, FormIn
      * @var int
      */
     protected $priority = self::PRIORITY_STEP_FETCHING + 100;
+
+    /**
+     * @var Step
+     */
+    protected $currentStep;
+
+    /**
+     * @var FormObjectSteps
+     */
+    protected $stepService;
 
     /**
      * @var StepMiddlewareService
@@ -66,51 +78,71 @@ class PreviousStepMiddleware extends AbstractMiddleware implements After, FormIn
             return;
         }
 
-        if (!$this->getRequest()->hasArgument(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER)) {
-            return;
+        $this->currentStep = $this->getCurrentStep();
+        $this->stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
+
+        if ($this->currentStep) {
+            if ($this->getRequest()->hasArgument(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER)) {
+                $this->redirectToPreviousStep();
+            } else {
+                $this->handleRedirectionSubstep();
+            }
         }
+    }
 
-        $currentStep = $this->getCurrentStep();
+    protected function redirectToPreviousStep()
+    {
+        $stepDefinition = $this->service->getStepDefinition($this->currentStep);
 
-        if ($currentStep) {
-            $stepDefinition = $this->service->getStepDefinition($currentStep);
+        if ($this->currentStep->hasSubsteps()) {
+            $substepsLevel = $this->stepService->getSubstepsLevel();
 
-            if ($currentStep->hasSubsteps()) {
-                $stepService = FormObjectFactory::get()->getStepService($this->getFormObject());
-                $substepsLevel = $stepService->getSubstepsLevel();
+            if ($substepsLevel > 1) {
+                $substepDefinition = $this->currentStep->getSubsteps()->getFirstSubstepDefinition();
 
-                if ($substepsLevel > 1) {
-                    $substepDefinition = $currentStep->getSubsteps()->getFirstSubstepDefinition();
+                while ($substepDefinition) {
+                    $nextSubstepDefinition = $this->service->getNextSubstepDefinition($substepDefinition);
 
-                    while ($substepDefinition) {
-                        $nextSubstepDefinition = $this->service->getNextSubstepDefinition($substepDefinition);
-
-                        if (!$nextSubstepDefinition
-                            || $nextSubstepDefinition->getLevel() >= $substepsLevel - 1
-                        ) {
-                            break;
-                        }
-
-                        $substepDefinition = $nextSubstepDefinition;
+                    if (!$nextSubstepDefinition
+                        || $nextSubstepDefinition->getLevel() >= $substepsLevel
+                    ) {
+                        break;
                     }
 
-                    $stepService->setCurrentSubstepDefinition($substepDefinition);
-                    $stepService->setCurrentStep($currentStep);
-                    $stepService->setSubstepsLevel($substepDefinition->getLevel());
-//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($substepDefinition, __CLASS__ . ':' . __LINE__ . ' $substepDefinition');
-//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($substepDefinition->getLevel(), __CLASS__ . ':' . __LINE__ . ' $substepDefinition->getLevel()');
-//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($currentStep, __CLASS__ . ':' . __LINE__ . ' $currentStep');
-//                    \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($stepService, __CLASS__ . ':' . __LINE__ . ' $stepService');
-//                    die();
-
-                    return;
+                    $substepDefinition = $nextSubstepDefinition;
                 }
-            }
 
+                $this->stepService->setCurrentSubstepDefinition($substepDefinition);
+                $this->stepService->setSubstepsLevel($substepDefinition->getLevel());
 
-            if ($stepDefinition->hasPreviousDefinition()) {
-                $this->service->redirectToStep($stepDefinition->getPreviousDefinition()->getStep(), $this->redirect());
+                return;
             }
+        }
+
+        if ($stepDefinition->hasPreviousDefinition()) {
+            $this->service->redirectToStep(
+                $stepDefinition->getPreviousDefinition()->getStep(),
+                $this->redirect()->withArguments(['fz-last-substep' => true])
+            );
+        }
+    }
+
+    protected function handleRedirectionSubstep()
+    {
+        if ($this->currentStep->hasSubsteps()
+            && $this->getRequest()->hasArgument('fz-last-substep')
+        ) {
+            $substepDefinition = $this->currentStep->getSubsteps()->getFirstSubstepDefinition();
+
+            do {
+                $nextSubstepDefinition = $this->service->getNextSubstepDefinition($substepDefinition);
+
+                if ($nextSubstepDefinition) {
+                    $substepDefinition = $nextSubstepDefinition;
+                }
+            } while ($nextSubstepDefinition);
+
+            $this->stepService->setCurrentSubstepDefinition($substepDefinition);
         }
     }
 }

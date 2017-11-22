@@ -68,22 +68,10 @@ class PreviousLinkViewHelper extends AbstractFormFieldViewHelper
             return null;
         }
 
-//        $stepService = FormObjectFactory::get()->getStepService($formObject);
-//        $level = $stepService->getSubstepsLevel();
-
-//        $uriBuilder = $this->controllerContext->getUriBuilder();
-//        $uri = $uriBuilder
-//            ->reset()
-//            ->uriFor(null, [self::PREVIOUS_LINK_PARAMETER => $level]);
-
         $this->tag->addAttribute('type', 'submit');
         $this->tag->addAttribute('value', $this->getValueAttribute());
         $this->tag->addAttribute('name', $this->prefixFieldName(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER));
-
-//        $this->tag->addAttribute('href', $uri);
         $this->tag->addAttribute('fz-previous-link', true);
-//        $this->tag->setContent($this->renderChildren());
-//        $this->tag->forceClosingTag(true);
 
         return $this->tag->render();
     }

@@ -15,6 +15,7 @@ namespace Romm\Formz\Middleware\Request;
 
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Extbase\Mvc\Request;
 
 abstract class Dispatcher
@@ -106,7 +107,7 @@ abstract class Dispatcher
      */
     public function withArguments(array $arguments)
     {
-        $this->arguments = $arguments;
+        ArrayUtility::mergeRecursiveWithOverrule($this->arguments, $arguments);
 
         return $this;
     }
