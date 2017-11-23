@@ -92,7 +92,7 @@ class PreviousStepMiddleware extends AbstractMiddleware implements After, FormIn
 
     protected function redirectToPreviousStep()
     {
-        $stepDefinition = $this->service->getStepDefinition($this->currentStep);
+        $currentStepDefinition = $this->service->getStepDefinition($this->currentStep);
 
         if ($this->currentStep->hasSubsteps()) {
             $substepsLevel = $this->stepService->getSubstepsLevel();
@@ -119,9 +119,21 @@ class PreviousStepMiddleware extends AbstractMiddleware implements After, FormIn
             }
         }
 
-        if ($stepDefinition->hasPreviousDefinition()) {
+        if ($currentStepDefinition->hasPreviousDefinition()) {
+            $stepDefinition = $this->getFormObject()->getDefinition()->getSteps()->getFirstStepDefinition();
+
+            do {
+                $nextStepDefinition = $this->service->getNextStepDefinition($stepDefinition);
+
+                if ($nextStepDefinition === $currentStepDefinition) {
+                    break;
+                }
+
+                $stepDefinition = $nextStepDefinition;
+            } while ($nextStepDefinition);
+
             $this->service->redirectToStep(
-                $stepDefinition->getPreviousDefinition()->getStep(),
+                $stepDefinition->getStep(),
                 $this->redirect()->withArguments(['fz-last-substep' => true])
             );
         }
