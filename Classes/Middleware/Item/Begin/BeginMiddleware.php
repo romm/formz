@@ -73,7 +73,7 @@ final class BeginMiddleware implements BasicMiddlewareInterface
 
         if ($this->requestWasSubmitted()
             && null === $request->getOriginalRequest()
-            && $this->processor->getRequestArguments()->hasArgument($formName)
+            && $request->hasArgument($formName)
         ) {
             if (false === $request->hasArgument('fz-hash')) {
                 throw new \Exception('todo fz-hash'); // @todo
