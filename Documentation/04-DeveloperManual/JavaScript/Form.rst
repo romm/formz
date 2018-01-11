@@ -154,7 +154,7 @@ Bind a function on the form submission
     Parameters
         - ``callback``: function called when the form is submitted. If it returns false, the form submission is cancelled.
     Description
-        Binds a function on the form submission. Note that the function wont be called if the form submission is blocked (for instance because of an invalid field).
+        Binds a function on the form submission. Note that the function won't be called if the form submission is blocked (for instance because of an invalid field).
 
         The function can return ``false`` if the submission must be blocked for any reason.
 

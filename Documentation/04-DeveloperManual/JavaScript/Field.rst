@@ -11,7 +11,7 @@
 Field
 =====
 
-You can find below the list of available function for a **field instance**:
+You can find below the list of available functions for a **field instance**:
 
 =========================================================================================================================== ====================================================================
 Function                                                                                                                    Description

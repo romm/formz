@@ -3,7 +3,7 @@
 
 This release introduces partial backend support for FormZ, meaning you can use FormZ in any backend module.
 
-The last remaining known issue is ajax calls, which wont work for now.
+The last remaining known issue is ajax calls, which won't work for now.
 
 ----
 

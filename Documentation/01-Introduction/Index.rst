@@ -23,7 +23,7 @@ FormZ helps with the following topics:
 What is this for?
 -----------------
 
-The goal of FormZ it to accelerate forms development, from a simple contact form to a complex subscription form. The extension provides a set of tools: developers, integrators and administrators will have access to ready-to-run and simple features.
+The goal of FormZ is to accelerate forms development, from a simple contact form to a complex subscription form. The extension provides a set of tools: developers, integrators and administrators will have access to ready-to-run and simple features.
 
 A form manipulation can be divided into three principal axes: its **composition**, its **validation on submission**, and its **data exploitation** when it is validated. The last part is specific to each form, while composition and validation will always have similarities between forms: identical fields with same validation rules, same display, etc.
 

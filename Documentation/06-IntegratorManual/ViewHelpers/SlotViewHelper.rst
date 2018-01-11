@@ -21,7 +21,7 @@ Argument                Description
 ======================= ================================================================================================================
 \* ``name``             Name of the slot.
 
-                        Note that if you use the name of a slot which is not used in the field layout, this slot wont be rendered.
+                        Note that if you use the name of a slot which is not used in the field layout, this slot won't be rendered.
 
 ``arguments``           Array of arbitrary arguments that will be passed to the slot and can be used within it as Fluid variables.
 ======================= ================================================================================================================

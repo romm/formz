@@ -5,7 +5,7 @@
 « FieldIsEmpty»
 ================
 
-This condition is verified when a given field was not filled. Works witch multiple checkboxes.
+This condition is verified when a given field was not filled. Works with multiple checkboxes.
 
 Properties
 ----------

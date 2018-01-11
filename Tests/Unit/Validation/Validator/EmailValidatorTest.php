@@ -30,7 +30,7 @@ class EmailValidatorTest extends AbstractValidatorUnitTest
     public function validatorWorksDataProvider()
     {
         /*
-         * We wont test too much different email adresses because the email
+         * We won't test too much different email adresses because the email
          * validator relies and TYPO3 core function for email checking.
          *
          * We're just going to see if both invalid and valid email examples

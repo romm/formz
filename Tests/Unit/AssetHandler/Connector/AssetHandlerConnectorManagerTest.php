@@ -17,7 +17,7 @@ class AssetHandlerConnectorManagerTest extends AbstractUnitTest
 
     /**
      * Checks that the manager getter method returns correct instances, and that
-     * there wont be duplicated instances for the same constructor arguments.
+     * there won't be duplicated instances for the same constructor arguments.
      *
      * @test
      */
