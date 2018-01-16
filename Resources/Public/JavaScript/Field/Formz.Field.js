@@ -192,10 +192,13 @@ Fz.Field = (function () {
             handleLoadingBehaviour: function (run) {
                 var element = this.getFieldContainer();
                 if (null !== element) {
+                    var formElement = this.getForm().getElement();
                     if (true === run) {
                         element.setAttribute('fz-loading', '1');
+                        formElement.setAttribute('fz-loading', '1');
                     } else {
                         element.removeAttribute('fz-loading');
+                        formElement.removeAttribute('fz-loading');
                     }
                 }
             },
