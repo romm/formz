@@ -150,7 +150,7 @@ config.tx_formz {
             className = Romm\Formz\Validation\Validator\RegexValidator
             options {
                 # Pattern used by the regex (you don't need separators).
-                pattern = ^[\w-\' àáâãäåçèéêëìíîïðòóôõöùúûüýÿ]*$
+                pattern = ^[\w-\' àáâãäåçèéêëìíîïðòóôõöùúûüýÿßÄÖÜ]*$
                 # Options for the regex, e.g. "i" for insensitive case.
                 options = i
             }
@@ -164,7 +164,7 @@ config.tx_formz {
             className = Romm\Formz\Validation\Validator\RegexValidator
             options {
                 # Pattern used by the regex (you don't need separators).
-                pattern = ^[A-Za-z0-9àáâãäåçèéêëìíîïðòóôõöùúûüýÿ]*$
+                pattern = ^[A-Za-z0-9àáâãäåçèéêëìíîïðòóôõöùúûüýÿßÄÖÜ]*$
                 # Options for the regex, e.g. "i" for insensitive case.
                 options = i
             }
