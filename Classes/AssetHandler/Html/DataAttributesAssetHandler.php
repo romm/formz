@@ -137,6 +137,16 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     }
 
     /**
+     * @return array
+     */
+    public function getCurrentStepDataAttribute()
+    {
+        $stepIdentifier = $this->getFormObject()->getCurrentStepDefinition()->getStep()->getIdentifier();
+
+        return ['fz-current-step' => $stepIdentifier];
+    }
+
+    /**
      * @param string $fieldName
      * @param Result $fieldResult
      * @return array

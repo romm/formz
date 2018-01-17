@@ -146,6 +146,16 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
     }
 
     /**
+     * Alias for Fluid usage.
+     *
+     * @return bool
+     */
+    public function getHasSubsteps()
+    {
+        return $this->hasSubsteps();
+    }
+
+    /**
      * @return Substeps
      */
     public function getSubsteps()

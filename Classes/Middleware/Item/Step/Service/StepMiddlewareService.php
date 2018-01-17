@@ -335,39 +335,9 @@ class StepMiddlewareService implements SingletonInterface
      */
     public function getStepDefinition(Step $step)
     {
-        return $this->findStepDefinition($step, $this->getFirstStepDefinition());
-    }
-
-    /**
-     * @param Step           $step
-     * @param StepDefinition $stepDefinition
-     * @return StepDefinition|null
-     */
-    protected function findStepDefinition(Step $step, StepDefinition $stepDefinition)
-    {
-        if ($stepDefinition->getStep() === $step) {
-            return $stepDefinition;
-        }
-
-        if ($stepDefinition->hasNextStep()) {
-            $result = $this->findStepDefinition($step, $stepDefinition->getNextStep());
-
-            if ($result instanceof StepDefinition) {
-                return $result;
-            }
-        }
-
-        if ($stepDefinition->hasDivergence()) {
-            foreach ($stepDefinition->getDivergenceSteps() as $divergenceStep) {
-                $result = $this->findStepDefinition($step, $divergenceStep);
-
-                if ($result instanceof StepDefinition) {
-                    return $result;
-                }
-            }
-        }
-
-        return null;
+        return FormObjectFactory::get()
+            ->getStepService($this->getFormObject())
+            ->getStepDefinition($step);
     }
 
     /**

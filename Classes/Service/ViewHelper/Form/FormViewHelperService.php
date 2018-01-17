@@ -197,6 +197,10 @@ class FormViewHelperService implements SingletonInterface
             $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
         }
 
+        if ($this->formObject->hasSteps()) {
+            $dataAttributes += $dataAttributesAssetHandler->getCurrentStepDataAttribute();
+        }
+
         $dataAttributes = $this->formatDataAttributes($dataAttributes);
 
         return $dataAttributes;

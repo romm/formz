@@ -67,4 +67,33 @@ class Substeps extends AbstractFormDefinitionComponent
     {
         return isset($this->entries[$name]);
     }
+
+    /**
+     * @todo
+     */
+    public function getMaxLevel()
+    {
+        return $this->getMaxLevelRecursive($this->firstSubstep);
+    }
+
+    /**
+     * @param SubstepDefinition $substepDefinition
+     * @return int
+     */
+    protected function getMaxLevelRecursive(SubstepDefinition $substepDefinition)
+    {
+        $maxLevel = $substepDefinition->getLevel();
+
+        if ($substepDefinition->hasNextSubstep()) {
+            $maxLevel = $this->getMaxLevelRecursive($substepDefinition->getNextSubstep());
+        }
+
+        if ($substepDefinition->hasDivergence()) {
+            foreach ($substepDefinition->getDivergenceSubsteps() as $divergenceSubstep) {
+                $maxLevel = max($maxLevel, $this->getMaxLevelRecursive($divergenceSubstep));
+            }
+        }
+
+        return $maxLevel;
+    }
 }

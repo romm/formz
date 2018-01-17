@@ -116,6 +116,16 @@ class StepDefinition extends AbstractFormDefinitionComponent
     }
 
     /**
+     * Alias for Fluid usage.
+     *
+     * @return bool
+     */
+    public function getHasNextStep()
+    {
+        return $this->hasNextStep();
+    }
+
+    /**
      * @return StepDefinition
      * @throws EntryNotFoundException
      */
@@ -132,6 +142,16 @@ class StepDefinition extends AbstractFormDefinitionComponent
      * @return bool
      */
     public function hasPreviousDefinition()
+    {
+        return $this->hasParent(self::class);
+    }
+
+    /**
+     * Alias for Fluid usage.
+     *
+     * @return bool
+     */
+    public function getHasPreviousDefinition()
     {
         return $this->hasParent(self::class);
     }
