@@ -201,30 +201,6 @@ class FormViewHelperService implements SingletonInterface
             $dataAttributes += $dataAttributesAssetHandler->getCurrentStepDataAttribute();
         }
 
-        $dataAttributes = $this->formatDataAttributes($dataAttributes);
-
-        return $dataAttributes;
-    }
-
-    /**
-     * Checks the type of every data attribute and formats it if needed.
-     *
-     * @param array $dataAttributes
-     * @return array
-     */
-    protected function formatDataAttributes(array $dataAttributes)
-    {
-        foreach ($dataAttributes as $key => $value) {
-            if (is_array($value) || $value instanceof Traversable) {
-                $dataAttributes[$key] = implode(',', $value);
-            } elseif ($value instanceof DateTime) {
-                $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'] . ' ' . $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'];
-                $dataAttributes[$key] = $value->format($format);
-            } elseif (false === is_string($value)) {
-                $dataAttributes[$key] = (string)$value;
-            }
-        }
-
         return $dataAttributes;
     }
 
