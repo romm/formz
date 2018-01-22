@@ -344,7 +344,7 @@ Fz.Field = (function () {
          */
         (function () {
             var trimField = function () {
-                this.value = this.value.replace(/\S/, '');
+                this.value = this.value.replace(/^\s+|\s+$/g, '');
             };
             
             var validateCallback = function () {
@@ -362,8 +362,10 @@ Fz.Field = (function () {
                             element.addEventListener('change', validateCallback);
                         } else if (element.type.substr(0, 6) === 'select') {
                             element.addEventListener('change', validateCallback);
+                        } else if (element.type === 'text') {
+                            element.onblur = removeSpecialCharValue;
+                            element.addEventListener('blur', validateCallback);
                         } else {
-                            element.onblur = trimField;
                             element.addEventListener('blur', validateCallback);
                         }
                     }
