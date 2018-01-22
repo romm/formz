@@ -363,7 +363,7 @@ Fz.Field = (function () {
                         } else if (element.type.substr(0, 6) === 'select') {
                             element.addEventListener('change', validateCallback);
                         } else if (element.type === 'text') {
-                            element.onblur = removeSpecialCharValue;
+                            element.addEventListener('blur', trimField);
                             element.addEventListener('blur', validateCallback);
                         } else {
                             element.addEventListener('blur', validateCallback);
