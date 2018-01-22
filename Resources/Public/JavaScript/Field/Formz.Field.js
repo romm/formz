@@ -343,6 +343,10 @@ Fz.Field = (function () {
          * triggered when the value is changed.
          */
         (function () {
+            var trimField = function () {
+                this.value = this.value.replace(/\S/, '');
+            };
+            
             var validateCallback = function () {
                 states.field.validate();
             };
@@ -359,6 +363,7 @@ Fz.Field = (function () {
                         } else if (element.type.substr(0, 6) === 'select') {
                             element.addEventListener('change', validateCallback);
                         } else {
+                            element.onblur = trimField;
                             element.addEventListener('blur', validateCallback);
                         }
                     }
