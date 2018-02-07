@@ -6,7 +6,6 @@ Fz.Condition.registerCondition(
 	 * @param {String}             data.fieldName
 	 */
 	function (form, data) {
-		/* initialisation du drapeau*/
         var flag = false;
 		var field = form.getFieldByName(data['fieldName']);
 

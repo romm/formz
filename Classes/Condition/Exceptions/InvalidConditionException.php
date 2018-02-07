@@ -150,6 +150,23 @@ class InvalidConditionException extends FormzException
     }
 
     /**
+     * @code 1518016343128
+     *
+     * @param string $fieldName
+     * @return InvalidConditionException
+     */
+    final public static function conditionFieldIsNotEmptyFieldNotFound($fieldName)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FIELD_DOES_NOT_EXIST,
+            [$fieldName]
+        );
+
+        return $exception;
+    }
+
+    /**
      * @code 1488183577
      *
      * @param string $fieldName

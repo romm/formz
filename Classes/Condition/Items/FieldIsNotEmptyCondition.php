@@ -17,12 +17,10 @@ namespace Romm\Formz\Condition\Items;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Form\Definition\FormDefinition;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
- * This condition will match when a field is valid (its validation returned no
- * error).
+ * This condition will match when a field is filled with any value.
  */
 class FieldIsNotEmptyCondition extends AbstractConditionItem
 {
@@ -84,12 +82,13 @@ class FieldIsNotEmptyCondition extends AbstractConditionItem
      * If any syntax/configuration error is found, an exception of type
      * `InvalidConditionException` must be thrown.
      *
-     * @param FormDefinition $formDefinition
      * @throws InvalidConditionException
      */
-    protected function checkConditionConfiguration(FormDefinition $formDefinition)
+    protected function checkConditionConfiguration()
     {
-        if (false === $formDefinition->hasField($this->fieldName)) {
+        $configuration = $this->formObject->getConfiguration();
+
+        if (false === $configuration->hasField($this->fieldName)) {
             throw InvalidConditionException::conditionFieldIsNotEmptyFieldNotFound($this->fieldName);
         }
     }
