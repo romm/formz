@@ -9,5 +9,6 @@ CREATE TABLE tx_formz_domain_model_formmetadata (
 
     PRIMARY KEY (uid),
     INDEX i_hash (hash),
+    INDEX i_class_name (class_name),
     UNIQUE KEY hash (hash)
 );
