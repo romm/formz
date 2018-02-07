@@ -155,7 +155,7 @@ class InvalidConditionException extends FormzException
      * @param string $fieldName
      * @return InvalidConditionException
      */
-    final public static function conditionFieldIsNotEmptyFieldNotFound($fieldName)
+    final public static function conditionFieldIsFilledFieldNotFound($fieldName)
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(

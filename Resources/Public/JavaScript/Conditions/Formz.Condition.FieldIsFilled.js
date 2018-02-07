@@ -1,5 +1,5 @@
 Fz.Condition.registerCondition(
-	'Romm\\Formz\\Condition\\Items\\FieldIsNotEmptyCondition',
+	'Romm\\Formz\\Condition\\Items\\FieldIsFilledCondition',
 	/**
 	 * @param {Formz.FormInstance} form
 	 * @param {Object}             data

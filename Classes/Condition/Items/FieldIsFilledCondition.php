@@ -22,16 +22,16 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 /**
  * This condition will match when a field is filled with any value.
  */
-class FieldIsNotEmptyCondition extends AbstractConditionItem
+class FieldIsFilledCondition extends AbstractConditionItem
 {
-    const CONDITION_IDENTIFIER = 'fieldIsNotEmpty';
+    const CONDITION_IDENTIFIER = 'fieldIsFilled';
 
     /**
      * @inheritdoc
      * @var array
      */
     protected static $javaScriptFiles = [
-        'EXT:formz/Resources/Public/JavaScript/Conditions/Formz.Condition.FieldIsNotEmpty.js'
+        'EXT:formz/Resources/Public/JavaScript/Conditions/Formz.Condition.FieldIsFilled.js'
     ];
 
     /**
@@ -89,7 +89,7 @@ class FieldIsNotEmptyCondition extends AbstractConditionItem
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw InvalidConditionException::conditionFieldIsNotEmptyFieldNotFound($this->fieldName);
+            throw InvalidConditionException::conditionFieldIsFilledFieldNotFound($this->fieldName);
         }
     }
 }
