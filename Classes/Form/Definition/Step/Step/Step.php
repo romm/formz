@@ -57,7 +57,6 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
 
     /**
      * @var \Romm\Formz\Form\Definition\Step\Step\SupportedField[]
-     * @validate NotEmpty
      */
     protected $supportedFields;
 

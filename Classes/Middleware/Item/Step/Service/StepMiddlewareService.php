@@ -91,7 +91,9 @@ class StepMiddlewareService implements SingletonInterface
 
         $nextStep = null;
 
-        if ($currentStepDefinition->hasNextStep()) {
+        if ($currentStepDefinition->hasNextStep()
+            || $currentStepDefinition->hasDivergence()
+        ) {
             $nextStep = $this->getNextStepDefinition($currentStepDefinition);
         }
 
