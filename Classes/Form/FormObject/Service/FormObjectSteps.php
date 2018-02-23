@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Form\FormObject\Service;
 
+use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
@@ -103,8 +104,6 @@ class FormObjectSteps
         if ($definition->hasSteps()) {
             foreach ($definition->getSteps()->getEntries() as $step) {
                 $data = [
-                    // @todo: no page uid to fetch?
-//                $step->getPageUid()    => Core::get()->getPageController()->id,
                     $step->getExtension() => $extensionName,
                     $step->getController() => $controllerName
                 ];
@@ -115,6 +114,12 @@ class FormObjectSteps
                     ) {
                         continue 2;
                     }
+                }
+
+                if ($step->getPageUid()
+                    && $step->getPageUid() !== Core::get()->getPageController()->id
+                ) {
+                    continue;
                 }
 
                 $actionList = $step->getAuthorizedActions();
