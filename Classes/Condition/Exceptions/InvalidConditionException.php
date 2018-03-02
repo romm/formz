@@ -182,4 +182,21 @@ class InvalidConditionException extends FormzException
 
         return $exception;
     }
+
+    /**
+     * @code 1519909297
+     *
+     * @param string $fieldName
+     * @return InvalidConditionException
+     */
+    final public static function conditionFieldCountValuesFieldNotFound($fieldName)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FIELD_DOES_NOT_EXIST,
+            [$fieldName]
+        );
+
+        return $exception;
+    }
 }
