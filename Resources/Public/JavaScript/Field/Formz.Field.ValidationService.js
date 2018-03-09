@@ -423,6 +423,13 @@ Fz.Field.ValidationService = (function () {
             },
 
             /**
+             * Unset any validation state that was previously set up.
+             */
+            resetState: function () {
+                wasValidated = false;
+            },
+
+            /**
              * Will check if the last validation returned a specific error.
              *
              * If the parameter `errorName` is null, if any error is found for
