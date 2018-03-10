@@ -12,9 +12,9 @@ call_user_func(
         // Registering the cache.
         if (!is_array($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][\Romm\Formz\Service\CacheService::CACHE_IDENTIFIER])) {
             $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][\Romm\Formz\Service\CacheService::CACHE_IDENTIFIER] = [
-                'backend'  => \TYPO3\CMS\Core\Cache\Backend\SimpleFileBackend::class,
+                'backend' => \TYPO3\CMS\Core\Cache\Backend\SimpleFileBackend::class,
                 'frontend' => \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class,
-                'groups'   => ['all', 'system', 'pages']
+                'groups' => ['all', 'system', 'pages']
             ];
         }
 
@@ -34,6 +34,11 @@ call_user_func(
         /** @var \TYPO3\CMS\Extbase\Object\Container\Container $container */
         $container = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Object\Container\Container::class);
         $typo3Version = \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version();
+
+        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('typo3_debugbar') && version_compare($typo3Version, '8.7.0', '>=')) {
+            $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\Konafets\TYPO3DebugBar\Typo3DebugBar::class] = ['className' => \Romm\Formz\Overrides\Typo3DebugBar::class];
+            $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\Konafets\TYPO3DebugBar\Typo3DebugBarServiceProvider::class] = ['className' => \Romm\Formz\Overrides\Typo3DebugBarServiceProvider::class];
+        }
 
         if (version_compare($typo3Version, '8.3.0', '<')) {
             $container->registerImplementation(\Romm\Formz\ViewHelpers\FormViewHelper::class, \Romm\Formz\Service\ViewHelper\Legacy\OldFormViewHelper::class);

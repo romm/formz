@@ -17,6 +17,7 @@ use Romm\Formz\AssetHandler\AssetHandlerFactory;
 use Romm\Formz\AssetHandler\Connector\AssetHandlerConnectorManager;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Core\Core;
+use Romm\Formz\DataCollectors\FormzCollector;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidOptionValueException;
@@ -114,6 +115,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      * @var ControllerService
      */
     protected $controllerService;
+
+    /**
+     * @var \Romm\Formz\DataCollectors\FormzCollector
+     */
+    protected $formzCollector;
 
     /**
      * @inheritdoc
@@ -520,5 +526,13 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     public function injectControllerService(ControllerService $controllerService)
     {
         $this->controllerService = $controllerService;
+    }
+
+    /**
+     * @param FormzCollector $formzCollector
+     */
+    public function injectFormzCollector(FormzCollector $formzCollector)
+    {
+        $this->formzCollector = $formzCollector;
     }
 }

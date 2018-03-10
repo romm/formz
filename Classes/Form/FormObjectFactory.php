@@ -193,4 +193,12 @@ class FormObjectFactory implements SingletonInterface
     {
         $this->typoScriptService = $typoScriptService;
     }
+
+    /**
+     * @return FormObject[]
+     */
+    public function getInstances()
+    {
+        return $this->instances;
+    }
 }
