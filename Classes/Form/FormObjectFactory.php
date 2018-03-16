@@ -177,6 +177,14 @@ class FormObjectFactory implements SingletonInterface
             ]
         );
     }
+    
+    /**
+     * @return FormObject[]
+     */
+    public function getInstances()
+    {
+        return $this->instances;
+    }
 
     /**
      * @param ConfigurationFactory $configurationFactory
