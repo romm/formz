@@ -29,7 +29,6 @@ class Substep extends AbstractFormDefinitionComponent implements DataPreProcesso
 
     /**
      * @var \Romm\Formz\Form\Definition\Step\Step\SupportedField[]
-     * @validate NotEmpty
      */
     protected $supportedFields;
 
