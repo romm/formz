@@ -201,6 +201,12 @@ class ControllerProcessor implements SingletonInterface
             foreach ($this->requestArguments as $argument) {
                 $type = $argument->getDataType();
 
+                if ($this->request->hasArgument($argument->getName())
+                    && $this->request->getArgument($argument->getName()) instanceof $type
+                ) {
+                    continue;
+                }
+
                 if (class_exists($type)
                     && in_array(FormInterface::class, class_implements($type))
                 ) {

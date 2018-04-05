@@ -21,6 +21,7 @@ use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
 use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
+use TYPO3\CMS\Extbase\Service\ExtensionService;
 
 final class BeginMiddleware implements BasicMiddlewareInterface
 {
@@ -155,6 +156,13 @@ final class BeginMiddleware implements BasicMiddlewareInterface
      */
     protected function requestWasSubmitted()
     {
-        return $this->processor->getRequest()->getMethod() === 'POST';
+        $request = $this->processor->getRequest();
+
+        /** @var ExtensionService $extensionService */
+        $extensionService = Core::instantiate(ExtensionService::class);
+
+        $pluginNamespace = $extensionService->getPluginNamespace($request->getControllerExtensionName(), $request->getPluginName());
+
+        return isset($_POST[$pluginNamespace][$this->processor->getFormObject()->getName()]);
     }
 }
