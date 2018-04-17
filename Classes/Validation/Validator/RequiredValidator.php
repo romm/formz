@@ -15,6 +15,8 @@ namespace Romm\Formz\Validation\Validator;
 
 class RequiredValidator extends AbstractValidator
 {
+    const OPTION_CHECK_BOOL = 'checkBool';
+
     const MESSAGE_DEFAULT = 'default';
 
     /**
@@ -28,6 +30,17 @@ class RequiredValidator extends AbstractValidator
      * @inheritdoc
      */
     protected $acceptsEmptyValues = false;
+
+    /**
+     * @inheritdoc
+     */
+    protected $supportedOptions = [
+        self::OPTION_CHECK_BOOL => [
+            false,
+            'Should the validator check for boolean values (useful for checkbox values)? By default it wont.',
+            'bool'
+        ]
+    ];
 
     /**
      * @inheritdoc
@@ -48,6 +61,7 @@ class RequiredValidator extends AbstractValidator
             || '' === $value
             || (is_array($value) && empty($value))
             || (is_object($value) && $value instanceof \Countable && $value->count() === 0)
+            || $this->options[self::OPTION_CHECK_BOOL] && $value === false
         ) {
             $this->addError(self::MESSAGE_DEFAULT, 1446026582);
         }
