@@ -27,6 +27,7 @@ use Romm\Formz\Form\FormObject\Builder\DefaultFormObjectBuilder;
 use Romm\Formz\Form\FormObject\Builder\FormObjectBuilderInterface;
 use Romm\Formz\Form\FormObject\Service\FormObjectSteps;
 use Romm\Formz\Service\CacheService;
+use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -234,6 +235,7 @@ class FormObjectFactory implements SingletonInterface
     protected function getCacheIdentifier($className)
     {
         $sanitizedClassName = StringService::get()->sanitizeString(str_replace('\\', '-', $className));
+        $sanitizedClassName .= '-' . ContextService::get()->getContextHash();
 
         return 'form-object-' . $sanitizedClassName;
     }
