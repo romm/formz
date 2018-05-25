@@ -43,7 +43,7 @@ class SessionPersistence extends AbstractPersistence
 
         if ($environmentService->isEnvironmentInFrontendMode()) {
             $this->user = Core::get()->getPageController()->fe_user;
-            $this->user->fetchSessionData();
+            $this->user->fetchUserSession();
         } else {
             $this->user = Core::get()->getBackendUser();
         }
