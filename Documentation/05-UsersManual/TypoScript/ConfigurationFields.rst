@@ -249,7 +249,7 @@ Message list selector
     Required?
         No
     Description
-        Contains the CSS selector which will be used to fetch the block containing the field messages. It's a second selection layout for the message container (``settings.messageContainerSelector``): it allows adding static HTML contents which wont be cleaned up by JavaScript during the message refreshing.
+        Contains the CSS selector which will be used to fetch the block containing the field messages. It's a second selection layout for the message container (``settings.messageContainerSelector``): it allows adding static HTML contents which won't be cleaned up by JavaScript during the message refreshing.
 
         Note that the marker ``#FIELD#`` is dynamically replaced by the name of the field.
 

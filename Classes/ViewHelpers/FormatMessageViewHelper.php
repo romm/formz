@@ -60,6 +60,8 @@ class FormatMessageViewHelper extends AbstractViewHelper
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('message', 'object', 'The message which will be formatted.', true);
         $this->registerArgument('field', 'string', 'Name of the field which will be managed. By default, it is the field from the current `FieldViewHelper`.');
     }

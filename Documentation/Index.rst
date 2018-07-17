@@ -43,7 +43,7 @@ FormZ • Modern form handler
     The content of this document is related to TYPO3,
     a GNU/GPL CMS/Framework available from `www.typo3.org <http://www.typo3.org/>`_.
 
-    **Sommaire**
+    **Table of contents**
 
 .. toctree::
     :maxdepth: 5

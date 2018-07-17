@@ -108,14 +108,23 @@ class FieldViewHelperService implements SingletonInterface
         $identifier = $layout->getTemplateFile();
 
         if (null === $this->view[$identifier]) {
-            /** @var StandaloneView $view */
-            $view = Core::instantiate(StandaloneView::class);
-            $view->setTemplatePathAndFilename($layout->getTemplateFile());
-
-            $this->view[$identifier] = $view;
+            $this->view[$identifier] = $this->getViewInstance($layout);
         }
 
-        return $this->view[$identifier];
+        return clone $this->view[$identifier];
+    }
+
+    /**
+     * @param Layout $layout
+     * @return StandaloneView
+     */
+    protected function getViewInstance(Layout $layout)
+    {
+        /** @var StandaloneView $view */
+        $view = Core::instantiate(StandaloneView::class);
+        $view->setTemplatePathAndFilename($layout->getTemplateFile());
+
+        return $view;
     }
 
     /**

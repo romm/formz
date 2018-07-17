@@ -114,7 +114,7 @@ Validator messages
                     }
                     test {
                         # If you fill `value`, the value will be directly used
-                        # and the system wont try to fetch a translation.
+                        # and the system won't try to fetch a translation.
                         value = Message test!
                     }
                 }
@@ -168,7 +168,7 @@ Use Ajax validation
     Description
         If this property is defined, an Ajax request is sent by JavaScript when it needs to test this validator.
 
-        Note that if a JavaScript version of this validator exists (see “:ref:`developerManual-javaScript-validation-registerValidator`”), then filling this property wont have any effect and the JavaScript validator will be used instead of Ajax.
+        Note that if a JavaScript version of this validator exists (see “:ref:`developerManual-javaScript-validation-registerValidator`”), then filling this property won't have any effect and the JavaScript validator will be used instead of Ajax.
 
         .. code-block:: typoscript
 

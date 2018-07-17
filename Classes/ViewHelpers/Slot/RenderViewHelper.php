@@ -19,6 +19,8 @@ use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use Romm\Formz\ViewHelpers\AbstractViewHelper;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -48,6 +50,8 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
+        parent::initializeArguments();
+
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -71,7 +75,13 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
         $result = '';
 
         if ($slotService->hasSlot($slotName)) {
-            $slotService->addTemplateVariables($slotName, $arguments['arguments']);
+            $currentVariables = version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')
+                ? $renderingContext->getTemplateVariableContainer()->getAll()
+                : $renderingContext->getVariableProvider()->getAll();
+
+            ArrayUtility::mergeRecursiveWithOverrule($currentVariables, $arguments['arguments']);
+
+            $slotService->addTemplateVariables($slotName, $currentVariables);
 
             $slotClosure = $slotService->getSlotClosure($slotName);
             $result = $slotClosure();

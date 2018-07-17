@@ -13,25 +13,24 @@
 
 namespace Romm\Formz\Condition\Items;
 
-use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Condition\Exceptions\InvalidConditionException;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
- * This condition will match when a field is valid (its validation returned no
- * error).
+ * This condition will match when a field has a number of selected items between
+ * a given minimum and maximum.
  */
-class FieldIsEmptyCondition extends AbstractConditionItem
+class FieldCountValuesCondition extends AbstractConditionItem
 {
-    const CONDITION_NAME = 'fieldIsEmpty';
+    const CONDITION_IDENTIFIER = 'fieldCountValues';
 
     /**
      * @inheritdoc
      * @var array
      */
     protected static $javaScriptFiles = [
-        'EXT:formz/Resources/Public/JavaScript/Conditions/Formz.Condition.FieldIsEmpty.js'
+        'EXT:formz/Resources/Public/JavaScript/Conditions/Formz.Condition.FieldCountValues.js'
     ];
 
     /**
@@ -41,14 +40,25 @@ class FieldIsEmptyCondition extends AbstractConditionItem
     protected $fieldName;
 
     /**
-     * @inheritdoc
+     * @var int
      */
-    public function getCssResult()
+    protected $minimum;
+
+    /**
+     * @var int
+     */
+    protected $maximum;
+
+    /**
+     * @param string $fieldName
+     * @param int $minimum
+     * @param int $maximum
+     */
+    public function __construct($fieldName, $minimum = null, $maximum = null)
     {
-        return [
-            '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '=""]',
-            ':not([' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '])'
-        ];
+        $this->fieldName = $fieldName;
+        $this->minimum = $minimum;
+        $this->maximum = $maximum;
     }
 
     /**
@@ -56,7 +66,11 @@ class FieldIsEmptyCondition extends AbstractConditionItem
      */
     public function getJavaScriptResult()
     {
-        return $this->getDefaultJavaScriptCall(['fieldName' => $this->fieldName]);
+        return $this->getDefaultJavaScriptCall([
+            'fieldName'  => $this->fieldName,
+            'minimum' => $this->minimum,
+            'maximum' => $this->maximum
+        ]);
     }
 
     /**
@@ -66,22 +80,29 @@ class FieldIsEmptyCondition extends AbstractConditionItem
     {
         $value = ObjectAccess::getProperty($dataObject->getForm(), $this->fieldName);
 
-        return empty($value);
+        return !($this->minimum && count($value) < (int)$this->minimum)
+            && !($this->maximum && count($value) > (int)$this->maximum);
     }
 
     /**
-     * @see validateConditionConfiguration()
+     * @inheritdoc
+     *
      * @throws InvalidConditionException
-     * @return bool
      */
     protected function checkConditionConfiguration()
     {
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw InvalidConditionException::conditionFieldIsEmptyFieldNotFound($this->fieldName);
+            throw InvalidConditionException::conditionFieldCountValuesFieldNotFound($this->fieldName);
         }
+    }
 
-        return true;
+    /**
+     * @return string
+     */
+    public function getCssResult()
+    {
+        return '';
     }
 }

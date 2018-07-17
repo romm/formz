@@ -11,7 +11,7 @@ After months of work on making the extension as reliable as possible (core refac
 
   This commit adds a more reliable handling of the warning and notice message types in validation rules.
 
-  These messages wont block a validation (an error will), but can be used to deliver more information to the final user about actions done during the validation.
+  These messages won't block a validation (an error will), but can be used to deliver more information to the final user about actions done during the validation.
 
   Ajax requests are supported.
 

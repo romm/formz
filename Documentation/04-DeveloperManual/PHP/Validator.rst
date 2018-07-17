@@ -98,7 +98,7 @@ Supported messages list
                ],
                'test'    => [
                   // If you fill "value", the value will be directly used and
-                  // the process wont try to fetch a translation.
+                  // the process won't try to fetch a translation.
                   'value'        => 'Test message!'
                ]
             ];

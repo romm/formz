@@ -131,7 +131,7 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
     }
 
     /**
-     * Validates the form, but wont save form data in the form object.
+     * Validates the form, but won't save form data in the form object.
      *
      * @param FormInterface $form
      * @param bool          $initialize

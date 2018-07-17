@@ -1,5 +1,6 @@
 <?php
 /*
+ * 2018 Abdeljabar SAID <abdeljabar.saiid@gmail.com
  * 2017 Romain CANON <romain.hydrocanon@gmail.com>
  *
  * This file is part of the TYPO3 FormZ project.
@@ -19,19 +20,18 @@ use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
- * This condition will match when a field is valid (its validation returned no
- * error).
+ * This condition will match when a field is filled with any value.
  */
-class FieldIsEmptyCondition extends AbstractConditionItem
+class FieldIsFilledCondition extends AbstractConditionItem
 {
-    const CONDITION_NAME = 'fieldIsEmpty';
+    const CONDITION_IDENTIFIER = 'fieldIsFilled';
 
     /**
      * @inheritdoc
      * @var array
      */
     protected static $javaScriptFiles = [
-        'EXT:formz/Resources/Public/JavaScript/Conditions/Formz.Condition.FieldIsEmpty.js'
+        'EXT:formz/Resources/Public/JavaScript/Conditions/Formz.Condition.FieldIsFilled.js'
     ];
 
     /**
@@ -41,14 +41,21 @@ class FieldIsEmptyCondition extends AbstractConditionItem
     protected $fieldName;
 
     /**
+     * @param string $fieldName
+     */
+    public function __construct($fieldName)
+    {
+        $this->fieldName = $fieldName;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getCssResult()
     {
-        return [
-            '[' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '=""]',
-            ':not([' . DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName) . '])'
-        ];
+        $valueKey = DataAttributesAssetHandler::getFieldDataValueKey($this->fieldName);
+
+        return '[' . $valueKey . ']:not([' . $valueKey . '=""])';
     }
 
     /**
@@ -66,22 +73,23 @@ class FieldIsEmptyCondition extends AbstractConditionItem
     {
         $value = ObjectAccess::getProperty($dataObject->getForm(), $this->fieldName);
 
-        return empty($value);
+        return !empty($value);
     }
 
     /**
-     * @see validateConditionConfiguration()
+     * Checks the condition configuration/options.
+     *
+     * If any syntax/configuration error is found, an exception of type
+     * `InvalidConditionException` must be thrown.
+     *
      * @throws InvalidConditionException
-     * @return bool
      */
     protected function checkConditionConfiguration()
     {
         $configuration = $this->formObject->getConfiguration();
 
         if (false === $configuration->hasField($this->fieldName)) {
-            throw InvalidConditionException::conditionFieldIsEmptyFieldNotFound($this->fieldName);
+            throw InvalidConditionException::conditionFieldIsFilledFieldNotFound($this->fieldName);
         }
-
-        return true;
     }
 }

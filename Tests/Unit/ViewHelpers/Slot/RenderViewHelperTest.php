@@ -8,7 +8,9 @@ use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
 use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
+use TYPO3\CMS\Fluid\Core\ViewHelper\TemplateVariableContainer;
 
 class RenderViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -54,7 +56,10 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new RenderViewHelper;
+
         $this->injectDependenciesIntoViewHelper($viewHelper);
+        $this->injectVariableProviderMock();
+
         $viewHelper->setArguments([
             'slot'      => $slotName,
             'arguments' => []
@@ -93,7 +98,10 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new RenderViewHelper;
+
         $this->injectDependenciesIntoViewHelper($viewHelper);
+        $this->injectVariableProviderMock();
+
         $viewHelper->setArguments([
             'slot'      => 'foo',
             'arguments' => []
@@ -113,9 +121,27 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $this->setExpectedException(ContextNotFoundException::class);
 
         $viewHelper = new RenderViewHelper;
+
         $this->injectDependenciesIntoViewHelper($viewHelper);
+        $this->injectVariableProviderMock();
+
         $viewHelper->initializeArguments();
 
         $viewHelper->render();
+    }
+
+    protected function injectVariableProviderMock()
+    {
+        $templateVariableContainer = $this->getMockBuilder(TemplateVariableContainer::class)
+            ->setMethods(['getAll'])
+            ->getMock();
+        $templateVariableContainer->method('getAll')
+            ->willReturn(['foo' => 'bar']);
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $this->renderingContext->injectTemplateVariableContainer($templateVariableContainer);
+        } else {
+            $this->renderingContext->setVariableProvider($templateVariableContainer);
+        }
     }
 }

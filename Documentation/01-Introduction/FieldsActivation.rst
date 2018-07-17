@@ -51,7 +51,7 @@ You can find the different existing conditions and their configuration at the ch
 The expression
 ^^^^^^^^^^^^^^
 
-The boolean expression allows to use several condition thanks to logical operators: the logical “and”, the logical “or”. It also allows to gather expressions thanks to parenthesis.
+The boolean expression allows to use several conditions thanks to logical operators: the logical “and”, the logical “or”. It also allows to gather expressions thanks to parenthesis.
 
 **Example:**
 

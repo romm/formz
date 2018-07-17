@@ -69,7 +69,7 @@ class ConfigurationFactory implements SingletonInterface
 
     /**
      * Will fetch the configuration from cache, and build it if not found. It
-     * wont be stored in cache if any error is found. This is done this way to
+     * won't be stored in cache if any error is found. This is done this way to
      * avoid the integrator to be forced to flush caches when errors are found.
      *
      * @param string $cacheIdentifier

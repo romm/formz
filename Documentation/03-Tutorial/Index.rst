@@ -91,7 +91,7 @@ TypoScript configuration
 
 The handling of the validation rules is done with TypoScript.
 
-You must follow the explanations of the chapter “:ref:`usersManual`” to configure correctly you validation rules.
+You must follow the explanations of the chapter “:ref:`usersManual`” to configure correctly your validation rules.
 
 **Configuration example:**
 

@@ -192,10 +192,13 @@ Fz.Field = (function () {
             handleLoadingBehaviour: function (run) {
                 var element = this.getFieldContainer();
                 if (null !== element) {
+                    var formElement = this.getForm().getElement();
                     if (true === run) {
                         element.setAttribute('fz-loading', '1');
+                        formElement.setAttribute('fz-loading', '1');
                     } else {
                         element.removeAttribute('fz-loading');
+                        formElement.removeAttribute('fz-loading');
                     }
                 }
             },
@@ -340,6 +343,10 @@ Fz.Field = (function () {
          * triggered when the value is changed.
          */
         (function () {
+            var trimField = function () {
+                this.value = this.value.replace(/^\s+|\s+$/g, '');
+            };
+            
             var validateCallback = function () {
                 states.field.validate();
             };
@@ -355,6 +362,9 @@ Fz.Field = (function () {
                             element.addEventListener('change', validateCallback);
                         } else if (element.type.substr(0, 6) === 'select') {
                             element.addEventListener('change', validateCallback);
+                        } else if (element.type === 'text') {
+                            element.addEventListener('blur', trimField);
+                            element.addEventListener('blur', validateCallback);
                         } else {
                             element.addEventListener('blur', validateCallback);
                         }

@@ -67,7 +67,7 @@ Pre-validation process
 
 .. container:: table-row
 
-    Fonction
+    Function
         .. code-block:: php
 
             protected function beforeValidationProcess()
@@ -86,7 +86,7 @@ During-validation process
 
 .. container:: table-row
 
-    Fonction
+    Function
         .. code-block:: php
 
             protected function *field*Validated()
@@ -107,7 +107,7 @@ Post-validation process
 
 .. container:: table-row
 
-    Fonction
+    Function
         .. code-block:: php
 
             protected function afterValidationProcess()
