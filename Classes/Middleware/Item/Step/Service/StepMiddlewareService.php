@@ -15,6 +15,7 @@ namespace Romm\Formz\Middleware\Item\Step\Service;
 
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
@@ -27,7 +28,6 @@ use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
 use Romm\Formz\Validation\Form\FormValidatorExecutor;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 /**
@@ -68,7 +68,7 @@ class StepMiddlewareService implements SingletonInterface
 
         $this->persistence = FormObjectFactory::get()->getStepService($formObject)->getStepPersistence();
 
-        $this->validationService = GeneralUtility::makeInstance(StepMiddlewareValidationService::class, $this);
+        $this->validationService = Core::instantiate(StepMiddlewareValidationService::class, $this);
     }
 
     /**

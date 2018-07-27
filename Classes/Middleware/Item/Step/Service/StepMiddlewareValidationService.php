@@ -21,9 +21,14 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddlewareOption;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class StepMiddlewareValidationService
 {
+    const STEP_HAS_ERROR = 'STEP_HAS_ERROR';
+
+    const STEP_INVALID_ACTIVATION = 'STEP_INVALID_ACTIVATION';
+
     /**
      * @var FormObject
      */
@@ -40,11 +45,18 @@ class StepMiddlewareValidationService
     protected $persistence;
 
     /**
-     * @param StepMiddlewareService $service
+     * @var Dispatcher
      */
-    public function __construct(StepMiddlewareService $service)
+    protected $signalSlotDispatcher;
+
+    /**
+     * @param StepMiddlewareService $service
+     * @param Dispatcher $signalSlotDispatcher
+     */
+    public function __construct(StepMiddlewareService $service, Dispatcher $signalSlotDispatcher)
     {
         $this->service = $service;
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
         $this->formObject = $service->getFormObject();
         $this->persistence = $service->getStepPersistence();
     }
@@ -162,6 +174,18 @@ class StepMiddlewareValidationService
 
             if ($result->hasErrors()) {
                 $invalidStepDefinition = $stepDefinition;
+
+                $this->signalSlotDispatcher->dispatch(
+                    self::class,
+                    self::STEP_HAS_ERROR,
+                    [
+                        $this->formObject,
+                        $currentStepDefinition,
+                        $invalidStepDefinition,
+                        $result,
+                    ]
+                );
+
                 break;
             } else {
                 $this->persistence->markStepAsValidated($stepDefinition);
@@ -173,8 +197,17 @@ class StepMiddlewareValidationService
             && $currentStepDefinition->hasActivation()
             && false === $this->service->getStepDefinitionConditionResult($currentStepDefinition)
         ) {
-
             $invalidStepDefinition = end($stepDefinitionsToTest);
+
+            $this->signalSlotDispatcher->dispatch(
+                self::class,
+                self::STEP_INVALID_ACTIVATION,
+                [
+                    $this->formObject,
+                    $currentStepDefinition,
+                    $invalidStepDefinition,
+                ]
+            );
         }
 
 
