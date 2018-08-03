@@ -122,6 +122,15 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
     }
 
     /**
+     * @param string $fieldName
+     */
+    public function addSupportedField($fieldName)
+    {
+        $this->supportedFields[$fieldName] = new SupportedField($fieldName);
+        $this->supportedFields[$fieldName]->attachParent($this);
+    }
+
+    /**
      * @param Field $field
      * @return bool
      */
