@@ -23,6 +23,7 @@ use Romm\Formz\Service\StringService;
 use Throwable;
 use Traversable;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Reflection\Exception\PropertyNotAccessibleException;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
@@ -59,7 +60,11 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
             $fieldName = $field->getName();
 
             if (false === $formResult->fieldIsDeactivated($field)) {
-                $value = ObjectAccess::getProperty($formInstance, $fieldName);
+                try {
+                    $value = ObjectAccess::getProperty($formInstance, $fieldName);
+                } catch (PropertyNotAccessibleException $exception) {
+                    continue;
+                }
 
                 try {
                     $value = $this->formatValue($value);
