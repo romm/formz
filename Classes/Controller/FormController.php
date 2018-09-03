@@ -66,10 +66,8 @@ class FormController extends ActionController
                     $this->resetSubstepsLevel();
                     $this->forwardToReferrer();
                 }
-            } elseif (false === $exception instanceof StopActionException) {
-                $this->callExceptionHandler($exception);
             } else {
-                throw $exception;
+                $this->callExceptionHandler($exception);
             }
         } finally {
             $this->persistForms();
@@ -105,11 +103,13 @@ class FormController extends ActionController
      */
     protected function callExceptionHandler(Throwable $exception)
     {
-        if ($this->processor->hasExceptionCallback()) {
-            call_user_func($this->processor->getExceptionCallback(), $exception);
-        } else {
+        if ($exception instanceof StopActionException
+            || !$this->processor->hasExceptionCallback()
+        ) {
             throw $exception;
         }
+
+        call_user_func($this->processor->getExceptionCallback(), $exception);
     }
 
     /**
