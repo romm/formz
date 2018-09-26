@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Service\ViewHelper\Form;
 
+use DateTime;
 use Romm\Formz\AssetHandler\Html\DataAttributesAssetHandler;
 use Romm\Formz\Behaviours\BehavioursManager;
 use Romm\Formz\Core\Core;
@@ -22,6 +23,7 @@ use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
+use Traversable;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
@@ -193,6 +195,10 @@ class FormViewHelperService implements SingletonInterface
         if (true === $this->formObject->formWasValidated()) {
             $dataAttributes += $dataAttributesAssetHandler->getFieldsValidDataAttributes();
             $dataAttributes += $dataAttributesAssetHandler->getFieldsMessagesDataAttributes();
+        }
+
+        if ($this->formObject->hasSteps()) {
+            $dataAttributes += $dataAttributesAssetHandler->getCurrentStepDataAttribute();
         }
 
         return $dataAttributes;

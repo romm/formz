@@ -15,9 +15,11 @@ namespace Romm\Formz\Condition;
 
 use InvalidArgumentException;
 use Romm\Formz\Condition\Items\ConditionItemInterface;
+use Romm\Formz\Condition\Items\FieldCountValuesCondition;
 use Romm\Formz\Condition\Items\FieldHasErrorCondition;
 use Romm\Formz\Condition\Items\FieldHasValueCondition;
 use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
+use Romm\Formz\Condition\Items\FieldIsFilledCondition;
 use Romm\Formz\Condition\Items\FieldIsValidCondition;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Exceptions\ClassNotFoundException;
@@ -171,6 +173,12 @@ class ConditionFactory implements SingletonInterface
             )->registerCondition(
                 FieldIsEmptyCondition::CONDITION_IDENTIFIER,
                 FieldIsEmptyCondition::class
+            )->registerCondition(
+                FieldIsFilledCondition::CONDITION_IDENTIFIER,
+                FieldIsFilledCondition::class
+            )->registerCondition(
+                FieldCountValuesCondition::CONDITION_IDENTIFIER,
+                FieldCountValuesCondition::class
             );
         }
     }

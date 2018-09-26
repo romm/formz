@@ -13,6 +13,8 @@
 
 namespace Romm\Formz\Service;
 
+use Romm\Formz\Core\Core;
+use Romm\Formz\Domain\Repository\FormMetadataRepository;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 
@@ -27,5 +29,31 @@ class HashService implements SingletonInterface
     public function getHash($value)
     {
         return hash('sha256', $value);
+    }
+
+    /**
+     * @param int $length the number of bytes to generate
+     * @return string the generated random bytes
+     * @throws \Exception
+     */
+    public function getUniqueHash($length = 32)
+    {
+        if (!is_int($length) || $length < 1) {
+            throw new \Exception('Invalid $length parameter');
+        }
+
+        /** @var FormMetadataRepository $formMetadataRepository */
+        $formMetadataRepository = Core::instantiate(FormMetadataRepository::class);
+
+        do {
+            // Generated random bytes
+            $hash = bin2hex(random_bytes($length));
+
+            // Check if the hash has already been generated
+            $object = $formMetadataRepository->findOneByHash($hash);
+
+        } while ($object !== null);
+
+        return $hash;
     }
 }

@@ -13,7 +13,9 @@
 
 namespace Romm\Formz\Form\FormObject\Service;
 
+use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Step\Step\Step;
+use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
 use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
@@ -102,8 +104,6 @@ class FormObjectSteps
         if ($definition->hasSteps()) {
             foreach ($definition->getSteps()->getEntries() as $step) {
                 $data = [
-                    // @todo: no page uid to fetch?
-//                $step->getPageUid()    => Core::get()->getPageController()->id,
                     $step->getExtension() => $extensionName,
                     $step->getController() => $controllerName
                 ];
@@ -114,6 +114,12 @@ class FormObjectSteps
                     ) {
                         continue 2;
                     }
+                }
+
+                if ($step->getPageUid()
+                    && $step->getPageUid() !== Core::get()->getPageController()->id
+                ) {
+                    continue;
                 }
 
                 $actionList = $step->getAuthorizedActions();
@@ -149,6 +155,47 @@ class FormObjectSteps
         }
 
         return $this->currentStep[$this->currentHash] ?: null;
+    }
+
+    /**
+     * @param Step $step
+     * @return StepDefinition|null
+     */
+    public function getStepDefinition(Step $step)
+    {
+        return $this->findStepDefinition($step, $this->formObject->getDefinition()->getSteps()->getFirstStepDefinition());
+    }
+
+    /**
+     * @param Step           $step
+     * @param StepDefinition $stepDefinition
+     * @return StepDefinition|null
+     */
+    protected function findStepDefinition(Step $step, StepDefinition $stepDefinition)
+    {
+        if ($stepDefinition->getStep() === $step) {
+            return $stepDefinition;
+        }
+
+        if ($stepDefinition->hasNextStep()) {
+            $result = $this->findStepDefinition($step, $stepDefinition->getNextStep());
+
+            if ($result instanceof StepDefinition) {
+                return $result;
+            }
+        }
+
+        if ($stepDefinition->hasDivergence()) {
+            foreach ($stepDefinition->getDivergenceSteps() as $divergenceStep) {
+                $result = $this->findStepDefinition($step, $divergenceStep);
+
+                if ($result instanceof StepDefinition) {
+                    return $result;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

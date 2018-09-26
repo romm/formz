@@ -97,12 +97,12 @@ Fz.Field = (function () {
                                 for (var name in messages[validationRuleName]) {
                                     if (messages[validationRuleName].hasOwnProperty(name)) {
                                         messageListContainerElement.innerHTML += messageTemplate
-                                            .replace('#FIELD#', this.getName())
-                                            .replace('#FIELD_ID#', Fz.camelCaseToDashed('fz-' + this.getForm().getName() + '-' + this.getName()))
-                                            .replace('#VALIDATOR#', Fz.camelCaseToDashed(validationRuleName))
-                                            .replace('#TYPE#', type)
-                                            .replace('#KEY#', name)
-                                            .replace('#MESSAGE#', messages[validationRuleName][name]);
+                                            .split('#FIELD#').join(this.getName())
+                                            .split('#FIELD_ID#').join(Fz.camelCaseToDashed('fz-' + this.getForm().getName() + '-' + this.getName()))
+                                            .split('#VALIDATOR#').join(Fz.camelCaseToDashed(validationRuleName))
+                                            .split('#TYPE#').join(type)
+                                            .split('#KEY#').join(name)
+                                            .split('#MESSAGE#').join(messages[validationRuleName][name]);
                                     }
                                 }
                             }
@@ -192,10 +192,13 @@ Fz.Field = (function () {
             handleLoadingBehaviour: function (run) {
                 var element = this.getFieldContainer();
                 if (null !== element) {
+                    var formElement = this.getForm().getElement();
                     if (true === run) {
                         element.setAttribute('fz-loading', '1');
+                        formElement.setAttribute('fz-loading', '1');
                     } else {
                         element.removeAttribute('fz-loading');
+                        formElement.removeAttribute('fz-loading');
                     }
                 }
             },
@@ -340,6 +343,10 @@ Fz.Field = (function () {
          * triggered when the value is changed.
          */
         (function () {
+            var trimField = function () {
+                this.value = this.value.replace(/^\s+|\s+$/g, '');
+            };
+            
             var validateCallback = function () {
                 states.field.validate();
             };
@@ -355,6 +362,9 @@ Fz.Field = (function () {
                             element.addEventListener('change', validateCallback);
                         } else if (element.type.substr(0, 6) === 'select') {
                             element.addEventListener('change', validateCallback);
+                        } else if (element.type === 'text') {
+                            element.addEventListener('blur', trimField);
+                            element.addEventListener('blur', validateCallback);
                         } else {
                             element.addEventListener('blur', validateCallback);
                         }

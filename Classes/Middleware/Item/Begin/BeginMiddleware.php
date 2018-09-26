@@ -13,12 +13,15 @@
 
 namespace Romm\Formz\Middleware\Item\Begin;
 
-use Romm\Formz\Form\FormInterface;
+use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\BasicMiddlewareInterface;
+use Romm\Formz\Middleware\Item\Begin\Service\FormService;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
 use Romm\Formz\Middleware\Signal\SignalObject;
+use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
+use TYPO3\CMS\Extbase\Service\ExtensionService;
 
 final class BeginMiddleware implements BasicMiddlewareInterface
 {
@@ -28,10 +31,17 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     private $processor;
 
     /**
+     * @var FormService
+     */
+    protected $formService;
+
+    /**
      * Initialization of this middleware.
      */
     public function initialize()
     {
+        $this->formService = Core::instantiate(FormService::class, $this->processor->getRequest(), $this->processor->getRequestArguments());
+
         $this->checkFormSubmission();
         $this->fetchCurrentStep();
         $this->fetchSubstepsLevel();
@@ -53,34 +63,38 @@ final class BeginMiddleware implements BasicMiddlewareInterface
      */
     protected function checkFormSubmission()
     {
-        if ($this->processor->inSingleFieldValidationContext()) {
-            /*
-             * In "single field validation context", there is no need to check
-             * for the form submission.
-             */
+        $formObject = $this->processor->getFormObject();
+
+        if ($formObject->hasForm()) {
             return;
         }
 
         $request = $this->processor->getRequest();
-        $formObject = $this->processor->getFormObject();
         $formName = $formObject->getName();
 
         if ($this->requestWasSubmitted()
-            && $this->processor->getRequestArguments()->hasArgument($formName)
+            && null === $request->getOriginalRequest()
+            && $request->hasArgument($formName)
         ) {
-            if (false === $request->hasArgument('formzData')) {
-                throw new \Exception('todo'); // @todo
+            if (false === $request->hasArgument('fz-hash')) {
+                throw new \Exception('todo fz-hash'); // @todo
             }
 
-            $form = $this->getFormInstance();
+            if (false === $request->hasArgument('formzData')) {
+                throw new \Exception('todo formzData'); // @todo
+            }
+
+            $form = $this->formService->getFormInstance($formName);
 
             $formObject->setForm($form);
 
             $formzData = $request->getArgument('formzData');
             $formObject->getRequestData()->fillFromHash($formzData);
 
-            $proxy = FormObjectFactory::get()->getProxy($form);
-            $proxy->markFormAsSubmitted();
+            if (!$request->hasArgument(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER)) {
+                $proxy = FormObjectFactory::get()->getProxy($form);
+                $proxy->markFormAsSubmitted();
+            }
 
             $this->injectFormHashInProxy();
         }
@@ -130,18 +144,6 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     }
 
     /**
-     * @return FormInterface
-     */
-    protected function getFormInstance()
-    {
-        $formName = $this->processor->getFormObject()->getName();
-        $formArray = $this->processor->getRequest()->getArgument($formName);
-        $argument = $this->processor->getRequestArguments()->getArgument($formName);
-
-        return $argument->setValue($formArray)->getValue();
-    }
-
-    /**
      * @param MiddlewareProcessor $middlewareProcessor
      */
     final public function bindMiddlewareProcessor(MiddlewareProcessor $middlewareProcessor)
@@ -154,6 +156,13 @@ final class BeginMiddleware implements BasicMiddlewareInterface
      */
     protected function requestWasSubmitted()
     {
-        return $this->processor->getRequest()->getMethod() === 'POST';
+        $request = $this->processor->getRequest();
+
+        /** @var ExtensionService $extensionService */
+        $extensionService = Core::instantiate(ExtensionService::class);
+
+        $pluginNamespace = $extensionService->getPluginNamespace($request->getControllerExtensionName(), $request->getPluginName());
+
+        return isset($_POST[$pluginNamespace][$this->processor->getFormObject()->getName()]);
     }
 }

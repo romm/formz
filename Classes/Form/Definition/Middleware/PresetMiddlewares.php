@@ -16,10 +16,11 @@ namespace Romm\Formz\Form\Definition\Middleware;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessor;
 use Romm\ConfigurationObject\Service\Items\DataPreProcessor\DataPreProcessorInterface;
 use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
+use Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware;
 use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware;
 use Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware;
-use Romm\Formz\Middleware\Item\Persistence\PersistenceInjectionMiddleware;
+use Romm\Formz\Middleware\Item\Step\PreviousStepMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepFetchingMiddleware;
 use Romm\Formz\Middleware\MiddlewareInterface;
@@ -39,14 +40,14 @@ class PresetMiddlewares implements DataPreProcessorInterface
     protected $formValidationMiddleware;
 
     /**
-     * @var \Romm\Formz\Middleware\Item\Persistence\PersistenceInjectionMiddleware
-     */
-    protected $persistenceInjectionMiddleware;
-
-    /**
      * @var \Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware
      */
     protected $persistenceFetchingMiddleware;
+
+    /**
+     * @var \Romm\Formz\Middleware\Item\Step\PreviousStepMiddleware
+     */
+    protected $previousStepMiddleware;
 
     /**
      * @var \Romm\Formz\Middleware\Item\Step\StepFetchingMiddleware
@@ -57,6 +58,11 @@ class PresetMiddlewares implements DataPreProcessorInterface
      * @var \Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware
      */
     protected $stepDispatchingMiddleware;
+
+    /**
+     * @var \Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware
+     */
+    protected $fieldFocusMiddleware;
 
     /**
      * Returns the full list of preset middlewares.
@@ -103,19 +109,19 @@ class PresetMiddlewares implements DataPreProcessorInterface
     }
 
     /**
-     * @return PersistenceInjectionMiddleware
-     */
-    public function getPersistenceInjectionMiddleware()
-    {
-        return $this->persistenceInjectionMiddleware;
-    }
-
-    /**
      * @return PersistenceFetchingMiddleware
      */
     public function getPersistenceFetchingMiddleware()
     {
         return $this->persistenceFetchingMiddleware;
+    }
+
+    /**
+     * @return PreviousStepMiddleware
+     */
+    public function getPreviousStepMiddleware()
+    {
+        return $this->previousStepMiddleware;
     }
 
     /**
@@ -132,5 +138,13 @@ class PresetMiddlewares implements DataPreProcessorInterface
     public function getStepDispatchingMiddleware()
     {
         return $this->stepDispatchingMiddleware;
+    }
+
+    /**
+     * @return FieldFocusMiddleware
+     */
+    public function getFieldFocusMiddleware()
+    {
+        return $this->fieldFocusMiddleware;
     }
 }

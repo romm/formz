@@ -31,15 +31,12 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 class SlotViewHelper extends AbstractViewHelper implements CompilableInterface
 {
     /**
-     * @var FieldViewHelperService
-     */
-    protected $fieldService;
-
-    /**
      * @inheritdoc
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('name', 'string', 'Name of the slot.', true);
         $this->registerArgument('arguments', 'array', 'Arguments sent to the slot.', false, []);
     }
@@ -49,10 +46,6 @@ class SlotViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::slotViewHelperFieldContextNotFound();
-        }
-
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -61,17 +54,16 @@ class SlotViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
+        /** @var FieldViewHelperService $fieldService */
+        $fieldService = Core::instantiate(FieldViewHelperService::class);
+
+        if (false === $fieldService->fieldContextExists()) {
+            throw ContextNotFoundException::slotViewHelperFieldContextNotFound();
+        }
+
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
 
         $slotService->addSlot($arguments['name'], $renderChildrenClosure, $arguments['arguments']);
-    }
-
-    /**
-     * @param FieldViewHelperService $service
-     */
-    public function injectFieldService(FieldViewHelperService $service)
-    {
-        $this->fieldService = $service;
     }
 }

@@ -5,6 +5,7 @@ use Romm\Formz\Configuration\View\Layouts\Layout;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 class FieldViewHelperServiceTest extends AbstractUnitTest
 {
@@ -61,7 +62,10 @@ class FieldViewHelperServiceTest extends AbstractUnitTest
      */
     public function viewIsInstantiatedOncePerLayout()
     {
-        $fieldService = new FieldViewHelperService;
+        /** @var FieldViewHelperService|\PHPUnit_Framework_MockObject_MockObject $fieldService */
+        $fieldService = $this->getMockBuilder(FieldViewHelperService::class)
+            ->setMethods(['getViewInstance'])
+            ->getMock();
 
         $layout1 = new Layout;
         $layout1->setTemplateFile('foo/bar');
@@ -69,13 +73,16 @@ class FieldViewHelperServiceTest extends AbstractUnitTest
         $layout2 = new Layout;
         $layout2->setTemplateFile('bar/baz');
 
-        $view1 = $fieldService->getView($layout1);
-        $view2 = $fieldService->getView($layout1);
+        $fieldService->expects($this->exactly(2))
+            ->method('getViewInstance')
+            ->withConsecutive($layout1, $layout2)
+            ->willReturnCallback(function () {
+                return $this->prophesize(StandaloneView::class)->reveal();
+            });
 
-        $this->assertSame($view1, $view2);
-
-        $view3 = $fieldService->getView($layout2);
-
-        $this->assertNotSame($view1, $view3);
+        $fieldService->getView($layout1);
+        $fieldService->getView($layout1);
+        $fieldService->getView($layout2);
+        $fieldService->getView($layout2);
     }
 }

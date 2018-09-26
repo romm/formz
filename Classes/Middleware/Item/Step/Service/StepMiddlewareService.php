@@ -15,18 +15,19 @@ namespace Romm\Formz\Middleware\Item\Step\Service;
 
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
-use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Core\Core;
+use Romm\Formz\Error\FormResult;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
+use Romm\Formz\Form\Definition\Step\Step\Substep\SubstepDefinition;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
 use Romm\Formz\Middleware\Request\Redirect;
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
-use Romm\Formz\Validation\Validator\Form\DataObject\FormValidatorDataObject;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Form\DataObject\FormValidatorDataObject;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 /**
@@ -67,7 +68,7 @@ class StepMiddlewareService implements SingletonInterface
 
         $this->persistence = FormObjectFactory::get()->getStepService($formObject)->getStepPersistence();
 
-        $this->validationService = GeneralUtility::makeInstance(StepMiddlewareValidationService::class, $this);
+        $this->validationService = Core::instantiate(StepMiddlewareValidationService::class, $this);
     }
 
     /**
@@ -82,54 +83,69 @@ class StepMiddlewareService implements SingletonInterface
          */
         $currentStepDefinition = $this->getStepDefinition($currentStep);
 
-        // Saving submitted form data for further usage.
-        $this->markStepAsValidated($currentStepDefinition, $this->getFormRawValues());
+        $this->validationService->markStepAsValidated($currentStepDefinition);
+        // @todo tmp-delete?
+//        // Saving submitted form data for further usage.
+//        $this->markStepAsValidated($currentStepDefinition, $this->getFormRawValues());
         $this->addValidatedFields($this->formObject->getFormResult()->getValidatedFields());
 
         $nextStep = null;
 
-        if ($currentStepDefinition->hasNextStep()) {
-            $nextStep = $this->getNextStepDefinition($currentStepDefinition, true);
+        if ($currentStepDefinition->hasNextStep()
+            || $currentStepDefinition->hasDivergence()
+        ) {
+            $nextStep = $this->getNextStepDefinition($currentStepDefinition);
         }
 
         return $nextStep;
     }
 
-    /**
-     * Fetches the raw values sent in the request.
-     *
-     * @return array
-     * @throws InvalidArgumentTypeException
-     */
-    protected function getFormRawValues()
-    {
-        $formName = $this->getFormObject()->getName();
-        $formArray = null;
-
-        if ($this->request->hasArgument($formName)) {
-            /** @var array $formArray */
-            $formArray = $this->request->getArgument($formName);
-
-            if (false === is_array($formArray)) {
-                throw InvalidArgumentTypeException::formArgumentNotArray($this->getFormObject(), $formArray);
-            }
-        } else {
-            $formArray = [];
-        }
-
-        return $formArray;
-    }
-
-    /**
-     * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::markStepAsValidated
-     *
-     * @param StepDefinition $stepDefinition
-     * @param array          $formValues
-     */
-    public function markStepAsValidated(StepDefinition $stepDefinition, array $formValues)
-    {
-        $this->validationService->markStepAsValidated($stepDefinition, $formValues);
-    }
+    // @todo tmp-delete?
+//    /**
+//     * Saves the submitted values in the metadata, for the given step.
+//     *
+//     * @param Step $currentStep
+//     */
+//    public function saveStepFormValues(Step $currentStep)
+//    {
+//        $this->persistence->addStepFormValues($this->getStepDefinition($currentStep), $this->getFormRawValues());
+//    }
+//
+//    /**
+//     * Fetches the raw values sent in the request.
+//     *
+//     * @return array
+//     * @throws InvalidArgumentTypeException
+//     */
+//    protected function getFormRawValues()
+//    {
+//        $formName = $this->getFormObject()->getName();
+//        $formArray = null;
+//
+//        if ($this->request->hasArgument($formName)) {
+//            /** @var array $formArray */
+//            $formArray = $this->request->getArgument($formName);
+//
+//            if (false === is_array($formArray)) {
+//                throw InvalidArgumentTypeException::formArgumentNotArray($this->getFormObject(), $formArray);
+//            }
+//        } else {
+//            $formArray = [];
+//        }
+//
+//        return $formArray;
+//    }
+//
+//    /**
+//     * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::markStepAsValidated()
+//     *
+//     * @param StepDefinition $stepDefinition
+//     * @param array          $formValues
+//     */
+//    public function markStepAsValidated(StepDefinition $stepDefinition, array $formValues)
+//    {
+//        $this->validationService->markStepAsValidated($stepDefinition, $formValues);
+//    }
 
     /**
      * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::addValidatedFields
@@ -165,10 +181,9 @@ class StepMiddlewareService implements SingletonInterface
 
     /**
      * @param StepDefinition $step
-     * @param bool           $removeConditionalSteps
      * @return StepDefinition
      */
-    public function getNextStepDefinition(StepDefinition $step, $removeConditionalSteps = false)
+    public function getNextStepDefinition(StepDefinition $step)
     {
         $nextStep = null;
 
@@ -191,7 +206,7 @@ class StepMiddlewareService implements SingletonInterface
                     if (true === $this->getStepDefinitionConditionResult($step)) {
                         $nextStep = $step;
                         break;
-                    } elseif (true === $removeConditionalSteps) {
+                    } else {
                         $this->persistence->removeStep($step);
                     }
                 } else {
@@ -202,6 +217,60 @@ class StepMiddlewareService implements SingletonInterface
         }
 
         return $nextStep;
+    }
+
+    public function getNextSubstepDefinition(SubstepDefinition $substepDefinition)
+    {
+        $nextSubstep = null;
+
+        if ($substepDefinition->hasDivergence()) {
+            $divergenceSteps = $substepDefinition->getDivergenceSubsteps();
+
+            foreach ($divergenceSteps as $divergenceStep) {
+                if (true === $this->getSubstepDefinitionConditionResult($divergenceStep)) {
+                    $nextSubstep = $divergenceStep;
+                    break;
+                }
+            }
+        }
+
+        if (null === $nextSubstep) {
+            while ($substepDefinition->hasNextSubstep()) {
+                $substepDefinition = $substepDefinition->getNextSubstep();
+
+                if ($substepDefinition->hasActivation()) {
+                    if (true === $this->getSubstepDefinitionConditionResult($substepDefinition)) {
+                        $nextSubstep = $substepDefinition;
+                        break;
+                    }
+                } else {
+                    $nextSubstep = $substepDefinition;
+                    break;
+                }
+            }
+        }
+
+        return $nextSubstep;
+    }
+
+    public function findSubstepDefinition(Step $step, callable $callback)
+    {
+        return $this->findSubstepDefinitionRecursive($step->getSubsteps()->getFirstSubstepDefinition(), $callback);
+    }
+
+    protected function findSubstepDefinitionRecursive(SubstepDefinition $substepDefinition, callable $callback)
+    {
+        $result = $callback($substepDefinition);
+
+        if (true === $result) {
+            return $substepDefinition;
+        }
+
+        $substepDefinition = $this->getNextSubstepDefinition($substepDefinition);
+
+        return $substepDefinition
+            ? $this->findSubstepDefinitionRecursive($substepDefinition, $callback)
+            : null;
     }
 
     /**
@@ -242,7 +311,21 @@ class StepMiddlewareService implements SingletonInterface
     {
         $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
         $tree = $conditionProcessor->getActivationConditionTreeForStep($stepDefinition);
-        $todo = new FormValidatorExecutor($this->getFormObject(), new FormValidatorDataObject()); // @todo
+        $todo = new FormValidatorExecutor(new FormValidatorDataObject($this->getFormObject(), new FormResult(), true)); // @todo
+        $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
+
+        return $tree->getPhpResult($dataObject);
+    }
+
+    /**
+     * @param SubstepDefinition $substepDefinition
+     * @return bool
+     */
+    public function getSubstepDefinitionConditionResult(SubstepDefinition $substepDefinition)
+    {
+        $conditionProcessor = ConditionProcessorFactory::getInstance()->get($this->getFormObject());
+        $tree = $conditionProcessor->getActivationConditionTreeForSubstep($substepDefinition);
+        $todo = new FormValidatorExecutor(new FormValidatorDataObject($this->getFormObject(), new FormResult(), true)); // @todo
         $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
 
         return $tree->getPhpResult($dataObject);
@@ -254,39 +337,9 @@ class StepMiddlewareService implements SingletonInterface
      */
     public function getStepDefinition(Step $step)
     {
-        return $this->findStepDefinition($step, $this->getFirstStepDefinition());
-    }
-
-    /**
-     * @param Step           $step
-     * @param StepDefinition $stepDefinition
-     * @return StepDefinition|null
-     */
-    protected function findStepDefinition(Step $step, StepDefinition $stepDefinition)
-    {
-        if ($stepDefinition->getStep() === $step) {
-            return $stepDefinition;
-        }
-
-        if ($stepDefinition->hasNextStep()) {
-            $result = $this->findStepDefinition($step, $stepDefinition->getNextStep());
-
-            if ($result instanceof StepDefinition) {
-                return $result;
-            }
-        }
-
-        if ($stepDefinition->hasDivergence()) {
-            foreach ($stepDefinition->getDivergenceSteps() as $divergenceStep) {
-                $result = $this->findStepDefinition($step, $divergenceStep);
-
-                if ($result instanceof StepDefinition) {
-                    return $result;
-                }
-            }
-        }
-
-        return null;
+        return FormObjectFactory::get()
+            ->getStepService($this->getFormObject())
+            ->getStepDefinition($step);
     }
 
     /**

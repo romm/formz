@@ -16,6 +16,7 @@ namespace Romm\Formz\Controller\Processor;
 use Romm\Formz\Form\FormInterface;
 use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
+use Romm\Formz\Middleware\Scope\ScopeInterface;
 use Romm\Formz\Service\Traits\ExtendedSelfInstantiateTrait;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\Argument;
@@ -46,22 +47,28 @@ class ControllerProcessor implements SingletonInterface
     /**
      * @var Request
      */
-    protected $request;
-
-    /**
-     * @var Request
-     */
-    protected $realRequest;
-
-    /**
-     * @var Request
-     */
     protected $originalRequest;
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * @var Arguments
      */
     protected $requestArguments;
+
+    /**
+     * An interface name that does implement:
+     *
+     * @see \Romm\Formz\Middleware\Scope\ScopeInterface
+     *
+     * It will be used to filter the middlewares that will be called.
+     *
+     * @var string
+     */
+    protected $scope;
 
     /**
      * @var array
@@ -76,14 +83,20 @@ class ControllerProcessor implements SingletonInterface
     protected $lastDispatchedRequest;
 
     /**
+     * @var callable
+     */
+    protected $exceptionCallback;
+
+    /**
      * @param MvcRequest $request
      * @param Arguments  $requestArguments
      * @param array      $settings
+     * @param string     $scope
      * @return $this
      */
-    public static function prepare(MvcRequest $request, Arguments $requestArguments, array $settings)
+    public static function prepare(MvcRequest $request, Arguments $requestArguments, $scope, array $settings = [])
     {
-        return self::get()->setData($request, $requestArguments, $settings);
+        return self::get()->setData($request, $requestArguments, $scope, $settings);
     }
 
     /**
@@ -92,21 +105,26 @@ class ControllerProcessor implements SingletonInterface
      *
      * @param MvcRequest $request
      * @param Arguments  $requestArguments
+     * @param string     $scope
      * @param array      $settings
      * @return $this
      */
-    public function setData(MvcRequest $request, Arguments $requestArguments, array $settings)
+    public function setData(MvcRequest $request, Arguments $requestArguments, $scope, array $settings = [])
     {
+        if (false === in_array(ScopeInterface::class, class_implements($scope))) {
+            throw new \Exception('todo scope : ' . $scope); // @todo
+        }
+
         /** @var Request $request */
-        $dispatchedRequest = $request->getControllerObjectName() . '::' . $request->getControllerActionName();
+        $dispatchedRequest = $request->getControllerObjectName() . '::' . $request->getControllerActionName() . '::' . $scope;
 
         if ($dispatchedRequest !== $this->lastDispatchedRequest) {
             $this->lastDispatchedRequest = $dispatchedRequest;
 
-            $this->realRequest = $request;
+            $this->originalRequest = $request;
             $this->request = clone $request;
-            $this->originalRequest = clone $request;
             $this->requestArguments = $requestArguments;
+            $this->scope = $scope;
             $this->settings = $settings;
             $this->formArguments = null;
             $this->dispatched = false;
@@ -129,20 +147,25 @@ class ControllerProcessor implements SingletonInterface
         if (false === $this->dispatched) {
             $this->dispatched = true;
 
-            if (false === empty($this->getRequestForms())) {
-                $this->realRequest->setDispatched(false);
-                $this->realRequest->setControllerVendorName('Romm');
-                $this->realRequest->setControllerName('Form');
-                $this->realRequest->setControllerExtensionName('Formz');
-                $this->realRequest->setControllerActionName('processForm');
-                $this->realRequest->setArguments([
-                    'originalRequest' => $this->originalRequest
-                ]);
+            $this->doDispatch();
+        }
+    }
 
-                $this->checkFormObjectsErrors();
+    /**
+     * Wrapper for unit testing.
+     */
+    protected function doDispatch()
+    {
+        if (false === empty($this->getRequestForms())) {
+            $this->originalRequest->setDispatched(false);
+            $this->originalRequest->setControllerVendorName('Romm');
+            $this->originalRequest->setControllerExtensionName('Formz');
+            $this->originalRequest->setControllerName('Form');
+            $this->originalRequest->setControllerActionName('processForm');
 
-                throw new StopActionException;
-            }
+            $this->checkFormObjectsErrors();
+
+            throw new StopActionException;
         }
     }
 
@@ -155,8 +178,8 @@ class ControllerProcessor implements SingletonInterface
     {
         foreach ($this->getRequestForms() as $formObject) {
             if ($formObject->getDefinitionValidationResult()->hasErrors()) {
-                $this->realRequest->setControllerActionName('formObjectError');
-                $this->realRequest->setArguments(['formObject' => $formObject]);
+                $this->originalRequest->setControllerActionName('formObjectError');
+                $this->originalRequest->setArguments(['formObject' => $formObject]);
 
                 break;
             }
@@ -177,6 +200,12 @@ class ControllerProcessor implements SingletonInterface
             /** @var Argument $argument */
             foreach ($this->requestArguments as $argument) {
                 $type = $argument->getDataType();
+
+                if ($this->request->hasArgument($argument->getName())
+                    && $this->request->getArgument($argument->getName()) instanceof $type
+                ) {
+                    continue;
+                }
 
                 if (class_exists($type)
                     && in_array(FormInterface::class, class_implements($type))
@@ -215,6 +244,41 @@ class ControllerProcessor implements SingletonInterface
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function setExceptionCallback(callable $callback)
+    {
+        $this->exceptionCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @return callable
+     */
+    public function getExceptionCallback()
+    {
+        return $this->exceptionCallback;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasExceptionCallback()
+    {
+        return null !== $this->exceptionCallback;
     }
 
     /**

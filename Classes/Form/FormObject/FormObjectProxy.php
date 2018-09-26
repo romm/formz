@@ -178,7 +178,7 @@ class FormObjectProxy
     public function getFormHash()
     {
         if (null === $this->formHash) {
-            $this->formHash = HashService::get()->getHash(uniqid(get_class($this->form)));
+            $this->formHash = HashService::get()->getUniqueHash();
         }
 
         return $this->formHash;

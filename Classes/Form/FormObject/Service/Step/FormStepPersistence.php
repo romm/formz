@@ -15,12 +15,13 @@ namespace Romm\Formz\Form\FormObject\Service\Step;
 
 use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Form\Definition\Step\Step\StepDefinition;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
  * This object is stored in a form metadata, and contains important information
  * about the form steps:
  * - Which steps were already validated;
- * - Form data that were submitted by the user at every step.
+ * - Form data that were submitted by the user at every step. @todo tmp-delete?
  *
  * Data consistency of this object is assured by the form object hash (which is
  * mainly calculated from the form configuration): if the hash changes (if the
@@ -44,10 +45,11 @@ class FormStepPersistence
      */
     protected $stepLevels = [];
 
-    /**
-     * @var array
-     */
-    protected $stepsFormValues = [];
+    // @todo tmp-delete?
+//    /**
+//     * @var array
+//     */
+//    protected $stepsFormValues = [];
 
     /**
      * @var array
@@ -82,7 +84,8 @@ class FormStepPersistence
 
         unset($this->validatedSteps[$identifier]);
         unset($this->stepLevels[$stepDefinition->getStepLevel()]);
-        unset($this->stepsFormValues[$identifier]);
+        // @todo tmp-delete?
+//        unset($this->stepsFormValues[$identifier]);
     }
 
     /**
@@ -124,51 +127,58 @@ class FormStepPersistence
         return $this->stepLevels[$level];
     }
 
-    /**
-     * @param StepDefinition $stepDefinition
-     * @param array          $formValues
-     */
-    public function addStepFormValues(StepDefinition $stepDefinition, array $formValues)
-    {
-        $this->stepsFormValues[$stepDefinition->getStep()->getIdentifier()] = $formValues;
-    }
-
-    /**
-     * @param StepDefinition $stepDefinition
-     * @return bool
-     */
-    public function hasStepFormValues(StepDefinition $stepDefinition)
-    {
-        return true === array_key_exists($stepDefinition->getStep()->getIdentifier(), $this->stepsFormValues);
-    }
-
-    /**
-     * @param StepDefinition $stepDefinition
-     * @return array
-     */
-    public function getStepFormValues(StepDefinition $stepDefinition)
-    {
-        if (false === $this->hasStepFormValues($stepDefinition)) {
-            throw new \Exception('todo'); // @todo
-        }
-
-        return $this->stepsFormValues[$stepDefinition->getStep()->getIdentifier()];
-    }
-
-    /**
-     * @return array
-     */
-    public function getMergedFormValues()
-    {
-        $formValues = [];
-
-        foreach ($this->stepsFormValues as $stepFormValues) {
-            unset($stepFormValues['__identity']);
-            $formValues = array_merge($formValues, $stepFormValues);
-        }
-
-        return $formValues;
-    }
+    // @todo tmp-delete?
+//    /**
+//     * @param StepDefinition $stepDefinition
+//     * @param array          $formValues
+//     */
+//    public function addStepFormValues(StepDefinition $stepDefinition, array $formValues)
+//    {
+//        $identifier = $stepDefinition->getStep()->getIdentifier();
+//
+//        if (false === isset($this->stepsFormValues[$identifier])) {
+//            $this->stepsFormValues[$identifier] = $formValues;
+//        } else {
+//            ArrayUtility::mergeRecursiveWithOverrule($this->stepsFormValues[$identifier], $formValues);
+//        }
+//    }
+//
+//    /**
+//     * @param StepDefinition $stepDefinition
+//     * @return bool
+//     */
+//    public function hasStepFormValues(StepDefinition $stepDefinition)
+//    {
+//        return true === array_key_exists($stepDefinition->getStep()->getIdentifier(), $this->stepsFormValues);
+//    }
+//
+//    /**
+//     * @param StepDefinition $stepDefinition
+//     * @return array
+//     */
+//    public function getStepFormValues(StepDefinition $stepDefinition)
+//    {
+//        if (false === $this->hasStepFormValues($stepDefinition)) {
+//            throw new \Exception('todo'); // @todo
+//        }
+//
+//        return $this->stepsFormValues[$stepDefinition->getStep()->getIdentifier()];
+//    }
+//
+//    /**
+//     * @return array
+//     */
+//    public function getMergedFormValues()
+//    {
+//        $formValues = [];
+//
+//        foreach ($this->stepsFormValues as $stepFormValues) {
+//            unset($stepFormValues['__identity']);
+//            $formValues = array_merge($formValues, $stepFormValues);
+//        }
+//
+//        return $formValues;
+//    }
 
     /**
      * @param array $validatedFields
@@ -183,8 +193,9 @@ class FormStepPersistence
      */
     public function hasData()
     {
-        return false === empty($this->validatedSteps)
-            && false === empty($this->stepsFormValues);
+        return false === empty($this->validatedSteps);
+        // @todo tmp-delete?
+//            && false === empty($this->stepsFormValues);
     }
 
     /**

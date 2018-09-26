@@ -29,6 +29,14 @@ class SupportedField extends AbstractFormDefinitionComponent
     protected $fieldName;
 
     /**
+     * @param string $fieldName
+     */
+    public function __construct(string $fieldName)
+    {
+        $this->fieldName = $fieldName;
+    }
+
+    /**
      * @return Field
      */
     public function getField()

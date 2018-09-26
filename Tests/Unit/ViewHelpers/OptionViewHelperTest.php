@@ -28,7 +28,6 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
 
         $viewHelper = new OptionViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService($fieldService);
         $viewHelper->initializeArguments();
         $viewHelper->setArguments([
             'name'  => 'foo',
@@ -36,6 +35,8 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
         ]);
 
         $viewHelper->render();
+
+        UnitTestContainer::get()->resetInstances();
     }
 
     /**
@@ -47,7 +48,6 @@ class OptionViewHelperTest extends AbstractViewHelperUnitTest
     {
         $viewHelper = new OptionViewHelper;
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService(new FieldViewHelperService);
         $viewHelper->initializeArguments();
 
         $this->setExpectedException(ContextNotFoundException::class);

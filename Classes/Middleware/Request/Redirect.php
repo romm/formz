@@ -13,6 +13,7 @@
 
 namespace Romm\Formz\Middleware\Request;
 
+use Romm\Formz\Form\Definition\Step\Step\Step;
 use Romm\Formz\Middleware\Request\Exception\RedirectException;
 
 class Redirect extends Dispatcher
@@ -33,10 +34,31 @@ class Redirect extends Dispatcher
     protected $status = 303;
 
     /**
+     * @var Step
+     */
+    protected $step;
+
+    /**
+     * @var bool
+     */
+    protected $addFormHashToArguments = true;
+
+    /**
      * @throws RedirectException
      */
     public function dispatch()
     {
+        if ($this->step) {
+            $this->pageUid = $this->step->getPageUid();
+            $this->controller = $this->step->getController();
+            $this->action = $this->step->getAction();
+            $this->extension = $this->step->getExtension();
+
+            if ($this->addFormHashToArguments) {
+                $this->arguments['fz-hash'] = [$this->formObject->getName() => $this->formObject->getFormHash()];
+            }
+        }
+
         throw new RedirectException(
             $this->action,
             $this->controller,
@@ -46,6 +68,17 @@ class Redirect extends Dispatcher
             $this->delay,
             $this->status
         );
+    }
+
+    /**
+     * @param Step $step
+     * @return $this
+     */
+    public function toStep(Step $step)
+    {
+        $this->step = $step;
+
+        return $this;
     }
 
     /**
@@ -77,6 +110,17 @@ class Redirect extends Dispatcher
     public function withStatus($status)
     {
         $this->status = (int)$status;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $addFormHashToArguments
+     * @return $this
+     */
+    public function addFormHashToArguments($addFormHashToArguments)
+    {
+        $this->addFormHashToArguments = (bool)$addFormHashToArguments;
 
         return $this;
     }

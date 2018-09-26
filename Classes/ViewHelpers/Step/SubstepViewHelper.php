@@ -23,6 +23,11 @@ use TYPO3\CMS\Extbase\Mvc\Web\Request;
 class SubstepViewHelper extends AbstractViewHelper
 {
     /**
+     * @var bool
+     */
+    protected $escapeOutput = false;
+
+    /**
      * @var FormViewHelperService
      */
     protected $formService;
@@ -59,7 +64,7 @@ class SubstepViewHelper extends AbstractViewHelper
 
         /** @var Request $request */
         $request = $this->controllerContext->getRequest();
-        $currentStep = $this->formService->getFormObject()->fetchCurrentStep($request)->getCurrentStep();
+        $currentStep = $formObject->fetchCurrentStep($request)->getCurrentStep();
 
         if (false === $currentStep->hasSubsteps()) {
             throw new \Exception('todo'); // @todo

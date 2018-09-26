@@ -13,7 +13,6 @@
 
 namespace Romm\Formz\Controller;
 
-use Exception;
 use Romm\Formz\Controller\Processor\ControllerProcessor;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject\FormObject;
@@ -22,9 +21,9 @@ use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Request\Exception\ForwardException;
 use Romm\Formz\Middleware\Request\Exception\RedirectException;
 use Romm\Formz\Middleware\Request\Exception\StopPropagationException;
+use Throwable;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
-use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 /**
  * This is the main form controller, which is called before a controller action
@@ -42,11 +41,6 @@ class FormController extends ActionController
     protected $processor;
 
     /**
-     * @var Request
-     */
-    protected $originalRequest;
-
-    /**
      * Main action used to dispatch the request properly, depending on FormZ
      * configuration.
      *
@@ -57,23 +51,14 @@ class FormController extends ActionController
      * Middlewares will be called for each form argument, and may modify the
      * request, which is then dispatched again with modified data.
      *
-     * @param Request $originalRequest
-     * @throws Exception
+     * @throws Throwable
      */
-    public function processFormAction(Request $originalRequest)
+    public function processFormAction()
     {
-        $exception = null;
-        $this->originalRequest = $originalRequest;
-
         try {
             $this->invokeMiddlewares();
             $this->manageRequestResult();
-        } catch (Exception $exception) {
-        }
-
-        $this->commitMetadata();
-
-        if ($exception instanceof Exception) {
+        } catch (Throwable $exception) {
             if ($exception instanceof StopPropagationException) {
                 if ($exception instanceof RedirectException) {
                     $this->redirectFromException($exception);
@@ -82,11 +67,26 @@ class FormController extends ActionController
                     $this->forwardToReferrer();
                 }
             } else {
-                throw $exception;
+                $this->callExceptionHandler($exception);
             }
+        } finally {
+            $this->persistForms();
         }
 
         $this->continueRequest();
+    }
+
+    /**
+     * Wrapping the rendering with a try/catch to handle the exception callback
+     * if there is one.
+     */
+    protected function callActionMethod()
+    {
+        try {
+            parent::callActionMethod();
+        } catch (Throwable $exception) {
+            $this->callExceptionHandler($exception);
+        }
     }
 
     /**
@@ -95,6 +95,21 @@ class FormController extends ActionController
     public function formObjectErrorAction(FormObject $formObject)
     {
         $this->view->assign('formObject', $formObject);
+    }
+
+    /**
+     * @param Throwable $exception
+     * @throws Throwable
+     */
+    protected function callExceptionHandler(Throwable $exception)
+    {
+        if ($exception instanceof StopActionException
+            || !$this->processor->hasExceptionCallback()
+        ) {
+            throw $exception;
+        }
+
+        call_user_func($this->processor->getExceptionCallback(), $exception);
     }
 
     /**
@@ -138,16 +153,21 @@ class FormController extends ActionController
     }
 
     /**
-     * Loops on every form of this request, and commits the metadata in database
-     * for each one.
+     * Loops on every form of this request, and persists each one.
      */
-    protected function commitMetadata()
+    protected function persistForms()
     {
         foreach ($this->processor->getRequestForms() as $formObject) {
             if ($formObject->hasForm()
-                && $formObject->isPersistent()
+                && ($formObject->isPersistent()
+                    || $formObject->formWasSubmitted()
+                )
             ) {
-                $formObject->getFormMetadata()->persist();
+                $formObject->getPersistenceManager()->save();
+
+                if ($formObject->isPersistent()) {
+                    $formObject->getFormMetadata()->persist();
+                }
             }
         }
     }
@@ -180,22 +200,35 @@ class FormController extends ActionController
      */
     protected function forwardToReferrer()
     {
-        $referringRequest = $this->originalRequest->getReferringRequest();
+        /*
+         * If the original request is filled, a forward to referrer has already
+         * been done.
+         */
+        if ($this->request->getOriginalRequest()) {
+            return;
+        }
+
+        $referringRequest = $this->processor->getRequest()->getReferringRequest();
 
         if ($referringRequest) {
+            $originalRequest = clone $this->request;
             $this->request->setDispatched(false);
-            $this->request->setOriginalRequest($this->originalRequest);
 
+            $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerVendorName($referringRequest->getControllerVendorName());
             $this->request->setControllerExtensionName($referringRequest->getControllerExtensionName());
             $this->request->setControllerName($referringRequest->getControllerName());
             $this->request->setControllerActionName($referringRequest->getControllerActionName());
             $this->request->setArguments($this->processor->getRequest()->getArguments());
-        } else {
-            // @todo ?
-        }
+            $this->request->setOriginalRequest($originalRequest);
 
-        throw new StopActionException;
+            throw new StopActionException;
+        } else {
+            /**
+             * @todo ?
+             * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::forwardToReferringRequest()
+             */
+        }
     }
 
     /**

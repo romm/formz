@@ -8,7 +8,9 @@ use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use Romm\Formz\Tests\Unit\UnitTestContainer;
 use Romm\Formz\Tests\Unit\ViewHelpers\AbstractViewHelperUnitTest;
 use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
+use TYPO3\CMS\Fluid\Core\ViewHelper\TemplateVariableContainer;
 
 class RenderViewHelperTest extends AbstractViewHelperUnitTest
 {
@@ -50,11 +52,14 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
             ->with($slotName)
             ->willReturn([]);
 
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new RenderViewHelper;
+
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService($fieldService);
+        $this->injectVariableProviderMock();
+
         $viewHelper->setArguments([
             'slot'      => $slotName,
             'arguments' => []
@@ -72,6 +77,9 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
      */
     public function argumentsAreAddedThenRemoved()
     {
+        $fieldService = new FieldViewHelperService;
+        $fieldService->setCurrentField(new Field('foo'));
+
         /** @var SlotViewHelperService|\PHPUnit_Framework_MockObject_MockObject $slotService */
         $slotService = $this->getMockBuilder(SlotViewHelperService::class)
             ->setMethods(['addTemplateVariables', 'restoreTemplateVariables'])
@@ -86,19 +94,19 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $slotService->expects($this->once())
             ->method('restoreTemplateVariables');
 
+        UnitTestContainer::get()->registerMockedInstance(FieldViewHelperService::class, $fieldService);
         UnitTestContainer::get()->registerMockedInstance(SlotViewHelperService::class, $slotService);
 
         $viewHelper = new RenderViewHelper;
+
         $this->injectDependenciesIntoViewHelper($viewHelper);
+        $this->injectVariableProviderMock();
+
         $viewHelper->setArguments([
             'slot'      => 'foo',
             'arguments' => []
         ]);
         $viewHelper->initializeArguments();
-
-        $fieldService = new FieldViewHelperService;
-        $fieldService->setCurrentField(new Field('foo'));
-        $viewHelper->injectFieldService($fieldService);
 
         $viewHelper->render();
     }
@@ -113,10 +121,27 @@ class RenderViewHelperTest extends AbstractViewHelperUnitTest
         $this->setExpectedException(ContextNotFoundException::class);
 
         $viewHelper = new RenderViewHelper;
+
         $this->injectDependenciesIntoViewHelper($viewHelper);
-        $viewHelper->injectFieldService(new FieldViewHelperService);
+        $this->injectVariableProviderMock();
+
         $viewHelper->initializeArguments();
 
         $viewHelper->render();
+    }
+
+    protected function injectVariableProviderMock()
+    {
+        $templateVariableContainer = $this->getMockBuilder(TemplateVariableContainer::class)
+            ->setMethods(['getAll'])
+            ->getMock();
+        $templateVariableContainer->method('getAll')
+            ->willReturn(['foo' => 'bar']);
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')) {
+            $this->renderingContext->injectTemplateVariableContainer($templateVariableContainer);
+        } else {
+            $this->renderingContext->setVariableProvider($templateVariableContainer);
+        }
     }
 }

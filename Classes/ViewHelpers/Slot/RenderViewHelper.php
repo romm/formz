@@ -19,6 +19,8 @@ use Romm\Formz\Exceptions\ContextNotFoundException;
 use Romm\Formz\Service\ViewHelper\Field\FieldViewHelperService;
 use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use Romm\Formz\ViewHelpers\AbstractViewHelper;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Facets\CompilableInterface;
 
@@ -35,15 +37,12 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
     protected $escapeOutput = false;
 
     /**
-     * @var FieldViewHelperService
-     */
-    protected $fieldService;
-
-    /**
      * @inheritdoc
      */
     public function initializeArguments()
     {
+        parent::initializeArguments();
+
         $this->registerArgument('slot', 'string', 'Instance of the slot which will be rendered.', true);
         $this->registerArgument('arguments', 'array', 'Arguments sent to the slot.', false, []);
     }
@@ -53,10 +52,6 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public function render()
     {
-        if (false === $this->fieldService->fieldContextExists()) {
-            throw ContextNotFoundException::slotRenderViewHelperFieldContextNotFound();
-        }
-
         return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
@@ -67,13 +62,26 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
      */
     public static function renderStatic(array $arguments, Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
+        /** @var FieldViewHelperService $fieldService */
+        $fieldService = Core::instantiate(FieldViewHelperService::class);
+
+        if (false === $fieldService->fieldContextExists()) {
+            throw ContextNotFoundException::slotRenderViewHelperFieldContextNotFound();
+        }
+
         /** @var SlotViewHelperService $slotService */
         $slotService = Core::instantiate(SlotViewHelperService::class);
         $slotName = $arguments['slot'];
         $result = '';
 
         if ($slotService->hasSlot($slotName)) {
-            $slotService->addTemplateVariables($slotName, $arguments['arguments']);
+            $currentVariables = version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')
+                ? $renderingContext->getTemplateVariableContainer()->getAll()
+                : $renderingContext->getVariableProvider()->getAll();
+
+            ArrayUtility::mergeRecursiveWithOverrule($currentVariables, $arguments['arguments']);
+
+            $slotService->addTemplateVariables($slotName, $currentVariables);
 
             $slotClosure = $slotService->getSlotClosure($slotName);
             $result = $slotClosure();
@@ -82,13 +90,5 @@ class RenderViewHelper extends AbstractViewHelper implements CompilableInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param FieldViewHelperService $service
-     */
-    public function injectFieldService(FieldViewHelperService $service)
-    {
-        $this->fieldService = $service;
     }
 }

@@ -122,7 +122,7 @@ class AssetHandlerConnectorManager
             0,
             22
         );
-        $identifier .= '-' . md5($formObject->getObjectHash());
+        $identifier .= '-' . md5($formObject->getObjectHash() . $formObject->getName());
 
         return CacheService::GENERATED_FILES_PATH . $identifier;
     }

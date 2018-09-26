@@ -92,19 +92,19 @@ class FormMetadata extends AbstractEntity
     }
 
     /**
-     * @return string
-     */
-    public function getClassName()
-    {
-        return $this->className;
-    }
-
-    /**
      * @return bool
      */
     public function hasIdentifier()
     {
         return null !== $this->identifier;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassName()
+    {
+        return $this->className;
     }
 
     /**

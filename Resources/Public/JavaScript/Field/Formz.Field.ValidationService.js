@@ -138,13 +138,14 @@ Fz.Field.ValidationService = (function () {
         /**
          * Internal recursive function to validate the field.
          *
-         * @param {Object}        validationRules     The validation rules which are checked.
-         * @param {Array}         validationRulesKeys Keys of the remaining validation rules to check (used for recursive behaviour).
+         * @param {Object}               validationRules     The validation rules which are checked.
+         * @param {Array}                validationRulesKeys Keys of the remaining validation rules to check (used for recursive behaviour).
+         * @param {Formz.ResultInstance} result
          */
-        var launchValidation = function (validationRules, validationRulesKeys) {
+        var launchValidation = function (validationRules, validationRulesKeys, result) {
             var validatorName = validationRulesKeys[0];
             var validationRule = validationRules[validatorName];
-            var result = Fz.Result.get({defaultErrorMessage: defaultErrorMessage});
+            result = result || Fz.Result.get({defaultErrorMessage: defaultErrorMessage});
             var finalValidationCallback = function () {
                 handleValidationResult(validatorName, result);
             };
@@ -153,13 +154,13 @@ Fz.Field.ValidationService = (function () {
                 /** @type {validationResultCallback} */
                 var callback;
 
-                callback = function (result) {
-                    if (false === result.hasErrors()
+                callback = function (freshResult) {
+                    if (false === freshResult.hasErrors()
                         && validationRulesKeys.length > 1
                     ) {
                         // Handling the remaining rules.
                         validationRulesKeys.splice(0, 1);
-                        launchValidation(validationRules, validationRulesKeys);
+                        launchValidation(validationRules, validationRulesKeys, result);
                     } else {
                         // The result has errors, or no more rule to check: the checks stop and the result is handled.
                         finalValidationCallback();
@@ -186,7 +187,7 @@ Fz.Field.ValidationService = (function () {
                 if (validationRulesKeys.length > 1) {
                     // Handling the remaining rules.
                     validationRulesKeys.splice(0, 1);
-                    launchValidation(validationRules, validationRulesKeys);
+                    launchValidation(validationRules, validationRulesKeys, result);
                 } else {
                     // No more rule to check: the checks stop.
                     finalValidationCallback();
@@ -420,6 +421,13 @@ Fz.Field.ValidationService = (function () {
              */
             wasValidated: function () {
                 return (wasValidated && getStringValue() === lastValidatedValue);
+            },
+
+            /**
+             * Unset any validation state that was previously set up.
+             */
+            resetState: function () {
+                wasValidated = false;
             },
 
             /**

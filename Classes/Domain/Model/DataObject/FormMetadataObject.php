@@ -15,6 +15,7 @@ namespace Romm\Formz\Domain\Model\DataObject;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Domain\Model\FormMetadata;
+use Romm\Formz\Domain\Repository\FormMetadataRepository;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\Type\TypeInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
@@ -24,6 +25,9 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
  */
 class FormMetadataObject implements TypeInterface
 {
+    const DATA_SET = 'set';
+    const DATA_REMOVED = 'removed';
+
     /**
      * @var array
      */
@@ -33,6 +37,17 @@ class FormMetadataObject implements TypeInterface
      * @var FormMetadata
      */
     protected $object;
+
+    /**
+     * Contains a list of data keys that have been manipulated by the methods of
+     * this class.
+     *
+     * This is used to keep a trace of what was changed, to handle database
+     * manipulation that was done during the runtime of this request.
+     *
+     * @var array
+     */
+    protected $touchedData = [];
 
     /**
      * @param string $data
@@ -80,6 +95,8 @@ class FormMetadataObject implements TypeInterface
     public function set($key, $value)
     {
         $this->metadata = ArrayUtility::setValueByPath($this->metadata, $key, $value, '.');
+
+        $this->touchedData[$key] = self::DATA_SET;
     }
 
     /**
@@ -89,6 +106,8 @@ class FormMetadataObject implements TypeInterface
     {
         if ($this->has($key)) {
             $this->metadata = ArrayUtility::removeByPath($this->metadata, $key, '.');
+
+            $this->touchedData[$key] = self::DATA_REMOVED;
         }
     }
 
@@ -100,7 +119,32 @@ class FormMetadataObject implements TypeInterface
         $persistenceManager = Core::get()->getPersistenceManager();
 
         if (null === $this->object->getUid()) {
-            $persistenceManager->add($this->object);
+            /** @var FormMetadataRepository $formMetadataRepository */
+            $formMetadataRepository = Core::instantiate(FormMetadataRepository::class);
+
+            $object = $formMetadataRepository->findOneByHash($this->object->getHash());
+
+            if ($object) {
+                $this->object = $object;
+
+                /*
+                 * If any data was manipulated during the runtime, it is updated
+                 * in the current metadata object.
+                 */
+                if (!empty($this->touchedData)) {
+                    foreach ($this->touchedData as $key => $type) {
+                        if ($type === self::DATA_SET) {
+                            $this->object->getMetadata()->set($key, $this->get($key));
+                        } elseif ($type === self::DATA_REMOVED) {
+                            $this->object->getMetadata()->remove($key);
+                        }
+                    }
+
+                    $persistenceManager->update($this->object);
+                }
+            } else {
+                $persistenceManager->add($this->object);
+            }
         } else {
             $persistenceManager->update($this->object);
         }

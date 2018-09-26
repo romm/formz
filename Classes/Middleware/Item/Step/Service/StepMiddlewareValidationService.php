@@ -21,13 +21,14 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\Service\Step\FormStepPersistence;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddlewareOption;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Property\PropertyMapper;
-use TYPO3\CMS\Extbase\Property\PropertyMappingConfiguration;
-use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 class StepMiddlewareValidationService
 {
+    const STEP_HAS_ERROR = 'STEP_HAS_ERROR';
+
+    const STEP_INVALID_ACTIVATION = 'STEP_INVALID_ACTIVATION';
+
     /**
      * @var FormObject
      */
@@ -44,11 +45,18 @@ class StepMiddlewareValidationService
     protected $persistence;
 
     /**
-     * @param StepMiddlewareService $service
+     * @var Dispatcher
      */
-    public function __construct(StepMiddlewareService $service)
+    protected $signalSlotDispatcher;
+
+    /**
+     * @param StepMiddlewareService $service
+     * @param Dispatcher $signalSlotDispatcher
+     */
+    public function __construct(StepMiddlewareService $service, Dispatcher $signalSlotDispatcher)
     {
         $this->service = $service;
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
         $this->formObject = $service->getFormObject();
         $this->persistence = $service->getStepPersistence();
     }
@@ -60,17 +68,16 @@ class StepMiddlewareValidationService
      * @param StepDefinition $stepDefinition
      * @param array          $formValues
      */
-    public function markStepAsValidated(StepDefinition $stepDefinition, array $formValues)
+    public function markStepAsValidated(StepDefinition $stepDefinition/*, array $formValues*/) // @todo tmp-delete?
     {
         $this->persistence->markStepAsValidated($stepDefinition);
 
-        if ($this->persistence->hasStepFormValues($stepDefinition)
-            && serialize($formValues) !== serialize($this->persistence->getStepFormValues($stepDefinition))
-        ) {
-            $this->persistence->resetValidationData();
-        }
-
-        $this->persistence->addStepFormValues($stepDefinition, $formValues);
+        // @todo tmp-delete?
+//        if ($this->persistence->hasStepFormValues($stepDefinition)
+//            && serialize($formValues) !== serialize($this->persistence->getStepFormValues($stepDefinition))
+//        ) {
+//            $this->persistence->resetValidationData();
+//        }
     }
 
     /**
@@ -157,18 +164,28 @@ class StepMiddlewareValidationService
             $step = $stepDefinition->getStep();
 
             /*
-             * If the already submitted form values are not found, the step is
-             * considered as invalid.
+             * If the form was already validated, no need to do it again.
              */
-            if (false === $this->persistence->hasStepFormValues($stepDefinition)) {
-                $invalidStepDefinition = $stepDefinition;
-                break;
+            if ($this->persistence->stepWasValidated($step)) {
+                continue;
             }
 
             $result = $this->validateStep($step);
 
             if ($result->hasErrors()) {
                 $invalidStepDefinition = $stepDefinition;
+
+                $this->signalSlotDispatcher->dispatch(
+                    self::class,
+                    self::STEP_HAS_ERROR,
+                    [
+                        $this->formObject,
+                        $currentStepDefinition,
+                        $invalidStepDefinition,
+                        $result,
+                    ]
+                );
+
                 break;
             } else {
                 $this->persistence->markStepAsValidated($stepDefinition);
@@ -176,33 +193,25 @@ class StepMiddlewareValidationService
             }
         }
 
-        $nextStepDefinition = $this->service->getNextStepDefinition($stepDefinition);
+        if (null === $invalidStepDefinition
+            && $currentStepDefinition->hasActivation()
+            && false === $this->service->getStepDefinitionConditionResult($currentStepDefinition)
+        ) {
+            $invalidStepDefinition = end($stepDefinitionsToTest);
 
-        if ($nextStepDefinition !== $currentStepDefinition) {
-            $invalidStepDefinition = $stepDefinition;
+            $this->signalSlotDispatcher->dispatch(
+                self::class,
+                self::STEP_INVALID_ACTIVATION,
+                [
+                    $this->formObject,
+                    $currentStepDefinition,
+                    $invalidStepDefinition,
+                ]
+            );
         }
+
 
         return $invalidStepDefinition;
-    }
-
-    /**
-     * @param array $stepFormValues
-     * @return PropertyMappingConfiguration
-     */
-    protected function getPropertyMappingConfiguration(array $stepFormValues)
-    {
-        /** @var PropertyMappingConfiguration $propertyMappingConfiguration */
-        $propertyMappingConfiguration = GeneralUtility::makeInstance(PropertyMappingConfiguration::class);
-        $propertyMappingConfiguration->allowAllProperties();
-        $propertyMappingConfiguration->setTypeConverterOption(PersistentObjectConverter::class, PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED, true);
-
-        foreach ($stepFormValues as $key => $value) {
-            if (is_array($value)) {
-                $propertyMappingConfiguration->forProperty($key)->allowAllProperties();
-            }
-        }
-
-        return $propertyMappingConfiguration;
     }
 
     /**
@@ -214,13 +223,7 @@ class StepMiddlewareValidationService
      */
     protected function validateStep(Step $step)
     {
-        /** @var PropertyMapper $propertyMapper */
-        $propertyMapper = Core::instantiate(PropertyMapper::class);
-
-        $stepFormValues = $this->persistence->getMergedFormValues();
-        $propertyMappingConfiguration = $this->getPropertyMappingConfiguration($stepFormValues);
-
-        $form = $propertyMapper->convert($stepFormValues, $this->formObject->getClassName(), $propertyMappingConfiguration);
+        $form = $this->formObject->getForm();
 
         /** @var FormValidationMiddlewareOption $formValidationMiddlewareOptions */
         $formValidationMiddlewareOptions = $this->formObject
@@ -234,6 +237,7 @@ class StepMiddlewareValidationService
             $formValidationMiddlewareOptions->getFormValidatorClassName(),
             [
                 'name'  => $this->formObject->getName(),
+                'form'  => $form,
                 'dummy' => true
             ]
         );

@@ -119,10 +119,10 @@ class Configuration extends AbstractConfiguration implements ConfigurationObject
     public static function getConfigurationObjectServices()
     {
         return ServiceFactory::getInstance()
-            ->attach(ServiceInterface::SERVICE_CACHE)
-            ->with(ServiceInterface::SERVICE_CACHE)
-            ->setOption(CacheService::OPTION_CACHE_NAME, InternalCacheService::CONFIGURATION_OBJECT_CACHE_IDENTIFIER)
-            ->setOption(CacheService::OPTION_CACHE_BACKEND, InternalCacheService::get()->getBackendCache())
+//            ->attach(ServiceInterface::SERVICE_CACHE)
+//            ->with(ServiceInterface::SERVICE_CACHE)
+//            ->setOption(CacheService::OPTION_CACHE_NAME, InternalCacheService::CONFIGURATION_OBJECT_CACHE_IDENTIFIER)
+//            ->setOption(CacheService::OPTION_CACHE_BACKEND, InternalCacheService::get()->getBackendCache())
             ->attach(ServiceInterface::SERVICE_PARENTS)
             ->attach(ServiceInterface::SERVICE_DATA_PRE_PROCESSOR)
             ->attach(ServiceInterface::SERVICE_MIXED_TYPES);

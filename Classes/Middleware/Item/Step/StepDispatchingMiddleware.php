@@ -17,24 +17,31 @@ use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\DefaultMiddleware;
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
-use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
+use Romm\Formz\Middleware\Scope\FieldValidationScope;
+use Romm\Formz\Middleware\Scope\ReadScope;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This middleware should be the last one called, as it is used to dispatch the
  * request to the next step, if there is one.
  */
-class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
+class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal
 {
     /**
      * @var int
      */
-    protected $priority = self::PRIORITY_STEP;
+    protected $priority = self::PRIORITY_STEP_DISPATCHING;
 
     /**
      * @var StepMiddlewareService
      */
     protected $service;
+
+    /**
+     * @var array
+     */
+    protected static $defaultScopesBlackList = [ReadScope::class, FieldValidationScope::class];
 
     /**
      * Inject the step service.
@@ -63,6 +70,13 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
             $currentStep = $this->getCurrentStep();
 
             if ($currentStep) {
+                // @todo tmp-delete?
+//                /*
+//                 * No error during the validation : the submitted form values
+//                 * are saved in the step metadata.
+//                 */
+//                $this->service->saveStepFormValues($currentStep);
+
                 $stepService = FormObjectFactory::get()->getStepService($formObject);
 
                 if ($currentStep->hasSubsteps()
@@ -74,9 +88,18 @@ class StepDispatchingMiddleware extends DefaultMiddleware implements PresetMiddl
                 $nextStep = $this->service->getNextStep($currentStep);
 
                 if ($nextStep) {
-                    $this->beforeSignal()->dispatch();
+                    /** @var StepDispatchingArguments $arguments */
+                    $arguments = GeneralUtility::makeInstance(StepDispatchingArguments::class);
 
-                    $this->service->moveForwardToStep($nextStep, $this->redirect());
+                    $this->beforeSignal()
+                        ->withArguments($arguments)
+                        ->dispatch();
+
+                    if (false === $arguments->getCancelStepDispatching()
+                        && false === $formResult->hasErrors()
+                    ) {
+                        $this->service->moveForwardToStep($nextStep, $this->redirect());
+                    }
                 }
             }
         }

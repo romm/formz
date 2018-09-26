@@ -6,8 +6,8 @@ use Romm\Formz\Form\FormObject\FormObjectProxy;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
 use Romm\Formz\Tests\Fixture\Validation\Validator\Form\DummyFormValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 use Romm\Formz\Validation\Validator\Form\DefaultFormValidator;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
 
 class AbstractFormValidatorTest extends AbstractUnitTest
 {

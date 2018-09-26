@@ -8,7 +8,7 @@ use Romm\Formz\Exceptions\SilentException;
 use Romm\Formz\Form\Definition\Condition\Activation;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Settings\FieldSettings;
-use Romm\Formz\Tests\Fixture\Validation\Validator\DummyValidator;
+use Romm\Formz\Tests\Fixture\Validation\Validator\DummyFieldValidator;
 use Romm\Formz\Tests\Unit\AbstractUnitTest;
 
 class FieldTest extends AbstractUnitTest
@@ -34,7 +34,7 @@ class FieldTest extends AbstractUnitTest
         $field = new Field('foo');
 
         $this->assertFalse($field->hasValidator($validatorName));
-        $validator = $field->addValidator($validatorName, DummyValidator::class);
+        $validator = $field->addValidator($validatorName, DummyFieldValidator::class);
         $this->assertTrue($field->hasValidator($validatorName));
         $this->assertSame($validator, $field->getValidator($validatorName));
         $this->assertSame([$validatorName => $validator], $field->getValidators());
@@ -47,7 +47,7 @@ class FieldTest extends AbstractUnitTest
     {
         $field = $this->getFieldWithDefinitionFreezeStateCheck();
 
-        $field->addValidator('my-validator', DummyValidator::class);
+        $field->addValidator('my-validator', DummyFieldValidator::class);
     }
 
     /**
@@ -60,8 +60,8 @@ class FieldTest extends AbstractUnitTest
         $validatorName = 'my-validator';
         $field = new Field('foo');
 
-        $field->addValidator($validatorName, DummyValidator::class);
-        $field->addValidator($validatorName, DummyValidator::class);
+        $field->addValidator($validatorName, DummyFieldValidator::class);
+        $field->addValidator($validatorName, DummyFieldValidator::class);
     }
 
     /**

@@ -1,9 +1,4 @@
-﻿.. ==================================================
-.. FOR YOUR INFORMATION
-.. --------------------------------------------------
-.. -*- coding: utf-8 -*- with BOM.
-
-.. include:: ../Includes.txt
+﻿.. include:: ../Includes.txt
 
 
 .. _start:
@@ -30,7 +25,7 @@ FormZ
         form
 
     :Copyright:
-        2016
+        2017
 
     :Author:
         Romain Canon
@@ -65,3 +60,4 @@ FormZ
     08-Example/Index
     09-Contact/Index
     10-Credits/Index
+    11-Changelog/Index

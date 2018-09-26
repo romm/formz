@@ -57,7 +57,6 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
 
     /**
      * @var \Romm\Formz\Form\Definition\Step\Step\SupportedField[]
-     * @validate NotEmpty
      */
     protected $supportedFields;
 
@@ -123,6 +122,15 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
     }
 
     /**
+     * @param string $fieldName
+     */
+    public function addSupportedField($fieldName)
+    {
+        $this->supportedFields[$fieldName] = new SupportedField($fieldName);
+        $this->supportedFields[$fieldName]->attachParent($this);
+    }
+
+    /**
      * @param Field $field
      * @return bool
      */
@@ -143,6 +151,16 @@ class Step extends AbstractFormDefinitionComponent implements DataPreProcessorIn
     public function hasSubsteps()
     {
         return $this->substeps instanceof Substeps;
+    }
+
+    /**
+     * Alias for Fluid usage.
+     *
+     * @return bool
+     */
+    public function getHasSubsteps()
+    {
+        return $this->hasSubsteps();
     }
 
     /**

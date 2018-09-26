@@ -71,7 +71,7 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
         return $this->activation instanceof ActivationInterface;
     }
 
-    public function getUniqueIdentifier()
+    public function getLevel()
     {
         $level = 1;
 
@@ -87,7 +87,7 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
             return true;
         });
 
-        return $this->getSubstep()->getIdentifier() . '-' . $level;
+        return $level;
     }
 
     /**

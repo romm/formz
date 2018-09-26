@@ -18,6 +18,7 @@ use Romm\Formz\Form\Definition\FormDefinition;
 use Romm\Formz\Form\FormObject\Definition\FormDefinitionObject;
 use Romm\Formz\Service\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
 
 /**
  * Default form object builder.
@@ -28,6 +29,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class DefaultFormObjectBuilder extends AbstractFormObjectBuilder
 {
+    const FORM_DEFINITION_BUILT = 'formDefinitionBuilt';
+
+    /**
+     * @var Dispatcher
+     */
+    protected $signalSlotDispatcher;
+
     /**
      * @see DefaultFormObjectBuilder
      */
@@ -49,6 +57,12 @@ class DefaultFormObjectBuilder extends AbstractFormObjectBuilder
             FormDefinitionObject::class,
             $configurationObject->getObject(true),
             $configurationObject->getValidationResult()
+        );
+
+        $this->signalSlotDispatcher->dispatch(
+            self::class,
+            self::FORM_DEFINITION_BUILT,
+            [$this->className, $formDefinitionObject]
         );
 
         return $formDefinitionObject;
@@ -73,5 +87,13 @@ class DefaultFormObjectBuilder extends AbstractFormObjectBuilder
     public function getFormDefinition()
     {
         return null;
+    }
+
+    /**
+     * @param Dispatcher $signalSlotDispatcher
+     */
+    public function injectSignalSlotDispatcher(Dispatcher $signalSlotDispatcher)
+    {
+        $this->signalSlotDispatcher = $signalSlotDispatcher;
     }
 }

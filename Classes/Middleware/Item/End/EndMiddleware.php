@@ -59,14 +59,6 @@ final class EndMiddleware implements BasicMiddlewareInterface
      */
     protected function injectFormResultInRequest()
     {
-        if ($this->processor->inSingleFieldValidationContext()) {
-            /*
-             * In "single field validation context", there is no need to inject
-             * the form result in the request.
-             */
-            return;
-        }
-
         $request = $this->processor->getRequest();
         $result = $this->processor->getFormObject()->getFormResult();
         $formName = $this->processor->getFormObject()->getName();

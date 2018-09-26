@@ -30,6 +30,7 @@ use Romm\Formz\Service\FormService;
 use Romm\Formz\Service\StringService;
 use Romm\Formz\Service\TimeTrackerService;
 use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
+use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
@@ -283,6 +284,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $requestData->setFormHash($this->formObject->getFormHash());
         $value = htmlspecialchars($this->hashService->appendHmac(base64_encode(serialize($requestData->toArray()))));
 
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('fz-hash') . '" value="' . $this->formObject->getFormHash() . '" />' . LF;
         $result .= '<input type="hidden" name="' . $this->prefixFieldName('formzData') . '" value="' . $value . '" />' . LF;
 
         if ($this->formObject->hasSteps()) {
@@ -291,10 +293,14 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             if ($currentStep->hasSubsteps()) {
                 $substepsLevel = FormObjectFactory::get()
                     ->getStepService($this->formObject)
-                    ->getSubstepsLevel();
+                    ->getCurrentSubstepDefinition()
+                    ->getLevel();
 
                 $result .= '<input type="hidden" fz-substeps-level="1" name="' . $this->prefixFieldName('substepsLevel') . '" value="' . $substepsLevel . '" />' . LF;
             }
+
+            $result .= '<input type="hidden" fz-substeps-previous="1" name="' . $this->prefixFieldName(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER) . '" disabled="1" value="1" />' . LF;
+            $result .= '<input type="submit" style="position: absolute; left: -9999px" />' . LF;
         }
 
         return $result;
@@ -480,6 +486,19 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
         $this->formService->checkStepFields($this->viewHelperVariableContainer);
 
         parent::removeFormFieldNamesFromViewHelperVariableContainer();
+    }
+
+    /**
+     * The identity of the form will be handled by FormZ, thanks to the form
+     * hash.
+     *
+     * @param object $object
+     * @param string $name
+     * @return string
+     */
+    protected function renderHiddenIdentityField($object, $name)
+    {
+        return '';
     }
 
     /**

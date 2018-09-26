@@ -15,11 +15,12 @@ namespace Romm\Formz\Middleware\Item\FormValidation;
 
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\Definition\Field\Field;
-use Romm\Formz\Middleware\Item\FieldValidation\FieldValidationArguments;
-use Romm\Formz\Middleware\Item\FieldValidation\FieldValidationSignal;
+use Romm\Formz\Middleware\Item\Field\Validation\FieldValidationArguments;
+use Romm\Formz\Middleware\Item\Field\Validation\FieldValidationSignal;
 use Romm\Formz\Middleware\Item\OnBeginMiddleware;
 use Romm\Formz\Middleware\Processor\PresetMiddlewareInterface;
-use Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext;
+use Romm\Formz\Middleware\Scope\FieldValidationScope;
+use Romm\Formz\Middleware\Scope\ReadScope;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
 
@@ -29,13 +30,8 @@ use Romm\Formz\Validation\Validator\Form\AbstractFormValidator;
  *
  * You can bind middlewares to the signal `FormValidationSignal`, which will be
  * dispatched if and only if the form was submitted by the user.
- *
- * Please note that this middleware will not be called when being in a "single
- * field validation context".
- *
- * @see \Romm\Formz\Middleware\Processor\RemoveFromSingleFieldValidationContext
  */
-class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal, RemoveFromSingleFieldValidationContext
+class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddlewareInterface, SendsMiddlewareSignal
 {
     /**
      * @var \Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddlewareOption
@@ -46,6 +42,11 @@ class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddle
      * @var AbstractFormValidator
      */
     protected $validator;
+
+    /**
+     * @var array
+     */
+    protected static $defaultScopesBlackList = [ReadScope::class, FieldValidationScope::class];
 
     /**
      * @see FormValidationMiddleware
@@ -59,7 +60,10 @@ class FormValidationMiddleware extends OnBeginMiddleware implements PresetMiddle
         if ($formObject->hasForm()
             && $formObject->formWasSubmitted()
         ) {
-            $this->validator = Core::instantiate($this->options->getFormValidatorClassName());
+            $this->validator = Core::instantiate(
+                $this->options->getFormValidatorClassName(),
+                ['form' => $formObject->getForm()]
+            );
 
             $this->injectFieldValidationCallback();
             $this->injectCurrentStep();

@@ -13,12 +13,17 @@
 
 namespace Romm\Formz\AssetHandler\Html;
 
+use DateTime;
 use Romm\Formz\AssetHandler\AbstractAssetHandler;
 use Romm\Formz\Error\FormResult;
 use Romm\Formz\Error\FormzMessageInterface;
+use Romm\Formz\Exceptions\InvalidArgumentTypeException;
 use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
+use Throwable;
+use Traversable;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Reflection\Exception\PropertyNotAccessibleException;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
@@ -55,10 +60,17 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
             $fieldName = $field->getName();
 
             if (false === $formResult->fieldIsDeactivated($field)) {
-                $value = ObjectAccess::getProperty($formInstance, $fieldName);
-                $value = (is_array($value))
-                    ? implode(' ', $value)
-                    : $value;
+                try {
+                    $value = ObjectAccess::getProperty($formInstance, $fieldName);
+                } catch (PropertyNotAccessibleException $exception) {
+                    continue;
+                }
+
+                try {
+                    $value = $this->formatValue($value);
+                } catch (Throwable $e) {
+                    throw InvalidArgumentTypeException::dataAttributeValueNotFormattable($formInstance, $fieldName, $value);
+                }
 
                 if (false === empty($value)) {
                     $result[self::getFieldDataValueKey($fieldName)] = $value;
@@ -137,6 +149,16 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
     }
 
     /**
+     * @return array
+     */
+    public function getCurrentStepDataAttribute()
+    {
+        $stepIdentifier = $this->getFormObject()->getCurrentStepDefinition()->getStep()->getIdentifier();
+
+        return ['fz-current-step' => $stepIdentifier];
+    }
+
+    /**
      * @param string $fieldName
      * @param Result $fieldResult
      * @return array
@@ -190,6 +212,26 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         }
 
         return $result;
+    }
+
+    /**
+     * Checks the type of a given data attribute and formats it if needed.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    protected function formatValue($value)
+    {
+        if (is_array($value) || $value instanceof Traversable) {
+            $value = implode(',', $value);
+        } elseif ($value instanceof DateTime) {
+            $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'] . ' ' . $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'];
+            $value = $value->format($format);
+        } elseif (false === is_string($value)) {
+            $value = (string)$value;
+        }
+
+        return $value;
     }
 
     /**

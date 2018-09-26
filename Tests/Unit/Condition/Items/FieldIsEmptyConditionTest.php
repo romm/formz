@@ -4,7 +4,7 @@ namespace Romm\Formz\Tests\Unit\Condition\Items;
 use Romm\Formz\Condition\Items\FieldIsEmptyCondition;
 use Romm\Formz\Condition\Processor\DataObject\PhpConditionDataObject;
 use Romm\Formz\Tests\Fixture\Form\DefaultForm;
-use Romm\Formz\Validation\Validator\Form\FormValidatorExecutor;
+use Romm\Formz\Validation\Form\FormValidatorExecutor;
 
 class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
 {
@@ -96,7 +96,7 @@ class FieldIsEmptyConditionTest extends AbstractConditionItemUnitTest
     {
         $conditionItem = new FieldIsEmptyCondition('foo');
 
-        $this->assertEquals('[fz-value-foo=""]', $conditionItem->getCssResult());
+        $this->assertEquals(['[fz-value-foo=""]', ':not([fz-value-foo])'], $conditionItem->getCssResult());
     }
 
     /**

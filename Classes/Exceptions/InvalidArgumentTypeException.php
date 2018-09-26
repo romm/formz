@@ -44,6 +44,8 @@ class InvalidArgumentTypeException extends FormzException
 
     const FORM_ARGUMENT_NOT_ARRAY = 'The request argument for the form "%s" (class: "%s") was not an array (found type is "%s"); there must have been a manual overriding of the argument.';
 
+    const DATA_ATTRIBUTE_NOT_FORMATTABLE = 'The field "%s" in the form "%s" cannot be formatted. It needs to either implement `__toString()` or you need to use the `@formz-ignore` annotation in the property docblock.';
+
     /**
      * @code 1477468571
      *
@@ -229,6 +231,29 @@ class InvalidArgumentTypeException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_ARGUMENT_NOT_ARRAY,
             [$formObject->getName(), $formObject->getClassName(), gettype($formData)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1509724328
+     *
+     * @param FormInterface $form
+     * @param $fieldName
+     * @param $value
+     * @return InvalidArgumentTypeException
+     */
+    final public static function dataAttributeValueNotFormattable(FormInterface $form, $fieldName, $value)
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::DATA_ATTRIBUTE_NOT_FORMATTABLE,
+            [
+                $fieldName,
+                get_class($form),
+                $value,
+            ]
         );
 
         return $exception;

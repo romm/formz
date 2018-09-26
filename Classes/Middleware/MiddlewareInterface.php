@@ -13,19 +13,22 @@
 
 namespace Romm\Formz\Middleware;
 
+use Romm\Formz\Form\Definition\Middleware\MiddlewareScopes;
 use Romm\Formz\Middleware\Option\AbstractOptionDefinition;
+use Romm\Formz\Middleware\Option\OptionInterface;
 
 interface MiddlewareInterface extends BasicMiddlewareInterface
 {
     const PRIORITY_INJECT_FORM = 1000;
     const PRIORITY_BEHAVIOURS = 100;
-    const PRIORITY_PERSISTENCE_INJECTION = -1000000;
-    const PRIORITY_STEP = -1000000;
+    const PRIORITY_STEP_FETCHING = 1000000;
+    const PRIORITY_STEP_DISPATCHING = -1000000;
 
     /**
-     * @param AbstractOptionDefinition $options
+     * @param OptionInterface  $options
+     * @param MiddlewareScopes $scopes
      */
-    public function __construct(AbstractOptionDefinition $options);
+    public function __construct(OptionInterface $options, MiddlewareScopes $scopes);
 
     /**
      * @return void
@@ -38,12 +41,9 @@ interface MiddlewareInterface extends BasicMiddlewareInterface
     public function getOptions();
 
     /**
-     * Must return a positive/negative integer priority. Considering two
-     * middlewares, the one with the higher priority will be executed first.
-     *
-     * @return int
+     * @return MiddlewareScopes
      */
-    public function getPriority();
+    public function getScopes();
 
     /**
      * Returns the name of the signal on which this middleware is bound.
@@ -51,4 +51,12 @@ interface MiddlewareInterface extends BasicMiddlewareInterface
      * @return string
      */
     public function getBoundSignalName();
+
+    /**
+     * Must return a positive/negative integer priority. Considering two
+     * middlewares, the one with the higher priority will be executed first.
+     *
+     * @return int
+     */
+    public function getPriority();
 }

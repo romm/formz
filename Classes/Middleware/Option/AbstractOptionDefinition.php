@@ -18,7 +18,7 @@ use Romm\ConfigurationObject\Traits\ConfigurationObject\MagicMethodsTrait;
 /**
  * Abstract class that must be extended by classes used for middlewares options.
  */
-abstract class AbstractOptionDefinition
+abstract class AbstractOptionDefinition implements OptionInterface
 {
     use MagicMethodsTrait;
 }
