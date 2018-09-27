@@ -199,17 +199,19 @@ class StepMiddlewareValidationService
         ) {
             $invalidStepDefinition = end($stepDefinitionsToTest);
 
-            if ($invalidStepDefinition instanceof \Romm\Formz\Form\Definition\Step\Step\StepDefinition) {
-                $this->signalSlotDispatcher->dispatch(
-                    self::class,
-                    self::STEP_INVALID_ACTIVATION,
-                    [
-                        $this->formObject,
-                        $currentStepDefinition,
-                        $invalidStepDefinition,
-                    ]
-                );
+            if (false === $invalidStepDefinition) {
+                return null;
             }
+
+            $this->signalSlotDispatcher->dispatch(
+                self::class,
+                self::STEP_INVALID_ACTIVATION,
+                [
+                    $this->formObject,
+                    $currentStepDefinition,
+                    $invalidStepDefinition,
+                ]
+            );
         }
 
 
