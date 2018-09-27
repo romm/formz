@@ -66,7 +66,7 @@ class StepMiddlewareValidationService
      * with the given values array.
      *
      * @param StepDefinition $stepDefinition
-     * @param array          $formValues
+     * @param array $formValues
      */
     public function markStepAsValidated(StepDefinition $stepDefinition/*, array $formValues*/) // @todo tmp-delete?
     {
@@ -199,15 +199,17 @@ class StepMiddlewareValidationService
         ) {
             $invalidStepDefinition = end($stepDefinitionsToTest);
 
-            $this->signalSlotDispatcher->dispatch(
-                self::class,
-                self::STEP_INVALID_ACTIVATION,
-                [
-                    $this->formObject,
-                    $currentStepDefinition,
-                    $invalidStepDefinition,
-                ]
-            );
+            if ($invalidStepDefinition instanceof \Romm\Formz\Form\Definition\Step\Step\StepDefinition) {
+                $this->signalSlotDispatcher->dispatch(
+                    self::class,
+                    self::STEP_INVALID_ACTIVATION,
+                    [
+                        $this->formObject,
+                        $currentStepDefinition,
+                        $invalidStepDefinition,
+                    ]
+                );
+            }
         }
 
 
@@ -236,8 +238,8 @@ class StepMiddlewareValidationService
         $validator = Core::instantiate(
             $formValidationMiddlewareOptions->getFormValidatorClassName(),
             [
-                'name'  => $this->formObject->getName(),
-                'form'  => $form,
+                'name' => $this->formObject->getName(),
+                'form' => $form,
                 'dummy' => true
             ]
         );
