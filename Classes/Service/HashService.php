@@ -46,8 +46,14 @@ class HashService implements SingletonInterface
         $formMetadataRepository = Core::instantiate(FormMetadataRepository::class);
 
         do {
-            // Generated random bytes
-            $hash = bin2hex(random_bytes($length));
+            // Generated random bytes with microtime
+            $hash = bin2hex(
+                str_pad(
+                    (string)microtime(true),
+                    $length,
+                    random_bytes($length)
+                )
+            );
 
             // Check if the hash has already been generated
             $object = $formMetadataRepository->findOneByHash($hash);
