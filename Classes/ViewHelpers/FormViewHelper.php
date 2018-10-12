@@ -271,6 +271,45 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     }
 
     /**
+     * Cette méthode reprend exactement ce qui est fait dans la classe parente
+     * sauf qu'on ne récupère plus les arguments passés dans la requête.
+     *
+     * Ce comportement dans Fluid permet normalement de pouvoir revenir en
+     * arrière dans un formulaire et de récupérer les arguments qui avaient été
+     * envoyés. Chose qui n'est pas utilisée dans FormZ, on peut donc supprimer
+     * la construction de `__referrer[arguments]` qui est peut être "lourd"
+     *
+     * @see \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper::renderHiddenReferrerFields
+     *
+     * @return string
+     */
+    protected function fluidRenderHiddenReferrerFields()
+    {
+        $request = $this->renderingContext->getControllerContext()->getRequest();
+        $extensionName = $request->getControllerExtensionName();
+        $vendorName = $request->getControllerVendorName();
+        $controllerName = $request->getControllerName();
+        $actionName = $request->getControllerActionName();
+        $actionRequest = [
+            '@extension' => $extensionName,
+            '@controller' => $controllerName,
+            '@action' => $actionName,
+        ];
+
+        $result = LF;
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('__referrer[@extension]') . '" value="' . $extensionName . '" />' . LF;
+        if ($vendorName !== null) {
+            $result .= '<input type="hidden" name="' . $this->prefixFieldName('__referrer[@vendor]') . '" value="' . $vendorName . '" />' . LF;
+            $actionRequest['@vendor'] = $vendorName;
+        }
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('__referrer[@controller]') . '" value="' . $controllerName . '" />' . LF;
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('__referrer[@action]') . '" value="' . $actionName . '" />' . LF;
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('__referrer[@request]') . '" value="' . htmlspecialchars($this->hashService->appendHmac(serialize($actionRequest))) . '" />' . LF;
+
+        return $result;
+    }
+
+    /**
      * Adds a hidden field to the form rendering, containing the form request
      * data as a hashed string (which can be retrieved and used later).
      *
@@ -278,7 +317,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
      */
     protected function renderHiddenReferrerFields()
     {
-        $result = parent::renderHiddenReferrerFields();
+        $result = $this->fluidRenderHiddenReferrerFields();
 
         $requestData = $this->formObject->getRequestData();
         $requestData->setFormHash($this->formObject->getFormHash());
