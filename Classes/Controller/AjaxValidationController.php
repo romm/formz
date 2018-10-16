@@ -50,6 +50,7 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 class AjaxValidationController extends ActionController
 {
     const DEFAULT_ERROR_MESSAGE_KEY = 'default_error_message';
+    const MAPPING_ERROR = 'MappingError';
 
     /**
      * @var Request
@@ -239,6 +240,12 @@ class AjaxValidationController extends ActionController
      */
     public function errorAction()
     {
+        $this->signalSlotDispatcher->dispatch(
+            __CLASS__,
+            self::MAPPING_ERROR,
+            [$this->arguments->getValidationResults()]
+        );
+
         throw InvalidArgumentValueException::ajaxDataMapperError($this->arguments->getValidationResults()->getFlattenedErrors());
     }
 
