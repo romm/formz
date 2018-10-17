@@ -16,6 +16,7 @@ namespace Romm\Formz\Exceptions;
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
 
 use Romm\Formz\Form\FormInterface;
+use TYPO3\CMS\Extbase\Error\Error;
 
 class InvalidArgumentValueException extends FormzException
 {
@@ -24,6 +25,8 @@ class InvalidArgumentValueException extends FormzException
     const SIGNAL_NOT_ALLOWED = 'Trying to dispatch a signal that was not allowed by the middleware "%s". Authorized signals for this middleware are: "%s".';
 
     const FORM_NAME_EMPTY = 'The name of the form (type: "%s") can not be empty.';
+
+    const AJAX_DATA_MAPPER_ERROR = 'Arguments mapping validation error %s';
 
     /**
      * @code 1485786285
@@ -70,6 +73,29 @@ class InvalidArgumentValueException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_NAME_EMPTY,
             [get_class($form)]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1539693830
+     *
+     * @param Error[] $errorsList
+     * @return self
+     */
+    final public static function ajaxDataMapperError(array $errorsList)
+    {
+        $message = '';
+
+        foreach ($errorsList as $key => $errors) {
+            $message .= ' / ' . $key . ': ' . implode('; ', $errors);
+        }
+
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::AJAX_DATA_MAPPER_ERROR,
+            [$message]
         );
 
         return $exception;

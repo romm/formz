@@ -21,6 +21,7 @@ use Romm\Formz\Error\FormzMessageInterface;
 use Romm\Formz\Exceptions\ClassNotFoundException;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use Romm\Formz\Exceptions\InvalidArgumentTypeException;
+use Romm\Formz\Exceptions\InvalidArgumentValueException;
 use Romm\Formz\Exceptions\InvalidConfigurationException;
 use Romm\Formz\Exceptions\MissingArgumentException;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
@@ -49,6 +50,7 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 class AjaxValidationController extends ActionController
 {
     const DEFAULT_ERROR_MESSAGE_KEY = 'default_error_message';
+    const MAPPING_ERROR = 'MappingError';
 
     /**
      * @var Request
@@ -227,6 +229,24 @@ class AjaxValidationController extends ActionController
         $result = $validator->validate($fieldValue);
 
         $this->result->merge($result);
+    }
+
+    /**
+     * If an error occurs, that must be because the mapping of the arguments
+     * failed somehow. Therefore we override the default behaviour (forward to
+     * referring request) and we throw an exception instead.
+     *
+     * @throws InvalidArgumentValueException
+     */
+    public function errorAction()
+    {
+        $this->signalSlotDispatcher->dispatch(
+            __CLASS__,
+            self::MAPPING_ERROR,
+            [$this->arguments->getValidationResults()]
+        );
+
+        throw InvalidArgumentValueException::ajaxDataMapperError($this->arguments->getValidationResults()->getFlattenedErrors());
     }
 
     /**
