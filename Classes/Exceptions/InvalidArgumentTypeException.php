@@ -47,8 +47,6 @@ class InvalidArgumentTypeException extends FormzException
     const DATA_ATTRIBUTE_NOT_FORMATTABLE = 'The field "%s" in the form "%s" cannot be formatted. It needs to either implement `__toString()` or you need to use the `@formz-ignore` annotation in the property docblock.';
 
     /**
-     * @code 1477468571
-     *
      * @param string $className
      * @return self
      */
@@ -57,6 +55,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_ASSET_HANDLER_TYPE,
+            1477468571,
             [AbstractAssetHandler::class, $className]
         );
 
@@ -64,8 +63,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1488664221
-     *
      * @param string $className
      * @return self
      */
@@ -74,6 +71,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
+            1488664221,
             [FormInterface::class, $className]
         );
 
@@ -81,8 +79,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1487865158
-     *
      * @param string $className
      * @return self
      */
@@ -91,6 +87,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VALIDATING_WRONG_FORM_TYPE,
+            1487865158,
             [FormInterface::class, $className]
         );
 
@@ -98,8 +95,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1465243479
-     *
      * @return self
      */
     final public static function fieldViewHelperInvalidTypeNameArgument()
@@ -107,6 +102,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_VIEW_HELPER_INVALID_TYPE_NAME_ARGUMENT,
+            1465243479,
             [FieldViewHelper::class]
         );
 
@@ -114,8 +110,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1485786193
-     *
      * @param mixed $value
      * @return self
      */
@@ -124,6 +118,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_VIEW_HELPER_LAYOUT_NOT_STRING,
+            1485786193,
             [gettype($value)]
         );
 
@@ -131,8 +126,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1467021406
-     *
      * @param mixed $value
      * @return self
      */
@@ -140,6 +133,7 @@ class InvalidArgumentTypeException extends FormzException
     {
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(self::FORMAT_MESSAGE_VIEW_HELPER_MESSAGE_INVALID_TYPE,
+            1467021406,
             [
                 FormatMessageViewHelper::class,
                 Message::class,
@@ -151,8 +145,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1466588489
-     *
      * @param string $name
      * @return self
      */
@@ -161,6 +153,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONDITION_NAME_NOT_STRING,
+            1466588489,
             [gettype($name)]
         );
 
@@ -168,8 +161,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1466588495
-     *
      * @param string $className
      * @return self
      */
@@ -178,6 +169,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONDITION_CLASS_NAME_NOT_VALID,
+            1466588495,
             [ConditionItemInterface::class, $className]
         );
 
@@ -185,8 +177,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1490179427
-     *
      * @param string $className
      * @return self
      */
@@ -195,6 +185,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
+            1490179427,
             [FormInterface::class, $className]
         );
 
@@ -202,8 +193,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1491294921
-     *
      * @param FormInterface $form
      * @return self
      */
@@ -212,6 +201,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::PERSISTENCE_REPOSITORY_WRONG_FORM_TYPE,
+            1491294921,
             [DomainObjectInterface::class, get_class($form)]
         );
 
@@ -219,8 +209,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1492612944
-     *
      * @param FormObject $formObject
      * @param mixed      $formData
      * @return self
@@ -230,6 +218,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_ARGUMENT_NOT_ARRAY,
+            1492612944,
             [$formObject->getName(), $formObject->getClassName(), gettype($formData)]
         );
 
@@ -237,8 +226,6 @@ class InvalidArgumentTypeException extends FormzException
     }
 
     /**
-     * @code 1509724328
-     *
      * @param FormInterface $form
      * @param $fieldName
      * @param $value
@@ -249,6 +236,7 @@ class InvalidArgumentTypeException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::DATA_ATTRIBUTE_NOT_FORMATTABLE,
+            1509724328,
             [
                 $fieldName,
                 get_class($form),

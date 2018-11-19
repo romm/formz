@@ -31,8 +31,6 @@ class InvalidOptionValueException extends FormzException
     const WRONG_BACKEND_CACHE_TYPE = 'The cache class name given in configuration "config.tx_formz.settings.defaultBackendCache" must inherit "%s" (current value: "%s")';
 
     /**
-     * @code 1457442462
-     *
      * @param string $name
      * @return self
      */
@@ -41,6 +39,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_TYPE,
+            1457442462,
             [FormInterface::class, $name]
         );
 
@@ -48,8 +47,6 @@ class InvalidOptionValueException extends FormzException
     }
 
     /**
-     * @code 1490713939
-     *
      * @param mixed $value
      * @return self
      */
@@ -58,6 +55,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_VALUE_TYPE,
+            1490713939,
             [
                 'object',
                 FormViewHelper::class,
@@ -70,8 +68,6 @@ class InvalidOptionValueException extends FormzException
     }
 
     /**
-     * @code 1490714346
-     *
      * @param object $value
      * @return self
      */
@@ -80,6 +76,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_VALUE_OBJECT_TYPE,
+            1490714346,
             [
                 'object',
                 FormViewHelper::class,
@@ -92,8 +89,6 @@ class InvalidOptionValueException extends FormzException
     }
 
     /**
-     * @code 1490714534
-     *
      * @param string $className
      * @param object $value
      * @return self
@@ -103,6 +98,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_VALUE_CLASS_NAME,
+            1490714534,
             [
                 'object',
                 FormViewHelper::class,
@@ -115,8 +111,6 @@ class InvalidOptionValueException extends FormzException
     }
 
     /**
-     * @code 1459251263
-     *
      * @param string $className
      * @return self
      */
@@ -125,6 +119,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_BACKEND_CACHE_TYPE,
+            1459251263,
             [AbstractBackend::class, $className]
         );
 
@@ -132,8 +127,6 @@ class InvalidOptionValueException extends FormzException
     }
 
     /**
-     * @code 1490959351
-     *
      * @param mixed $value
      * @return self
      */
@@ -142,6 +135,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_VALUE_TYPE,
+            1490959351,
             [
                 'form',
                 FormIdentifierHashViewHelper::class,
@@ -154,8 +148,6 @@ class InvalidOptionValueException extends FormzException
     }
 
     /**
-     * @code 1490959375
-     *
      * @param object $value
      * @return self
      */
@@ -164,6 +156,7 @@ class InvalidOptionValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_VALUE_OBJECT_TYPE,
+            1490959375,
             [
                 'form',
                 FormIdentifierHashViewHelper::class,

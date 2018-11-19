@@ -17,6 +17,8 @@ use Romm\Formz\Configuration\Configuration;
 use Romm\Formz\Configuration\View\Classes\ViewClass;
 use Romm\Formz\Configuration\View\Layouts\LayoutGroup;
 use Romm\Formz\Configuration\View\View;
+use Romm\Formz\Domain\Model\DataObject\FormMetadataObject;
+use Romm\Formz\Domain\Model\FormMetadata;
 use Romm\Formz\Form\Definition\Field\Field;
 use Romm\Formz\Form\Definition\Field\Validation\Validator;
 use Romm\Formz\Form\Definition\FormDefinition;
@@ -99,8 +101,6 @@ class EntryNotFoundException extends FormzException
     const FORM_OBJECT_INSTANCE_NOT_FOUND = 'The form instance for the object of type "%s" was not found. Please take care of registering it before with "%s::registerFormInstance()".';
 
     /**
-     * @code 1472650209
-     *
      * @param string $identifier
      * @param array  $list
      * @return self
@@ -110,6 +110,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONDITION_NOT_FOUND,
+            1472650209,
             [
                 $identifier,
                 implode('" ,"', array_keys($list))
@@ -120,8 +121,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1493890438
-     *
      * @param string $identifier
      * @param array  $list
      * @return self
@@ -131,6 +130,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_ADD_CONDITION_NOT_FOUND,
+            1493890438,
             [
                 $identifier,
                 implode('" ,"', array_keys($list))
@@ -141,8 +141,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1494329341
-     *
      * @param string $identifier
      * @param array  $list
      * @return self
@@ -152,6 +150,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ACTIVATION_ADD_CONDITION_NOT_FOUND,
+            1494329341,
             [
                 $identifier,
                 implode('" ,"', array_keys($list))
@@ -162,8 +161,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1493890825
-     *
      * @param string $identifier
      * @param array  $list
      * @return self
@@ -173,6 +170,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::INSTANTIATE_CONDITION_NOT_FOUND,
+            1493890825,
             [
                 $identifier,
                 implode('" ,"', array_keys($list))
@@ -183,8 +181,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1488482191
-     *
      * @param string $name
      * @return self
      */
@@ -193,6 +189,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ACTIVATION_CONDITION_NOT_FOUND,
+            1488482191,
             [$name]
         );
 
@@ -200,8 +197,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1489765133
-     *
      * @param string $name
      * @return self
      */
@@ -210,6 +205,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONFIGURATION_FIELD_NOT_FOUND,
+            1489765133,
             [$name, FormDefinition::class]
         );
 
@@ -217,8 +213,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1487672276
-     *
      * @param string $name
      * @return self
      */
@@ -227,6 +221,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VALIDATOR_NOT_FOUND,
+            1487672276,
             [$name, Field::class]
         );
 
@@ -234,8 +229,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1494685753
-     *
      * @param string $name
      * @return self
      */
@@ -244,6 +237,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::BEHAVIOUR_NOT_FOUND,
+            1494685753,
             [$name, Field::class]
         );
 
@@ -251,8 +245,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1494694474
-     *
      * @param string $name
      * @return self
      */
@@ -261,6 +253,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::MESSAGE_NOT_FOUND,
+            1494694474,
             [$name, Validator::class]
         );
 
@@ -268,8 +261,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1489753952
-     *
      * @param string $name
      * @return self
      */
@@ -278,6 +269,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_LAYOUT_NOT_FOUND,
+            1489753952,
             [$name, View::class]
         );
 
@@ -285,8 +277,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1489757511
-     *
      * @param string $name
      * @return self
      */
@@ -295,6 +285,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_LAYOUT_ITEM_NOT_FOUND,
+            1489757511,
             [$name, LayoutGroup::class]
         );
 
@@ -302,8 +293,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1489754909
-     *
      * @param string $name
      * @return self
      */
@@ -312,6 +301,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_CLASS_NOT_FOUND,
+            1489754909,
             [$name, ViewClass::class]
         );
 
@@ -319,8 +309,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1487672956
-     *
      * @param string $validationName
      * @param string $fieldName
      * @return self
@@ -330,6 +318,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VALIDATION_NOT_FOUND_FOR_FIELD,
+            1487672956,
             [$fieldName, $validationName]
         );
 
@@ -337,8 +326,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1487671603
-     *
      * @param string     $fieldName
      * @param FormObject $formObject
      * @return self
@@ -348,6 +335,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_NOT_FOUND,
+            1487671603,
             [$fieldName, $formObject->getName(), $formObject->getClassName()]
         );
 
@@ -355,8 +343,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1455272659
-     *
      * @param string            $key
      * @param AbstractValidator $validator
      * @return self
@@ -366,6 +352,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ERROR_KEY_NOT_FOUND_FOR_VALIDATOR,
+            1455272659,
             [$key, get_class($validator)]
         );
 
@@ -373,8 +360,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1487947224
-     *
      * @param string     $fieldName
      * @param FormObject $formObject
      * @return self
@@ -384,6 +369,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_NOT_FOUND,
+            1487947224,
             [$fieldName, $formObject->getName(), $formObject->getClassName()]
         );
 
@@ -391,8 +377,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1467623761
-     *
      * @return self
      */
     final public static function classViewHelperFieldNotFound()
@@ -400,6 +384,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_HELPER_FIELD_NOT_FOUND,
+            1467623761,
             [ClassViewHelper::class, FieldViewHelper::class]
         );
 
@@ -407,8 +392,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1467624152
-     *
      * @param string $fieldName
      * @return self
      */
@@ -417,6 +400,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_HELPER_FIELD_NOT_FOUND,
+            1467624152,
             [$fieldName, FormatMessageViewHelper::class, FieldViewHelper::class]
         );
 
@@ -424,8 +408,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1465243586
-     *
      * @param string $layoutName
      * @return self
      */
@@ -434,6 +416,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_VIEW_HELPER_LAYOUT_NOT_FOUND,
+            1465243586,
             [$layoutName]
         );
 
@@ -441,8 +424,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1485867803
-     *
      * @param string $layoutName
      * @param string $itemName
      * @return self
@@ -452,6 +433,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_VIEW_HELPER_LAYOUT_ITEM_NOT_FOUND,
+            1485867803,
             [$layoutName, $itemName]
         );
 
@@ -459,8 +441,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1473084335
-     *
      * @param string     $fieldName
      * @param FormObject $formObject
      * @return self
@@ -470,6 +450,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_NOT_FOUND,
+            1473084335,
             [$fieldName, $formObject->getName(), $formObject->getClassName()]
         );
 
@@ -477,8 +458,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1457441846
-     *
      * @param string $controllerObjectName
      * @param string $actionName
      * @param string $formName
@@ -489,6 +468,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONTROLLER_SERVICE_ACTION_FORM_ARGUMENT_MISSING,
+            1457441846,
             [$controllerObjectName, $actionName . 'Action', $formName]
         );
 
@@ -496,8 +476,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1488988452
-     *
      * @param string $name
      * @return self
      */
@@ -506,6 +484,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::SLOT_NOT_FOUND,
+            1488988452,
             [$name]
         );
 
@@ -513,8 +492,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1489497046
-     *
      * @param string $name
      * @return self
      */
@@ -523,6 +500,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::SLOT_NOT_FOUND,
+            1489497046,
             [$name]
         );
 
@@ -530,8 +508,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1490792697
-     *
      * @param string $name
      * @return self
      */
@@ -540,6 +516,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ARGUMENT_NOT_FOUND,
+            1490792697,
             [$name]
         );
 
@@ -547,8 +524,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1490799273
-     *
      * @param string $name
      * @return self
      */
@@ -557,6 +532,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_REQUEST_DATA_NOT_FOUND,
+            1490799273,
             [$name, FormObjectRequestData::class]
         );
 
@@ -564,8 +540,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1491293933
-     *
      * @param FormMetadata $metadata
      * @return self
      */
@@ -574,6 +548,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::PERSISTENCE_SESSION_ENTRY_NOT_FOUND,
+            1491293933,
             [$metadata->getHash(), SessionPersistence::class]
         );
 
@@ -581,8 +556,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1491814768
-     *
      * @param string $key
      * @return self
      */
@@ -591,6 +564,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::META_DATA_NOT_FOUND,
+            1491814768,
             [$key, FormMetadataObject::class]
         );
 
@@ -598,8 +572,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1491997168
-     *
      * @return self
      */
     final public static function formConfigurationNotFound()
@@ -607,6 +579,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_CONFIGURATION_NOT_FOUND,
+            1491997168,
             [Configuration::class]
         );
 
@@ -614,8 +587,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1493881671
-     *
      * @param string $name
      * @return self
      */
@@ -624,6 +595,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONDITION_NOT_FOUND_IN_DEFINITION,
+            1493881671,
             [$name, Configuration::class]
         );
 
@@ -631,8 +603,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1491997309
-     *
      * @param string $name
      * @return self
      */
@@ -641,6 +611,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_NOT_FOUND,
+            1491997309,
             [$name, FormDefinition::class]
         );
 
@@ -648,8 +619,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1492602754
-     *
      * @param string $name
      * @return self
      */
@@ -658,6 +627,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::STEP_ENTRY_NOT_FOUND,
+            1492602754,
             [$name, Steps::class]
         );
 
@@ -665,8 +635,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1492603394
-     *
      * @param StepDefinition $stepDefinition
      * @return EntryNotFoundException
      */
@@ -675,6 +643,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::NEXT_STEPS_NOT_FOUND,
+            1492603394,
             [$stepDefinition->getStep()->getIdentifier(), get_class($stepDefinition)]
         );
 
@@ -682,8 +651,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1492603656
-     *
      * @param StepDefinition $stepDefinition
      * @return EntryNotFoundException
      */
@@ -692,6 +659,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::PREVIOUS_DEFINITION_NOT_FOUND,
+            1492603656,
             [$stepDefinition->getStep()->getIdentifier(), get_class($stepDefinition)]
         );
 
@@ -699,8 +667,6 @@ class EntryNotFoundException extends FormzException
     }
 
     /**
-     * @code 1494514957
-     *
      * @param FormInterface $form
      * @return self
      */
@@ -709,6 +675,7 @@ class EntryNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_OBJECT_INSTANCE_NOT_FOUND,
+            1494514957,
             [get_class($form), FormObjectFactory::class]
         );
 

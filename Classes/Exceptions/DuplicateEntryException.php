@@ -53,21 +53,17 @@ class DuplicateEntryException extends FormzException
     const LAYOUT_ITEM_ALREADY_ADDED = 'The item "%s" already exists for the layout "%s". Please use the function `%s::hasItem()` before.';
 
     /**
-     * @code 1465242575
-     *
      * @return self
      */
     final public static function duplicatedFormContext()
     {
         /** @var self $exception */
-        $exception = self::getNewExceptionInstance(self::DUPLICATED_FORM_CONTEXT);
+        $exception = self::getNewExceptionInstance(self::DUPLICATED_FORM_CONTEXT, 1465242575);
 
         return $exception;
     }
 
     /**
-     * @code 1477255145
-     *
      * @param FormObjectStatic $form
      * @return self
      */
@@ -76,6 +72,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_WAS_ALREADY_REGISTERED,
+            1477255145,
             [$form->getClassName(), Configuration::class]
         );
 
@@ -83,8 +80,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1491898212
-     *
      * @param FormObject $formObject
      * @return self
      */
@@ -93,6 +88,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_INSTANCE_ALREADY_ADDED,
+            1491898212,
             [$formObject->getClassName()]
         );
 
@@ -100,8 +96,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1494515318
-     *
      * @param FormInterface $form
      * @param string        $name
      * @return self
@@ -111,6 +105,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_OBJECT_INSTANCE_ALREADY_REGISTERED,
+            1494515318,
             [get_class($form), $name]
         );
 
@@ -118,8 +113,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1493881202
-     *
      * @param string $name
      * @return self
      */
@@ -128,6 +121,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_ALREADY_ADDED,
+            1493881202,
             [$name, FormDefinition::class]
         );
 
@@ -135,8 +129,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1493882348
-     *
      * @param string $name
      * @return self
      */
@@ -145,6 +137,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_CONDITION_ALREADY_ADDED,
+            1493882348,
             [$name, FormDefinition::class]
         );
 
@@ -152,8 +145,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1494329265
-     *
      * @param string $name
      * @return self
      */
@@ -162,6 +153,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ACTIVATION_CONDITION_ALREADY_ADDED,
+            1494329265,
             [$name, Activation::class]
         );
 
@@ -169,8 +161,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1494685038
-     *
      * @param string $validatorName
      * @param string $fieldName
      * @return self
@@ -180,6 +170,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_VALIDATOR_ALREADY_ADDED,
+            1494685038,
             [$validatorName, $fieldName, Field::class]
         );
 
@@ -187,8 +178,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1494685575
-     *
      * @param string $behaviourName
      * @param Field  $field
      * @return self
@@ -198,6 +187,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_BEHAVIOUR_ALREADY_ADDED,
+            1494685575,
             [$behaviourName, $field->getName(), Field::class]
         );
 
@@ -205,8 +195,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1494694566
-     *
      * @param string    $messageName
      * @param Validator $validator
      * @return self
@@ -216,6 +204,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VALIDATOR_MESSAGE_ALREADY_ADDED,
+            1494694566,
             [$messageName, $validator->getName(), Validator::class]
         );
 
@@ -223,8 +212,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1494846335
-     *
      * @param string $name
      * @return self
      */
@@ -233,6 +220,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VIEW_LAYOUT_ALREADY_ADDED,
+            1494846335,
             [$name, View::class]
         );
 
@@ -240,8 +228,6 @@ class DuplicateEntryException extends FormzException
     }
 
     /**
-     * @code 1494846944
-     *
      * @param string      $name
      * @param LayoutGroup $layoutGroup
      * @return self
@@ -251,6 +237,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::LAYOUT_ITEM_ALREADY_ADDED,
+            1494846944,
             [$name, $layoutGroup->getName(), LayoutGroup::class]
         );
 

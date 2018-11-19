@@ -24,8 +24,6 @@ class SilentException extends FormzException implements SilentExceptionInterface
     const VALIDATOR_HAS_NO_ACTIVATION = 'The validator "%s" does not have activation. Please use the function `%s::hasActivation()` before.';
 
     /**
-     * @code 1494685913
-     *
      * @param Field $field
      * @return self
      */
@@ -34,6 +32,7 @@ class SilentException extends FormzException implements SilentExceptionInterface
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_HAS_NO_ACTIVATION,
+            1494685913,
             [$field->getName(), Field::class]
         );
 
@@ -41,8 +40,6 @@ class SilentException extends FormzException implements SilentExceptionInterface
     }
 
     /**
-     * @code 1494690671
-     *
      * @param Validator $validator
      * @return self
      */
@@ -51,6 +48,7 @@ class SilentException extends FormzException implements SilentExceptionInterface
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::VALIDATOR_HAS_NO_ACTIVATION,
+            1494690671,
             [$validator->getName(), Validator::class]
         );
 

@@ -26,8 +26,6 @@ class ClassNotFoundException extends FormzException
     const CONDITION_CLASS_NAME_NOT_FOUND = 'The class name for the condition "%s" was not found (given value: "%s").';
 
     /**
-     * @code 1489602455
-     *
      * @param string $name
      * @param string $className
      * @return self
@@ -37,6 +35,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONDITION_CLASS_NAME_NOT_FOUND,
+            1489602455,
             [$name, $className]
         );
 
@@ -44,8 +43,6 @@ class ClassNotFoundException extends FormzException
     }
 
     /**
-     * @code 1477468381
-     *
      * @param string $className
      * @return self
      */
@@ -54,6 +51,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_ASSET_HANDLER_CLASS_NAME,
+            1477468381,
             [$className]
         );
 
@@ -61,8 +59,6 @@ class ClassNotFoundException extends FormzException
     }
 
     /**
-     * @code 1467191011
-     *
      * @param string $className
      * @return self
      */
@@ -71,6 +67,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_CLASS_NAME,
+            1467191011,
             [$className]
         );
 
@@ -78,8 +75,6 @@ class ClassNotFoundException extends FormzException
     }
 
     /**
-     * @code 1457442014
-     *
      * @param string $formClassName
      * @param string $formName
      * @param string $controller
@@ -91,6 +86,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_VIEW_HELPER_CLASS_NOT_FOUND,
+            1457442014,
             [$formClassName, $formName, $controller, $action . 'Action']
         );
 
@@ -98,8 +94,6 @@ class ClassNotFoundException extends FormzException
     }
 
     /**
-     * @code 1488475103
-     *
      * @param string $className
      * @return self
      */
@@ -108,6 +102,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::BACKEND_CACHE_CLASS_NAME_NOT_FOUND,
+            1488475103,
             [$className]
         );
 
@@ -115,8 +110,6 @@ class ClassNotFoundException extends FormzException
     }
 
     /**
-     * @code 1490179346
-     *
      * @param string $className
      * @return self
      */
@@ -125,6 +118,7 @@ class ClassNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_FORM_CLASS_NAME,
+            1490179346,
             [$className]
         );
 

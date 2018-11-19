@@ -13,8 +13,6 @@
 
 namespace Romm\Formz\Exceptions;
 
-use TYPO3\CMS\Extbase\Reflection\ClassReflection;
-
 /**
  * A generic FormZ exception.
  */
@@ -23,22 +21,18 @@ abstract class FormzException extends \Exception
     /**
      * Creates a new exception instance.
      *
-     * The code will be fetched from the calling method's `@code` property.
-     *
      * @param string $message
-     * @param array  $arguments
+     * @param int $code
+     * @param array $arguments
      * @return FormzException
      */
-    final protected static function getNewExceptionInstance($message, array $arguments = [])
+    final protected static function getNewExceptionInstance($message, $code, array $arguments = [])
     {
         $exceptionClassName = get_called_class();
-        $methodName = ucfirst(debug_backtrace()[1]['function']);
-        $reflection = new ClassReflection($exceptionClassName);
-        $exceptionCode = end($reflection->getMethod($methodName)->getTagValues('code'));
 
         return new $exceptionClassName(
             vsprintf($message, $arguments),
-            $exceptionCode
+            $code
         );
     }
 }

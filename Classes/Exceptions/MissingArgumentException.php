@@ -14,7 +14,6 @@
 namespace Romm\Formz\Exceptions;
 
 use Romm\Formz\Middleware\Signal\SendsMiddlewareSignal;
-use Romm\Formz\ViewHelpers\FormIdentifierHashViewHelper;
 
 class MissingArgumentException extends FormzException
 {
@@ -25,8 +24,6 @@ class MissingArgumentException extends FormzException
     const SIGNAL_NAME_MISSING = 'No signal has been given to the signal dispatcher, used in the middleware "%s". This is because this middleware can dispatch several signals (namely "%s"); so you must indicate which signal to dispatch.';
 
     /**
-     * @code 1490179179
-     *
      * @return self
      */
     final public static function ajaxControllerNameArgumentNotSet()
@@ -34,6 +31,7 @@ class MissingArgumentException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ARGUMENT_MISSING,
+            1490179179,
             ['name']
         );
 
@@ -41,8 +39,6 @@ class MissingArgumentException extends FormzException
     }
 
     /**
-     * @code 1490179250
-     *
      * @return self
      */
     final public static function ajaxControllerClassNameArgumentNotSet()
@@ -50,6 +46,7 @@ class MissingArgumentException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ARGUMENT_MISSING,
+            1490179250,
             ['className']
         );
 
@@ -57,8 +54,6 @@ class MissingArgumentException extends FormzException
     }
 
     /**
-     * @code 1494850270
-     *
      * @param string $conditionName
      * @param string $conditionClassName
      * @param array  $arguments
@@ -69,6 +64,7 @@ class MissingArgumentException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CONDITION_CONSTRUCTOR_ARGUMENT_MISSING,
+            1494850270,
             [$conditionName, $conditionClassName, implode('", "', array_keys($arguments))]
         );
 
@@ -76,8 +72,6 @@ class MissingArgumentException extends FormzException
     }
 
     /**
-     * @code 1490793826
-     *
      * @param SendsMiddlewareSignal $middleware
      * @return self
      */
@@ -86,6 +80,7 @@ class MissingArgumentException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::SIGNAL_NAME_MISSING,
+            1490793826,
             [
                 get_class($middleware),
                 implode('", "', $middleware->getAllowedSignals())

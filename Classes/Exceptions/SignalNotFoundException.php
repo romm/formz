@@ -21,8 +21,6 @@ class SignalNotFoundException extends FormzException
     const SIGNAL_NOT_FOUND = 'The middleware "%s" is not bound to any signal. Make sure that this middleware implements one (and one only) signal interface based on "%s".';
 
     /**
-     * @code 1490793544
-     *
      * @param AbstractMiddleware $middleware
      * @return self
      */
@@ -31,6 +29,7 @@ class SignalNotFoundException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::SIGNAL_NOT_FOUND,
+            1490793544,
             [get_class($middleware), MiddlewareSignal::class]
         );
 

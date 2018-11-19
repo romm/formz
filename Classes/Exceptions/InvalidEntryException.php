@@ -27,8 +27,6 @@ class InvalidEntryException extends FormzException
     const PERSISTENCE_INVALID_ENTRY_FETCHED = 'The form instance fetched from persistence service "%s" is not valid: an instance of "%s" is awaited, result is of type "%s".';
 
     /**
-     * @code 1467623504
-     *
      * @param string $className
      * @param array  $acceptedClassesNameSpace
      * @return self
@@ -38,6 +36,7 @@ class InvalidEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::INVALID_CSS_CLASS_NAMESPACE,
+            1467623504,
             [$className, implode(', ', $acceptedClassesNameSpace)]
         );
 
@@ -45,8 +44,6 @@ class InvalidEntryException extends FormzException
     }
 
     /**
-     * @code 1490798324
-     *
      * @param AbstractMiddleware $middleware
      * @return InvalidEntryException
      */
@@ -55,6 +52,7 @@ class InvalidEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::MIDDLEWARE_NOT_SENDING_SIGNALS,
+            1490798324,
             [get_class($middleware), SendsMiddlewareSignal::class]
         );
 
@@ -62,8 +60,6 @@ class InvalidEntryException extends FormzException
     }
 
     /**
-     * @code 1491294224
-     *
      * @param PersistenceInterface $persistence
      * @param mixed                $result
      * @return InvalidEntryException
@@ -77,6 +73,7 @@ class InvalidEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::PERSISTENCE_INVALID_ENTRY_FETCHED,
+            1491294224,
             [get_class($persistence), FormInterface::class, $resultType]
         );
 

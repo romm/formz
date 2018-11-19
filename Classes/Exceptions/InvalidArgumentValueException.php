@@ -29,21 +29,17 @@ class InvalidArgumentValueException extends FormzException
     const AJAX_DATA_MAPPER_ERROR = 'Arguments mapping validation error %s';
 
     /**
-     * @code 1485786285
-     *
      * @return self
      */
     final public static function fieldViewHelperEmptyLayout()
     {
         /** @var self $exception */
-        $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_EMPTY_LAYOUT);
+        $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_EMPTY_LAYOUT, 1485786285);
 
         return $exception;
     }
 
     /**
-     * @code 1490798201
-     *
      * @param SendsMiddlewareSignal $middleware
      * @return InvalidArgumentValueException
      */
@@ -52,6 +48,7 @@ class InvalidArgumentValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::SIGNAL_NOT_ALLOWED,
+            1490798201,
             [
                 get_class($middleware),
                 implode('", "', $middleware->getAllowedSignals())
@@ -62,8 +59,6 @@ class InvalidArgumentValueException extends FormzException
     }
 
     /**
-     * @code 1494515073
-     *
      * @param FormInterface $form
      * @return self
      */
@@ -72,6 +67,7 @@ class InvalidArgumentValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_NAME_EMPTY,
+            1494515073,
             [get_class($form)]
         );
 
@@ -79,8 +75,6 @@ class InvalidArgumentValueException extends FormzException
     }
 
     /**
-     * @code 1539693830
-     *
      * @param Error[] $errorsList
      * @return self
      */
@@ -95,6 +89,7 @@ class InvalidArgumentValueException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::AJAX_DATA_MAPPER_ERROR,
+            1539693830,
             [$message]
         );
 

@@ -22,21 +22,17 @@ class InvalidConfigurationException extends FormzException
     const WRONG_BOOLEAN_NODE_OPERATOR = 'The boolean node has a wrong operator: "%s".';
 
     /**
-     * @code 1487671395
-     *
      * @return self
      */
     final public static function ajaxControllerInvalidFormConfiguration()
     {
         /** @var self $exception */
-        $exception = self::getNewExceptionInstance(self::INVALID_FORM_CONFIGURATION);
+        $exception = self::getNewExceptionInstance(self::INVALID_FORM_CONFIGURATION, 1487671395);
 
         return $exception;
     }
 
     /**
-     * @code 1487673434
-     *
      * @param string $validationName
      * @param string $fieldName
      * @return self
@@ -46,6 +42,7 @@ class InvalidConfigurationException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::AJAX_VALIDATION_NOT_ACTIVATED,
+            1487673434,
             [$validationName, $fieldName]
         );
 
@@ -53,8 +50,6 @@ class InvalidConfigurationException extends FormzException
     }
 
     /**
-     * @code 1458150438
-     *
      * @param string $operator
      * @return self
      */
@@ -63,6 +58,7 @@ class InvalidConfigurationException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::WRONG_BOOLEAN_NODE_OPERATOR,
+            1458150438,
             [$operator]
         );
 
