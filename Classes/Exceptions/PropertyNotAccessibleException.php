@@ -20,8 +20,6 @@ class PropertyNotAccessibleException extends FormzException
     const FIELD_NOT_ACCESSIBLE_IN_FORM = 'The form "%s" does not have an accessible property "%s". Please be sure this property exists, and it has a proper getter to access its value.';
 
     /**
-     * @code 1465243619
-     *
      * @param FormObject $formObject
      * @param string     $fieldName
      * @return self
@@ -31,6 +29,7 @@ class PropertyNotAccessibleException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FIELD_NOT_ACCESSIBLE_IN_FORM,
+            1465243619,
             [$formObject->getClassName(), $fieldName]
         );
 

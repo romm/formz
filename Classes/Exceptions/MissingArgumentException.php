@@ -18,8 +18,6 @@ class MissingArgumentException extends FormzException
     const ARGUMENT_MISSING = 'The argument "%s" was not found in the request.';
 
     /**
-     * @code 1490179179
-     *
      * @return self
      */
     final public static function ajaxControllerNameArgumentNotSet()
@@ -27,6 +25,7 @@ class MissingArgumentException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ARGUMENT_MISSING,
+            1490179179,
             ['name']
         );
 
@@ -34,8 +33,6 @@ class MissingArgumentException extends FormzException
     }
 
     /**
-     * @code 1490179250
-     *
      * @return self
      */
     final public static function ajaxControllerClassNameArgumentNotSet()
@@ -43,6 +40,7 @@ class MissingArgumentException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::ARGUMENT_MISSING,
+            1490179250,
             ['className']
         );
 

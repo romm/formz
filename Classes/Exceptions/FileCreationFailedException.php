@@ -18,8 +18,6 @@ class FileCreationFailedException extends FormzException
     const FILE_CREATION_FAILED = 'The file "%s" could not be created, error message is: "%s".';
 
     /**
-     * @code 1489955763
-     *
      * @param string $absolutePath
      * @param string $message
      * @return self
@@ -29,6 +27,7 @@ class FileCreationFailedException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FILE_CREATION_FAILED,
+            1489955763,
             [$absolutePath, $message]
         );
 

@@ -18,8 +18,6 @@ class InvalidEntryException extends FormzException
     const INVALID_CSS_CLASS_NAMESPACE = 'The class "%s" is not valid: the namespace of the error must be one of the following: %s.';
 
     /**
-     * @code 1467623504
-     *
      * @param string $className
      * @param array  $acceptedClassesNameSpace
      * @return self
@@ -29,6 +27,7 @@ class InvalidEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::INVALID_CSS_CLASS_NAMESPACE,
+            1467623504,
             [$className, implode(', ', $acceptedClassesNameSpace)]
         );
 

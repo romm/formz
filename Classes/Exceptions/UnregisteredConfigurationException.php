@@ -18,8 +18,6 @@ class UnregisteredConfigurationException extends FormzException
     const CSS_CLASS_NAME_NOT_FOUND = 'The class "%s" is not valid: the class name "%s" was not found in the namespace "%s".';
 
     /**
-     * @code 1467623662
-     *
      * @param string $class
      * @param string $classNamespace
      * @param string $className
@@ -30,6 +28,7 @@ class UnregisteredConfigurationException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::CSS_CLASS_NAME_NOT_FOUND,
+            1467623662,
             [$class, $className, $classNamespace]
         );
 

@@ -18,14 +18,12 @@ class InvalidArgumentValueException extends FormzException
     const FIELD_VIEW_HELPER_EMPTY_LAYOUT = 'The layout name cannot be empty, please fill with a value.';
 
     /**
-     * @code 1485786285
-     *
      * @return self
      */
     final public static function fieldViewHelperEmptyLayout()
     {
         /** @var self $exception */
-        $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_EMPTY_LAYOUT);
+        $exception = self::getNewExceptionInstance(self::FIELD_VIEW_HELPER_EMPTY_LAYOUT, 1485786285);
 
         return $exception;
     }

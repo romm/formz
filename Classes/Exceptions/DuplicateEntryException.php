@@ -23,21 +23,17 @@ class DuplicateEntryException extends FormzException
     const FORM_WAS_ALREADY_REGISTERED = 'The form "%s" of class "%s" was already registered. You can only register a form once. Check the function `%s::hasForm()`.';
 
     /**
-     * @code 1465242575
-     *
      * @return self
      */
     final public static function duplicatedFormContext()
     {
         /** @var self $exception */
-        $exception = self::getNewExceptionInstance(self::DUPLICATED_FORM_CONTEXT);
+        $exception = self::getNewExceptionInstance(self::DUPLICATED_FORM_CONTEXT, 1465242575);
 
         return $exception;
     }
 
     /**
-     * @code 1477255145
-     *
      * @param FormObject $form
      * @return self
      */
@@ -46,6 +42,7 @@ class DuplicateEntryException extends FormzException
         /** @var self $exception */
         $exception = self::getNewExceptionInstance(
             self::FORM_WAS_ALREADY_REGISTERED,
+            1477255145,
             [$form->getName(), $form->getClassName(), Configuration::class]
         );
 
