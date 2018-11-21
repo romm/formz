@@ -27,6 +27,7 @@ use Romm\Formz\Service\ViewHelper\Slot\SlotViewHelperService;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 
 /**
  * This view helper is used to automatize the rendering of a field layout. It
@@ -69,6 +70,11 @@ class FieldViewHelper extends AbstractViewHelper
     protected $slotService;
 
     /**
+     * @var ControllerContext
+     */
+    protected $controllerContext;
+
+    /**
      * @inheritdoc
      */
     public function initializeArguments()
@@ -85,6 +91,10 @@ class FieldViewHelper extends AbstractViewHelper
      */
     public function render()
     {
+        if (!$this->controllerContext) {
+            $this->controllerContext = $this->renderingContext->getControllerContext();
+        }
+
         /*
          * First, we check if this view helper is called from within the
          * `FormViewHelper`, because it would not make sense anywhere else.
@@ -178,7 +188,7 @@ class FieldViewHelper extends AbstractViewHelper
 
             $view->getRenderingContext()->setViewHelperVariableContainer($this->viewHelperVariableContainer);
 
-            $view->setControllerContext($this->controllerContext);
+            $view->setControllerContext($this->renderingContext->getControllerContext());
 
             /*
              * Adding current variables to the field view variables.

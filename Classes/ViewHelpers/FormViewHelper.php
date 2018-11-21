@@ -34,6 +34,7 @@ use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -118,11 +119,20 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
     protected $controllerService;
 
     /**
+     * @var ControllerContext
+     */
+    protected $controllerContext;
+
+    /**
      * @inheritdoc
      */
     public function initialize()
     {
         parent::initialize();
+
+        if (!$this->controllerContext) {
+            $this->controllerContext = $this->renderingContext->getControllerContext();
+        }
 
         $this->typoScriptIncluded = ContextService::get()->isTypoScriptIncluded();
 

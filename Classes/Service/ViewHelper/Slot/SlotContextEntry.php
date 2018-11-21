@@ -16,7 +16,9 @@ namespace Romm\Formz\Service\ViewHelper\Slot;
 use Closure;
 use Romm\Formz\Exceptions\EntryNotFoundException;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\Variables\VariableProviderInterface;
 
 class SlotContextEntry
 {
@@ -123,7 +125,7 @@ class SlotContextEntry
      */
     public function addTemplateVariables($slotName, array $arguments)
     {
-        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+        $templateVariableContainer = $this->getVariableProvider();
         $savedArguments = [];
 
         ArrayUtility::mergeRecursiveWithOverrule(
@@ -152,7 +154,7 @@ class SlotContextEntry
      */
     public function restoreTemplateVariables($slotName)
     {
-        $templateVariableContainer = $this->renderingContext->getTemplateVariableContainer();
+        $templateVariableContainer = $this->getVariableProvider();
         $mergedArguments = (isset($this->injectedVariables[$slotName])) ? $this->injectedVariables[$slotName] : [];
         $savedArguments = (isset($this->savedVariables[$slotName])) ? $this->savedVariables[$slotName] : [];
 
@@ -163,5 +165,15 @@ class SlotContextEntry
         foreach ($savedArguments as $key => $value) {
             $templateVariableContainer->add($key, $value);
         }
+    }
+
+    /**
+     * @return VariableProviderInterface
+     */
+    private function getVariableProvider()
+    {
+        return version_compare(VersionNumberUtility::getCurrentTypo3Version(), '8.0.0', '<')
+            ? $this->renderingContext->getTemplateVariableContainer()
+            : $this->renderingContext->getVariableProvider();
     }
 }
