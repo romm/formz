@@ -15,9 +15,7 @@ namespace Romm\Formz\Core;
 
 use Romm\Formz\Service\Traits\SelfInstantiateTrait;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\Container\ClassInfo;
 use TYPO3\CMS\Extbase\Object\Container\Container as ExtbaseContainer;
-use TYPO3\CMS\Extbase\Reflection\PropertyReflection;
 
 /**
  * This container allows injecting dependencies in objects. It is used on
@@ -44,49 +42,11 @@ class Container extends ExtbaseContainer
     }
 
     /**
-     * @see \Romm\Formz\Core\Container
-     *
      * @param object $instance
      */
     public function injectDependenciesInInstance($instance)
     {
-        $classInfo = $this->getClassInfo(get_class($instance));
-
-        if (!$classInfo->hasInjectMethods() && !$classInfo->hasInjectProperties()) {
-            return;
-        }
-
-        foreach ($classInfo->getInjectMethods() as $injectMethodName => $classNameToInject) {
-            $instanceToInject = $this->extbaseContainer->getInstance($classNameToInject);
-            if (is_callable([$instance, $injectMethodName])) {
-                $instance->{$injectMethodName}($instanceToInject);
-            }
-        }
-        foreach ($classInfo->getInjectProperties() as $injectPropertyName => $classNameToInject) {
-            $instanceToInject = $this->extbaseContainer->getInstance($classNameToInject);
-            $propertyReflection = GeneralUtility::makeInstance(PropertyReflection::class, $instance, $injectPropertyName);
-
-            $propertyReflection->setAccessible(true);
-            $propertyReflection->setValue($instance, $instanceToInject);
-        }
-    }
-
-    /**
-     * @see \Romm\Formz\Core\Container
-     *
-     * @param string $className
-     * @return ClassInfo
-     */
-    private function getClassInfo($className)
-    {
-        $classNameHash = md5($className);
-        $classInfo = $this->getClassInfoCache()->get($classNameHash);
-
-        if (!$classInfo instanceof ClassInfo) {
-            $classInfo = $this->getClassInfoFactory()->buildClassInfoFromClassName($className);
-            $this->getClassInfoCache()->set($classNameHash, $classInfo);
-        }
-
-        return $classInfo;
+        $classSchema = $this->getReflectionService()->getClassSchema(get_class($instance));
+        $this->extbaseContainer->injectDependencies($instance, $classSchema);
     }
 }
