@@ -20,6 +20,8 @@ Property                                                        Title
 :ref:`layoutRootPaths <viewLayoutRootPaths>`                    Valid paths for layouts.
 
 :ref:`partialRootPaths <viewPartialRootPaths>`                  Valid paths for partials.
+
+:ref:`templateRootPaths <viewTemplateRootPaths>`                Valid paths for templates.
 =============================================================== =====================================
 
 -----
@@ -170,3 +172,32 @@ Partial root paths
                     20 = EXT:my_extension/Resources/Private/Partials/Forms/
                 }
             }
+            
+.. _viewTemplateRootPaths:
+
+Template root paths
+------------------
+
+.. container:: table-row
+
+    Property
+        ``templateRootPaths``
+    Required?
+        No
+    Description
+        Contains the list of paths to choose your own HTML template files.
+
+        .. note::
+
+            Under TYPO3 6.2 you must use ``config.tx_extbase.view``.
+
+        **Example:**
+
+        .. code-block:: typoscript
+
+            config.tx_formz.view {
+                templateRootPaths {
+                    20 = fileadmin/Resources/Private/Extensions/FormZ/Templates/
+                }
+            }
+
