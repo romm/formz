@@ -53,6 +53,10 @@ call_user_func(
                 'className' => \Romm\Formz\Service\ViewHelper\Legacy\OldHasViewHelper::class
             ];
         }
+
+        if (class_exists(\Doctrine\Common\Annotations\AnnotationReader::class)) {
+            \Doctrine\Common\Annotations\AnnotationReader::addGlobalIgnoredName('formz');
+        }
     },
     $_EXTKEY
 );

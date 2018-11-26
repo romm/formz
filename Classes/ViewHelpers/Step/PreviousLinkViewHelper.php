@@ -15,6 +15,7 @@ namespace Romm\Formz\ViewHelpers\Step;
 
 use Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareService;
 use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Fluid\ViewHelpers\Form\AbstractFormFieldViewHelper;
 
@@ -32,6 +33,11 @@ class PreviousLinkViewHelper extends AbstractFormFieldViewHelper
      */
     protected $formService;
 
+    /**
+     * @var ControllerContext
+     */
+    protected $controllerContext;
+
     public function initializeArguments()
     {
         parent::initializeArguments();
@@ -40,6 +46,10 @@ class PreviousLinkViewHelper extends AbstractFormFieldViewHelper
 
     public function render()
     {
+        if (!$this->controllerContext) {
+            $this->controllerContext = $this->renderingContext->getControllerContext();
+        }
+
         /*
          * First, we check if this view helper is called from within the
          * `FormViewHelper`, because it would not make sense anywhere else.

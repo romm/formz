@@ -18,6 +18,7 @@ use Romm\Formz\Form\Definition\Step\Step\Substep\Substep;
 use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
 use Romm\Formz\ViewHelpers\AbstractViewHelper;
 use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 
 class SubstepViewHelper extends AbstractViewHelper
@@ -38,6 +39,11 @@ class SubstepViewHelper extends AbstractViewHelper
     protected $errors = [];
 
     /**
+     * @var ControllerContext
+     */
+    protected $controllerContext;
+
+    /**
      * @inheritdoc
      */
     public function initializeArguments()
@@ -47,6 +53,10 @@ class SubstepViewHelper extends AbstractViewHelper
 
     public function render()
     {
+        if (!$this->controllerContext) {
+            $this->controllerContext = $this->renderingContext->getControllerContext();
+        }
+
         /*
          * First, we check if this view helper is called from within the
          * `FormViewHelper`, because it would not make sense anywhere else.
