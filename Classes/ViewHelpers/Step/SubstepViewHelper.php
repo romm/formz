@@ -43,6 +43,7 @@ class SubstepViewHelper extends AbstractViewHelper
     public function initializeArguments()
     {
         $this->registerArgument('identifier', 'string', 'Identifier of the substep.', true);
+        $this->registerArgument('class', 'string', 'Class given to the created HTML tag');
     }
 
     public function render()
@@ -84,7 +85,7 @@ class SubstepViewHelper extends AbstractViewHelper
         $this->checkSubstepSupportedFields($currentFields, $substeps->getEntry($substepIdentifier));
 
         return <<<XML
-<div fz-substep="{$this->arguments['identifier']}">
+<div fz-substep="{$this->arguments['identifier']}" class="{$this->arguments['class']}">
     $content
 </div>
 XML;
