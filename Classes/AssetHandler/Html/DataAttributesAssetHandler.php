@@ -23,6 +23,7 @@ use Romm\Formz\Service\StringService;
 use Throwable;
 use Traversable;
 use TYPO3\CMS\Extbase\Error\Result;
+use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 use TYPO3\CMS\Extbase\Reflection\Exception\PropertyNotAccessibleException;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
@@ -222,6 +223,10 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
      */
     protected function formatValue($value)
     {
+        if ($value instanceof ObjectStorage) {
+            $value = $value->toArray();
+        }
+
         if (is_array($value) || $value instanceof Traversable) {
             $value = implode(',', $value);
         } elseif ($value instanceof DateTime) {

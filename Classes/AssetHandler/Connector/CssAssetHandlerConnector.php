@@ -17,6 +17,7 @@ use Romm\Formz\AssetHandler\Css\FieldsActivationCssAssetHandler;
 use Romm\Formz\AssetHandler\Css\MessageContainerDisplayCssAssetHandler;
 use Romm\Formz\AssetHandler\Css\SubstepCssAssetHandler;
 use Romm\Formz\Service\StringService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CssAssetHandlerConnector
 {
@@ -73,33 +74,25 @@ class CssAssetHandlerConnector
      */
     public function includeGeneratedCss()
     {
-        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.css';
+        $assetHandlerFactory = $this->assetHandlerConnectorManager->getAssetHandlerFactory();
 
-        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
-            $filePath,
-            function () {
-                $assetHandlerFactory = $this->assetHandlerConnectorManager->getAssetHandlerFactory();
+        /** @var MessageContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
+        $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(MessageContainerDisplayCssAssetHandler::class);
 
-                /** @var MessageContainerDisplayCssAssetHandler $errorContainerDisplayCssAssetHandler */
-                $errorContainerDisplayCssAssetHandler = $assetHandlerFactory->getAssetHandler(MessageContainerDisplayCssAssetHandler::class);
+        /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
+        $fieldsActivationCssAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsActivationCssAssetHandler::class);
 
-                /** @var FieldsActivationCssAssetHandler $fieldsActivationCssAssetHandler */
-                $fieldsActivationCssAssetHandler = $assetHandlerFactory->getAssetHandler(FieldsActivationCssAssetHandler::class);
+        /** @var SubstepCssAssetHandler $substepCssAssetHandler */
+        $substepCssAssetHandler = $assetHandlerFactory->getAssetHandler(SubstepCssAssetHandler::class);
 
-                /** @var SubstepCssAssetHandler $substepCssAssetHandler */
-                $substepCssAssetHandler = $assetHandlerFactory->getAssetHandler(SubstepCssAssetHandler::class);
+        $css = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss() . LF;
+        $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss() . LF;
+        $css .= $substepCssAssetHandler->getSubstepCss();
 
-                $css = $errorContainerDisplayCssAssetHandler->getErrorContainerDisplayCss() . LF;
-                $css .= $fieldsActivationCssAssetHandler->getFieldsActivationCss() . LF;
-                $css .= $substepCssAssetHandler->getSubstepCss();
-
-                return $css;
-            }
-        );
-
+        $path = GeneralUtility::writeStyleSheetContentToTemporaryFile($css);
         $this->assetHandlerConnectorManager
             ->getPageRenderer()
-            ->addCssFile(StringService::get()->getResourceRelativePath($filePath));
+            ->addCssFile($path);
 
         return $this;
     }

@@ -70,7 +70,7 @@ class FormDefinition extends AbstractFormDefinitionComponent implements Configur
      * @var \Romm\Formz\Persistence\PersistenceInterface[]
      * @mixedTypesResolver \Romm\Formz\Form\Definition\Persistence\PersistenceResolver
      */
-    protected $persistence;
+    protected $persistence = [];
 
     /**
      * @var \Romm\Formz\Form\Definition\Step\Steps

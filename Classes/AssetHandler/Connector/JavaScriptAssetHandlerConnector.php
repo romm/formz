@@ -26,9 +26,9 @@ use Romm\Formz\Condition\Processor\ConditionProcessor;
 use Romm\Formz\Condition\Processor\ConditionProcessorFactory;
 use Romm\Formz\Core\Core;
 use Romm\Formz\Form\FormObject\FormObject;
-use Romm\Formz\Service\ContextService;
 use Romm\Formz\Service\ExtensionService;
 use Romm\Formz\Service\StringService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
@@ -112,18 +112,12 @@ class JavaScriptAssetHandlerConnector
      */
     public function includeLanguageJavaScriptFiles()
     {
-        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath('locale-' . ContextService::get()->getLanguageKey()) . '.js';
+        $code = $this->getFormzLocalizationJavaScriptAssetHandler()
+            ->injectTranslationsForFormFieldsValidator()
+            ->getJavaScriptCode();
 
-        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
-            $filePath,
-            function () {
-                return $this->getFormzLocalizationJavaScriptAssetHandler()
-                    ->injectTranslationsForFormFieldsValidator()
-                    ->getJavaScriptCode();
-            }
-        );
-
-        $this->includeJsFile(StringService::get()->getResourceRelativePath($filePath));
+        $path = GeneralUtility::writeJavaScriptContentToTemporaryFile($code);
+        $this->includeJsFile($path);
 
         return $this;
     }
@@ -138,16 +132,11 @@ class JavaScriptAssetHandlerConnector
     public function generateAndIncludeFormzConfigurationJavaScript()
     {
         $formzConfigurationJavaScriptAssetHandler = $this->getFormzConfigurationJavaScriptAssetHandler();
-        $fileName = $formzConfigurationJavaScriptAssetHandler->getJavaScriptFileName();
 
-        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
-            $fileName,
-            function () use ($formzConfigurationJavaScriptAssetHandler) {
-                return $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
-            }
-        );
+        $code = $formzConfigurationJavaScriptAssetHandler->getJavaScriptCode();
 
-        $this->includeJsFile(StringService::get()->getResourceRelativePath($fileName));
+        $path = GeneralUtility::writeJavaScriptContentToTemporaryFile($code);
+        $this->includeJsFile($path);
 
         return $this;
     }
@@ -160,31 +149,24 @@ class JavaScriptAssetHandlerConnector
      */
     public function generateAndIncludeJavaScript()
     {
-        $filePath = $this->assetHandlerConnectorManager->getFormzGeneratedFilePath() . '.js';
+        $code = // Form initialization code.
+            $this->getFormInitializationJavaScriptAssetHandler()
+                ->getFormInitializationJavaScriptCode() .
+            LF .
+            // Fields validation code.
+            $this->getFieldsValidationJavaScriptAssetHandler()
+                ->getJavaScriptCode() .
+            LF .
+            // Fields activation conditions code.
+            $this->getFieldsActivationJavaScriptAssetHandler()
+                ->getFieldsActivationJavaScriptCode() .
+            LF .
+            // Fields validation activation conditions code.
+            $this->getFieldsValidationActivationJavaScriptAssetHandler()
+                ->getFieldsValidationActivationJavaScriptCode();
 
-        $this->assetHandlerConnectorManager->createFileInTemporaryDirectory(
-            $filePath,
-            function () {
-                return
-                    // Form initialization code.
-                    $this->getFormInitializationJavaScriptAssetHandler()
-                        ->getFormInitializationJavaScriptCode() .
-                    LF .
-                    // Fields validation code.
-                    $this->getFieldsValidationJavaScriptAssetHandler()
-                        ->getJavaScriptCode() .
-                    LF .
-                    // Fields activation conditions code.
-                    $this->getFieldsActivationJavaScriptAssetHandler()
-                        ->getFieldsActivationJavaScriptCode() .
-                    LF .
-                    // Fields validation activation conditions code.
-                    $this->getFieldsValidationActivationJavaScriptAssetHandler()
-                        ->getFieldsValidationActivationJavaScriptCode();
-            }
-        );
-
-        $this->includeJsFile(StringService::get()->getResourceRelativePath($filePath));
+        $path = GeneralUtility::writeJavaScriptContentToTemporaryFile($code);
+        $this->includeJsFile($path);
 
         return $this;
     }
