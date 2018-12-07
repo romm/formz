@@ -22,6 +22,7 @@ use Romm\Formz\Form\FormObject\FormObject;
 use Romm\Formz\Form\FormObject\FormObjectFactory;
 use Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware;
 use Romm\Formz\Service\ViewHelper\Form\FormViewHelperService;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
 
 /**
@@ -38,6 +39,11 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
      * @var FormViewHelperService
      */
     protected $formService;
+
+    /**
+     * @var ControllerContext
+     */
+    protected $controllerContext;
 
     /**
      * Arguments initialization: does also use universal tags.
@@ -59,6 +65,10 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
      */
     public function render()
     {
+        if (!$this->controllerContext) {
+            $this->controllerContext = $this->renderingContext->getControllerContext();
+        }
+
         $this->checkFormContext();
         $this->checkFieldExists();
 
@@ -85,7 +95,7 @@ class FocusLinkViewHelper extends AbstractTagBasedViewHelper
         $step = $this->getStep();
 
         if ($step) {
-            $request = $this->renderingContext->getControllerContext()->getRequest();
+            $request = $this->controllerContext->getRequest();
 
             if (Core::get()->getPageController()->id !== $step->getPageUid()) {
                 // @todo handle backend context
