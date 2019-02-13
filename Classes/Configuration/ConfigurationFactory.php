@@ -92,12 +92,17 @@ class ConfigurationFactory implements SingletonInterface
 
         if ($cacheInstance->has($cacheIdentifier)) {
             $instance = $cacheInstance->get($cacheIdentifier);
-        } else {
-            $instance = $this->buildRootConfiguration();
 
-            if (false === $instance->getValidationResult()->hasErrors()) {
-                $cacheInstance->set($cacheIdentifier, $instance);
+            if ($instance instanceof ConfigurationObjectInstance) { 
+
+                return $instance;
             }
+        }
+
+        $instance = $this->buildRootConfiguration();
+
+        if (false === $instance->getValidationResult()->hasErrors()) {
+            $cacheInstance->set($cacheIdentifier, $instance);
         }
 
         return $instance;
