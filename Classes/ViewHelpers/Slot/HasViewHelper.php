@@ -38,6 +38,18 @@ class HasViewHelper extends AbstractConditionViewHelper implements CompilableInt
     }
 
     /**
+     * @return string
+     */
+    public function render()
+    {
+        if (static::evaluateCondition($this->arguments)) {
+            return $this->renderThenChild();
+        }
+
+        return $this->renderElseChild();
+    }
+
+    /**
      * @param array $arguments
      * @return bool
      * @throws ContextNotFoundException
