@@ -338,6 +338,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 $result .= '<input type="hidden" fz-substeps-level="1" name="' . $this->prefixFieldName('substepsLevel') . '" value="' . $substepsLevel . '" />' . LF;
             }
 
+            $result .= '<input type="hidden" name="' . $this->prefixFieldName('formName') . '" value="' . $this->formObject->getName() . '" />' . LF;
             $result .= '<input type="hidden" fz-substeps-previous="1" name="' . $this->prefixFieldName(PreviousLinkViewHelper::PREVIOUS_LINK_PARAMETER) . '" disabled="1" value="1" />' . LF;
             $result .= '<input type="submit" style="position: absolute; left: -9999px" />' . LF;
         }
