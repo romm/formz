@@ -141,6 +141,9 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             $this->formService->setFormObject($this->formObject);
             $this->formService->setRequest($request);
             $this->formService->injectFormRequestData();
+
+            // Forcing the current action inside the "action" URI of the form.
+            $this->arguments['action'] = $request->getControllerActionName();
         }
 
         /*
