@@ -23,6 +23,13 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 trait FormActionControllerTrait
 {
     /**
+     * @todo
+     *
+     * @var string
+     */
+    protected $formScope = MainScope::class;
+
+    /**
      * In case an exception (any exception type) is thrown during the
      * middlewares execution, it can be automatically caught by FormZ, and the
      * request will be forwarded to an action of the controller.
@@ -31,20 +38,16 @@ trait FormActionControllerTrait
      * render a view that contains a message explaining to the user that
      * something went wrong.
      *
-     * Just fill the property below with the name of an existing action of the
+     * Just override this method to return the name of an existing action of the
      * controller. The method will have a single parameter which is the
      * exception.
      *
-     * @var string
+     * @return string|null
      */
-    protected $actionForException;
-
-    /**
-     * @todo
-     *
-     * @var string
-     */
-    protected $formScope = MainScope::class;
+    protected function actionForException(): ?string
+    {
+        return null;
+    }
 
     /**
      * IMPORTANT: if you need to override this method in your own controller, do
@@ -58,14 +61,14 @@ trait FormActionControllerTrait
 
         $processor = ControllerProcessor::prepare($this->request, $this->arguments, $this->formScope, $settings);
 
-        if (null !== $this->actionForException) {
+        if (null !== $this->actionForException()) {
             $vendorName = $this->request->getControllerVendorName();
             $extensionName = $this->request->getControllerExtensionName();
             $controllerName = $this->request->getControllerName();
 
             $processor->setExceptionCallback(function ($exception) use ($vendorName, $controllerName, $extensionName) {
                 $this->request->setControllerVendorName($vendorName);
-                $this->forward($this->actionForException, $controllerName, $extensionName, ['exception' => $exception]);
+                $this->forward($this->actionForException(), $controllerName, $extensionName, ['exception' => $exception]);
             });
         }
 
