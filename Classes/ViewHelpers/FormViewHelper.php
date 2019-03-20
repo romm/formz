@@ -143,7 +143,9 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             $this->formService->injectFormRequestData();
 
             // Forcing the current action inside the "action" URI of the form.
-            $this->arguments['action'] = $request->getControllerActionName();
+            if (empty($this->arguments['action'])) {
+                $this->arguments['action'] = $request->getControllerActionName();
+            }
         }
 
         /*
