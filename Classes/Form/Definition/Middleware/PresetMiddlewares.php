@@ -23,6 +23,7 @@ use Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\PreviousStepMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepFetchingMiddleware;
+use Romm\Formz\Middleware\Item\Step\SubstepFetchingMiddleware;
 use Romm\Formz\Middleware\MiddlewareInterface;
 
 class PresetMiddlewares implements DataPreProcessorInterface
@@ -58,6 +59,11 @@ class PresetMiddlewares implements DataPreProcessorInterface
      * @var \Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware
      */
     protected $stepDispatchingMiddleware;
+
+    /**
+     * @var \Romm\Formz\Middleware\Item\Step\SubstepFetchingMiddleware
+     */
+    protected $substepFetchingMiddleware;
 
     /**
      * @var \Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware
@@ -138,6 +144,14 @@ class PresetMiddlewares implements DataPreProcessorInterface
     public function getStepDispatchingMiddleware()
     {
         return $this->stepDispatchingMiddleware;
+    }
+
+    /**
+     * @return SubstepFetchingMiddleware
+     */
+    public function getSubstepFetchingMiddleware()
+    {
+        return $this->substepFetchingMiddleware;
     }
 
     /**

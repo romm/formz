@@ -401,6 +401,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 ->getIdentifier();
 
             $this->tag->addAttribute('fz-substep', $identifier);
+            $this->tag->addAttribute('fz-initial-substep', $identifier);
         }
     }
 

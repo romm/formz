@@ -238,14 +238,8 @@ class StepMiddlewareService implements SingletonInterface
             while ($substepDefinition->hasNextSubstep()) {
                 $substepDefinition = $substepDefinition->getNextSubstep();
 
-                if ($substepDefinition->hasActivation()) {
-                    if (true === $this->getSubstepDefinitionConditionResult($substepDefinition)) {
-                        $nextSubstep = $substepDefinition;
-                        break;
-                    }
-                } else {
+                if ($this->substepIsValid($substepDefinition)) {
                     $nextSubstep = $substepDefinition;
-                    break;
                 }
             }
         }
@@ -256,6 +250,21 @@ class StepMiddlewareService implements SingletonInterface
     public function findSubstepDefinition(Step $step, callable $callback)
     {
         return $this->findSubstepDefinitionRecursive($step->getSubsteps()->getFirstSubstepDefinition(), $callback);
+    }
+
+    /**
+     * Finds the first valid substep.
+     *
+     * @param Step $step
+     * @return SubstepDefinition|null
+     */
+    public function findFirstSubstepDefinition(Step $step)
+    {
+        $firstSubstepDefinition = $step->getSubsteps()->getFirstSubstepDefinition();
+
+        return $this->substepIsValid($firstSubstepDefinition)
+            ? $firstSubstepDefinition
+            : $this->getNextSubstepDefinition($firstSubstepDefinition);
     }
 
     protected function findSubstepDefinitionRecursive(SubstepDefinition $substepDefinition, callable $callback)
@@ -329,6 +338,15 @@ class StepMiddlewareService implements SingletonInterface
         $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
 
         return $tree->getPhpResult($dataObject);
+    }
+
+    private function substepIsValid(SubstepDefinition $substepDefinition)
+    {
+        if ($substepDefinition->hasActivation()) {
+            return $this->getSubstepDefinitionConditionResult($substepDefinition);
+        }
+
+        return true;
     }
 
     /**
