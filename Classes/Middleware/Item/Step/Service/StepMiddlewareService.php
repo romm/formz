@@ -228,8 +228,7 @@ class StepMiddlewareService implements SingletonInterface
 
             foreach ($divergenceSteps as $divergenceStep) {
                 if (true === $this->getSubstepDefinitionConditionResult($divergenceStep)) {
-                    $nextSubstep = $divergenceStep;
-                    break;
+                    return $divergenceStep;
                 }
             }
         }
@@ -239,7 +238,7 @@ class StepMiddlewareService implements SingletonInterface
                 $substepDefinition = $substepDefinition->getNextSubstep();
 
                 if ($this->substepIsValid($substepDefinition)) {
-                    $nextSubstep = $substepDefinition;
+                    return $substepDefinition;
                 }
             }
         }
