@@ -88,7 +88,7 @@ class ContextService implements SingletonInterface
         $extensionKey = ($extensionKey) ?: ExtensionService::get()->getExtensionKey();
         $result = LocalizationUtility::translate($index, $extensionKey, $arguments);
 
-        if ($result === '' && $index !== '') {
+        if (empty($result) && $index !== '') {
             $result = $index;
         }
 
