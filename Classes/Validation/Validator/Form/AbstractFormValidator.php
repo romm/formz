@@ -138,6 +138,10 @@ abstract class AbstractFormValidator extends ExtbaseAbstractValidator implements
      */
     public function validate($form)
     {
+        if (null === $form) {
+            return GeneralUtility::makeInstance(FormResult::class);
+        }
+
         $this->initializeValidator($form);
 
         if (false === $this->isDummy()) {
