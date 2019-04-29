@@ -121,7 +121,7 @@ class ConditionProcessor
      */
     public function getActivationConditionTreeForStep(StepDefinition $stepDefinition)
     {
-        $key = 'step-' . serialize($stepDefinition);
+        $key = 'step-' . $stepDefinition->hash();
 
         if (false === array_key_exists($key, $this->stepTree)) {
             $this->stepTree[$key] = $this->getConditionTree($stepDefinition->getActivation());
@@ -140,7 +140,7 @@ class ConditionProcessor
      */
     public function getActivationConditionTreeForSubstep(SubstepDefinition $substep)
     {
-        $key = 'substep-' . serialize($substep);
+        $key = 'substep-' . $substep->hash();
 
         if (false === array_key_exists($key, $this->substepTree)) {
             $this->substepTree[$key] = $this->getConditionTree($substep->getActivation());

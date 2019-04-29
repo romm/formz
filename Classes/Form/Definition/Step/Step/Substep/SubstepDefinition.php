@@ -16,6 +16,7 @@ namespace Romm\Formz\Form\Definition\Step\Step\Substep;
 use Romm\Formz\Form\Definition\AbstractFormDefinitionComponent;
 use Romm\Formz\Form\Definition\Condition\Activation;
 use Romm\Formz\Form\Definition\Condition\ActivationInterface;
+use Romm\Formz\Form\Definition\Step\Step\DivergenceStepDefinition;
 use Romm\Formz\Form\Definition\Step\Step\Step;
 
 class SubstepDefinition extends AbstractFormDefinitionComponent
@@ -135,5 +136,35 @@ class SubstepDefinition extends AbstractFormDefinitionComponent
     public function hasDivergence()
     {
         return false === empty($this->divergence);
+    }
+
+    /**
+     * @return string
+     */
+    public function hash()
+    {
+        return serialize([
+            $this->substep,
+            (function () {
+                if (!$this->activation) {
+                    return null;
+                }
+
+                return [
+                    $this->activation->getExpression(),
+                    $this->activation->getAllConditions(),
+                ];
+            })(),
+            $this->next ? $this->next->hash() : null,
+            (function () {
+                if (!$this->divergence) {
+                    return null;
+                }
+
+                return array_map(function (DivergenceStepDefinition $divergenceStepDefinition) {
+                    return $divergenceStepDefinition->hash();
+                }, $this->divergence);
+            })(),
+        ]);
     }
 }

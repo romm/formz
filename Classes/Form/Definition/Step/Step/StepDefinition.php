@@ -187,4 +187,34 @@ class StepDefinition extends AbstractFormDefinitionComponent
     {
         return false === empty($this->divergence);
     }
+
+    /**
+     * @return string
+     */
+    public function hash()
+    {
+        return serialize([
+            $this->step,
+            (function () {
+                if (!$this->activation) {
+                    return null;
+                }
+
+                return [
+                    $this->activation->getExpression(),
+                    $this->activation->getAllConditions(),
+                ];
+            })(),
+            $this->next ? $this->next->hash() : null,
+            (function () {
+                if (!$this->divergence) {
+                    return null;
+                }
+
+                return array_map(function (DivergenceStepDefinition $divergenceStepDefinition) {
+                    return $divergenceStepDefinition->hash();
+                }, $this->divergence);
+            })(),
+        ]);
+    }
 }
