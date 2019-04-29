@@ -26,6 +26,9 @@
     "satooshi/php-coveralls": "^1.0",
     "nimut/testing-framework": "^1.0"
   },
+  "suggest": {
+    "konafets/typo3_debugbar": "debug formz more easyly"
+  },
   "autoload": {
     "psr-4": {
       "Romm\\Formz\\": "Classes/"
