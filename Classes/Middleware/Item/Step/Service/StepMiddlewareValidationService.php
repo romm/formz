@@ -127,7 +127,6 @@ class StepMiddlewareValidationService
     public function getFirstInvalidStep(Step $step)
     {
         $firstStep = $this->service->getFirstStepDefinition();
-
         if ($step === $firstStep->getStep()) {
             /*
              * The first step is always valid.
@@ -161,6 +160,7 @@ class StepMiddlewareValidationService
         }
 
         foreach ($stepDefinitionsToTest as $stepDefinition) {
+
             $step = $stepDefinition->getStep();
 
             /*
@@ -188,8 +188,19 @@ class StepMiddlewareValidationService
 
                 break;
             } else {
-                $this->persistence->markStepAsValidated($stepDefinition);
-                $this->persistence->addValidatedFields($result->getValidatedFields());
+                $invalidStepDefinition = $stepDefinition;
+
+                $this->signalSlotDispatcher->dispatch(
+                    self::class,
+                    self::STEP_INVALID_ACTIVATION,
+                    [
+                        $this->formObject,
+                        $currentStepDefinition,
+                        $invalidStepDefinition
+                    ]
+                );
+
+                break;
             }
         }
 
@@ -213,8 +224,7 @@ class StepMiddlewareValidationService
                 ]
             );
         }
-
-
+        
         return $invalidStepDefinition;
     }
 
