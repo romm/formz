@@ -180,6 +180,17 @@ class StepMiddlewareService implements SingletonInterface
     }
 
     /**
+     * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::getFirstNotValidatedStep
+     *
+     * @param StepDefinition $stepDefinition
+     * @return StepDefinition|null
+     */
+    public function getFirstNotValidatedStep(StepDefinition $stepDefinition)
+    {
+        return $this->validationService->getFirstNotValidatedStep($stepDefinition);
+    }
+
+    /**
      * @param StepDefinition $step
      * @return StepDefinition
      */

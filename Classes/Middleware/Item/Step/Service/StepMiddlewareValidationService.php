@@ -114,6 +114,31 @@ class StepMiddlewareValidationService
     }
 
     /**
+     * Get the first not validated step
+     *
+     * @param StepDefinition $stepDefinition
+     * @return StepDefinition|null
+     */
+    public function getFirstNotValidatedStep(StepDefinition $stepDefinition)
+    {
+        if (false === $stepDefinition->hasPreviousDefinition()) {
+            /*
+             * No previous step definition found: the user stands on the first
+             * step, it always has the right to stand there.
+             */
+            return null;
+        }
+
+        $previousStepDefinition = $stepDefinition->getPreviousDefinition();
+
+        if ($this->persistence->stepWasValidated($previousStepDefinition->getStep())) {
+            return $stepDefinition;
+        }
+
+        return $this->getFirstNotValidatedStep($previousStepDefinition);
+    }
+
+    /**
      * Searches for the first invalid step among previous steps from the given
      * step.
      *
@@ -183,20 +208,6 @@ class StepMiddlewareValidationService
                         $currentStepDefinition,
                         $invalidStepDefinition,
                         $result,
-                    ]
-                );
-
-                break;
-            } else {
-                $invalidStepDefinition = $stepDefinition;
-
-                $this->signalSlotDispatcher->dispatch(
-                    self::class,
-                    self::STEP_INVALID_ACTIVATION,
-                    [
-                        $this->formObject,
-                        $currentStepDefinition,
-                        $invalidStepDefinition
                     ]
                 );
 
