@@ -141,7 +141,7 @@ class AjaxValidationController extends ActionController
 
             $errorMessage = ExtensionService::get()->isInDebugMode()
                 ? $this->getDebugMessageForException($exception)
-                : ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY);
+                : $this->getDefaultErrorMessage();
 
             $error = new Error($errorMessage, 1490176818);
             $this->result->addError($error);
@@ -152,6 +152,18 @@ class AjaxValidationController extends ActionController
         ob_clean();
 
         $this->injectResultInResponse();
+    }
+
+    /**
+     * Will get the default error message from the form configuartion
+     */
+    protected function getDefaultErrorMessage()
+    {
+        if ($this->formObject === null) {
+            return ContextService::get()->translate(self::DEFAULT_ERROR_MESSAGE_KEY);
+        }
+
+        return $this->formObject->getDefinition()->getSettings()->getDefaultErrorMessage();
     }
 
     /**

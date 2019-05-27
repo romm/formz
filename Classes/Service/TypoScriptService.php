@@ -105,10 +105,13 @@ class TypoScriptService implements SingletonInterface
     {
         $cacheInstance = CacheService::get()->getCacheInstance();
         $hash = $this->getContextHash();
+        $result = null;
 
         if ($cacheInstance->has($hash)) {
             $result = $cacheInstance->get($hash);
-        } else {
+        }
+
+        if (!is_array($result)) {
             $result = $this->getFullConfiguration();
             $result = (ArrayUtility::isValidPath($result, self::EXTENSION_CONFIGURATION_PATH, '.'))
                 ? ArrayUtility::getValueByPath($result, self::EXTENSION_CONFIGURATION_PATH, '.')

@@ -180,6 +180,17 @@ class StepMiddlewareService implements SingletonInterface
     }
 
     /**
+     * @see \Romm\Formz\Middleware\Item\Step\Service\StepMiddlewareValidationService::getFirstNotValidatedStep
+     *
+     * @param StepDefinition $stepDefinition
+     * @return StepDefinition|null
+     */
+    public function getFirstNotValidatedStep(StepDefinition $stepDefinition)
+    {
+        return $this->validationService->getFirstNotValidatedStep($stepDefinition);
+    }
+
+    /**
      * @param StepDefinition $step
      * @return StepDefinition
      */
@@ -228,8 +239,7 @@ class StepMiddlewareService implements SingletonInterface
 
             foreach ($divergenceSteps as $divergenceStep) {
                 if (true === $this->getSubstepDefinitionConditionResult($divergenceStep)) {
-                    $nextSubstep = $divergenceStep;
-                    break;
+                    return $divergenceStep;
                 }
             }
         }
@@ -238,14 +248,8 @@ class StepMiddlewareService implements SingletonInterface
             while ($substepDefinition->hasNextSubstep()) {
                 $substepDefinition = $substepDefinition->getNextSubstep();
 
-                if ($substepDefinition->hasActivation()) {
-                    if (true === $this->getSubstepDefinitionConditionResult($substepDefinition)) {
-                        $nextSubstep = $substepDefinition;
-                        break;
-                    }
-                } else {
-                    $nextSubstep = $substepDefinition;
-                    break;
+                if ($this->substepIsValid($substepDefinition)) {
+                    return $substepDefinition;
                 }
             }
         }
@@ -256,6 +260,21 @@ class StepMiddlewareService implements SingletonInterface
     public function findSubstepDefinition(Step $step, callable $callback)
     {
         return $this->findSubstepDefinitionRecursive($step->getSubsteps()->getFirstSubstepDefinition(), $callback);
+    }
+
+    /**
+     * Finds the first valid substep.
+     *
+     * @param Step $step
+     * @return SubstepDefinition|null
+     */
+    public function findFirstSubstepDefinition(Step $step)
+    {
+        $firstSubstepDefinition = $step->getSubsteps()->getFirstSubstepDefinition();
+
+        return $this->substepIsValid($firstSubstepDefinition)
+            ? $firstSubstepDefinition
+            : $this->getNextSubstepDefinition($firstSubstepDefinition);
     }
 
     protected function findSubstepDefinitionRecursive(SubstepDefinition $substepDefinition, callable $callback)
@@ -329,6 +348,15 @@ class StepMiddlewareService implements SingletonInterface
         $dataObject = new PhpConditionDataObject($this->getFormObject()->getForm(), $todo);
 
         return $tree->getPhpResult($dataObject);
+    }
+
+    private function substepIsValid(SubstepDefinition $substepDefinition)
+    {
+        if ($substepDefinition->hasActivation()) {
+            return $this->getSubstepDefinitionConditionResult($substepDefinition);
+        }
+
+        return true;
     }
 
     /**

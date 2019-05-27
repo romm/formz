@@ -151,6 +151,11 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
             $this->formService->setFormObject($this->formObject);
             $this->formService->setRequest($request);
             $this->formService->injectFormRequestData();
+
+            // Forcing the current action inside the "action" URI of the form.
+            if (empty($this->arguments['action'])) {
+                $this->arguments['action'] = $request->getControllerActionName();
+            }
         }
 
         /*
@@ -335,6 +340,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
 
         $result .= '<input type="hidden" name="' . $this->prefixFieldName('fz-hash') . '" value="' . $this->formObject->getFormHash() . '" />' . LF;
         $result .= '<input type="hidden" name="' . $this->prefixFieldName('formzData') . '" value="' . $value . '" />' . LF;
+        $result .= '<input type="hidden" name="' . $this->prefixFieldName('formName') . '" value="' . $this->formObject->getName() . '" />' . LF;
 
         if ($this->formObject->hasSteps()) {
             $currentStep = $this->getCurrentStep();
@@ -405,6 +411,7 @@ class FormViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\FormViewHelper
                 ->getIdentifier();
 
             $this->tag->addAttribute('fz-substep', $identifier);
+            $this->tag->addAttribute('fz-initial-substep', $identifier);
         }
     }
 

@@ -22,6 +22,7 @@ use Romm\Formz\Service\MessageService;
 use Romm\Formz\Service\StringService;
 use Throwable;
 use Traversable;
+use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 use TYPO3\CMS\Extbase\Reflection\Exception\PropertyNotAccessibleException;
@@ -232,6 +233,8 @@ class DataAttributesAssetHandler extends AbstractAssetHandler
         } elseif ($value instanceof DateTime) {
             $format = $GLOBALS['TYPO3_CONF_VARS']['SYS']['ddmmyy'] . ' ' . $GLOBALS['TYPO3_CONF_VARS']['SYS']['hhmm'];
             $value = $value->format($format);
+        } elseif ($value instanceof DomainObjectInterface) {
+            $value = $value->getUid();
         } elseif (false === is_string($value)) {
             $value = (string)$value;
         }

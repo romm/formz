@@ -74,7 +74,6 @@ final class BeginMiddleware implements BasicMiddlewareInterface
 
         if ($this->requestWasSubmitted()
             && null === $request->getOriginalRequest()
-            && $request->hasArgument($formName)
         ) {
             if (false === $request->hasArgument('fz-hash')) {
                 throw new \Exception('todo fz-hash'); // @todo
@@ -82,6 +81,10 @@ final class BeginMiddleware implements BasicMiddlewareInterface
 
             if (false === $request->hasArgument('formzData')) {
                 throw new \Exception('todo formzData'); // @todo
+            }
+
+            if (!$request->hasArgument($formName)) {
+                $request->setArgument($formName, []);
             }
 
             $form = $this->formService->getFormInstance($formName);
@@ -163,6 +166,8 @@ final class BeginMiddleware implements BasicMiddlewareInterface
 
         $pluginNamespace = $extensionService->getPluginNamespace($request->getControllerExtensionName(), $request->getPluginName());
 
-        return isset($_POST[$pluginNamespace][$this->processor->getFormObject()->getName()]);
+        $formName = $_POST[$pluginNamespace]['formName'] ?? null;
+
+        return $formName === $this->processor->getFormObject()->getName();
     }
 }
