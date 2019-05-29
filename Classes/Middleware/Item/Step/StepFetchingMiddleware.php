@@ -88,10 +88,10 @@ class StepFetchingMiddleware extends AbstractMiddleware implements After, FormIn
                 /**
                  * If we don't find an invalid Step we search the first not validated step
                  */
-                $stepToRedirect = $this->service->getFirstNotValidatedStep($stepDefinition);
+               /** TODO : $stepToRedirect = $this->service->getFirstNotValidatedStep($stepDefinition);
                 if ($stepToRedirect instanceof StepDefinition) {
                     $this->service->redirectToStep($stepToRedirect->getStep(), $this->redirect());
-                }
+                }*/
             }
         }
     }
