@@ -21,6 +21,7 @@ use Romm\Formz\Middleware\Item\FormInjection\FormInjectionMiddleware;
 use Romm\Formz\Middleware\Item\FormValidation\FormValidationMiddleware;
 use Romm\Formz\Middleware\Item\Persistence\PersistenceFetchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\PreviousStepMiddleware;
+use Romm\Formz\Middleware\Item\Step\SkipMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepDispatchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\StepFetchingMiddleware;
 use Romm\Formz\Middleware\Item\Step\SubstepFetchingMiddleware;
@@ -69,6 +70,11 @@ class PresetMiddlewares implements DataPreProcessorInterface
      * @var \Romm\Formz\Middleware\Item\Field\Focus\FieldFocusMiddleware
      */
     protected $fieldFocusMiddleware;
+
+    /**
+     * @var \Romm\Formz\Middleware\Item\Step\SkipMiddleware
+     */
+    protected $skipMiddleware;
 
     /**
      * Returns the full list of preset middlewares.
@@ -160,5 +166,13 @@ class PresetMiddlewares implements DataPreProcessorInterface
     public function getFieldFocusMiddleware()
     {
         return $this->fieldFocusMiddleware;
+    }
+
+    /**
+     * @return SkipMiddleware
+     */
+    public function getSkipMiddleware()
+    {
+        return $this->skipMiddleware;
     }
 }

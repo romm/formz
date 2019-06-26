@@ -72,10 +72,14 @@ class MiddlewareProcessor
         /** @var BeginMiddleware $beginMiddleware */
         $beginMiddleware = Core::instantiate(BeginMiddleware::class);
         $beginMiddleware->bindMiddlewareProcessor($this);
-        $beginMiddleware->initialize();
 
         foreach ($this->formObject->getDefinition()->getAllMiddlewares() as $middleware) {
             $middleware->bindMiddlewareProcessor($this);
+        }
+
+        $beginMiddleware->initialize();
+
+        foreach ($this->formObject->getDefinition()->getAllMiddlewares() as $middleware) {
             $middleware->initialize();
         }
 

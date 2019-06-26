@@ -19,6 +19,7 @@ use Romm\Formz\Middleware\BasicMiddlewareInterface;
 use Romm\Formz\Middleware\Item\Begin\Service\FormService;
 use Romm\Formz\Middleware\Processor\MiddlewareProcessor;
 use Romm\Formz\Middleware\Signal\After;
+use Romm\Formz\Middleware\Signal\Before;
 use Romm\Formz\Middleware\Signal\SignalObject;
 use Romm\Formz\ViewHelpers\Step\PreviousLinkViewHelper;
 use TYPO3\CMS\Extbase\Service\ExtensionService;
@@ -41,6 +42,9 @@ final class BeginMiddleware implements BasicMiddlewareInterface
     public function initialize()
     {
         $this->formService = Core::instantiate(FormService::class, $this->processor->getRequest(), $this->processor->getRequestArguments());
+
+        $signalObject = new SignalObject($this->processor, BeginSignal::class, Before::class);
+        $signalObject->dispatch();
 
         $this->checkFormSubmission();
         $this->fetchCurrentStep();

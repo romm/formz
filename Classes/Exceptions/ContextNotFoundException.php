@@ -20,7 +20,8 @@ use Romm\Formz\ViewHelpers\OptionViewHelper;
 use Romm\Formz\ViewHelpers\Slot\HasViewHelper;
 use Romm\Formz\ViewHelpers\Slot\RenderViewHelper;
 use Romm\Formz\ViewHelpers\SlotViewHelper;
-use Romm\Formz\ViewHelpers\SubstepViewHelper;
+use Romm\Formz\ViewHelpers\Step\SkipViewHelper;
+use Romm\Formz\ViewHelpers\Step\SubstepViewHelper;
 
 class ContextNotFoundException extends FormzException
 {
@@ -56,6 +57,22 @@ class ContextNotFoundException extends FormzException
         $exception = self::getNewExceptionInstance(
             self::FORM_CONTEXT_NOT_FOUND,
             [SubstepViewHelper::class, FormViewHelper::class]
+        );
+
+        return $exception;
+    }
+
+    /**
+     * @code 1561020379
+     *
+     * @return self
+     */
+    final public static function skipViewHelperFormContextNotFound()
+    {
+        /** @var self $exception */
+        $exception = self::getNewExceptionInstance(
+            self::FORM_CONTEXT_NOT_FOUND,
+            [SkipViewHelper::class, FormViewHelper::class]
         );
 
         return $exception;

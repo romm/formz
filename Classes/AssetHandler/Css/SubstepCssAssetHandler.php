@@ -51,7 +51,7 @@ class SubstepCssAssetHandler extends AbstractAssetHandler
             $substepIdentifier = $substep->getIdentifier();
 
             $cssBlocks[] = <<<CSS
-form[name="$formName"]:not([fz-substep="$substepIdentifier"]) div[fz-substep="$substepIdentifier"] {
+form[name="$formName"]:not([fz-substep="$substepIdentifier"]) [fz-substep="$substepIdentifier"] {
     display: none;
 }
 CSS;

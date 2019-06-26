@@ -41,6 +41,11 @@ Fz.Form.SubmissionService = (function () {
         var onSubmitCallBacks = [];
 
         /**
+         * @type {Array<function>}
+         */
+        var onSubmitBeginCallBacks = [];
+
+        /**
          * Callback function called when the form was submitted. The submission
          * is cancelled and a check is done on every field to know if the
          * submission should be launched for real.
@@ -136,6 +141,10 @@ Fz.Form.SubmissionService = (function () {
                 fieldsChecked[fieldName] = true;
                 endProcess();
             };
+
+            for (var i = 0; i < onSubmitBeginCallBacks.length; i++) {
+                onSubmitBeginCallBacks[i]();
+            }
 
             var fields = form.getFields();
             for (var fieldName in fields) {
@@ -275,6 +284,11 @@ Fz.Form.SubmissionService = (function () {
             onSubmit: function (callback) {
                 if (typeof callback === 'function') {
                     onSubmitCallBacks.push(callback);
+                }
+            },
+            onSubmitBegin: function (callback) {
+                if (typeof callback === 'function') {
+                    onSubmitBeginCallBacks.push(callback);
                 }
             },
             submit: function() {
