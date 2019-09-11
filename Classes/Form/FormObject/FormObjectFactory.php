@@ -214,9 +214,11 @@ class FormObjectFactory implements SingletonInterface
         if (false === isset($this->static[$cacheIdentifier])) {
             $cacheInstance = $this->getCacheInstance();
 
-            if ($cacheInstance->has($cacheIdentifier)) {
-                $static = $cacheInstance->get($cacheIdentifier);
-            } else {
+            $static = $cacheInstance->has($cacheIdentifier)
+                ? $cacheInstance->get($cacheIdentifier)
+                : null;
+
+            if (!$static instanceof FormObjectStatic) {
                 $static = $this->buildStaticInstance($className);
                 $static->getObjectHash();
 
