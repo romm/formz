@@ -47,6 +47,7 @@ class FormObjectConfiguration
     {
         $this->static = $static;
         $this->definition = $definition;
+        $this->injectDependenciesInConfiguration();
     }
 
     /**
