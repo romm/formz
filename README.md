@@ -1,5 +1,10 @@
 # ![FormZ](Documentation/Images/formz-icon@medium.png) FormZ • Modern form handler
 
+> **Warning** This package is no longer maintained.
+
+<details>
+<summary>ℹ️ Show more info</summary>
+
 > [![Build Status](https://travis-ci.org/romm/formz.svg?branch=master)](https://travis-ci.org/romm/formz) [![Coverage Status](https://coveralls.io/repos/github/romm/formz/badge.svg?branch=master)](https://coveralls.io/github/romm/formz?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/romm/formz/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/romm/formz/?branch=master) [![Latest Stable Version](https://poser.pugx.org/romm/formz/v/stable)](https://packagist.org/packages/romm/formz) [![Total Downloads](https://poser.pugx.org/romm/formz/downloads)](https://packagist.org/packages/romm/formz) [![SensioLabs Insight](https://img.shields.io/sensiolabs/i/9ec58fe3-3e6c-4524-82bd-b6e2a14824a2.svg)](https://insight.sensiolabs.com/projects/9ec58fe3-3e6c-4524-82bd-b6e2a14824a2) [![StyleCI](https://styleci.io/repos/69821260/shield?branch=master)](https://styleci.io/repos/69821260)
 
 > **→ [FormZ official website](http://typo3-formz.com/)**
@@ -191,3 +196,4 @@ class ExampleForm implements FormInterface
     <f:form.submit value="Send" class="btn btn-primary" />
 </fz:form>
 ```
+</details>
